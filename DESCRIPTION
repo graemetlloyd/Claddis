@@ -1,0 +1,12 @@
+Package: Claddis
+Type: Package
+Title: Cladistic disparity
+Version: 0.1
+Date: 2014-07-02
+Author: Graeme T. Lloyd
+Maintainer: Graeme T. Lloyd <graemetlloyd@gmail.com>
+Depends: phytools,strap,ape,gdata
+Description: A package for examining disparity and rates for discrete cladistic characters.
+License: GPL (>=2)
+LazyData: yes
+ByteCompile: yes
