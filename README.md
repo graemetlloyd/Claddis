@@ -1,12 +1,25 @@
-Dummy readme file.
+Claddis is an in-development R package designed to import cladistic-type data sets (#NEXUS format) into R and perform disparity and rate tests.
 
-http://www.slideshare.net/graemelloyd/a-new-r-package-for-automating-cladistic-ordination-and-the-effects-of-phylogenetic-signal-on-disparity-measures
-http://www.slideshare.net/graemelloyd/claddis-a-new-r-package-for-automating-disparity-analyses-based-on-cladistic-datasets
-[link](http://example.com)
+Below are links to slides from two conference presentations on the package. (Note: the package has changed a lot since these were given!)
+
+[Talk 1](http://www.slideshare.net/graemelloyd/a-new-r-package-for-automating-cladistic-ordination-and-the-effects-of-phylogenetic-signal-on-disparity-measures)
+
+[Talk 2](http://www.slideshare.net/graemelloyd/claddis-a-new-r-package-for-automating-disparity-analyses-based-on-cladistic-datasets)
+
+You can install and load Claddis into R using the following:
 
 ```r
-dummy.code <- c(1, 2, 3)
+# Install the devtools package from CRAN:
+install.packages("devtools")
+
+# Load the devtools package into R:
+library(devtools)
+
+# Install the Claddis package from github:
+install_github("graemetlloyd/Claddis")
+
+# Load the Claddis package into R:
+library(Claddis)
 ```
 
-
-More dummy text.
+More will be added here in future to show the basic features of the package.
