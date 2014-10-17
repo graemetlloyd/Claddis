@@ -206,10 +206,13 @@ MorphDistMatrix <- function(morph.matrix) {
   rownames(comp.char.matrix) <- colnames(comp.char.matrix) <- rownames(GED.dist.matrix) <- colnames(GED.dist.matrix) <- rownames(gower.dist.matrix) <- colnames(gower.dist.matrix) <- rownames(max.dist.matrix) <- colnames(max.dist.matrix) <- rownames(dist.matrix) <- colnames(dist.matrix) <- rownames(morph.matrix)
 
   # Convert all Gower values to 0 to 1 scale then take arcsine of sqrt to get valus that better approximate a normal distribution:
-  gower.dist.matrix <- asin(sqrt(gower.dist.matrix / max(gower.dist.matrix)))
+  gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(gower.dist.matrix / max(sort(gower.dist.matrix)))))), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+
+  # Take arcsine square root of all MOD dist values:
+  max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(max.dist.matrix)))), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
 
   # Compile results as a list:
-  result <- list(dist.matrix, GED.dist.matrix, gower.dist.matrix, asin(sqrt(max.dist.matrix)), comp.char.matrix)
+  result <- list(dist.matrix, GED.dist.matrix, gower.dist.matrix, max.dist.matrix, comp.char.matrix)
     
   # Add names to results list:
   names(result) <- c("raw.dist.matrix", "GED.dist.matrix", "gower.dist.matrix", "max.dist.matrix", "comp.char.matrix")
