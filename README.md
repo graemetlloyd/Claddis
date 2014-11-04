@@ -23,3 +23,11 @@ library(Claddis)
 ```
 
 More will be added here in future to show the basic features of the package.
+
+
+Citation
+========
+
+Claddis will eventually be uploaded to [CRAN](http://cran.r-project.org/) and have a publication associated with it. Until then, please cite:
+
+Lloyd, Graeme T. (2014). "Claddis: an R package for performing disparity and rate analysis on cladistic-type data sets." Online at GitHub, [https://github.com/graemetlloyd/Claddis]{http://https://github.com/graemetlloyd/Claddis}. Accessed (access date).
