@@ -9,6 +9,9 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars=FALSE, estim
   # Catch problem with zero-length branches:
   if(any(tree$edge.length == 0)) stop("ERROR:\n Tree must not have zero-length branches.")
 
+  # Remove node labels from tree (causes bug downstream):
+  tree$node.label <- NULL
+
   # Collapse matrix to vectors for each character (state and ordering combination):
   collapse.matrix <- apply(rbind(morph.matrix$matrix, morph.matrix$ordering), 2, paste, collapse="")
 
@@ -119,8 +122,16 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars=FALSE, estim
 
             }
 
+<<<<<<< HEAD
             # Get likelihoods for each state in taxa and ancestors:
             state.likelihoods <- rerootingMethod(chartree, tipvals.mat, model=mymodel)$marginal.anc
+=======
+          # Remove any potential node labels on the character tree to avoid an error from rerootingMethod():
+          chartree$node.label<-NULL 
+
+          # Get likelihoods for each state in taxa and ancestors:
+          state.likelihoods <- rerootingMethod(chartree, tipvals.mat, model=mymodel)$marginal.anc
+>>>>>>> cca75c486bbf1fae4bff0c145455dc96156d764b
                     
             # Get maximum likelihood:
             max.lik <- apply(state.likelihoods, 1, max)
