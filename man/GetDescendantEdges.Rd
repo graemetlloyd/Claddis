@@ -15,7 +15,7 @@ GetDescendantEdges(n, tree)
 }
 
 \arguments{
-\item{n}{An integer corresponding to the internal node for which the descendna edges are sought.}
+\item{n}{An integer corresponding to the internal node for which the descendant edges are sought.}
 \item{tree}{A tree as a phylo object.}
 }
 
