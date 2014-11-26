@@ -1,6 +1,6 @@
 Claddis is an in-development R package designed to import cladistic-type data sets (#NEXUS format) into R and perform disparity and rate tests.
 
-Below are links to slides from three conference presentations on the package. (Note: the package has changed a lot since these were given!)
+Below are links to slides from three conference presentations on the package. (Note: the package has changed a lot since the first two were given!)
 
 [Talk 1](http://www.slideshare.net/graemelloyd/a-new-r-package-for-automating-cladistic-ordination-and-the-effects-of-phylogenetic-signal-on-disparity-measures)
 
