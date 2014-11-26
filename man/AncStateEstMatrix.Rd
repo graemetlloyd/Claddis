@@ -22,19 +22,15 @@ AncStateEstMatrix(morph.matrix, tree, estimate.allchars=FALSE, estimate.tips=FAL
 }
 
 \details{
-\link{rerootingMethod}.
-
-\link{phytools}.
-
-\code{estimate.all} options.
+Uses the \link{rerootingMethod} (REF) in the \link{phytools} package.
 }
 
 \value{
-\item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral values.}
+\item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral states.}
 }
 
 \references{
-Schluter et al. 1997.
+REROOTING PAPER
 }
 
 \author{
