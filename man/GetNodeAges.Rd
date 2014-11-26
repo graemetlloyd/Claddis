@@ -7,7 +7,7 @@ Returns node ages for a time-scaled tree
 }
 
 \description{
-Given a tree with branch lengths scaled to time and value for \code{$root.time} will return a vector of node ages.
+Given a tree with branch-lengths scaled to time and a value for \code{$root.time} will return a vector of node ages.
 }
 
 \usage{
