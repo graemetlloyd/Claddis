@@ -7,7 +7,7 @@ Find ancestor
 }
 
 \description{
-Finds last common ancestor (node) of a set of descendant tips.
+Finds last common ancestor (node) of a set of two or more descendant tips.
 }
 
 \usage{
@@ -20,7 +20,7 @@ FindAncestor(descs, tree)
 }
 
 \details{
-An internal function for \link{TrimMorphDistMatrix}.
+Intended for use as an internal function for \link{TrimMorphDistMatrix}, but potentially of more general use.
 }
 
 \value{
