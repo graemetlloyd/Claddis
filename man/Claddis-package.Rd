@@ -11,8 +11,10 @@ Cladistic disparity
 }
 
 \description{
-A package to convert cladistic morphological datasets into distance matrices
-to enable multivariate ordinations to be performed upon them.
+A package to read cladistic morphological datasets into R and 
+cpnvert them into distance matrices to enable multivariate 
+ordinations to be performed upon them or perform analyses of
+rates of discrete character evolution.
 }
 
 \details{
@@ -32,13 +34,11 @@ Graeme T. Lloyd <graemetlloyd@gmail.com>
 
 \references{
 Brusatte et al. 2008
+Brusatte et al. 2014
+Lloyd et al. 2012
 }
 
 \keyword{ disparity,distance,morphology,phylogeny }
-
-\seealso{
-See also.
-}
 
 \examples{
 # Nothing yet
