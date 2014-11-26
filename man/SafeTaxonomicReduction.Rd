@@ -20,6 +20,8 @@ SafeTaxonomicReduction(morph.matrix)
 
 \details{
 Performs Safe Taxonomic Reduction (Wilkinson 1995).
+
+If no taxa can be safely removed will simply return the text: "No taxa can be safely removed".
 }
 
 \value{
