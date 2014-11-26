@@ -3,11 +3,11 @@
 \alias{MorphDistMatrix}
 
 \title{
-Get distance matrices from a character-taxon matrix
+Get distance matrices from a cladistic matrix
 }
 
 \description{
-Takes a cladistic morphological dataset of discrete characters and converts it into a set of pairwise distances.
+Takes a cladistic morphological dataset and converts it into a set of pairwise distances.
 }
 
 \usage{
@@ -21,7 +21,7 @@ MorphDistMatrix(morph.matrix)
 \details{
 This function is an important preliminary step in performing multivariate ordination(s) upon a cladistic dataset of discrete characters and deals with three peculiarities of such data: 1) the prevalence of missing values, 2) the use of unordered multistate characters, and 3) the presence of polymorphisms.
 
-Missing data is dealt with by providing two rescaled distances as well as the uncorrected raw distances. These are: 1) Gower (1971) dissimilarity, which rescales each pairwise distance by dividing by the number of comparable characters upon which that distance is based, and 2) a set of distances rescaled against the maximum possible observed distance based on the set of comparable characters upon which that distance is based (using the difference between \code{max.vals} and \code{min.vals} supplied by the input matrix). In practice the user is not recommended to use raw distances unless the input matrix is highly complete.
+Missing data is dealt with by providing three rescaled distances as well as the uncorrected raw distances. These are: 1) the Generalised Euclidean Distance (GED) of Wills (2001) which replaces all incalculable taxon-taxon character distances with a weighted fractional mean distance, 2) Gower (1971) dissimilarity, which rescales each pairwise distance by dividing by the number of comparable characters upon which that distance is based, and 3) a set of distances rescaled against the maximum possible observable distance based on the set of comparable characters upon which that distance is based (using the difference between \code{max.vals} and \code{min.vals} supplied by the input matrix). In practice the user is not recommended to use raw distances unless the input matrix is complete.
 
 The method automatically treats distances between unordered characters as zero (if the two states are identical) or one (if the two states are different). So, for example, the distances between 0 and 3 and between 2 and 3 for an unordered character are both 1.
 
