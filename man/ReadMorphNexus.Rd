@@ -51,7 +51,8 @@ Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
 
 \examples{
-# Create example matrix (NB: creates a file in the current working directory called "morphmatrix.nex"):
+# Create example matrix (NB: creates a file in the current
+# working directory called "morphmatrix.nex"):
 cat("#NEXUS\n\nBEGIN DATA;\n\tDIMENSIONS  NTAX=5 NCHAR=5;\n\t
 FORMAT SYMBOLS= \" 0 1 2\" MISSING=? GAP=- ;\nMATRIX\n\n
 Taxon_1  010?0\nTaxon_2  021?0\nTaxon_3  02111\nTaxon_4  011-1
