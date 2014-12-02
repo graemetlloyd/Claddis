@@ -1,0 +1,50 @@
+\name{EdgeMatch}
+
+\alias{EdgeMatch}
+
+\title{
+Edge matching function
+}
+
+\description{
+Given two trees where one is a pruned version of the other gives matching edges of pruned tree to original tree.
+}
+
+\usage{
+EdgeMatch(original.tree, pruned.tree)
+}
+
+\arguments{
+\item{original.tree}{A tree in phylo format.}
+\item{pruned.tree}{A tree in phylo format that represents a pruned version of \code{original.tree}.}
+}
+
+\details{
+Finds matching edge(s) for a pruned tree in the original tree from which it was created. This is intended as an internal function
+}
+
+\value{
+\item{matching.edges}{A list of the matching edges.}
+\item{removed.edges}{A vector of the removed edges.}
+}
+
+\author{
+Graeme T. Lloyd \email{graemetlloyd@gmail.com}
+}
+
+\examples{
+# Create a random 10-taxon tree:
+original.tree <- rtree(10)
+
+# Remove three leaves:
+pruned.tree <- drop.tip(original.tree, c("t1", "t3", "t8"))
+
+# Find matching edges:
+X <- EdgeMatch(original.tree, pruned.tree)
+
+# Show matching edges:
+X$matching.edges
+
+# Show removed edges:
+X$removed.edges
+}
