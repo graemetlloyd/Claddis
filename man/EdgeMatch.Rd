@@ -7,7 +7,7 @@ Edge matching function
 }
 
 \description{
-Given two trees where one is a pruned version of the other gives matching edges of pruned tree to original tree.
+Given two trees where one is a pruned version of the other gives matching edges and nodes of pruned tree to original tree.
 }
 
 \usage{
@@ -20,11 +20,12 @@ EdgeMatch(original.tree, pruned.tree)
 }
 
 \details{
-Finds matching edge(s) for a pruned tree in the original tree from which it was created. This is intended as an internal function
+Finds matching edge(s) and node(s) for a pruned tree in the original tree from which it was created. This is intended as an internal function, but may be of use to someone.
 }
 
 \value{
 \item{matching.edges}{A list of the matching edges.}
+\item{matching.nodes}{A matrix of matching node numbers.}
 \item{removed.edges}{A vector of the removed edges.}
 }
 
