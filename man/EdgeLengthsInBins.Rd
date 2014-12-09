@@ -1,0 +1,46 @@
+\name{EdgeLengthsInBins}
+
+\alias{EdgeLengthsInBins}
+
+\title{
+Edge-lengths present in time-bins
+}
+
+\description{
+Given a time-scaled tree and set of time bin boundaries will sum the edge-lengths present in each bin.
+}
+
+\usage{
+EdgeLengthsInBins(tree, time.bins)
+}
+
+\arguments{
+\item{tree}{A time-scaled tree in phylo format with a \code{$root.time} value.}
+\item{time.bins}{A vector of ages in millions of years of time bin boundaries in old-to-young order.}
+}
+
+\details{
+Calculates the total edge length present in each of a series of time bins. This is intended as an internal function for rate calculations, but may be of use to someone.
+}
+
+\value{
+A vector giving the summed values in millions of years for each time bin. Names indicate the maximum and minimum values for each time bin.
+}
+
+\author{
+Graeme T. Lloyd \email{graemetlloyd@gmail.com}
+}
+
+\examples{
+# Create a random 10-taxon tree:
+tree <- rtree(10)
+
+# Add root age:
+tree$root.time <- 100
+
+# Create time bins:
+time.bins <- seq(100, 0, length.out=11)
+
+# Get edge lengths for each bin:
+EdgeLengthsInBins(tree, time.bins)
+}
