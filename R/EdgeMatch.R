@@ -109,11 +109,17 @@ EdgeMatch <- function(original.tree, pruned.tree) {
 	# Add names to matching edges:
 	names(matching.edges) <- 1:nrow(pruned.tree$edge)
 	
+	# Make list of matching nodes:
+	node.matches <- cbind(clades, corresponding.nodes)
+	
+	# Add column names:
+	colnames(node.matches) <- c("Pruned_node", "Original_node")
+	
 	# Compile output:
-	output <- list(matching.edges, removed.edges)
+	output <- list(matching.edges, node.matches, removed.edges)
 	
 	# Add output names:
-	names(output) <- c("matching.edges", "removed.edges")
+	names(output) <- c("matching.edges", "matching.nodes", "removed.edges")
 	
 	# Return output:
 	return(output)
