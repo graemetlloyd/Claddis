@@ -18,6 +18,9 @@ EdgeMatch <- function(original.tree, pruned.tree) {
 		# Return matching edges as list:
 		matching.edges <- as.list(1:nrow(original.tree$edge))
 		
+		# Create lists of nodes (which will be identical):
+		clades <- corresponding.nodes <- c((Ntip(pruned.tree) + 1):(Ntip(pruned.tree) + Nnode(pruned.tree)), 1:Ntip(pruned.tree))
+		
 	# If taxa are removed:
 	} else {
 		
