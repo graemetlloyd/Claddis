@@ -23,6 +23,8 @@ DiscreteCharacterRate(tree, clad.matrix, time.bins, alpha=0.01)
 
 \details{
 Uses \link{AncStateEstMatrix}.
+
+Time series method does not work and these results should be ignored.
 }
 
 \value{
