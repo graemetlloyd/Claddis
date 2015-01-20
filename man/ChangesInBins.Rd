@@ -7,7 +7,7 @@ Counts the changes in a series of time bins
 }
 
 \description{
-Given a vector of dates for a series of time bins and another for the times when a character change occurred will returns the total number of changes in each bin.
+Given a vector of dates for a series of time bins and another for the times when a character change occurred will return the total number of changes in each bin.
 }
 
 \usage{
@@ -20,7 +20,7 @@ ChangesInBins(change.times, time.bins)
 }
 
 \details{
-Calculates the total number of evolutionary changes in a series of time bins. This is intended as an internal function for rate calculations, but may be of use to someone.
+Calculates the total number of evolutionary changes in a series of time bins. This is intended as an internal function for rate calculations, but could be used for other purposes (e.g., counting any point events in a series of time bins).
 }
 
 \value{
