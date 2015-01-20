@@ -12,7 +12,7 @@ Cladistic disparity
 
 \description{
 A package to read cladistic morphological datasets into R and 
-cpnvert them into distance matrices to enable multivariate 
+convert them into distance matrices to enable multivariate 
 ordinations to be performed upon them or perform analyses of
 rates of discrete character evolution.
 }
