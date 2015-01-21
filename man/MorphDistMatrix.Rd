@@ -50,7 +50,23 @@ Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
 
 \examples{
-# Nothing yet
+# Get morphological distances for Michaux (1989) data set:
+distances <- MorphDistMatrix(Michaux1989)
+
+# Show raw Euclidean distances:
+distances$raw.dist.matrix
+
+# Show Generailsed Euclidean Distances:
+distances$GED.dist.matrix
+
+# Show Gower rescaled distances:
+distances$gower.dist.matrix
+
+# Show maximum observable rescaled distances:
+distances$max.dist.matrix
+
+# Show number of characters that can be scored for each pairwise comparison:
+distances$comp.char.matrix
 }
 
 \keyword{Distance}
