@@ -40,5 +40,3 @@ Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 \examples{
 # Nothing yet
 }
-
-\keyword{Safe Taxonomic Reduction}
