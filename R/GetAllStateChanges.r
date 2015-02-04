@@ -2,6 +2,8 @@ GetAllStateChanges <- function(clad.matrix, tree, time.bins, Nsim=10) {
 
 # The above could maybe be modified to allow other options to be specified and handed to make.simmap (pi, Q etc.)
 # ADD CONDITIONALS HERE TO CHECK DATA ARE VALID
+# NEED TO TIME BIN INTERNAL VERSUS TERMINAL BRANCHES; ALSO MAYBE BY CHARACTER?
+# MAKE LESS VERBOSE OUTPUT?
 	
 	# Create strings that define character models (non-missing states plus ordering):
 	char.model.sets <- paste(unlist(lapply(lapply(lapply(lapply(apply(clad.matrix$matrix, 2, strsplit, split="&"), unlist), sort), unique), paste, collapse="")), clad.matrix$ordering, sep="")
@@ -284,8 +286,14 @@ GetAllStateChanges <- function(clad.matrix, tree, time.bins, Nsim=10) {
 				# If character varies:
 				if(length(sort(unique(unlist(strsplit(tip.values, "&"))))) > 1) {
 					
-					# Create tip states matrix that will serve as priors for make.simmap:
-					tip.states <- matrix(0, nrow=Ntip(pruned.tree), ncol=length(sort(unique(unlist(strsplit(tip.values, "&"))))), dimnames=list(pruned.tree$tip.label, range(as.numeric(sort(unique(unlist(strsplit(tip.values, "&"))))))[1]:range(as.numeric(sort(unique(unlist(strsplit(tip.values, "&"))))))[2]))
+# NEED SOMETHING HERE TO CATCH ISSUE WITH ORDERED CHARACTERS FOR WHICH NOT ALL STATES ARE RECOVERED
+# ALSO WHAT IF NEITHER ORDERED NOR UNORDERED?
+					
+					# Create tip states matrix that will serve as priors for make.simmap (if character is ordered):
+					if(clad.matrix$ordering[j] == "ord") tip.states <- matrix(0, nrow=Ntip(pruned.tree), ncol=length(sort(unique(unlist(strsplit(tip.values, "&"))))), dimnames=list(pruned.tree$tip.label, range(as.numeric(sort(unique(unlist(strsplit(tip.values, "&"))))))[1]:range(as.numeric(sort(unique(unlist(strsplit(tip.values, "&"))))))[2]))
+
+					# Create tip states matrix that will serve as priors for make.simmap (if character is unordered):
+					if(clad.matrix$ordering[j] == "unord") tip.states <- matrix(0, nrow=Ntip(pruned.tree), ncol=length(sort(unique(unlist(strsplit(tip.values, "&"))))), dimnames=list(pruned.tree$tip.label, sort(unique(unlist(strsplit(tip.values, "&"))))))
 					
 					# Case if polymorphisms amongst tip states:
 					if(length(grep("&", tip.values))) {
