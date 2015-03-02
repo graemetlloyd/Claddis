@@ -1,5 +1,13 @@
-MorphDistMatrix <- function(morph.matrix) {
-    
+MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcsine_sqrt") {
+
+  # Check format of transform.proportional.distances:
+  if(transform.proportional.distances != "none" && transform.proportional.distances != "sqrt" && transform.proportional.distances != "arcsine_sqrt") {
+
+    # Give error if something other than three possible settings is given:
+    stop("ERROR: transform.proportional.distances must be one of \"none\", \"sqrt\", or \"arcsine_sqrt\".")
+
+  }
+
   # Isolate ordering element of morphology matrix:
   ordering <- morph.matrix$ordering
 
@@ -128,26 +136,26 @@ MorphDistMatrix <- function(morph.matrix) {
       # Get weighted differences:
       diffs <- as.numeric(weights[compchar]) * diffs
 
-      # Get actual distance:
-      actual.dist <- dist(rbind(diffs, rep(0, length(diffs))), method="euclidean")
+      # Get raw Euclidean distance:
+      raw.dist <- dist(rbind(diffs, rep(0, length(diffs))), method="euclidean")
 
       # Work out maximum difference (again, checked against ordering) using compchar characters only:
       raw.maxdiffs <- maxdiffs <- as.numeric(max.vals[compchar]) - as.numeric(min.vals[compchar])
 
-      # Correct maximum differences for unordered characters:
+      # Correct maximum possible differences for unordered characters:
       if(length(grep(TRUE, maxdiffs > 1)) > 0) maxdiffs[grep(TRUE, maxdiffs > 1)[grep(TRUE, ordering[compchar[grep(TRUE, maxdiffs > 1)]] == "unord")]] <- 1
 
-      # Get vector of maximum differences:
+      # Get vector of maximum differences (corrected for character weights):
       maxdiffs <- as.numeric(weights[compchar]) * maxdiffs
 
       # Store raw distance:
-      dist.matrix[i, j] <- dist.matrix[j, i] <- actual.dist
+      dist.matrix[i, j] <- dist.matrix[j, i] <- raw.dist
 
       # Store Gower distance:
-      gower.dist.matrix[i, j] <- gower.dist.matrix[j, i] <- sqrt(sum(diffs) / sum(weights[compchar]))
+      gower.dist.matrix[i, j] <- gower.dist.matrix[j, i] <- sum(diffs) / sum(weights[compchar])
 
       # Store maximum-rescaled distance:
-      max.dist.matrix[i, j] <- max.dist.matrix[j, i] <- sqrt(sum(diffs) / sum(maxdiffs))
+      max.dist.matrix[i, j] <- max.dist.matrix[j, i] <- sum(diffs) / sum(maxdiffs)
 
       # Store N comparable characters:
       comp.char.matrix[i, j] <- comp.char.matrix[j, i] <- length(compchar)
@@ -162,10 +170,10 @@ MorphDistMatrix <- function(morph.matrix) {
 
   }
 
-  # Calculated weighted mean univariate distance for calculating GED (equation 2 in WIlls 2001):
+  # Calculated weighted mean univariate distance for calculating GED (equation 2 in Wills 2001):
   S_ijk_bar <- sum(differences) / sum(maximum.differences)
 
-  # Replace missing distances with S_ijk_bar (i.e., results of equation 2 in WIlls 2001 into equation 1 of WIlls 2001):
+  # Replace missing distances with S_ijk_bar (i.e., results of equation 2 in Wills 2001 into equation 1 of Wills 2001):
   GED.data[is.na(GED.data)] <- S_ijk_bar
 
   # Isolate the distances:
@@ -177,7 +185,7 @@ MorphDistMatrix <- function(morph.matrix) {
   # Calculate the GED (equation 1 of Wills 2001) for each pairwise comparison (ij):
   GED_ij <- sqrt(apply(W_ijk * (S_ijk ^ 2), 1, sum))
 
-  # Create empty GED distacne matrix:
+  # Create empty GED distance matrix:
   GED.dist.matrix <- matrix(0, nrow=nrow(morph.matrix), ncol=nrow(morph.matrix))
 
   # Set initial value for counter:
@@ -201,15 +209,19 @@ MorphDistMatrix <- function(morph.matrix) {
     
   # Set diagonals as zero:
   diag(gower.dist.matrix) <- diag(max.dist.matrix) <- 0
-    
+
   # Add row and column names (taxa) to distance matrices:
   rownames(comp.char.matrix) <- colnames(comp.char.matrix) <- rownames(GED.dist.matrix) <- colnames(GED.dist.matrix) <- rownames(gower.dist.matrix) <- colnames(gower.dist.matrix) <- rownames(max.dist.matrix) <- colnames(max.dist.matrix) <- rownames(dist.matrix) <- colnames(dist.matrix) <- rownames(morph.matrix)
 
-  # Convert all Gower values to 0 to 1 scale then take arcsine of sqrt to get valus that better approximate a normal distribution:
+
+
+  # Convert all Gower values to 0 to 1 scale then take arcsine of sqrt to get values that better approximate a normal distribution:
   gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(gower.dist.matrix / max(sort(gower.dist.matrix)))))), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
 
   # Take arcsine square root of all MOD dist values:
   max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(max.dist.matrix)))), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+
+
 
   # Compile results as a list:
   result <- list(dist.matrix, GED.dist.matrix, gower.dist.matrix, max.dist.matrix, comp.char.matrix)
