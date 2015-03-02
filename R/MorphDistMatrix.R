@@ -213,15 +213,42 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcs
   # Add row and column names (taxa) to distance matrices:
   rownames(comp.char.matrix) <- colnames(comp.char.matrix) <- rownames(GED.dist.matrix) <- colnames(GED.dist.matrix) <- rownames(gower.dist.matrix) <- colnames(gower.dist.matrix) <- rownames(max.dist.matrix) <- colnames(max.dist.matrix) <- rownames(dist.matrix) <- colnames(dist.matrix) <- rownames(morph.matrix)
 
+  # If transformation option is not "none":
+  if(transform.proportional.distances != "none") {
 
+    # If transformation option is "sqrt":
+    if(transform.proportional.distances == "sqrt") {
 
-  # Convert all Gower values to 0 to 1 scale then take arcsine of sqrt to get values that better approximate a normal distribution:
-  gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(gower.dist.matrix / max(sort(gower.dist.matrix)))))), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+      # Replace NaN with NA for Gower distances and take square root:
+      gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(gower.dist.matrix))), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
 
-  # Take arcsine square root of all MOD dist values:
-  max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(max.dist.matrix)))), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+      # Replace NaN with NA for Max distances and take square root:
+      max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(max.dist.matrix))), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
 
+    # If transformation option is "arcsine_sqrt":
+    } else {
 
+      # Establish correction factor to ensure Gower data is proportional:
+      gower.correction <- max(c(max(sort(gower.dist.matrix)), 1))
+
+      # Ensure all Gower values are on 0 to 1 scale then take arcsine of sqrt to get values that better approximate a normal distribution:
+      gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(gower.dist.matrix / gower.correction)))), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+
+      # Take arcsine square root of all MOD dist values:
+      max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(max.dist.matrix)))), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+
+    }
+
+  # If transformation option is "none":
+  } else {
+
+    # Replace NaN with NA for Gower distances:
+    gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, gower.dist.matrix)), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+
+    # Replace NaN with NA for Max distances:
+    max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, max.dist.matrix)), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+
+  }
 
   # Compile results as a list:
   result <- list(dist.matrix, GED.dist.matrix, gower.dist.matrix, max.dist.matrix, comp.char.matrix)
