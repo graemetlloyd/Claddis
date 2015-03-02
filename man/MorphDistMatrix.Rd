@@ -11,11 +11,12 @@ Takes a cladistic morphological dataset and converts it into a set of pairwise d
 }
 
 \usage{
-MorphDistMatrix(morph.matrix)
+MorphDistMatrix(morph.matrix, transform.proportional.distances="arcsine_sqrt")
 }
 
 \arguments{
 \item{morph.matrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
+\item{transform.proportional.distances}{Whether to transform the proportional distances (Gower and max). Options are \code{none}, \code{sqrt}, or \code{arcsine_sqrt} (the default).}
 }
 
 \details{
