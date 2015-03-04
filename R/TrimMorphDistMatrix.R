@@ -1,5 +1,11 @@
 TrimMorphDistMatrix <- function(dist.matrix, tree=NULL) {
 
+  # If input is iof class "dist" first convert to a regular matrix:
+  if(class(dist.matrix) == "dist") dist.matrix <- as.matrix(dist.matrix)
+
+  # Check the input is a distance matrix:
+  if(!is.matrix(dist.matrix)) stop("ERROR: Input must be a distance matrix (i.e., either an object of class \"dist\" or a square matrix).")
+
   # Case if there is no tree:
   if(is.null(tree)) {
     
