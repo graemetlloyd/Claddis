@@ -594,7 +594,7 @@ GetAllStateChanges <- function(clad.matrix, tree, time.bins, Nsim=10) {
 	}
 	
 	# Add column names to edge lengths per bin:
-	colnames(edge.lengths.per.bin) <- names(edge.length.per.bin)
+	colnames(terminal.edge.lengths.per.bin) <- colnames(internal.edge.lengths.per.bin) <- colnames(edge.lengths.per.bin) <- names(edge.length.per.bin$edge.length.in.bin)
 	
 	# Get rid of pesky state rownames:
 	rownames(allstatechanges) <- NULL
