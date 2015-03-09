@@ -5,6 +5,10 @@ GetAllStateChanges <- function(clad.matrix, tree, time.bins, Nsim=10) {
 # NEED TO TIME BIN INTERNAL VERSUS TERMINAL BRANCHES; ALSO MAYBE BY CHARACTER?
 # MAKE LESS VERBOSE OUTPUT?
 	
+# NEED TO SPLIT APART TERMINAL AND INTERNAL EDGES IN BINS:
+#terminal.edges <- match(1:Ntip(tree), tree$edge[, 2])
+#internal.edges <- setdiff(1:nrow(tree$edge), terminal.edges)
+	
 	# Create strings that define character models (non-missing states plus ordering):
 	char.model.sets <- paste(unlist(lapply(lapply(lapply(lapply(apply(clad.matrix$matrix, 2, strsplit, split="&"), unlist), sort), unique), paste, collapse="")), clad.matrix$ordering, sep="")
 	
@@ -74,7 +78,7 @@ GetAllStateChanges <- function(clad.matrix, tree, time.bins, Nsim=10) {
 	chartime <- rep(0, ncol(clad.matrix$matrix))
 	
 	# Matrix to store time for each character:
-	edge.lengths.per.bin <- matrix(0, ncol=length(time.bins) - 1, nrow=ncol(clad.matrix$matrix))
+	terminal.edge.lengths.per.bin <- internal.edge.lengths.per.bin <- edge.lengths.per.bin <- matrix(0, ncol=length(time.bins) - 1, nrow=ncol(clad.matrix$matrix))
 	
 	# Get node ages for original tree:
 	tree.nodeages <- GetNodeAges(tree)
@@ -164,8 +168,17 @@ GetAllStateChanges <- function(clad.matrix, tree, time.bins, Nsim=10) {
 					# Add edge length for character:
 					pruned.tree$edge.length[edge.number] <- pruned.tree$root.time - branch.end.dates[2]
 					
+					# Get edge length per bin:
+					edge.length.per.bin <- EdgeLengthsInBins(pruned.tree, time.bins)
+					
 					# Store edge length per bin for character:
-					edge.lengths.per.bin[j, ] <- EdgeLengthsInBins(pruned.tree, time.bins)
+					edge.lengths.per.bin[j, ] <- edge.length.per.bin$edge.length.in.bin
+					
+					# Store terminal edge length per bin for character:
+					terminal.edge.lengths.per.bin[j, ] <- edge.length.per.bin$terminal.edge.length.in.bin
+					
+					# Store internal edge length per bin for character:
+					internal.edge.lengths.per.bin[j, ] <- edge.length.per.bin$internal.edge.length.in.bin
 					
 					# Update character time:
 					chartime[j] <- sum(pruned.tree$edge.length)
@@ -212,8 +225,19 @@ GetAllStateChanges <- function(clad.matrix, tree, time.bins, Nsim=10) {
 				# Get edge length per bin for pruned tree:
 				edge.length.per.bin <- EdgeLengthsInBins(pruned.tree, time.bins)
 				
-				# Store edge length per bin for each character:
-				for(j in MissingStringCharacters[[i]]) edge.lengths.per.bin[j, ] <- edge.length.per.bin
+				# For each character:
+				for(j in MissingStringCharacters[[i]]) {
+					
+					# Store edge length per bin:
+					edge.lengths.per.bin[j, ] <- edge.length.per.bin$edge.length.in.bin
+					
+					# Store terminal edge length per bin:
+					terminal.edge.lengths.per.bin[j, ] <- edge.length.per.bin$terminal.edge.length.in.bin
+					
+					# Store internal edge length per bin:
+					internal.edge.lengths.per.bin[j, ] <- edge.length.per.bin$internal.edge.length.in.bin
+				
+				}
 				
 				# For each character:
 				for(j in MissingStringCharacters[[i]]) {
@@ -549,10 +573,21 @@ GetAllStateChanges <- function(clad.matrix, tree, time.bins, Nsim=10) {
 			}
 			
 			# Get edge length per bin for pruned tree:
-			edge.length.per.bin <- EdgeLengthsInBins(pruned.tree, time.bins)
+			edge.length.per.bin <- EdgeLengthsInBins(tree, time.bins, pruned.tree)
 			
 			# Store edge length per bin for each character:
-			for(j in MissingStringCharacters[[i]]) edge.lengths.per.bin[j, ] <- edge.length.per.bin
+			for(j in MissingStringCharacters[[i]]) {
+			
+				# Store edge length per bin:
+				edge.lengths.per.bin[j, ] <- edge.length.per.bin$edge.length.in.bin
+				
+				# Store terminal edge length per bin:
+				terminal.edge.lengths.per.bin[j, ] <- edge.length.per.bin$terminal.edge.length.in.bin
+				
+				# Store internal edge length per bin:
+				internal.edge.lengths.per.bin[j, ] <- edge.length.per.bin$internal.edge.length.in.bin
+			
+			}
 			
 		}
 		
@@ -574,10 +609,10 @@ GetAllStateChanges <- function(clad.matrix, tree, time.bins, Nsim=10) {
 	allstatechanges <- allstatechanges[order(allstatechanges[, "Nsim"]), ]
 	
 	# Compile output as list:
-	output <- list(allstatechanges, chartime, edge.lengths.per.bin)
+	output <- list(allstatechanges, chartime, edge.lengths.per.bin, terminal.edge.lengths.per.bin, internal.edge.lengths.per.bin)
 	
 	# Add names to output:
-	names(output) <- c("all.state.changes", "character.times", "edge.length.per.bin")
+	names(output) <- c("all.state.changes", "character.times", "edge.length.per.bin", "terminal.edge.length.per.bin", "internal.edge.length.per.bin")
 	
 	# Return output:
 	return(output)
