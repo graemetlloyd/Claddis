@@ -11,20 +11,25 @@ Given a time-scaled tree and set of time bin boundaries will sum the edge-length
 }
 
 \usage{
-EdgeLengthsInBins(tree, time.bins)
+EdgeLengthsInBins(tree, time.bins, pruned.tree=NULL)
 }
 
 \arguments{
 \item{tree}{A time-scaled tree in phylo format with a \code{$root.time} value.}
 \item{time.bins}{A vector of ages in millions of years of time bin boundaries in old-to-young order.}
+\item{pruned.tree}{A time-scaled tree in phylo format with a \code{$root.time} value that is a subset of \code{tree}.}
 }
 
 \details{
 Calculates the total edge length present in each of a series of time bins. This is intended as an internal function for rate calculations, but may be of use to someone.
+
+\code{pruned.tree} explanation needed.
 }
 
 \value{
-A vector giving the summed values in millions of years for each time bin. Names indicate the maximum and minimum values for each time bin.
+\item{edge.length.in.bin}{A vector giving the summed values in millions of years for each time bin. Names indicate the maximum and minimum values for each time bin.}
+\item{terminal.edge.length.in.bin}{As above, but counting terminal edges only.}
+\item{internal.edge.length.in.bin}{As above, but counting internal edges only.}
 }
 
 \author{
