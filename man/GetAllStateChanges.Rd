@@ -31,6 +31,8 @@ More to come.
 \item{all.state.changes}{A matrix of rows for each change with columns corresponding to: the character concerned, the simulation number, the edge number, the time, and the start and end states.}
 \item{character.times}{A vector of the sampled tree-length (in Ma) for each character.}
 \item{edge.length.per.bin}{A matrix of time bins (columns) and characters (rows) indicating the sampled tree-length (in Ma).}
+\item{terminal.edge.length.per.bin}{As above, but for terminal edges only.}
+\item{internal.edge.length.per.bin}{As above, but for internal edges only.}
 }
 
 \references{
