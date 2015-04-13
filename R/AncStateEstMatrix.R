@@ -1,5 +1,5 @@
 AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars=FALSE, estimate.tips=FALSE) {
-
+#NOTHING AT ALL
   # Catch problem with trees with no branch lengths:
   if(is.null(tree$edge.length)) stop("ERROR:\n Tree must have branch lengths.")
 
