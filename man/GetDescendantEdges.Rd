@@ -7,7 +7,7 @@ Gets descendant edges of an internal node
 }
 
 \description{
-Gets all descendant edges of an internal node for a phylo object.
+Returns all descendant edges of an internal node for a phylo object.
 }
 
 \usage{
@@ -37,9 +37,11 @@ plot(tree)
 # Add nodelabels:
 nodelabels()
 
-# Add edgelabels (note that edges 5 and 6 are descendants of node 7):
+# Add edgelabels (note that edges 5 and 6
+# are descendants of node 7):
 edgelabels()
 
-# Use GdtDescendantEdges to show that edges 5 and 6 are descendants of node 7:
+# Use GdtDescendantEdges to show that edges
+# 5 and 6 are descendants of node 7:
 GetDescendantEdges(7, tree)
 }

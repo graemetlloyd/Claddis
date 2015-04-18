@@ -12,6 +12,8 @@
 
 \format{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
 
-\references{Michaux, B., 1989. Cladograms can reconstruct phylogenies: an example from the fossil record. Alcheringa, 13, 21-36.}
+\references{
+Michaux, B., 1989. Cladograms can reconstruct phylogenies: an example from the fossil record. Alcheringa, 13, 21-36.
+}
 
-\keyword{datasets}
+\keyword{ datasets }

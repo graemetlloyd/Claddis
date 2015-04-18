@@ -24,7 +24,7 @@ GetAllStateChanges(clad.matrix, tree, time.bins, Nsim=10)
 \details{
 A wrapper function for \link{make.simmap} in the \link{phytools} package.
 
-More to come.
+This function is intended to numerate all possible changes on a tree (including to and from missing or inapplicable states) under the assumptions of stochastic character mapping as an alternative means of establishing branch-lengths (for rate analyses) or recording the state occupied at a particular point in time for disparity analyses.
 }
 
 \value{
@@ -35,14 +35,24 @@ More to come.
 \item{internal.edge.length.per.bin}{As above, but for internal edges only.}
 }
 
-\references{
-STOCHASTIC CHARACTER MAPPING
-}
-
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
 
 \examples{
-# Nothing yet
+# Set random seed:
+set.seed(17)
+
+# Generate a random tree for the Michaux data set:
+tree <- rtree(nrow(Michaux1989$matrix))
+
+# Update taxon names to match those in the data matrix:
+tree$tip.label <- rownames(Michaux1989$matrix)
+
+# Set root time by making youngest taxon extant:
+tree$root.time <- max(diag(vcv(tree)))
+
+# Get all state changes:
+GetAllStateChanges(Michaux1989, tree,
+  seq(tree$root.time, 0, length.out=3), Nsim=2)
 }

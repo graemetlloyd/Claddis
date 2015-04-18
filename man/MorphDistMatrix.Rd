@@ -43,7 +43,8 @@ It is important to note that in practice not all pairwise distances can be calcu
 
 \references{
 Gower, J. C., 1971. A general coefficient of similarity and some of its properties. Biometrics, 27, 857-871.
-Wills, M. A., 2001.
+
+Wills, M. A., 2001a. Morphological disparity: a primer. In: Adrain, J. M., Edgecombe, G. D. and Lieberman, B. S. (eds.), Fossils, Phylogeny, and Form: An Analytical Approach. Kluwer Academic/Plenum Publishers, New York, p55-144.
 }
 
 \author{
@@ -51,7 +52,8 @@ Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
 
 \examples{
-# Get morphological distances for Michaux (1989) data set:
+# Get morphological distances for Michaux (1989)
+# data set:
 distances <- MorphDistMatrix(Michaux1989)
 
 # Show raw Euclidean distances:
@@ -66,8 +68,9 @@ distances$gower.dist.matrix
 # Show maximum observable rescaled distances:
 distances$max.dist.matrix
 
-# Show number of characters that can be scored for each pairwise comparison:
+# Show number of characters that can be scored for
+# each pairwise comparison:
 distances$comp.char.matrix
 }
 
-\keyword{Distance}
+\keyword{ distance }

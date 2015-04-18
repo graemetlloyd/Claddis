@@ -24,7 +24,7 @@ Reads in a #NEXUS (Maddison et al. 1997) data file representing the distribution
 
 Note that the function is generally intolerant to excursions from a standard format and it is recommended your data be formatted like the \code{morphmatrix.nex} example below.
 
-All empty values (missing plus gaps) are treated as NAs.
+All empty values (missing or inapplicable) are treated as NAs.
 }
 
 \value{
@@ -68,4 +68,4 @@ morph.matrix <- ReadMorphNexus("morphmatrix.nex")
 morph.matrix
 }
 
-\keyword{NEXUS}
+\keyword{ NEXUS }

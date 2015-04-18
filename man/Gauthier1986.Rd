@@ -12,6 +12,8 @@
 
 \format{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
 
-\references{Gauthier, J. A., 1986. Saurischian monophyly and the origin of birds. In Padian, K. (ed.) The Origin of Birds and the Evolution of Flight. Towne and Bacon, San Francisco, CA, United States, 1-55.}
+\references{
+Gauthier, J. A., 1986. Saurischian monophyly and the origin of birds. In Padian, K. (ed.) The Origin of Birds and the Evolution of Flight. Towne and Bacon, San Francisco, CA, United States, 1-55.
+}
 
-\keyword{datasets}
+\keyword{ datasets }

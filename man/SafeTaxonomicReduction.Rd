@@ -39,7 +39,8 @@ Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
 
 \examples{
-# Performs STR on the Gauthier 1986 dataset used in the Wilkinson (1995) paper:
+# Performs STR on the Gauthier 1986 dataset used
+# in the Wilkinson (1995) paper:
 str.out <- SafeTaxonomicReduction(Gauthier1986)
 
 # View deleted taxa:

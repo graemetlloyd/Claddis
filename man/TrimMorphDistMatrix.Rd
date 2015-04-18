@@ -24,7 +24,7 @@ Trims a morphological distance matrix by removing nodes (terminal or internal) t
 
 Some distances are not calculable from cladistic matrices if there are taxa that have no coded characters in common. This algorithm iteratively removes the taxa responsible for the most empty cells until the matrix is complete (no empty cells).
 
-If the matrix includes reconstructed ancestors the user should also provide the tree used (as the \code{tree} argument). The function will then also remove the tips from the tree and where reconstructed ancestors also cause empty cells will prune the minimum number of taxa required to also remove these. The function will then renumber the nodes in the distance matrix so they match the pruned tree.
+If the matrix includes reconstructed ancestors the user should also provide the tree used (as the \code{tree} argument). The function will then also remove the tips from the tree and where reconstructed ancestors also cause empty cells will prune the minimum number of descendants of that node. The function will then renumber the nodes in the distance matrix so they match the pruned tree.
 }
 
 \value{
@@ -38,5 +38,9 @@ Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
 
 \examples{
-# Nothing yet
+# Get morphological distances for Michaux (1989) data set:
+distances <- MorphDistMatrix(Michaux1989)
+
+# Attempt to trim max.dist.matrix:
+TrimMorphDistMatrix(distances$max.dist.matrix)
 }

@@ -24,7 +24,7 @@ Calculates the total number of evolutionary changes in a series of time bins. Th
 }
 
 \value{
-A vector giving the number of changes for each time bin. Names indicate the maximum and minimum values for each time bin.
+A vector giving the number of changes for each time bin. Names indicate the maximum and minimum (bottom and top) values for each time bin.
 }
 
 \author{

@@ -23,7 +23,7 @@ EdgeLengthsInBins(tree, time.bins, pruned.tree=NULL)
 \details{
 Calculates the total edge length present in each of a series of time bins. This is intended as an internal function for rate calculations, but may be of use to someone.
 
-\code{pruned.tree} explanation needed.
+The option of using a \code{pruned.tree} allows the user to correctly classify internal and terminal branches in a subtree of the larger tree. So for example, if taxa A and B are sisters then after pruning B the subtree branch leading to A is composed of an internal and a terminal branch on the complete tree. 
 }
 
 \value{

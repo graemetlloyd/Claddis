@@ -20,6 +20,8 @@ FindLinkedEdges(tree)
 
 \details{
 Finds all edges that link (share a node) with each edge of a tree.
+
+This is intended as an internal function, but may be of use to someone else.
 }
 
 \value{

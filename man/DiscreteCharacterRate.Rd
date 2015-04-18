@@ -22,20 +22,21 @@ DiscreteCharacterRate(tree, clad.matrix, time.bins, alpha=0.01)
 }
 
 \details{
-Uses \link{AncStateEstMatrix}.
+Uses \link{AncStateEstMatrix} to estimate ancestral states and parsimony to count changes on branches, then applies the methods outlined in Lloyd et al. (2012), and updated in Brusatte et al. (2014) to test for significantly high or low rates on a branch or within a clade.
 
-Time series method does not work and these results should be ignored.
+Please note that the time series method used here is an untested attempt to deal with the problem of correcting for completeness (something that Lloyd et al. 2012 were not able to do) and should be used with caution.
 }
 
 \value{
 \item{node.results}{A table displaying the results of the per-clade rate tests.}
 \item{branch.results}{A table displaying the results of the per-branch rate tests.}
-\item{per.bin.rates}{In preparation. DO NOT USE.}
+\item{per.bin.rates}{Per time-bin rates (use with caution).}
 }
 
 \references{
-Brusatte et al. 2014
-Lloyd et al. 2012
+Brusatte, S. L., Lloyd, G. T., Wang, S. C. and Norell, M. A., 2014. Gradual assembly of avian body plan culminated in rapid rates of evolution across dinosaur-bird transition. Current Biology, 24, 2386-2392.
+
+Lloyd, G. T., Wang, S. C. and Brusatte, S. L., 2012. Identifying heterogeneity in rates of morphological evolution: discrete character change in the evolution of lungfish (Sarcopterygii; Dipnoi). Evolution, 66, 330-348.
 }
 
 \author{
@@ -43,7 +44,21 @@ Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Steve C. Wang \email{scwang@s
 }
 
 \examples{
-# Nothing yet
+# Set random seed:
+set.seed(17)
+
+# Generate a random tree for the Michaux data set:
+tree <- rtree(nrow(Michaux1989$matrix))
+
+# Update taxon names to match those in the data matrix:
+tree$tip.label <- rownames(Michaux1989$matrix)
+
+# Set root time by making youngest taxon extant:
+tree$root.time <- max(diag(vcv(tree)))
+
+# Get discrete character rates:
+DiscreteCharacterRate(tree, Michaux1989,
+  seq(tree$root.time, 0, length.out=3), alpha=0.01)
 }
 
-\keyword{evolutionary rates}
+\keyword{ evolution,rates }
