@@ -365,9 +365,6 @@ ReadMorphNexus <- function(file, equalise.weights=FALSE) {
     # Little function to generate all possible character combinations (to help find those with spaces between that can be removed):
     CharCombs <- function(chars) {
 
-      # Require utils package:
-      require(utils)
-
       # Store combinations (both directions, i.e. 0 1 and 1 0):
       combos <- apply(rbind(t(combn(chars, 2)), cbind(t(combn(chars, 2))[, 2], t(combn(chars, 2))[, 1])), 1, paste, collapse=" ")
 

@@ -18,13 +18,13 @@ EdgeLengthsInBins <- function(tree, time.bins, pruned.tree=NULL) {
 		# Only continue if there are more branch lengths to collapse:
 		if(sum(pruned.tree$edge.length) < sum(tree$edge.length)) {
 			
-			# Find descendnat tips of each node:
+			# Find descendant tips of each node:
 			descendant.tips <- lapply(as.list((Ntip(tree) + 1):(Ntip(tree) + Nnode(tree))), FindDescendants, tree=tree)
 			
 			# Add node numbers as names:
 			names(descendant.tips) <- (Ntip(tree) + 1):(Ntip(tree) + Nnode(tree))
 			
-			# Find edges to collapse (those with dropped descendnats only):
+			# Find edges to collapse (those with dropped descendants only):
 			edges.to.collapse <- match(as.numeric(names(which(unlist(lapply(lapply(lapply(descendant.tips, match, table=match(dropped.tips, tree$tip.label)), is.na), sum)) == 0))), tree$edge[, 2])
 			
 			# Collapse these branches to zero:
