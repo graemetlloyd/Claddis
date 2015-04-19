@@ -6,7 +6,7 @@ Date: 2015-04-19
 Author: Graeme T. Lloyd
 Maintainer: Graeme T. Lloyd <graemetlloyd@gmail.com>
 Depends: gdata,ape,phytools,strap
-Description: Morphological disparity and rates with discrete cladistic characters.
+Description: Morphological disparity and rates with discrete cladistic characters (those that potentially define natural biological groups).
 License: GPL (>=2)
 LazyData: yes
 ByteCompile: yes
