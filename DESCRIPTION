@@ -1,12 +1,12 @@
 Package: Claddis
 Type: Package
-Title: Cladistic Disparity
+Title: Measuring morphological diversity and evolutionary tempo
 Version: 0.1
-Date: 2015-04-19
+Date: 2015-04-27
 Author: Graeme T. Lloyd
 Maintainer: Graeme T. Lloyd <graemetlloyd@gmail.com>
 Depends: gdata,ape,phytools,strap
-Description: Morphological disparity and rates with discrete cladistic characters (those that potentially define natural biological groups).
+Description: Measures morphological diversity from discrete character data and estimates evolutionary tempo on phylogenetic trees.
 License: GPL (>=2)
 LazyData: yes
 ByteCompile: yes
