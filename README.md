@@ -32,6 +32,6 @@ More will be added here in future to show the basic features of the package.
 Citation
 ========
 
-Claddis will eventually be uploaded to [CRAN](http://cran.r-project.org/) and have a publication associated with it. Until then, please cite:
+Claddis is now on [CRAN](http://cran.r-project.org/web/packages/Claddis/index.html) and a publication is on the way. Until then, please cite:
 
-Lloyd, Graeme T. (2015). "Claddis: an R package for performing disparity and rate analysis on cladistic-type data sets." Online at GitHub, [https://github.com/graemetlloyd/Claddis](https://github.com/graemetlloyd/Claddis). Accessed (access date).
+Lloyd, Graeme T. (2015). Claddis: Measuring Morphological Diversity and Evolutionary Tempo. R package version 0.1.
