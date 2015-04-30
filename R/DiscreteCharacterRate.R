@@ -271,19 +271,19 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
     cat(paste("H_0 - all rates equal across time bins - is rejected at an alpha of ", alpha, " (actual p = ", chisq.p, ").\nContinuing to per-bin rate calculations.\n", sep=""))
 
     # Create matrix to store time bin results:
-    bin.results <- matrix(0, nrow=length(time.bins) - 1, ncol=10)
+    bin.results.tb <- bin.results.ib <- bin.results <- matrix(0, nrow=length(time.bins) - 1, ncol=10)
 
     # Add column names:
-    colnames(bin.results) <- c("bin", "from", "to", "in.rate", "out.rate", "ml.chisq", "ml.pval", "ml.signif", "ml.signif.hi", "ml.signif.lo")
+    colnames(bin.results.tb) <- colnames(bin.results.ib) <- colnames(bin.results) <- c("bin", "from", "to", "in.rate", "out.rate", "ml.chisq", "ml.pval", "ml.signif", "ml.signif.hi", "ml.signif.lo")
 
     # Fill bin numbers (from 1:n):
-    bin.results[, "bin"] <- 1:(length(time.bins) - 1)
+    bin.results.tb[, "bin"] <- bin.results.ib[, "bin"] <- bin.results[, "bin"] <- 1:(length(time.bins) - 1)
 
     # Fill in from values (in Ma):
-    bin.results[, "from"] <- time.bins[1:(length(time.bins) - 1)]
+    bin.results.tb[, "from"] <- bin.results.ib[, "from"] <- bin.results[, "from"] <- time.bins[1:(length(time.bins) - 1)]
 
     # Fill in to values (in Ma):
-    bin.results[, "to"] <- time.bins[2:length(time.bins)]
+    bin.results.tb[, "to"] <- bin.results.ib[, "to"] <- bin.results[, "to"] <- time.bins[2:length(time.bins)]
 
     # For each time bin:
     for(i in 1:(length(time.bins) - 1)) {
@@ -292,19 +292,43 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
       other <- (1:(length(time.bins) - 1))[-i]
 
       # Create maximum likelihood denominator variable:
-      mledenom <- rep(NA, nrow(bin.results))
+      mledenom.tb <- mledenom.ib <- mledenom <- rep(NA, nrow(bin.results))
 
       # Calculate maximum likelihood denominator for bin:
       mledenom[i] <- mlebin <- changes[i] / (Time[i] * pctcomp[i])
 
+      # Calculate maximum likelihood denominator for bin (terminal branches):
+      mledenom.tb[i] <- mlebin.tb <- changes.tb[i] / (Time.tb[i] * pctcomp.tb[i])
+
+      # Calculate maximum likelihood denominator for bin (internal branches):
+      mledenom.ib[i] <- mlebin.ib <- changes.ib[i] / (Time.ib[i] * pctcomp.ib[i])
+
       # Calculate maximum likelihood denominator for other bins:
       mledenom[other] <- mleother <- sum(changes[other]) / sum(Time[other] * pctcomp[other])
+
+      # Calculate maximum likelihood denominator for other bins:
+      mledenom.tb[other] <- mleother.tb <- sum(changes.tb[other]) / sum(Time.tb[other] * pctcomp.tb[other])
+
+      # Calculate maximum likelihood denominator for other bins:
+      mledenom.ib[other] <- mleother.ib <- sum(changes.ib[other]) / sum(Time.ib[other] * pctcomp.ib[other])
 
       # Calculate log numerator (rounding non-integers):
       lognumer <- sum(log(dpois(round(changes), mlenumer * Time * pctcomp)), na.rm=TRUE)
 
+      # Calculate log numerator (rounding non-integers):
+      lognumer.tb <- sum(log(dpois(round(changes.tb), mlenumer.tb * Time.tb * pctcomp.tb)), na.rm=TRUE)
+
+      # Calculate log numerator (rounding non-integers):
+      lognumer.ib <- sum(log(dpois(round(changes.ib), mlenumer.ib * Time.ib * pctcomp.ib)), na.rm=TRUE)
+
       # Calculate log denominator:
       logdenom <- sum(log(dpois(round(changes), mledenom * Time * pctcomp)), na.rm=TRUE) 
+
+      # Calculate log denominator:
+      logdenom.tb <- sum(log(dpois(round(changes.tb), mledenom.tb * Time.tb * pctcomp.tb)), na.rm=TRUE) 
+
+      # Calculate log denominator:
+      logdenom.ib <- sum(log(dpois(round(changes.ib), mledenom.ib * Time.ib * pctcomp.ib)), na.rm=TRUE) 
 
       # Store rate for branch:
       bin.results[i, "in.rate"] <- round(mlebin, 2)
@@ -312,46 +336,132 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
       # Store rate for branch:
       bin.results[i, "out.rate"] <- round(mleother, 2)
 
+      # Store rate for branch:
+      bin.results.tb[i, "in.rate"] <- round(mlebin.tb, 2)
+
+      # Store rate for branch:
+      bin.results.tb[i, "out.rate"] <- round(mleother.tb, 2)
+
+      # Store rate for branch:
+      bin.results.ib[i, "in.rate"] <- round(mlebin.ib, 2)
+
+      # Store rate for branch:
+      bin.results.ib[i, "out.rate"] <- round(mleother.ib, 2)
+
       # Store chi-squared value (will be zero for zero-duration branch):
       bin.results[i, "ml.chisq"] <- teststat <- -2 * (lognumer - logdenom)
 
       # Store probability for bin (will be 1 for zero-duration branch):
       bin.results[i, "ml.pval"] <- pchisq(teststat, 2 - 1, lower.tail=FALSE)
 
+      # Store chi-squared value (will be zero for zero-duration branch):
+      bin.results.tb[i, "ml.chisq"] <- teststat.tb <- -2 * (lognumer.tb - logdenom.tb)
+
+      # Store probability for bin (will be 1 for zero-duration branch):
+      bin.results.tb[i, "ml.pval"] <- pchisq(teststat.tb, 2 - 1, lower.tail=FALSE)
+
+      # Store chi-squared value (will be zero for zero-duration branch):
+      bin.results.ib[i, "ml.chisq"] <- teststat.ib <- -2 * (lognumer.ib - logdenom.ib)
+
+      # Store probability for bin (will be 1 for zero-duration branch):
+      bin.results.ib[i, "ml.pval"] <- pchisq(teststat.ib, 2 - 1, lower.tail=FALSE)
+
     }
 
-    # Get just the branch p-values:
+    # Get just the bin p-values:
     bin.pvals <- bin.results[, "ml.pval"]
 
-    # Number of zero-duration bins:
-    nzero <- 0
+    # Get just the bin p-values:
+    bin.pvals.tb <- bin.results.tb[, "ml.pval"]
+
+    # Get just the bin p-values:
+    bin.pvals.ib <- bin.results.ib[, "ml.pval"]
+
+# CHECK BELOW IS TRUE
+
+    # Number of zero-duration branches:
+    nzero.tb <- nzero.ib <- nzero <- 0
 
     # Do not count zero-duration branches in sample:
     m <- nrow(bin.results) - nzero
 
+    # Do not count zero-duration branches in sample:
+    m.tb <- nrow(bin.results.tb) - nzero.tb
+
+    # Do not count zero-duration branches in sample:
+    m.ib <- nrow(bin.results.ib) - nzero.ib
+
     # Calculate cutoffs (significance thresholds) based on Benjamini and Hochberg 1995 JRSSB False Discovery Rate (FDR):
     cutoffs <- c((1:m) / m * alpha, rep(0, nzero))
+
+    # Calculate cutoffs (significance thresholds) based on Benjamini and Hochberg 1995 JRSSB False Discovery Rate (FDR):
+    cutoffs.tb <- c((1:m.tb) / m.tb * alpha, rep(0, nzero.tb))
+
+    # Calculate cutoffs (significance thresholds) based on Benjamini and Hochberg 1995 JRSSB False Discovery Rate (FDR):
+    cutoffs.ib <- c((1:m.ib) / m.ib * alpha, rep(0, nzero.ib))
 
     # Get indices ready for identifying significant p values:
     ifelse(length(grep(TRUE, sort(bin.pvals) <= cutoffs)) > 0, indices <- 1:max((1:m)[sort(bin.pvals) <= cutoffs]), indices <- c(1)[-1])
 
+    # Get indices ready for identifying significant p values:
+    ifelse(length(grep(TRUE, sort(bin.pvals.tb) <= cutoffs.tb)) > 0, indices.tb <- 1:max((1:m.tb)[sort(bin.pvals.tb) <= cutoffs.tb]), indices.tb <- c(1)[-1])
+
+    # Get indices ready for identifying significant p values:
+    ifelse(length(grep(TRUE, sort(bin.pvals.ib) <= cutoffs.ib)) > 0, indices.ib <- 1:max((1:m.ib)[sort(bin.pvals.ib) <= cutoffs.ib]), indices.ib <- c(1)[-1])
+
     # Isolate significant p values:
     signif <- order(bin.pvals)[indices]
+
+    # Isolate significant p values:
+    signif.tb <- order(bin.pvals.tb)[indices.tb]
+
+    # Isolate significant p values:
+    signif.ib <- order(bin.pvals.ib)[indices.ib]
 
     # Add 1 in significance column for significant p-values after FDR correction:
     bin.results[signif, "ml.signif"] <- 1
 
+    # Add 1 in significance column for significant p-values after FDR correction:
+    bin.results.tb[signif.tb, "ml.signif"] <- 1
+
+    # Add 1 in significance column for significant p-values after FDR correction:
+    bin.results.ib[signif.ib, "ml.signif"] <- 1
+
     # Indicate significantly high rate bins:
     bin.results[(bin.results[, "ml.signif"] & bin.results[, "in.rate"] > bin.results[, "out.rate"]), "ml.signif.hi"] <- 1
+
+    # Indicate significantly high rate bins:
+    bin.results.tb[(bin.results.tb[, "ml.signif"] & bin.results.tb[, "in.rate"] > bin.results.tb[, "out.rate"]), "ml.signif.hi"] <- 1
+
+    # Indicate significantly high rate bins:
+    bin.results.ib[(bin.results.ib[, "ml.signif"] & bin.results.ib[, "in.rate"] > bin.results.ib[, "out.rate"]), "ml.signif.hi"] <- 1
   
     # Indicate significantly low rate bins:
     bin.results[(bin.results[, "ml.signif"] & bin.results[, "in.rate"] < bin.results[, "out.rate"]), "ml.signif.lo"] <- 1
 
+    # Indicate significantly low rate bins:
+    bin.results.tb[(bin.results.tb[, "ml.signif"] & bin.results.tb[, "in.rate"] < bin.results.tb[, "out.rate"]), "ml.signif.lo"] <- 1
+
+    # Indicate significantly low rate bins:
+    bin.results.ib[(bin.results.ib[, "ml.signif"] & bin.results.ib[, "in.rate"] < bin.results.ib[, "out.rate"]), "ml.signif.lo"] <- 1
+
     # Round chi-square values in output:
     bin.results[, "ml.chisq"] <- round(bin.results[, "ml.chisq"], 2)
+
+    # Round chi-square values in output:
+    bin.results.tb[, "ml.chisq"] <- round(bin.results.tb[, "ml.chisq"], 2)
+
+    # Round chi-square values in output:
+    bin.results.ib[, "ml.chisq"] <- round(bin.results.ib[, "ml.chisq"], 2)
   
     # Round p-values in output:
     bin.results[, "ml.pval"] <- round(bin.results[, "ml.pval"], 3)
+
+    # Round p-values in output:
+    bin.results.tb[, "ml.pval"] <- round(bin.results.tb[, "ml.pval"], 3)
+
+    # Round p-values in output:
+    bin.results.ib[, "ml.pval"] <- round(bin.results.ib[, "ml.pval"], 3)
   
 # WHAT TO DO WITH ZERO VALUES IN TIME SERIES? EXCLUDE?
 # TIME IS KEY THING TO CHECK (IF ZERO THEN NO CHANCE TO OBSERVE ANYTHING)
@@ -362,8 +472,10 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
     # If not then print notification and stop:
     cat(paste("H_0 - all rates equal across time bins - cannot be rejected at an alpha of ", alpha, " (Actual p = ", chisq.p, ").\nCalculations of per-bin rates aborted.", sep=""))
     
+# NEED TO MODIFY THE BELOW AS MAY BE SIG DIFFS FOR INTERNAL OR TERMINAL BRANCHES NOT SEEN IN POOLED
+
     # Create NULL outputs:
-    bin.results <- paste("H_0 - all rates equal across time bins - cannot be rejected at an alpha of ", alpha, " (Actual p = ", chisq.p, ").\nA single rate of ", mlenumer, "is preferred.", sep="")
+    bin.results.tb <- bin.results.ib <- bin.results <- paste("H_0 - all rates equal across time bins - cannot be rejected at an alpha of ", alpha, " (Actual p = ", chisq.p, ").\nA single rate of ", mlenumer, "is preferred.", sep="")
     
   }
 
@@ -900,11 +1012,13 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
     
   }
   
+# COMBINE TIME BIN RESULTS INTO SINGLE VARIABLE?
+
   # List output matrices:
-  out <- list(node.results, branch.results, bin.results)
+  out <- list(node.results, branch.results, bin.results, bin.results.tb, bin.results.ib)
   
   # Add names to them:
-  names(out) <- c("node.results", "branch.results", "per.bin.rates")
+  names(out) <- c("node.results", "branch.results", "per.bin.rates", "per.bin.rates.tb", "per.bin.rates.ib")
   
   # Return results:
   return(out)
