@@ -22,7 +22,7 @@ AncStateEstMatrix(morph.matrix, tree, estimate.allchars=FALSE, estimate.tips=FAL
 }
 
 \details{
-Uses the \link{rerootingMethod} (Tang et al. 1995) as implemented in the \link{phytools} package to make ancestral state estimates. Here these are collapsed to the most likely state, or if two or more states are most likely, a polymorphism of the most likely states. This is the method used by Brusatte et al. (2014).
+Uses the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package to make ancestral state estimates. Here these are collapsed to the most likely state, or if two or more states are most likely, a polymorphism of the most likely states. This is the method used by Brusatte et al. (2014).
 }
 
 \value{
