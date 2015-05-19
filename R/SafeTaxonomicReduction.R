@@ -179,10 +179,10 @@ SafeTaxonomicReduction <- function(morph.matrix) {
     reduced.matrix <- removed.matrix <- full.matrix
     
     # Remove STR taxa to create reduced matrix:
-    reduced.matrix <- reduced.matrix$matrix[-match(removes, rownames(reduced.matrix$matrix)), ]
+    reduced.matrix <- reduced.matrix$matrix[-match(removes, rownames(reduced.matrix$matrix)), , drop = FALSE]
     
     # Isolate removed taxa for removed matrix:
-    removed.matrix <- removed.matrix$matrix[match(removes, rownames(removed.matrix$matrix)), ]
+    removed.matrix <- removed.matrix$matrix[match(removes, rownames(removed.matrix$matrix)), , drop = FALSE]
     
     # Compile results into a list:
     result <- list(str.list, reduced.matrix, removed.matrix)
