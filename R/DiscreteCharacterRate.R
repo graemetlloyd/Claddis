@@ -268,7 +268,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
   if(chisq.p < alpha) {
     
     # If so then print notification and carry on:
-    cat(paste("H_0 - all rates equal across time bins - is rejected at an alpha of ", alpha, " (actual p = ", chisq.p, ").\nContinuing to per-bin rate calculations.\n", sep=""))
+    cat(paste("H_0 -  equal across time bins - is rejected at an alpha of ", alpha, " (actual p = ", chisq.p, ").\nContinuing to per-bin rate calculations.\n", sep=""))
 
     # Create matrix to store time bin results:
     bin.results.tb <- bin.results.ib <- bin.results <- matrix(0, nrow=length(time.bins) - 1, ncol=10)
@@ -475,7 +475,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
 # NEED TO MODIFY THE BELOW AS MAY BE SIG DIFFS FOR INTERNAL OR TERMINAL BRANCHES NOT SEEN IN POOLED
 
     # Create NULL outputs:
-    bin.results.tb <- bin.results.ib <- bin.results <- paste("H_0 - all rates equal across time bins - cannot be rejected at an alpha of ", alpha, " (Actual p = ", chisq.p, ").\nA single rate of ", mlenumer, "is preferred.", sep="")
+    bin.results.tb <- bin.results.ib <- bin.results <- message(paste("H_0 - all rates equal across time bins - cannot be rejected at an alpha of ", alpha, " (Actual p = ", chisq.p, ").\nA single rate of ", mlenumer, "is preferred.", sep=""))
     
   }
 
@@ -585,7 +585,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
   if(chisq.p < alpha) {
     
     # If so then print notification and carry on:
-    cat(paste("H_0 - all rates equal across the tree - is rejected at an alpha of ", alpha, " (actual p = ", chisq.p, ").\nContinuing to per-branch and per-clade rate calculations.", sep=""))
+    cat(paste("H_0 -  equal across the tree - is rejected at an alpha of ", alpha, " (actual p = ", chisq.p, ").\nContinuing to per-branch and per-clade rate calculations.", sep=""))
     
     # Create matrix to store branch results:
     branch.results <- matrix(0, nrow=n, ncol=20)
