@@ -1,3 +1,5 @@
+# OUTPUT CAN BE VECTORS IF MATRIX HAS ROW ONE - FIX!!!!!
+
 SafeTaxonomicReduction <- function(morph.matrix) {
   
   # Store extra copy of matrix:
