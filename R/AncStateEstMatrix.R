@@ -1,4 +1,4 @@
-AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars=FALSE, estimate.tips=FALSE) {
+AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, estimate.tips = FALSE) {
 
   # Catch problem with trees with no branch lengths:
   if(is.null(tree$edge.length)) stop("ERROR:\n Tree must have branch lengths.")
@@ -122,11 +122,8 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars=FALSE, estim
 
             }
 
-            # Get likelihoods for each state in taxa and ancestors:
-            state.likelihoods <- rerootingMethod(chartree, tipvals.mat, model=mymodel)$marginal.anc
-
             # Remove any potential node labels on the character tree to avoid an error from rerootingMethod():
-            chartree$node.label<-NULL 
+            chartree$node.label <- NULL
 
             # Get likelihoods for each state in taxa and ancestors:
             state.likelihoods <- rerootingMethod(chartree, tipvals.mat, model=mymodel)$marginal.anc
