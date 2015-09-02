@@ -38,11 +38,11 @@
 #' # Show distances:
 #' distances
 #'
-#' exportPattern("^[[:alpha:]]+")
-#' import(ape)
-#' import(gdata)
-#' import(phytools)
-#' import(strap)
+#' @exportPattern "^[[:alpha:]]+"
+#' @import ape
+#' @import gdata
+#' @import phytools
+#' @import strap
 NULL
 
 
