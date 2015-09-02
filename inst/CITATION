@@ -1,5 +1,5 @@
 citHeader("To cite package 'Claddis' in a publication use:")
 
-        textVersion = paste("Lloyd, Graeme T. (2015). Claddis: Measuring Morphological Diversity and Evolutionary Tempo. R package version 0.1."))
+        textVersion = paste("Lloyd, Graeme T. (2015). Claddis: Measuring Morphological Diversity and Evolutionary Tempo. R package version 0.1.")
 
 citFooter("As Claddis is evolving quickly, you may want to cite also its version number (found with 'library(help = Claddis)').")
