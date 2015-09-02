@@ -1,4 +1,4 @@
-
+# ADD CLOSE REFERENCE
 
 #' Cladistic disparity
 #' 
@@ -37,7 +37,12 @@
 #' 
 #' # Show distances:
 #' distances
-#' 
+#'
+#' exportPattern("^[[:alpha:]]+")
+#' import(ape)
+#' import(gdata)
+#' import(phytools)
+#' import(strap)
 NULL
 
 
