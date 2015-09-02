@@ -641,7 +641,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
   if(chisq.p < alpha) {
     
     # If so then print notification and carry on:
-    cat(paste("H_0 -  equal across the tree - is rejected at an alpha of ", alpha, " (actual p = ", chisq.p, ").\nContinuing to per-branch and per-clade rate calculations.", sep=""))
+    cat(paste("H_0 - all rates equal across the tree - is rejected at an alpha of ", alpha, " (actual p = ", chisq.p, ").\nContinuing to per-branch and per-clade rate calculations.", sep=""))
     
     # Create matrix to store branch results:
     branch.results <- matrix(0, nrow=n, ncol=20)
