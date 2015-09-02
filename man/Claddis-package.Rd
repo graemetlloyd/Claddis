@@ -4,15 +4,9 @@
 \name{Claddis-package}
 \alias{Claddis}
 \alias{Claddis-package}
-\title{Cladistic disparity}
+\title{Measuring Morphological Diversity and Evolutionary Tempo}
 \description{
-A package to read cladistic morphological datasets into R and perform
-morphological disparity or rates of character evolution analyses upon them.
-}
-\details{
-\tabular{ll}{ Package: \tab Claddis\cr Type: \tab Package\cr Version: \tab
-0.0.1\cr Date: \tab 2013-05-22\cr License: \tab GPL (>=2)\cr LazyLoad: \tab
-yes\cr }
+Measures morphological diversity from discrete character data and estimates evolutionary tempo on phylogenetic trees.
 }
 \examples{
 # Get morphological distances for Michaux (1989) data set:
@@ -36,6 +30,9 @@ morphological disparity. Biology Letters, 4, 733-736.
 Brusatte, S. L., Lloyd, G. T., Wang, S. C. and Norell, M. A., 2014. Gradual
 assembly of avian body plan culminated in rapid rates of evolution across
 dinosaur-bird transition. Current Biology, 24, 2386-2392.
+
+Close, R. A., Friedman, M., Lloyd, G. T. and Benson, R. B. J., in press.
+Evidence for a mid-Jurassic adaptive radiation in mammals. Current Biology.
 
 Lloyd, G. T., Wang, S. C. and Brusatte, S. L., 2012. Identifying
 heterogeneity in rates of morphological evolution: discrete character change
