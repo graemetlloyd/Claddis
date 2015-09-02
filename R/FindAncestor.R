@@ -1,3 +1,33 @@
+#' Find ancestor
+#' 
+#' Finds last common ancestor (node) of a set of two or more descendant tips.
+#' 
+#' Intended for use as an internal function for \link{TrimMorphDistMatrix}, but
+#' potentially of more general use.
+#' 
+#' @param descs A vector of mode character representing the tip names for which
+#' an ancestor is sought.
+#' @param tree The tree as a phylo object.
+#' @return \item{anc.node}{The ancestral node number.}
+#' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#' @keywords ancestor
+#' @examples
+#' 
+#' # Create a simple four-taxon tree:
+#' tree <- read.tree(text="(A,(B,(C,D)));")
+#' 
+#' # Plot the tree:
+#' plot(tree)
+#' 
+#' # Add nodelabels and show that the most recent common
+#' # ancestor of B, C, and D is node 6:
+#' nodelabels()
+#' 
+#' # Use FindAncestor to show that the most recent common
+#' # ancestor of B, C, and D is node 6:
+#' FindAncestor(c("B", "C", "D"), tree)
+#' 
+#' @export FindAncestor
 FindAncestor <- function(descs, tree) {
 
   # Get tip numbers:

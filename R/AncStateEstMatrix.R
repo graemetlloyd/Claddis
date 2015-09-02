@@ -1,3 +1,51 @@
+#' Ancestral State Estimation
+#' 
+#' Given a tree and a cladistic matrix uses likelihood to estimate the
+#' ancestral states for every character.
+#' 
+#' Uses the \link{rerootingMethod} (Yang et al. 1995) as implemented in the
+#' \link{phytools} package to make ancestral state estimates. Here these are
+#' collapsed to the most likely state, or if two or more states are most
+#' likely, a polymorphism of the most likely states. This is the method used by
+#' Brusatte et al. (2014).
+#' 
+#' @param morph.matrix A character-taxon matrix in the format imported by
+#' \link{ReadMorphNexus}.
+#' @param tree A tree (phylo object) with branch lengths that represents the
+#' relationships of the taxa in \code{morph.matrix}.
+#' @param estimate.allchars An optional that allows the user to make estimates
+#' for all ancestral values. The default will only make estimates for nodes
+#' that link coded terminals.
+#' @param estimate.tips An optional that allows the user to make estimates for
+#' tip values. The default only makes estimates for internal nodes.
+#' @return \item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors;
+#' rows) against characters (columns) listing the reconstructed ancestral
+#' states.}
+#' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#' @references Brusatte, S. L., Lloyd, G. T., Wang, S. C. and Norell, M. A.,
+#' 2014. Gradual assembly of avian body plan culminated in rapid rates of
+#' evolution across dinosaur-bird transition. Current Biology, 24, 2386-2392.
+#' 
+#' Yang, Z., Kumar, S. and Nei, M., 1995. A new method of inference of
+#' ancestral nucleotide and amino acid sequences. Genetics, 141, 1641-1650.
+#' @examples
+#' 
+#' # Set random seed:
+#' set.seed(17)
+#' 
+#' # Generate a random tree for the Michaux data set:
+#' tree <- rtree(nrow(Michaux1989$matrix))
+#' 
+#' # Update taxon names to match those in the data matrix:
+#' tree$tip.label <- rownames(Michaux1989$matrix)
+#' 
+#' # Set root time by making youngest taxon extant:
+#' tree$root.time <- max(diag(vcv(tree)))
+#' 
+#' # Estimate ancestral states:
+#' AncStateEstMatrix(Michaux1989, tree)
+#' 
+#' @export AncStateEstMatrix
 AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, estimate.tips = FALSE) {
 
   # Catch problem with trees with no branch lengths:
