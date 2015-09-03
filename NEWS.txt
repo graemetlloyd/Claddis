@@ -2,7 +2,7 @@ CHANGES IN CLADDIS VERSION 0.2
 
   NEW FEATURES
     o Added citation file to package.
-    o Added internal and terminal branch versions of the time series output for DiscreteCharacterRate. This was added for sensitivity tests in Close et al. (2015).
+    o Added internal and terminal branch versions of the time series output for DiscreteCharacterRate. This was added to complete the internal and terminal test and was used as an additional set of sensitivity tests in Close et al. (2015).
     o Added this NEWS file to keep users abreast of changes to Claddis.
 
   BUG FIXES
