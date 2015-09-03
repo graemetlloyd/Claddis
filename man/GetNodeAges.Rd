@@ -7,16 +7,13 @@
 GetNodeAges(tree)
 }
 \arguments{
-\item{tree}{A tree (phylo object) with branch lengths representing time and
-a value for \code{$root.time}.}
+\item{tree}{A tree (phylo object) with branch lengths representing time and a value for \code{$root.time}.}
 }
 \description{
-Given a tree with branch-lengths scaled to time and a value for
-\code{$root.time} will return a vector of node ages.
+Given a tree with branch-lengths scaled to time and a value for \code{$root.time} will return a vector of node ages.
 }
 \details{
-Returns a vector of node ages (terminal and internal) labelled by their node
-number.
+Returns a vector of node ages (terminal and internal) labelled by their node number.
 }
 \examples{
 # Create simple four-taxon tree with edge lengths all

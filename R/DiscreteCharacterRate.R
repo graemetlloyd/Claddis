@@ -45,7 +45,7 @@
 #' 
 #' # Get discrete character rates:
 #' DiscreteCharacterRate(tree, Michaux1989,
-#'   seq(tree$root.time, 0, length.out=3), alpha=0.01)
+#'   seq(tree$root.time, 0, length.out = 3), alpha = 0.01)
 #' 
 #' @export DiscreteCharacterRate
 DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
@@ -113,7 +113,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   for(i in 1:length(tree$edge[, 1])) {
     
     # Find the characters scored for both nodes (either end of the branch):
-    comp.chars <- intersect(grep(TRUE, !is.na(all.states[tree$edge[i, 1], ])), grep(TRUE, !is.na(all.states[tree$edge[i, 2], ])))
+    comp.chars <- intersect(which(!is.na(all.states[tree$edge[i, 1], ])), which(!is.na(all.states[tree$edge[i, 2], ])))
     
     # Store completeness of branch:
     completeness.tree$edge.length[i] <- sum(clad.matrix$weights[comp.chars])
@@ -131,7 +131,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
     ranges <- (clad.matrix$max.vals - clad.matrix$min.vals)[comp.chars]
     
     # Correct ranges for unordered characters:
-    ranges[intersect(grep(TRUE, ranges > 1), grep(TRUE, orderings == "unord"))] <- 1
+    ranges[intersect(which(ranges > 1), which(orderings == "unord"))] <- 1
     
     # WILL EVENTUALLY NEED SOMETHING HERE TO DEAL WITH STEP MATRICES (DITTO FOR POLYMORPHISMS PART BELOW)
     
@@ -191,7 +191,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
     comp.diffs <- abs(comp.states[1, ] - comp.states[2, ])
     
     # Identify distances greater than one for unordered characters if present:
-    unord.diffs <- intersect(grep(TRUE, orderings == "unord"), grep(TRUE, comp.diffs > 1))
+    unord.diffs <- intersect(which(orderings == "unord"), which(comp.diffs > 1))
     
     # If distances greater than one are found for unordered characters:
     if(length(unord.diffs) > 0) {
@@ -450,13 +450,13 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
     cutoffs.ib <- c((1:m.ib) / m.ib * alpha, rep(0, nzero.ib))
 
     # Get indices ready for identifying significant p values:
-    ifelse(length(grep(TRUE, sort(bin.pvals) <= cutoffs)) > 0, indices <- 1:max((1:m)[sort(bin.pvals) <= cutoffs]), indices <- c(1)[-1])
+    ifelse(length(which(sort(bin.pvals) <= cutoffs)) > 0, indices <- 1:max((1:m)[sort(bin.pvals) <= cutoffs]), indices <- c(1)[-1])
 
     # Get indices ready for identifying significant p values:
-    ifelse(length(grep(TRUE, sort(bin.pvals.tb) <= cutoffs.tb)) > 0, indices.tb <- 1:max((1:m.tb)[sort(bin.pvals.tb) <= cutoffs.tb]), indices.tb <- c(1)[-1])
+    ifelse(length(which(sort(bin.pvals.tb) <= cutoffs.tb)) > 0, indices.tb <- 1:max((1:m.tb)[sort(bin.pvals.tb) <= cutoffs.tb]), indices.tb <- c(1)[-1])
 
     # Get indices ready for identifying significant p values:
-    ifelse(length(grep(TRUE, sort(bin.pvals.ib) <= cutoffs.ib)) > 0, indices.ib <- 1:max((1:m.ib)[sort(bin.pvals.ib) <= cutoffs.ib]), indices.ib <- c(1)[-1])
+    ifelse(length(which(sort(bin.pvals.ib) <= cutoffs.ib)) > 0, indices.ib <- 1:max((1:m.ib)[sort(bin.pvals.ib) <= cutoffs.ib]), indices.ib <- c(1)[-1])
 
     # Isolate significant p values:
     signif <- order(bin.pvals)[indices]
@@ -568,13 +568,13 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   Time.ib <- tree$edge.length[internal.branches]
   
   # Get number of zero length branches:
-  nzero <- length(grep(TRUE, Time == 0))
+  nzero <- length(which(Time == 0))
   
   # Get number of zero length terminal branches:
-  nzero.tb <- length(grep(TRUE, Time.tb == 0))
+  nzero.tb <- length(which(Time.tb == 0))
   
   # Get number of zero length internal branches:
-  nzero.ib <- length(grep(TRUE, Time.ib == 0))
+  nzero.ib <- length(which(Time.ib == 0))
   
   # Get maximum likelihood numerator:
   mlenumer <- sum(changes) / sum(Time * pctcomp)
@@ -913,13 +913,13 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
     cutoffs.ib <- c((1:m.ib) / m.ib * alpha, rep(0, nzero.ib))
     
     # Get indices ready for identifying significant p values:
-    ifelse(length(grep(TRUE, sort(branch.pvals) <= cutoffs)) > 0, indices <- 1:max((1:m)[sort(branch.pvals) <= cutoffs]), indices <- c(1)[-1])
+    ifelse(length(which(sort(branch.pvals) <= cutoffs)) > 0, indices <- 1:max((1:m)[sort(branch.pvals) <= cutoffs]), indices <- c(1)[-1])
     
     # Get indices ready for identifying significant terminal p values:
-    ifelse(length(grep(TRUE, sort(branch.pvals.tb) <= cutoffs.tb)) > 0, indices.tb <- 1:max((1:m.tb)[sort(branch.pvals.tb) <= cutoffs.tb]), indices.tb <- c(1)[-1])
+    ifelse(length(which(sort(branch.pvals.tb) <= cutoffs.tb)) > 0, indices.tb <- 1:max((1:m.tb)[sort(branch.pvals.tb) <= cutoffs.tb]), indices.tb <- c(1)[-1])
     
     # Get indices ready for identifying significant internal p values:
-    ifelse(length(grep(TRUE, sort(branch.pvals.ib) <= cutoffs.ib)) > 0, indices.ib <- 1:max((1:m.ib)[sort(branch.pvals.ib) <= cutoffs.ib]), indices.ib <- c(1)[-1])
+    ifelse(length(which(sort(branch.pvals.ib) <= cutoffs.ib)) > 0, indices.ib <- 1:max((1:m.ib)[sort(branch.pvals.ib) <= cutoffs.ib]), indices.ib <- c(1)[-1])
     
     # Isolate significant p values:
     signif <- order(branch.pvals)[indices]
@@ -985,13 +985,13 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
     cutoffs.ib <- (1:m.ib) / m.ib * alpha
     
     # Get indices ready for identifying significant p values:
-    ifelse(length(grep(TRUE, sort(node.pvals) <= cutoffs)) > 0, indices <- 1:max((1:m)[sort(node.pvals) <= cutoffs]), indices <- c(1)[-1])
+    ifelse(length(which(sort(node.pvals) <= cutoffs)) > 0, indices <- 1:max((1:m)[sort(node.pvals) <= cutoffs]), indices <- c(1)[-1])
     
     # Get indices ready for identifying significant p values for terminal branches:
-    ifelse(length(grep(TRUE, sort(node.pvals.tb) <= cutoffs)) > 0, indices.tb <- 1:max((1:m)[sort(node.pvals.tb) <= cutoffs]), indices.tb <- c(1)[-1])
+    ifelse(length(which(sort(node.pvals.tb) <= cutoffs)) > 0, indices.tb <- 1:max((1:m)[sort(node.pvals.tb) <= cutoffs]), indices.tb <- c(1)[-1])
     
     # Get indices ready for identifying significant p values for internal branches:
-    ifelse(length(grep(TRUE, sort(node.pvals.ib) <= cutoffs.ib)) > 0, indices.ib <- 1:max((1:m.ib)[sort(node.pvals.ib) <= cutoffs.ib]), indices.ib <- c(1)[-1])
+    ifelse(length(which(sort(node.pvals.ib) <= cutoffs.ib)) > 0, indices.ib <- 1:max((1:m.ib)[sort(node.pvals.ib) <= cutoffs.ib]), indices.ib <- c(1)[-1])
     
     # Isolate significant p-values:
     signif <- order(node.pvals)[indices]
@@ -1039,7 +1039,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
     node.results[(node.results[, "ml.signif.tb"] & node.results[, "in.rate.tb"] > node.results[, "out.rate.tb"]), "ml.signif.hi.tb"] <- 1
     
     # Record significantly high clade rates:
-    node.results[intersect(grep(TRUE, node.results[, "ml.signif.ib"] == 1), grep(TRUE, node.results[, "in.rate.ib"] > node.results[, "out.rate.ib"])), "ml.signif.hi.ib"] <- 1
+    node.results[intersect(which(node.results[, "ml.signif.ib"] == 1), which(node.results[, "in.rate.ib"] > node.results[, "out.rate.ib"])), "ml.signif.hi.ib"] <- 1
     
     # Record signficiantly low rates:
     node.results[(node.results[, "ml.signif"] & node.results[, "in.rate"] < node.results[, "out.rate"]), "ml.signif.lo"] <- 1
@@ -1048,7 +1048,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
     node.results[(node.results[, "ml.signif.tb"] & node.results[, "in.rate.tb"] < node.results[, "out.rate.tb"]), "ml.signif.lo.tb"] <- 1
     
     # Record significantly low rates:
-    node.results[intersect(grep(TRUE, node.results[, "ml.signif.ib"] == 1), grep(TRUE, node.results[, "in.rate.ib"] < node.results[, "out.rate.ib"])), "ml.signif.lo.ib"] <- 1
+    node.results[intersect(which(node.results[, "ml.signif.ib"] == 1), which(node.results[, "in.rate.ib"] < node.results[, "out.rate.ib"])), "ml.signif.lo.ib"] <- 1
 
   # Case if equal rates cannot be rejected:
   } else {

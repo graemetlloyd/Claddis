@@ -7,9 +7,11 @@
 #' This is intended as an internal function, but may be of use to someone else.
 #' 
 #' @param tree A tree (phylo object).
-#' @return Returns a matrix where links are scored 1 and everything else 0. The
-#' diagonal is left as zero.
+#'
+#' @return Returns a matrix where links are scored 1 and everything else 0. The diagonal is left as zero.
+#'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#'
 #' @examples
 #' 
 #' # Create a simple four-taxon tree:

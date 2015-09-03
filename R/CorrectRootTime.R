@@ -2,23 +2,19 @@
 #' 
 #' Corrects root.time after taxa have been pruned from a tree using drop.tip
 #' 
-#' (NB: This function is designed to only cope with trees containing at least
-#' three tips.)
+#' (NB: This function is designed to only cope with trees containing at least three tips.)
 #' 
-#' When removing taxa from a time-scaled tree using \link{drop.tip} in
-#' \link{ape} \code{$root.time} is left unchanged. This can cause downstream
-#' problems if not corrected and that is what this function does.
+#' When removing taxa from a time-scaled tree using \link{drop.tip} in \link{ape} \code{$root.time} is left unchanged. This can cause downstream problems if not corrected and that is what this function does.
 #' 
-#' Note that \code{fixRootTime} in the \code{paleotree} package performs the
-#' same function, but is not called here to reduce the number of libraries on
-#' which \code{Claddis} is dependent. Interested users should also refer to the
-#' \code{dropPaleoTip} function in \code{paleotree}.
+#' Note that \code{fixRootTime} in the \code{paleotree} package performs the same function, but is not called here to reduce the number of libraries on which \code{Claddis} is dependent. Interested users should also refer to the \code{dropPaleoTip} function in \code{paleotree}.
 #' 
 #' @param original.tree A tree in phylo format.
-#' @param pruned.tree A tree in phylo format that represents a pruned version
-#' of \code{original.tree}.
+#' @param pruned.tree A tree in phylo format that represents a pruned version of \code{original.tree}.
+#'
 #' @return Returns a tree (phylo object) with a corrected \code{$root.time}.
+#'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#'
 #' @examples
 #' 
 #' # Create a simple four-taxon tree with branch lengths:

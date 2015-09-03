@@ -51,7 +51,7 @@ TrimMorphDistMatrix <- function(dist.matrix, tree=NULL) {
   if(is.null(tree)) {
     
     # Case if distance matrix is already complete:
-    if(length(grep(TRUE, is.na(dist.matrix))) == 0) {
+    if(length(which(is.na(dist.matrix))) == 0) {
 
       # Warn user:
       print("There are no gaps in the distance matrix")
@@ -75,19 +75,19 @@ TrimMorphDistMatrix <- function(dist.matrix, tree=NULL) {
       removes <- vector(mode="character")
       
       # Whilst there are still gaps in the matrix:
-      while(length(grep(TRUE, is.na(dist.matrix))) > 0) {
+      while(length(which(is.na(dist.matrix))) > 0) {
         
         # Vector to store number of NAs for each row of the matrix:
         na.lengths <- vector(mode="numeric")
         
         # For each row of the matrix get the number of NAs:
-        for(i in 1:length(dist.matrix[, 1])) na.lengths[i] <- length(grep(TRUE, is.na(dist.matrix[i, ])))
+        for(i in 1:length(dist.matrix[, 1])) na.lengths[i] <- length(which(is.na(dist.matrix[i, ])))
         
         # Take row with most NAs and make it the taxon to delete:
-        taxon.to.delete <- rownames(dist.matrix)[grep(TRUE, na.lengths == max(na.lengths))[1]]
+        taxon.to.delete <- rownames(dist.matrix)[which(na.lengths == max(na.lengths))[1]]
         
         # Find the taxons row:
-        delete.row <- grep(TRUE, rownames(dist.matrix) == taxon.to.delete)
+        delete.row <- which(rownames(dist.matrix) == taxon.to.delete)
         
         # Remove it from the distance matrix:
         dist.matrix <- dist.matrix[-delete.row, -delete.row]
@@ -112,7 +112,7 @@ TrimMorphDistMatrix <- function(dist.matrix, tree=NULL) {
   } else {
     
     # Case if distance matrix is already complete:
-    if(length(grep(TRUE, is.na(dist.matrix))) == 0) {
+    if(length(which(is.na(dist.matrix))) == 0) {
       
       # Warn user:
       print("There are no gaps in the distance matrix")
@@ -145,19 +145,19 @@ TrimMorphDistMatrix <- function(dist.matrix, tree=NULL) {
       temp.dist.matrix <- dist.matrix
       
       # Whilst there are still gaps in the matrix:
-      while(length(grep(TRUE, is.na(dist.matrix))) > 0) {
+      while(length(which(is.na(dist.matrix))) > 0) {
         
         # Vector to store number of NAs for each row of the matrix:
         na.lengths <- vector(mode="numeric")
         
         # For each row of the matrix get the number of NAs:
-        for(i in 1:length(dist.matrix[, 1])) na.lengths[i] <- length(grep(TRUE, is.na(dist.matrix[i, ])))
+        for(i in 1:length(dist.matrix[, 1])) na.lengths[i] <- length(which(is.na(dist.matrix[i, ])))
         
         # Take row with most NAs and make it the taxon to delete:
-        taxon.to.delete <- rownames(dist.matrix)[grep(TRUE, na.lengths == max(na.lengths))[1]]
+        taxon.to.delete <- rownames(dist.matrix)[which(na.lengths == max(na.lengths))[1]]
         
         # Find the taxons row:
-        delete.row <- grep(TRUE, rownames(dist.matrix) == taxon.to.delete)
+        delete.row <- which(rownames(dist.matrix) == taxon.to.delete)
         
         # Remove it from the distance matrix:
         dist.matrix <- dist.matrix[-delete.row, -delete.row]
@@ -183,7 +183,7 @@ TrimMorphDistMatrix <- function(dist.matrix, tree=NULL) {
       for(i in tips.to.remove) {
         
         # Get originating node for tip:
-        originating.node <- tree$edge[match(grep(TRUE, tree$tip.label == i), tree$edge[, 2]), 1]
+        originating.node <- tree$edge[match(which(tree$tip.label == i), tree$edge[, 2]), 1]
         
         # Get name of originating node:
         originating.node.name <- paste(sort(tree$tip.label[FindDescendants(originating.node, tree)]), collapse="%%")
@@ -206,10 +206,10 @@ TrimMorphDistMatrix <- function(dist.matrix, tree=NULL) {
           originating.node <- FindAncestor(strsplit(i, "%%")[[1]], tree)
           
           # Find descendants of that node:
-          descendant.nodes <- tree$edge[grep(TRUE, tree$edge[, 1] == originating.node), 2]
+          descendant.nodes <- tree$edge[which(tree$edge[, 1] == originating.node), 2]
           
           # Case if one of the descendants is a tip:
-          if(length(grep(TRUE,descendant.nodes <= Ntip(tree))) > 0) {
+          if(length(which(descendant.nodes <= Ntip(tree))) > 0) {
             
             # Get taxon to exclude:
             taxon.to.exclude <- tree$tip.label[min(descendant.nodes)]
@@ -253,12 +253,12 @@ TrimMorphDistMatrix <- function(dist.matrix, tree=NULL) {
         nms <- strsplit(rownames(dist.matrix)[i], "%%")[[1]]
         
         # Get only still present taxa and rename rows and columns:
-        rownames(dist.matrix)[i] <- colnames(dist.matrix)[i] <- paste(sort(nms[grep(TRUE, is.na(match(nms, tips.to.remove)))]), collapse="%%")
+        rownames(dist.matrix)[i] <- colnames(dist.matrix)[i] <- paste(sort(nms[which(is.na(match(nms, tips.to.remove)))]), collapse="%%")
         
       }
 
       # Estbalish if there are redundant rows (nodes defined by a single tip or by no tips at all):
-      redundant.rows <- c(grep(TRUE, duplicated(rownames(dist.matrix))), grep(TRUE, rownames(dist.matrix) == ""))
+      redundant.rows <- c(which(duplicated(rownames(dist.matrix))), which(rownames(dist.matrix) == ""))
       
       # If there are any redundant rows:
       if(length(redundant.rows) > 0) {

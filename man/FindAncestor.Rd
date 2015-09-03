@@ -7,8 +7,7 @@
 FindAncestor(descs, tree)
 }
 \arguments{
-\item{descs}{A vector of mode character representing the tip names for which
-an ancestor is sought.}
+\item{descs}{A vector of mode character representing the tip names for which an ancestor is sought.}
 
 \item{tree}{The tree as a phylo object.}
 }

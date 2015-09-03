@@ -1,33 +1,24 @@
 #' Ancestral State Estimation
 #' 
-#' Given a tree and a cladistic matrix uses likelihood to estimate the
-#' ancestral states for every character.
+#' Given a tree and a cladistic matrix uses likelihood to estimate the ancestral states for every character.
 #' 
-#' Uses the \link{rerootingMethod} (Yang et al. 1995) as implemented in the
-#' \link{phytools} package to make ancestral state estimates. Here these are
-#' collapsed to the most likely state, or if two or more states are most
-#' likely, a polymorphism of the most likely states. This is the method used by
-#' Brusatte et al. (2014).
+#' Uses the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package to make ancestral state estimates. Here these are collapsed to the most likely state, or if two or more states are most likely, a polymorphism of the most likely states. This is the method used by Brusatte et al. (2014).
 #' 
-#' @param morph.matrix A character-taxon matrix in the format imported by
-#' \link{ReadMorphNexus}.
-#' @param tree A tree (phylo object) with branch lengths that represents the
-#' relationships of the taxa in \code{morph.matrix}.
-#' @param estimate.allchars An optional that allows the user to make estimates
-#' for all ancestral values. The default will only make estimates for nodes
-#' that link coded terminals.
-#' @param estimate.tips An optional that allows the user to make estimates for
-#' tip values. The default only makes estimates for internal nodes.
-#' @return \item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors;
-#' rows) against characters (columns) listing the reconstructed ancestral
-#' states.}
+#' @param morph.matrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#' @param tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{morph.matrix}.
+#' @param estimate.allchars An optional that allows the user to make estimates for all ancestral values. The default will only make estimates for nodes that link coded terminals.
+#' @param estimate.tips An optional that allows the user to make estimates for tip values. The default only makes estimates for internal nodes.
+#'
+#' @return \item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral states.}
+#'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
-#' @references Brusatte, S. L., Lloyd, G. T., Wang, S. C. and Norell, M. A.,
-#' 2014. Gradual assembly of avian body plan culminated in rapid rates of
-#' evolution across dinosaur-bird transition. Current Biology, 24, 2386-2392.
+#'
+#' @references
+#'
+#' Brusatte, S. L., Lloyd, G. T., Wang, S. C. and Norell, M. A., 2014. Gradual assembly of avian body plan culminated in rapid rates of evolution across dinosaur-bird transition. Current Biology, 24, 2386-2392.
 #' 
-#' Yang, Z., Kumar, S. and Nei, M., 1995. A new method of inference of
-#' ancestral nucleotide and amino acid sequences. Genetics, 141, 1641-1650.
+#' Yang, Z., Kumar, S. and Nei, M., 1995. A new method of inference of ancestral nucleotide and amino acid sequences. Genetics, 141, 1641-1650.
+#'
 #' @examples
 #' 
 #' # Set random seed:
@@ -102,10 +93,10 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
       if(maxval != minval) {
             
         # If estimating states for all taxa then treat missing values as all possible states:
-        if(estimate.allchars) morph.matrix$matrix[grep(TRUE, is.na(morph.matrix$matrix[, i])), i] <- paste(minval:maxval, collapse="&")
+        if(estimate.allchars) morph.matrix$matrix[which(is.na(morph.matrix$matrix[, i])), i] <- paste(minval:maxval, collapse="&")
             
         # Find tips which cannot be used due to missing data:
-        tipstogo <- rownames(morph.matrix$matrix)[grep(TRUE, is.na(morph.matrix$matrix[, i]))]
+        tipstogo <- rownames(morph.matrix$matrix)[which(is.na(morph.matrix$matrix[, i]))]
             
         # Only continue if at least three tips in pruned tree:
         if(length(tipstogo) < (Ntip(tree) - 2)) {
@@ -149,13 +140,13 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
             colnames(tipvals.mat) <- minval:maxval
                     
             # Fill all probabilities equal to one (non-polymorphisms):
-            for(j in colnames(tipvals.mat)) tipvals.mat[grep(TRUE, tipvals == j), j] <- 1
+            for(j in colnames(tipvals.mat)) tipvals.mat[which(tipvals == j), j] <- 1
                     
             # If there are polymorphisms make all observed states equally probable:
             if(any(apply(tipvals.mat, 1, sum) == 0)) {
                         
               # Get list of tip values with polymorphisms:
-              polymorphism.values <- grep(TRUE, apply(tipvals.mat, 1, sum) == 0)
+              polymorphism.values <- which(apply(tipvals.mat, 1, sum) == 0)
                         
               # Go through each polymorphism:
               for(j in polymorphism.values) {
@@ -186,7 +177,7 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
             names(max.lik.state) <- rownames(state.likelihoods)
                     
             # For each tip and node find most likely state(s):
-            for(j in 1:length(max.lik)) max.lik.state[j] <- paste(colnames(state.likelihoods)[grep(TRUE, state.likelihoods[j, ] == max.lik[j])], collapse="&")
+            for(j in 1:length(max.lik)) max.lik.state[j] <- paste(colnames(state.likelihoods)[which(state.likelihoods[j, ] == max.lik[j])], collapse="&")
 
           # Case if gap-coded or apparently gap-coded:
           } else {

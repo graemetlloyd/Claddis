@@ -9,8 +9,7 @@ EdgeMatch(original.tree, pruned.tree)
 \arguments{
 \item{original.tree}{A tree in phylo format.}
 
-\item{pruned.tree}{A tree in phylo format that represents a pruned version
-of \code{original.tree}.}
+\item{pruned.tree}{A tree in phylo format that represents a pruned version \code{original.tree}.}
 }
 \value{
 \item{matching.edges}{A list of the matching edges.}
@@ -18,13 +17,10 @@ of \code{original.tree}.}
 \item{removed.edges}{A vector of the removed edges.}
 }
 \description{
-Given two trees where one is a pruned version of the other gives matching
-edges and nodes of pruned tree to original tree.
+Given two trees where one is a pruned version of the other gives matching edges and nodes of pruned tree to original tree.
 }
 \details{
-Finds matching edge(s) and node(s) for a pruned tree in the original tree
-from which it was created. This is intended as an internal function, but may
-be of use to someone.
+Finds matching edge(s) and node(s) for a pruned tree in the original tree from which it was created. This is intended as an internal function, but may be of use to someone.
 }
 \examples{
 # Create a random 10-taxon tree:

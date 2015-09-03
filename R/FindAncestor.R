@@ -5,14 +5,17 @@
 #' Intended for use as an internal function for \link{TrimMorphDistMatrix}, but
 #' potentially of more general use.
 #' 
-#' @param descs A vector of mode character representing the tip names for which
-#' an ancestor is sought.
+#' @param descs A vector of mode character representing the tip names for which an ancestor is sought.
 #' @param tree The tree as a phylo object.
+#'
 #' @return \item{anc.node}{The ancestral node number.}
+#'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#'
 #' @keywords ancestor
+#'
 #' @examples
-#' 
+#'
 #' # Create a simple four-taxon tree:
 #' tree <- read.tree(text="(A,(B,(C,D)));")
 #' 

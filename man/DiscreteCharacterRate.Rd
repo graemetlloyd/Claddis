@@ -45,7 +45,7 @@ tree$root.time <- max(diag(vcv(tree)))
 
 # Get discrete character rates:
 DiscreteCharacterRate(tree, Michaux1989,
-  seq(tree$root.time, 0, length.out=3), alpha=0.01)
+  seq(tree$root.time, 0, length.out = 3), alpha = 0.01)
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Steve C. Wang \email{scwang@swarthmore.edu}

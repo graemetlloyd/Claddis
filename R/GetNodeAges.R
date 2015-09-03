@@ -1,14 +1,13 @@
 #' Returns node ages for a time-scaled tree
 #' 
-#' Given a tree with branch-lengths scaled to time and a value for
-#' \code{$root.time} will return a vector of node ages.
+#' Given a tree with branch-lengths scaled to time and a value for \code{$root.time} will return a vector of node ages.
 #' 
-#' Returns a vector of node ages (terminal and internal) labelled by their node
-#' number.
+#' Returns a vector of node ages (terminal and internal) labelled by their node number.
 #' 
-#' @param tree A tree (phylo object) with branch lengths representing time and
-#' a value for \code{$root.time}.
+#' @param tree A tree (phylo object) with branch lengths representing time and a value for \code{$root.time}.
+#'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#'
 #' @examples
 #' 
 #' # Create simple four-taxon tree with edge lengths all
@@ -34,7 +33,7 @@ GetNodeAges <- function(tree) {
   names(paths) <- NULL
 
   # For each path:
-  for (i in 1:length(paths)) {
+  for(i in 1:length(paths)) {
     
     # Set counter as 1:
     j <- 1
@@ -43,7 +42,7 @@ GetNodeAges <- function(tree) {
     currentnode <- paths[[i]][j]
     
     # While current node is not the root (path has not terminated):
-    while (currentnode != rootnode) {
+    while(currentnode != rootnode) {
       
       # Update current node and add to path:
       currentnode <- paths[[i]][j + 1] <- tree$edge[match(currentnode, tree$edge[, 2]), 1]
@@ -59,7 +58,7 @@ GetNodeAges <- function(tree) {
   nodeages <- vector(mode="numeric", length=Ntip(tree) + Nnode(tree))
   
   # For each path:
-  for (i in 1:length(paths)) {
+  for(i in 1:length(paths)) {
     
     # Store path lengths from root:
     nodeages[paths[[i]][1]] <- sum(tree$edge.length[match(paths[[i]][1:(length(paths[[i]]) - 1)], tree$edge[, 2])])

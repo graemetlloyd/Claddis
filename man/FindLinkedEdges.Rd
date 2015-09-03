@@ -10,8 +10,7 @@ FindLinkedEdges(tree)
 \item{tree}{A tree (phylo object).}
 }
 \value{
-Returns a matrix where links are scored 1 and everything else 0. The
-diagonal is left as zero.
+Returns a matrix where links are scored 1 and everything else 0. The diagonal is left as zero.
 }
 \description{
 Given a tree finds edges that are linked to each other.

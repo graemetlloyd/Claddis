@@ -159,7 +159,7 @@ ReadMorphNexus <- function(file, equalise.weights=FALSE) {
   X <- apply(matrix(gsub("\t", " ", X)), 2, trim)
 
   # Delete any empty lines (if present):
-  if(length(grep(TRUE, X == "")) > 0) X <- X[-grep(TRUE, X == "")]
+  if(length(which(X == "")) > 0) X <- X[-which(X == "")]
 
   # If header text is present:
   if(length(grep("\\[", X)) > 0) {
@@ -490,7 +490,7 @@ ReadMorphNexus <- function(file, equalise.weights=FALSE) {
   matrixblock <- matrix(matrixblock, nrow=ntax)
 
   # Get discrete columns:
-  discrete.columns <- setdiff(1:ncol(matrixblock), grep(TRUE, unlist(lapply(apply(matrixblock, 2, grep, pattern="\\."), length)) > 0))
+  discrete.columns <- setdiff(1:ncol(matrixblock), which(unlist(lapply(apply(matrixblock, 2, grep, pattern="\\."), length)) > 0))
 
   # Collapse discrete columns and repeat:
   matrixblock[, discrete.columns] <- apply(as.matrix(matrixblock[, discrete.columns], nrow=ntax), 1, paste, collapse="")
@@ -507,7 +507,7 @@ ReadMorphNexus <- function(file, equalise.weights=FALSE) {
   }
 
   # Find columns in matrix that contain continuous data:
-  continuous.columns <- grep(TRUE, unlist(lapply(apply(matrixblock, 2, grep, pattern="\\."), length)) > 0)
+  continuous.columns <- which(unlist(lapply(apply(matrixblock, 2, grep, pattern="\\."), length)) > 0)
 
   # Find columns in matrix that contain discrete data:
   discrete.columns <- setdiff(c(1:ncol(matrixblock)), continuous.columns)
@@ -573,7 +573,7 @@ ReadMorphNexus <- function(file, equalise.weights=FALSE) {
     }
   
     # Find rows with parentheses and by extension polymorphisms:
-    polymorphism.rows <- grep(TRUE, unlist(lapply(lapply(discrete.matrix, grep, pattern="\\("), length)) > 0)
+    polymorphism.rows <- which(unlist(lapply(lapply(discrete.matrix, grep, pattern="\\("), length)) > 0)
 
     # As long as there are polymorphisms:
     if(length(polymorphism.rows) > 0) {
@@ -606,7 +606,7 @@ ReadMorphNexus <- function(file, equalise.weights=FALSE) {
     }
   
     # Little test to check the number of characters on each line is the same as nchar:
-    if(length(grep(TRUE, unlist(lapply(discrete.matrix, length)) != nchar)) > 0) stop("Some lines have too many or too few characters.")
+    if(length(which(unlist(lapply(discrete.matrix, length)) != nchar)) > 0) stop("Some lines have too many or too few characters.")
 
     # Convert into matrix format:
     discrete.matrix <- matrix(unlist(discrete.matrix), byrow=TRUE, nrow=ntax)

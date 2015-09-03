@@ -54,7 +54,7 @@ SafeTaxonomicReduction <- function(morph.matrix) {
   }
   
   # Record zero weight characters:
-  zero.wts <- grep(TRUE, morph.matrix$weights == 0)
+  zero.wts <- which(morph.matrix$weights == 0)
   
   # Concatenate characters that are not usable in safe taxonomic reduction:
   deletes <- sort(unique(c(pars.unif, zero.wts)))
@@ -118,10 +118,10 @@ SafeTaxonomicReduction <- function(morph.matrix) {
     for(j in 1:length(pairs[, 1])) {
       
       # Get scored characters for first taxon:
-      missing.1 <- grep(TRUE, is.na(morph.matrix$matrix[match(pairs[j, 1], rownames(morph.matrix$matrix)), ]))
+      missing.1 <- which(is.na(morph.matrix$matrix[match(pairs[j, 1], rownames(morph.matrix$matrix)), ]))
       
       # Get scored characters for second taxon:
-      missing.2 <- grep(TRUE, is.na(morph.matrix$matrix[match(pairs[j, 2], rownames(morph.matrix$matrix)), ]))
+      missing.2 <- which(is.na(morph.matrix$matrix[match(pairs[j, 2], rownames(morph.matrix$matrix)), ]))
       
       # STR Rule 1 test (equivalence; retain either taxon):
       if(length(setdiff(missing.1, missing.2)) == 0 && length(setdiff(missing.2, missing.1)) == 0) {

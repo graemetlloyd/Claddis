@@ -1,19 +1,20 @@
 #' Edge matching function
 #' 
-#' Given two trees where one is a pruned version of the other gives matching
-#' edges and nodes of pruned tree to original tree.
+#' Given two trees where one is a pruned version of the other gives matching edges and nodes of pruned tree to original tree.
 #' 
-#' Finds matching edge(s) and node(s) for a pruned tree in the original tree
-#' from which it was created. This is intended as an internal function, but may
-#' be of use to someone.
+#' Finds matching edge(s) and node(s) for a pruned tree in the original tree from which it was created. This is intended as an internal function, but may be of use to someone.
 #' 
 #' @param original.tree A tree in phylo format.
-#' @param pruned.tree A tree in phylo format that represents a pruned version
-#' of \code{original.tree}.
-#' @return \item{matching.edges}{A list of the matching edges.}
+#' @param pruned.tree A tree in phylo format that represents a pruned version \code{original.tree}.
+#'
+#' @return
+#'
+#' \item{matching.edges}{A list of the matching edges.}
 #' \item{matching.nodes}{A matrix of matching node numbers.}
 #' \item{removed.edges}{A vector of the removed edges.}
+#'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#'
 #' @examples
 #' 
 #' # Create a random 10-taxon tree:

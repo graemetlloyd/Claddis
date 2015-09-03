@@ -120,7 +120,7 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcs
   comp.char.matrix <- gower.dist.matrix <- max.dist.matrix <- dist.matrix <- matrix(0, nrow=length(rownames(morph.matrix)), ncol=length(rownames(morph.matrix)))
     
   # Fill comparable characters diagonal:
-  for(i in 1:length(morph.matrix[, 1])) comp.char.matrix[i,i] <- length(morph.matrix[i, ]) - length(grep(TRUE, is.na(morph.matrix[i, ])))
+  for(i in 1:length(morph.matrix[, 1])) comp.char.matrix[i,i] <- length(morph.matrix[i, ]) - length(which(is.na(morph.matrix[i, ])))
 
   # Set up empty matrix for storing data to calculate the Generalised Euclidean Distance of Wills (2001):
   GED.data <- matrix(nrow=0, ncol=ncol(morph.matrix))
@@ -132,7 +132,7 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcs
     for(j in (i + 1):length(morph.matrix[, 1])) {
             
       # Get just the comparable characters (those coded for both taxa):
-      compchar <- intersect(grep(TRUE, !is.na(morph.matrix[rownames(morph.matrix)[i], ])), grep(TRUE, !is.na(morph.matrix[rownames(morph.matrix)[j], ])))
+      compchar <- intersect(which(!is.na(morph.matrix[rownames(morph.matrix)[i], ])), which(!is.na(morph.matrix[rownames(morph.matrix)[j], ])))
             
       # Get comparable characters for ith taxon:
       firstrow <- morph.matrix[rownames(morph.matrix)[i], compchar]
@@ -215,7 +215,7 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcs
       raw.diffs <- diffs <- abs(as.numeric(firstrow) - as.numeric(secondrow))
             
       # If there are differences greater than 1 for unordered characters then rescore as 1:
-      if(length(grep(TRUE, diffs > 1)) > 0) diffs[grep(TRUE, diffs > 1)[grep(TRUE, ordering[compchar[grep(TRUE, diffs > 1)]] == "unord")]] <- 1
+      if(length(which(diffs > 1)) > 0) diffs[which(diffs > 1)[which(ordering[compchar[which(diffs > 1)]] == "unord")]] <- 1
 
       # Find the incomparable characters:
       incompchar <- setdiff(1:ncol(morph.matrix), compchar)
@@ -233,7 +233,7 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcs
       raw.maxdiffs <- maxdiffs <- as.numeric(max.vals[compchar]) - as.numeric(min.vals[compchar])
 
       # Correct maximum possible differences for unordered characters:
-      if(length(grep(TRUE, maxdiffs > 1)) > 0) maxdiffs[grep(TRUE, maxdiffs > 1)[grep(TRUE, ordering[compchar[grep(TRUE, maxdiffs > 1)]] == "unord")]] <- 1
+      if(length(which(maxdiffs > 1)) > 0) maxdiffs[which(maxdiffs > 1)[which(ordering[compchar[which(maxdiffs > 1)]] == "unord")]] <- 1
 
       # Get vector of maximum differences (corrected for character weights):
       maxdiffs <- as.numeric(weights[compchar]) * maxdiffs
@@ -267,10 +267,10 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcs
   GED.data[is.na(GED.data)] <- S_ijk_bar
 
   # Isolate the distances:
-  S_ijk <- GED.data[grep(TRUE, (1:nrow(GED.data) %% 2) == 1), ]
+  S_ijk <- GED.data[which((1:nrow(GED.data) %% 2) == 1), ]
 
   # Isolate the weights:
-  W_ijk <- GED.data[grep(TRUE, (1:nrow(GED.data) %% 2) == 0), ]
+  W_ijk <- GED.data[which((1:nrow(GED.data) %% 2) == 0), ]
 
   # Calculate the GED (equation 1 of Wills 2001) for each pairwise comparison (ij):
   GED_ij <- sqrt(apply(W_ijk * (S_ijk ^ 2), 1, sum))
