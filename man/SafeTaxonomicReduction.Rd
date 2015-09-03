@@ -7,16 +7,12 @@
 SafeTaxonomicReduction(morph.matrix)
 }
 \arguments{
-\item{morph.matrix}{A character-taxon matrix in the format imported by
-\link{ReadMorphNexus}.}
+\item{morph.matrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
 }
 \value{
-\item{str.list}{A matrix listing the taxa that can be removed
-(\code{Junior}), the taxa which they are equivalent to (\code{Senior}) and
-the rule under which they can be safely removed (\code{Rule}).}
-\item{reduced.matrix}{A character-taxon matrix excluding the taxa that can
-be safely removed.} \item{removed.matrix}{A character-taxon matrix of the
-taxa that can be safely removed.}
+\item{str.list}{A matrix listing the taxa that can be removed (\code{Junior}), the taxa which they are equivalent to (\code{Senior}) and the rule under which they can be safely removed (\code{Rule}).}
+\item{reduced.matrix}{A character-taxon matrix excluding the taxa that can be safely removed.}
+\item{removed.matrix}{A character-taxon matrix of the taxa that can be safely removed.}
 }
 \description{
 Performs Safe Taxonomic Reduction (STR) on a character-taxon matrix.
@@ -24,8 +20,7 @@ Performs Safe Taxonomic Reduction (STR) on a character-taxon matrix.
 \details{
 Performs Safe Taxonomic Reduction (Wilkinson 1995).
 
-If no taxa can be safely removed will simply return the text: "No taxa can
-be safely removed".
+If no taxa can be safely removed will print the text "No taxa can be safely removed", and the \code{str.list} and \code{removed.matrix} will have no rows.
 }
 \examples{
 # Performs STR on the Gauthier 1986 dataset used

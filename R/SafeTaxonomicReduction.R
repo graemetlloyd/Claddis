@@ -1,28 +1,26 @@
-# OUTPUT CAN BE VECTORS IF MATRIX HAS ROW ONE - FIX!!!!!
-
-
-
 #' Safe Taxonomic Reduction
 #' 
 #' Performs Safe Taxonomic Reduction (STR) on a character-taxon matrix.
 #' 
 #' Performs Safe Taxonomic Reduction (Wilkinson 1995).
 #' 
-#' If no taxa can be safely removed will simply return the text: "No taxa can
-#' be safely removed".
+#' If no taxa can be safely removed will print the text "No taxa can be safely removed", and the \code{str.list} and \code{removed.matrix} will have no rows.
 #' 
-#' @param morph.matrix A character-taxon matrix in the format imported by
-#' \link{ReadMorphNexus}.
-#' @return \item{str.list}{A matrix listing the taxa that can be removed
-#' (\code{Junior}), the taxa which they are equivalent to (\code{Senior}) and
-#' the rule under which they can be safely removed (\code{Rule}).}
-#' \item{reduced.matrix}{A character-taxon matrix excluding the taxa that can
-#' be safely removed.} \item{removed.matrix}{A character-taxon matrix of the
-#' taxa that can be safely removed.}
+#' @param morph.matrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#'
+#' @return
+#'
+#' \item{str.list}{A matrix listing the taxa that can be removed (\code{Junior}), the taxa which they are equivalent to (\code{Senior}) and the rule under which they can be safely removed (\code{Rule}).}
+#' \item{reduced.matrix}{A character-taxon matrix excluding the taxa that can be safely removed.}
+#' \item{removed.matrix}{A character-taxon matrix of the taxa that can be safely removed.}
+#'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#'
 #' @references Wilkinson, M., 1995. Coping with abundant missing entries in
 #' phylogenetic inference using parsimony. Systematic Biology, 44, 501-514.
+#'
 #' @keywords Safe Taxonomic Reduction
+#'
 #' @examples
 #' 
 #' # Performs STR on the Gauthier 1986 dataset used
@@ -65,11 +63,11 @@ SafeTaxonomicReduction <- function(morph.matrix) {
   if(length(deletes) > 0) {
     
     # Remove them from every section of the matrix:
-    morph.matrix$matrix <- morph.matrix$matrix[, -deletes]
-    morph.matrix$ordering <- morph.matrix$ordering[-deletes]
-    morph.matrix$weights <- morph.matrix$weights[-deletes]
-    morph.matrix$max.vals <- morph.matrix$max.vals[-deletes]
-    morph.matrix$min.vals <- morph.matrix$min.vals[-deletes]
+    morph.matrix$matrix <- morph.matrix$matrix[, -deletes, drop = FALSE]
+    morph.matrix$ordering <- morph.matrix$ordering[-deletes, drop = FALSE]
+    morph.matrix$weights <- morph.matrix$weights[-deletes, drop = FALSE]
+    morph.matrix$max.vals <- morph.matrix$max.vals[-deletes, drop = FALSE]
+    morph.matrix$min.vals <- morph.matrix$min.vals[-deletes, drop = FALSE]
 
   }
   
@@ -108,16 +106,13 @@ SafeTaxonomicReduction <- function(morph.matrix) {
   }
   
   # Vectors to store results under each rule of Wilkinson
-  rule.1a <- rule.1b <- rule.2a <- rule.2b <- c(NA, NA)
+  rule.1a <- rule.1b <- rule.2a <- rule.2b <- matrix(nrow = 0, ncol = 2)
   
   # As long as there are zerovalue pairs:
   if(length(pairs) > 2) {
     
     # Delete first line which is empty:
-    pairs <- pairs[-1, ]
-    
-    # Case if only one pair:
-    if(length(pairs) == 2) pairs <- t(as.matrix(pairs))
+    pairs <- pairs[-1, , drop = FALSE]
     
     # For each zero distance pair:
     for(j in 1:length(pairs[, 1])) {
@@ -192,12 +187,6 @@ SafeTaxonomicReduction <- function(morph.matrix) {
 
   }
   
-  # Remove empty first rows
-  if(length(rule.1a) == 2) rule.1a <- rule.1a[-(1:2)] else rule.1a <- rule.1a[-1,]
-  if(length(rule.1b) == 2) rule.1b <- rule.1b[-(1:2)] else rule.1b <- rule.1b[-1,]
-  if(length(rule.2a) == 2) rule.2a <- rule.2a[-(1:2)] else rule.2a <- rule.2a[-1,]
-  if(length(rule.2b) == 2) rule.2b <- rule.2b[-(1:2)] else rule.2b <- rule.2b[-1,]
-  
   # List taxon pairs:
   pairs <- rbind(rule.1a, rule.1b, rule.2a, rule.2b)
   
@@ -207,11 +196,11 @@ SafeTaxonomicReduction <- function(morph.matrix) {
   # Combine into single table:
   str.list <- cbind(pairs, rule)
   
+  # Name columns:
+  colnames(str.list) <- c("Junior", "Senior", "Rule")
+
   # If there are taxa that can be safely removed:
   if(length(str.list) > 0) {
-    
-    # Name columns:
-    colnames(str.list) <- c("Junior", "Senior", "Rule")
     
     # List junior taxa (i.e. those to remove):
     removes <- sort(unique(str.list[, "Junior"]))
@@ -225,20 +214,26 @@ SafeTaxonomicReduction <- function(morph.matrix) {
     # Isolate removed taxa for removed matrix:
     removed.matrix <- removed.matrix$matrix[match(removes, rownames(removed.matrix$matrix)), , drop = FALSE]
     
-    # Compile results into a list:
-    result <- list(str.list, reduced.matrix, removed.matrix)
-    
-    # Add names to results list:
-    names(result) <- c("str.list", "reduced.matrix", "removed.matrix")
-    
   # If there are no taxa that can be safely removed:
   } else {
     
-    # Have warning message as result:
-    result <- "No taxa can be safely removed"
+    # Create reduced matrix:
+    reduced.matrix <- full.matrix$matrix
+    
+    # Create empty removed matrix:
+    removed.matrix <- matrix(nrow = 0, ncol = ncol(full.matrix$matrix))
+    
+    # Print warning message:
+    print("No taxa can be safely removed")
 
   }
-  
+
+  # Compile results into a list:
+  result <- list(str.list, reduced.matrix, removed.matrix)
+
+  # Add names to results list:
+  names(result) <- c("str.list", "reduced.matrix", "removed.matrix")
+
   # Return results:
   return(invisible(result))
 
