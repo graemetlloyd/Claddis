@@ -7,37 +7,28 @@
 DiscreteCharacterRate(tree, clad.matrix, time.bins, alpha = 0.01)
 }
 \arguments{
-\item{tree}{A tree (phylo object) with branch lengths that represents the
-relationships of the taxa in \code{clad.matrix}.}
+\item{tree}{A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{clad.matrix}.}
 
-\item{clad.matrix}{A character-taxon matrix in the format imported by
-\link{ReadMorphNexus}.}
+\item{clad.matrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
 
-\item{time.bins}{A vector of ages (in millions of years) indicating the
-boundaries of a series of time bins.}
+\item{time.bins}{A vector of ages (in millions of years) indicating the boundaries of a series of time bins.}
 
-\item{alpha}{The alpha value to be used for the significance tests. The
-default is 0.01.}
+\item{alpha}{The alpha value to be used for the significance tests. The default is 0.01.}
 }
 \value{
-\item{node.results}{A table displaying the results of the per-clade
-rate tests.} \item{branch.results}{A table displaying the results of the
-per-branch rate tests.} \item{per.bin.rates}{Per time-bin rates (use with
-caution).}
+\item{node.results}{A table displaying the results of the per-clade rate tests.}
+\item{branch.results}{A table displaying the results of the per-branch rate tests.}
+\item{per.bin.rates}{Per time-bin rates (use with caution).}
+\item{per.bin.rates.tb}{Per time-bin rates for terminal branches (use with caution).}
+\item{per.bin.rates.ib}{Per time-bin rates for internal branches (use with caution).}
 }
 \description{
-Given a tree and a cladistic matrix uses likelihood methods to search for
-significant rate excursions from an equal rate model.
+Given a tree and a cladistic matrix uses likelihood methods to search for significant rate excursions from an equal rate model.
 }
 \details{
-Uses \link{AncStateEstMatrix} to estimate ancestral states and parsimony to
-count changes on branches, then applies the methods outlined in Lloyd et al.
-(2012), and updated in Brusatte et al. (2014) to test for significantly high
-or low rates on a branch or within a clade.
+Uses \link{AncStateEstMatrix} to estimate ancestral states and parsimony to count changes on branches, then applies the methods outlined in Lloyd et al. (2012), and updated in Brusatte et al. (2014) to test for significantly high or low rates on a branch or within a clade.
 
-Please note that the time series method used here is an untested attempt to
-deal with the problem of correcting for completeness (something that Lloyd
-et al. 2012 were not able to do) and should be used with caution.
+Please note that the time series method used here is an attempt to deal with the problem of correcting for completeness (something that Lloyd et al. 2012 were not able to do) and should be used with caution. (This is the apporach used in Close et al. 2015.)
 }
 \examples{
 # Set random seed:
@@ -57,18 +48,14 @@ DiscreteCharacterRate(tree, Michaux1989,
   seq(tree$root.time, 0, length.out=3), alpha=0.01)
 }
 \author{
-Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Steve C. Wang
-\email{scwang@swarthmore.edu}
+Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Steve C. Wang \email{scwang@swarthmore.edu}
 }
 \references{
-Brusatte, S. L., Lloyd, G. T., Wang, S. C. and Norell, M. A.,
-2014. Gradual assembly of avian body plan culminated in rapid rates of
-evolution across dinosaur-bird transition. Current Biology, 24, 2386-2392.
+Brusatte, S. L., Lloyd, G. T., Wang, S. C. and Norell, M. A., 2014. Gradual assembly of avian body plan culminated in rapid rates of evolution across dinosaur-bird transition. Current Biology, 24, 2386-2392.
 
-Lloyd, G. T., Wang, S. C. and Brusatte, S. L., 2012. Identifying
-heterogeneity in rates of morphological evolution: discrete character change
-in the evolution of lungfish (Sarcopterygii; Dipnoi). Evolution, 66,
-330-348.
+Close, R. A., Friedman, M., Lloyd, G. T. and Benson, R. B. J., 2015. Evidence for a mid-Jurassic adaptive radiation in mammals. Current Biology, 25, 2137-2142.
+
+Lloyd, G. T., Wang, S. C. and Brusatte, S. L., 2012. Identifying heterogeneity in rates of morphological evolution: discrete character change in the evolution of lungfish (Sarcopterygii; Dipnoi). Evolution, 66, 330-348.
 }
 \keyword{evolution,rates}
 

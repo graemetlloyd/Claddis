@@ -1,40 +1,34 @@
 #' A function for examining discrete character rates
 #' 
-#' Given a tree and a cladistic matrix uses likelihood methods to search for
-#' significant rate excursions from an equal rate model.
+#' Given a tree and a cladistic matrix uses likelihood methods to search for significant rate excursions from an equal rate model.
 #' 
-#' Uses \link{AncStateEstMatrix} to estimate ancestral states and parsimony to
-#' count changes on branches, then applies the methods outlined in Lloyd et al.
-#' (2012), and updated in Brusatte et al. (2014) to test for significantly high
-#' or low rates on a branch or within a clade.
+#' Uses \link{AncStateEstMatrix} to estimate ancestral states and parsimony to count changes on branches, then applies the methods outlined in Lloyd et al. (2012), and updated in Brusatte et al. (2014) to test for significantly high or low rates on a branch or within a clade.
 #' 
-#' Please note that the time series method used here is an untested attempt to
-#' deal with the problem of correcting for completeness (something that Lloyd
-#' et al. 2012 were not able to do) and should be used with caution.
+#' Please note that the time series method used here is an attempt to deal with the problem of correcting for completeness (something that Lloyd et al. 2012 were not able to do) and should be used with caution. (This is the apporach used in Close et al. 2015.)
 #' 
-#' @param tree A tree (phylo object) with branch lengths that represents the
-#' relationships of the taxa in \code{clad.matrix}.
-#' @param clad.matrix A character-taxon matrix in the format imported by
-#' \link{ReadMorphNexus}.
-#' @param time.bins A vector of ages (in millions of years) indicating the
-#' boundaries of a series of time bins.
-#' @param alpha The alpha value to be used for the significance tests. The
-#' default is 0.01.
-#' @return \item{node.results}{A table displaying the results of the per-clade
-#' rate tests.} \item{branch.results}{A table displaying the results of the
-#' per-branch rate tests.} \item{per.bin.rates}{Per time-bin rates (use with
-#' caution).}
-#' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Steve C. Wang
-#' \email{scwang@@swarthmore.edu}
-#' @references Brusatte, S. L., Lloyd, G. T., Wang, S. C. and Norell, M. A.,
-#' 2014. Gradual assembly of avian body plan culminated in rapid rates of
-#' evolution across dinosaur-bird transition. Current Biology, 24, 2386-2392.
-#' 
-#' Lloyd, G. T., Wang, S. C. and Brusatte, S. L., 2012. Identifying
-#' heterogeneity in rates of morphological evolution: discrete character change
-#' in the evolution of lungfish (Sarcopterygii; Dipnoi). Evolution, 66,
-#' 330-348.
+#' @param tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{clad.matrix}.
+#' @param clad.matrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#' @param time.bins A vector of ages (in millions of years) indicating the boundaries of a series of time bins.
+#' @param alpha The alpha value to be used for the significance tests. The default is 0.01.
+#'
+#' @return
+#'
+#' \item{node.results}{A table displaying the results of the per-clade rate tests.}
+#' \item{branch.results}{A table displaying the results of the per-branch rate tests.}
+#' \item{per.bin.rates}{Per time-bin rates (use with caution).}
+#' \item{per.bin.rates.tb}{Per time-bin rates for terminal branches (use with caution).}
+#' \item{per.bin.rates.ib}{Per time-bin rates for internal branches (use with caution).}
+#'
+#' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Steve C. Wang \email{scwang@@swarthmore.edu}
+#'
+#' @references Brusatte, S. L., Lloyd, G. T., Wang, S. C. and Norell, M. A., 2014. Gradual assembly of avian body plan culminated in rapid rates of evolution across dinosaur-bird transition. Current Biology, 24, 2386-2392.
+#'
+#' Close, R. A., Friedman, M., Lloyd, G. T. and Benson, R. B. J., 2015. Evidence for a mid-Jurassic adaptive radiation in mammals. Current Biology, 25, 2137-2142.
+#'
+#' Lloyd, G. T., Wang, S. C. and Brusatte, S. L., 2012. Identifying heterogeneity in rates of morphological evolution: discrete character change in the evolution of lungfish (Sarcopterygii; Dipnoi). Evolution, 66, 330-348.
+#'
 #' @keywords evolution,rates
+#'
 #' @examples
 #' 
 #' # Set random seed:
@@ -54,13 +48,13 @@
 #'   seq(tree$root.time, 0, length.out=3), alpha=0.01)
 #' 
 #' @export DiscreteCharacterRate
-DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
+DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   
   # Ensure time bins are in correct order:
-  time.bins <- sort(time.bins, decreasing=TRUE)
+  time.bins <- sort(time.bins, decreasing = TRUE)
 
   # Find the Time bin midpoints:
-  Time.bin.midpoints <- (time.bins[2:length(time.bins)] + time.bins[1:(length(time.bins)-1)])/2
+  Time.bin.midpoints <- (time.bins[2:length(time.bins)] + time.bins[1:(length(time.bins) - 1)]) / 2
   
   # Get ages for each (tip and internal) node:
   node.ages <- GetNodeAges(tree)
@@ -72,7 +66,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
   rownames(branch.ages) <- NULL
 
   # Matrix to store proportion of each branch in a bin:
-  prop.branch.in.bin <- matrix(0, nrow=nrow(tree$edge), ncol=length(time.bins) - 1)
+  prop.branch.in.bin <- matrix(0, nrow = nrow(tree$edge), ncol = length(time.bins) - 1)
 
   # Get branch durations:
   branch.durations <- abs(apply(branch.ages, 1, diff))
@@ -101,16 +95,16 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
   }
 
   # Get ancestral character states:
-  anc.states <- AncStateEstMatrix(clad.matrix, tree, estimate.allchars=FALSE, estimate.tips=FALSE)
+  anc.states <- AncStateEstMatrix(clad.matrix, tree, estimate.allchars = FALSE, estimate.tips = FALSE)
   
   # Isolate tip states in tip label order:
-  tip.states <- clad.matrix$matrix[tree$tip.label,]
+  tip.states <- clad.matrix$matrix[tree$tip.label, , drop = FALSE]
   
   # Build matrix of all states in node number order:
   all.states <- rbind(tip.states, anc.states)
   
   # Re-label row names by node number:
-  rownames(all.states) <- c(1:(Ntip(tree)+Nnode(tree)))
+  rownames(all.states) <- c(1:(Ntip(tree) + Nnode(tree)))
   
   # Create trees to store branch lengths with respect to completeness and observed and observable character changes:
   completeness.tree <- observed.tree <- observable.tree <- tree
@@ -125,10 +119,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
     completeness.tree$edge.length[i] <- sum(clad.matrix$weights[comp.chars])
     
     # List the states for both nodes for comparable characters only:
-    comp.states <- all.states[tree$edge[i,], comp.chars]
-    
-    # Special case if there is only one character (need to re-define as matrix):
-    if(length(comp.states) == 2) comp.states <- as.matrix(comp.states)
+    comp.states <- all.states[tree$edge[i, ], comp.chars, drop = FALSE]
     
     # Get weightings for comparable characters only:
     weightings <- clad.matrix$weights[comp.chars]
@@ -140,10 +131,12 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
     ranges <- (clad.matrix$max.vals - clad.matrix$min.vals)[comp.chars]
     
     # Correct ranges for unordered characters:
-    ranges[intersect(grep(TRUE, ranges > 1), grep(TRUE, orderings == "UNORD"))] <- 1
+    ranges[intersect(grep(TRUE, ranges > 1), grep(TRUE, orderings == "unord"))] <- 1
+    
+    # WILL EVENTUALLY NEED SOMETHING HERE TO DEAL WITH STEP MATRICES (DITTO FOR POLYMORPHISMS PART BELOW)
     
     # Find polymorphisms (if present):
-    polymorphisms <- sort(unique(c(grep("&", comp.states[1,]), grep("&", comp.states[2,]))))
+    polymorphisms <- sort(unique(c(grep("&", comp.states[1, ]), grep("&", comp.states[2, ]))))
     
     # If polymorphisms are present:
     if(length(polymorphisms) > 0) {
@@ -167,7 +160,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
         } else {
           
           # Create differences matrix between each set of states:
-          diff.matrix <- matrix(nrow=length(top.states), ncol=length(bottom.states))
+          diff.matrix <- matrix(nrow = length(top.states), ncol = length(bottom.states))
           
           # For each state at one end of the branch:
           for(k in 1:length(top.states)) {
@@ -192,13 +185,13 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
     }
     
     # Convert comparable states to numeric now that polymorphisms are collapsed:
-    comp.states <- matrix(as.numeric(comp.states), nrow=2)
+    comp.states <- matrix(as.numeric(comp.states), nrow = 2)
     
     # Identify differences:
-    comp.diffs <- abs(comp.states[1,] - comp.states[2,])
+    comp.diffs <- abs(comp.states[1, ] - comp.states[2, ])
     
     # Identify distances greater than one for unordered characters if present:
-    unord.diffs <- intersect(grep(TRUE, orderings == "UNORD"), grep(TRUE, comp.diffs > 1))
+    unord.diffs <- intersect(grep(TRUE, orderings == "unord"), grep(TRUE, comp.diffs > 1))
     
     # If distances greater than one are found for unordered characters:
     if(length(unord.diffs) > 0) {
@@ -249,13 +242,13 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
     # Calculate sum of internal branches (including parts) present in bin:
     Time.ib[(i - 1)] <- sum(prop.branch.in.bin[, (i - 1)][internal.branches] * tree$edge.length[internal.branches])
     
-    # Callculate number of all changes present in bin:
+    # Calculate number of all changes present in bin:
     changes[(i - 1)] <- sum(prop.branch.in.bin[, (i - 1)] * observed.tree$edge.length)
     
-    # Callculate number of terminal changes present in bin:
+    # Calculate number of terminal changes present in bin:
     changes.tb[(i - 1)] <- sum(prop.branch.in.bin[, (i - 1)][terminal.branches] * observed.tree$edge.length[terminal.branches])
     
-    # Callculate number of internal changes present in bin:
+    # Calculate number of internal changes present in bin:
     changes.ib[(i - 1)] <- sum(prop.branch.in.bin[, (i - 1)][internal.branches] * observed.tree$edge.length[internal.branches])
     
   }
@@ -310,13 +303,13 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
   teststat.ib <- -2 * (lognumer.ib - logdenom.ib)
   
   # Calculate position of test statistic in chi-square distribution to get probability (zero-length branches not calculated in df):
-  chisq.p <- pchisq(teststat, length(which(Time > 0)) - 1, lower.tail=F)
+  chisq.p <- pchisq(teststat, length(which(Time > 0)) - 1, lower.tail = FALSE)
   
   # Calculate position of test statistic in chi-square distribution to get probability (zero-length branches not calculated in df):
-  chisq.p.tb <- pchisq(teststat.tb, length(which(Time.tb > 0)) - 1, lower.tail=F)
+  chisq.p.tb <- pchisq(teststat.tb, length(which(Time.tb > 0)) - 1, lower.tail = FALSE)
   
   # Calculate position of test statistic in chi-square distribution to get probability (zero-length branches not calculated in df):
-  chisq.p.ib <- pchisq(teststat.ib, length(which(Time.ib > 0)) - 1, lower.tail=F)
+  chisq.p.ib <- pchisq(teststat.ib, length(which(Time.ib > 0)) - 1, lower.tail = FALSE)
   
 # NEED TO CONSIDER WHAT SHOULD DO IF TB OR IB FAIL TEST EVEN IF POOLED DATA DOES NOT
 
@@ -324,10 +317,10 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
   if(chisq.p < alpha) {
     
     # If so then print notification and carry on:
-    cat(paste("H_0 -  equal across time bins - is rejected at an alpha of ", alpha, " (actual p = ", chisq.p, ").\nContinuing to per-bin rate calculations.\n", sep=""))
+    cat(paste("H_0 - all rates equal across time bins - is rejected at an alpha of ", alpha, " (actual p = ", chisq.p, ").\nContinuing to per-bin rate calculations.\n", sep=""))
 
     # Create matrix to store time bin results:
-    bin.results.tb <- bin.results.ib <- bin.results <- matrix(0, nrow=length(time.bins) - 1, ncol=10)
+    bin.results.tb <- bin.results.ib <- bin.results <- matrix(0, nrow = length(time.bins) - 1, ncol = 10)
 
     # Add column names:
     colnames(bin.results.tb) <- colnames(bin.results.ib) <- colnames(bin.results) <- c("bin", "from", "to", "in.rate", "out.rate", "ml.chisq", "ml.pval", "ml.signif", "ml.signif.hi", "ml.signif.lo")
@@ -369,22 +362,22 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
       mledenom.ib[other] <- mleother.ib <- sum(changes.ib[other]) / sum(Time.ib[other] * pctcomp.ib[other])
 
       # Calculate log numerator (rounding non-integers):
-      lognumer <- sum(log(dpois(round(changes), mlenumer * Time * pctcomp)), na.rm=TRUE)
+      lognumer <- sum(log(dpois(round(changes), mlenumer * Time * pctcomp)), na.rm = TRUE)
 
       # Calculate log numerator (rounding non-integers):
-      lognumer.tb <- sum(log(dpois(round(changes.tb), mlenumer.tb * Time.tb * pctcomp.tb)), na.rm=TRUE)
+      lognumer.tb <- sum(log(dpois(round(changes.tb), mlenumer.tb * Time.tb * pctcomp.tb)), na.rm = TRUE)
 
       # Calculate log numerator (rounding non-integers):
-      lognumer.ib <- sum(log(dpois(round(changes.ib), mlenumer.ib * Time.ib * pctcomp.ib)), na.rm=TRUE)
+      lognumer.ib <- sum(log(dpois(round(changes.ib), mlenumer.ib * Time.ib * pctcomp.ib)), na.rm = TRUE)
 
       # Calculate log denominator:
-      logdenom <- sum(log(dpois(round(changes), mledenom * Time * pctcomp)), na.rm=TRUE) 
+      logdenom <- sum(log(dpois(round(changes), mledenom * Time * pctcomp)), na.rm = TRUE)
 
       # Calculate log denominator:
-      logdenom.tb <- sum(log(dpois(round(changes.tb), mledenom.tb * Time.tb * pctcomp.tb)), na.rm=TRUE) 
+      logdenom.tb <- sum(log(dpois(round(changes.tb), mledenom.tb * Time.tb * pctcomp.tb)), na.rm = TRUE)
 
       # Calculate log denominator:
-      logdenom.ib <- sum(log(dpois(round(changes.ib), mledenom.ib * Time.ib * pctcomp.ib)), na.rm=TRUE) 
+      logdenom.ib <- sum(log(dpois(round(changes.ib), mledenom.ib * Time.ib * pctcomp.ib)), na.rm = TRUE)
 
       # Store rate for branch:
       bin.results[i, "in.rate"] <- round(mlebin, 2)
@@ -408,19 +401,19 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
       bin.results[i, "ml.chisq"] <- teststat <- -2 * (lognumer - logdenom)
 
       # Store probability for bin (will be 1 for zero-duration branch):
-      bin.results[i, "ml.pval"] <- pchisq(teststat, 2 - 1, lower.tail=FALSE)
+      bin.results[i, "ml.pval"] <- pchisq(teststat, 2 - 1, lower.tail = FALSE)
 
       # Store chi-squared value (will be zero for zero-duration branch):
       bin.results.tb[i, "ml.chisq"] <- teststat.tb <- -2 * (lognumer.tb - logdenom.tb)
 
       # Store probability for bin (will be 1 for zero-duration branch):
-      bin.results.tb[i, "ml.pval"] <- pchisq(teststat.tb, 2 - 1, lower.tail=FALSE)
+      bin.results.tb[i, "ml.pval"] <- pchisq(teststat.tb, 2 - 1, lower.tail = FALSE)
 
       # Store chi-squared value (will be zero for zero-duration branch):
       bin.results.ib[i, "ml.chisq"] <- teststat.ib <- -2 * (lognumer.ib - logdenom.ib)
 
       # Store probability for bin (will be 1 for zero-duration branch):
-      bin.results.ib[i, "ml.pval"] <- pchisq(teststat.ib, 2 - 1, lower.tail=FALSE)
+      bin.results.ib[i, "ml.pval"] <- pchisq(teststat.ib, 2 - 1, lower.tail = FALSE)
 
     }
 
@@ -531,12 +524,12 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
 # NEED TO MODIFY THE BELOW AS MAY BE SIG DIFFS FOR INTERNAL OR TERMINAL BRANCHES NOT SEEN IN POOLED
 
     # Create NULL outputs:
-    bin.results.tb <- bin.results.ib <- bin.results <- message(paste("H_0 - all rates equal across time bins - cannot be rejected at an alpha of ", alpha, " (Actual p = ", chisq.p, ").\nA single rate of ", mlenumer, "is preferred.", sep=""))
+    bin.results.tb <- bin.results.ib <- bin.results <- message(paste("H_0 - all rates equal across time bins - cannot be rejected at an alpha of ", alpha, " (Actual p = ", chisq.p, ").\nA single rate of ", mlenumer, "is preferred.", sep = ""))
     
   }
 
   # Get number of branches:
-  n <- length(tree$edge[,1])
+  n <- length(tree$edge[, 1])
   
   # Get number of tips (and terminal branches):
   ntips <- n.tb <- Ntip(tree)
@@ -611,13 +604,13 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
   lognumer.ib <- sum(log(dpois(changes.ib, mlenumer.ib * Time.ib * pctcomp.ib)))
   
   # Get log denominator with zero-length branches removed:
-  logdenom <- sum(log(dpois(changes, mledenom * Time * pctcomp)), na.rm=TRUE)
+  logdenom <- sum(log(dpois(changes, mledenom * Time * pctcomp)), na.rm = TRUE)
   
   # Get log denominator for terminal branches with zero-length branches removed:
-  logdenom.tb <- sum(log(dpois(changes.tb, mledenom.tb * Time.tb * pctcomp.tb)), na.rm=TRUE)
+  logdenom.tb <- sum(log(dpois(changes.tb, mledenom.tb * Time.tb * pctcomp.tb)), na.rm = TRUE)
   
   # Get log denominator for internal branches with zero-length branches removed:
-  logdenom.ib <- sum(log(dpois(changes.ib, mledenom.ib * Time.ib * pctcomp.ib)), na.rm=TRUE)
+  logdenom.ib <- sum(log(dpois(changes.ib, mledenom.ib * Time.ib * pctcomp.ib)), na.rm = TRUE)
   
   # Get test statistic:
   teststat <- -2 * (lognumer - logdenom)
@@ -629,31 +622,31 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
   teststat.ib <- -2 * (lognumer.ib - logdenom.ib)
   
   # Calculate position of test statistic in chi-square distribution to get probability (zero-length branches not calculated in df):
-  chisq.p <- pchisq(teststat, n - 1 - nzero, lower.tail=F)
+  chisq.p <- pchisq(teststat, n - 1 - nzero, lower.tail = FALSE)
   
   # Calculate position of test statistic in chi-square distribution for terminal branches to get probability (zero-length branches not calculated in df):
-  chisq.p.tb <- pchisq(teststat.tb, n.tb - 1 - nzero.tb, lower.tail=F)
+  chisq.p.tb <- pchisq(teststat.tb, n.tb - 1 - nzero.tb, lower.tail = FALSE)
   
   # Calculate position of test statistic in chi-square distribution for internal branches to get probability (zero-length branches not calculated in df):
-  chisq.p.ib <- pchisq(teststat.ib, n.ib - 1 - nzero.ib, lower.tail=F)
+  chisq.p.ib <- pchisq(teststat.ib, n.ib - 1 - nzero.ib, lower.tail = FALSE)
   
   # Check to see if null hypothesis of equal rates across the tree can be rejected:
   if(chisq.p < alpha) {
     
     # If so then print notification and carry on:
-    cat(paste("H_0 - all rates equal across the tree - is rejected at an alpha of ", alpha, " (actual p = ", chisq.p, ").\nContinuing to per-branch and per-clade rate calculations.", sep=""))
+    cat(paste("H_0 - all rates equal across the tree - is rejected at an alpha of ", alpha, " (actual p = ", chisq.p, ").\nContinuing to per-branch and per-clade rate calculations.", sep = ""))
     
     # Create matrix to store branch results:
-    branch.results <- matrix(0, nrow=n, ncol=20)
+    branch.results <- matrix(0, nrow = n, ncol = 20)
     
     # Create matrix to store terminal branch results:
-    branch.results.tb <- matrix(0, nrow=n.tb, ncol=20)
+    branch.results.tb <- matrix(0, nrow = n.tb, ncol = 20)
     
     # Create matrix to store internal branch results:
-    branch.results.ib <- matrix(0, nrow=n.ib, ncol=20)
+    branch.results.ib <- matrix(0, nrow = n.ib, ncol = 20)
     
     # Create matrix to store node results:
-    node.results <- matrix(0, nrow=length(nodes), ncol=29)
+    node.results <- matrix(0, nrow = length(nodes), ncol = 29)
     
     # Add column names for branches:
     colnames(branch.results) <- colnames(branch.results.tb) <- colnames(branch.results.ib) <- c("branch", "from", "to", "in.rate", "out.rate", "ml.chisq", "ml.pval", "ml.signif.hi", "ml.signif.hi.ti", "ml.signif.lo", "ml.signif.lo.ti", "ml.signif", "ml.signif.ti", "rand.val", "rand.mean", "rand.sd", "rand.pval", "rand.signif.hi", "rand.signif.lo", "rand.signif")
@@ -724,16 +717,16 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
       ifelse(branch.is.terminal, mledenom.tb[-match(i, terminal.branches)] <- mleother.tb <- sum(changes[other.tb]) / sum(Time[other.tb] * pctcomp[other.tb]), mledenom.ib[-match(i, internal.branches)] <- mleother.ib <- sum(changes[other.ib]) / sum(Time[other.ib] * pctcomp[other.ib]))
       
       # Calculate log numerator:
-      lognumer <- sum(log(dpois(changes, mlenumer * Time * pctcomp)), na.rm=TRUE)
+      lognumer <- sum(log(dpois(changes, mlenumer * Time * pctcomp)), na.rm = TRUE)
       
       # Calculate log numerator for terminal or internal branches:
-      ifelse(branch.is.terminal, lognumer.tb <- sum(log(dpois(changes.tb, mlenumer.tb * Time.tb * pctcomp.tb)), na.rm=TRUE), lognumer.ib <- sum(log(dpois(changes.ib, mlenumer.ib * Time.ib * pctcomp.ib)), na.rm=TRUE))
+      ifelse(branch.is.terminal, lognumer.tb <- sum(log(dpois(changes.tb, mlenumer.tb * Time.tb * pctcomp.tb)), na.rm = TRUE), lognumer.ib <- sum(log(dpois(changes.ib, mlenumer.ib * Time.ib * pctcomp.ib)), na.rm = TRUE))
       
       # Calculate log denominator:
-      logdenom <- sum(log(dpois(changes, mledenom * Time * pctcomp)), na.rm=TRUE) 
+      logdenom <- sum(log(dpois(changes, mledenom * Time * pctcomp)), na.rm = TRUE)
       
       # Calculate log denominator for terminal or internal branches:
-      ifelse(branch.is.terminal, logdenom.tb <- sum(log(dpois(changes.tb, mledenom.tb * Time.tb * pctcomp.tb)), na.rm=TRUE), logdenom.ib <- sum(log(dpois(changes.ib, mledenom.ib * Time.ib * pctcomp.ib)), na.rm=TRUE))
+      ifelse(branch.is.terminal, logdenom.tb <- sum(log(dpois(changes.tb, mledenom.tb * Time.tb * pctcomp.tb)), na.rm = TRUE), logdenom.ib <- sum(log(dpois(changes.ib, mledenom.ib * Time.ib * pctcomp.ib)), na.rm = TRUE))
       
       # Store rate for branch:
       branch.results[i, "in.rate"] <- round(mlebranch, 2)
@@ -754,10 +747,10 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
       ifelse(branch.is.terminal, branch.results.tb[match(i, branch.results.tb[, "branch"]), "ml.chisq"] <- teststat.tb <- -2 * (lognumer.tb - logdenom.tb), branch.results.ib[match(i, branch.results.ib[, "branch"]), "ml.chisq"] <- teststat.ib <- -2 * (lognumer.ib - logdenom.ib))
       
       # Store probability for branch (will be 1 for zero-duration branch):
-      branch.results[i, "ml.pval"] <- pchisq(teststat, 2-1, lower.tail=FALSE)
+      branch.results[i, "ml.pval"] <- pchisq(teststat, 2 - 1, lower.tail = FALSE)
       
       # Store probability for branch (will be 1 for zero-duration branch) for terminal or internal branches:
-      ifelse(branch.is.terminal, branch.results.tb[match(i, branch.results.tb[, "branch"]), "ml.pval"] <- pchisq(teststat.tb, 2 - 1, lower.tail=FALSE), branch.results.ib[match(i, branch.results.ib[, "branch"]), "ml.pval"] <- pchisq(teststat.ib, 2 - 1, lower.tail=FALSE))
+      ifelse(branch.is.terminal, branch.results.tb[match(i, branch.results.tb[, "branch"]), "ml.pval"] <- pchisq(teststat.tb, 2 - 1, lower.tail = FALSE), branch.results.ib[match(i, branch.results.ib[, "branch"]), "ml.pval"] <- pchisq(teststat.ib, 2 - 1, lower.tail = FALSE))
       
     }
     
@@ -813,22 +806,22 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
       if(length(clade.ib) > 0) mledenom.ib[match(nonclade.ib, internal.branches)] <- noncladerate.ib <- sum(changes[nonclade.ib]) / sum(Time[nonclade.ib] * pctcomp[nonclade.ib])
       
       # Set log-likelihood numerator:
-      lognumer <- sum(log(dpois(changes, mlenumer * Time * pctcomp)), na.rm=T)
+      lognumer <- sum(log(dpois(changes, mlenumer * Time * pctcomp)), na.rm = TRUE)
       
       # Set log-likelihood numerator for terminal branches:
-      lognumer.tb <- sum(log(dpois(changes.tb, mlenumer.tb * Time.tb * pctcomp.tb)), na.rm=T)
+      lognumer.tb <- sum(log(dpois(changes.tb, mlenumer.tb * Time.tb * pctcomp.tb)), na.rm = TRUE)
       
       # Set log-likelihood numerator for internal branches (if present):
-      if(length(clade.ib) > 0) lognumer.ib <- sum(log(dpois(changes.ib, mlenumer.ib * Time.ib * pctcomp.ib)), na.rm=T)
+      if(length(clade.ib) > 0) lognumer.ib <- sum(log(dpois(changes.ib, mlenumer.ib * Time.ib * pctcomp.ib)), na.rm = TRUE)
       
       # Set log-likelihood denominator:
-      logdenom <- sum(log(dpois(changes, mledenom * Time * pctcomp)), na.rm=T)
+      logdenom <- sum(log(dpois(changes, mledenom * Time * pctcomp)), na.rm = TRUE)
       
       # Set log-likelihood denominator for terminal branches:
-      logdenom.tb <- sum(log(dpois(changes.tb, mledenom.tb * Time.tb * pctcomp.tb)), na.rm=T)
+      logdenom.tb <- sum(log(dpois(changes.tb, mledenom.tb * Time.tb * pctcomp.tb)), na.rm = TRUE)
       
       # Set log-likelihood denominator for internal branches (if present):
-      if(length(clade.ib) > 0) logdenom.ib <- sum(log(dpois(changes.ib, mledenom.ib * Time.ib * pctcomp.ib)), na.rm=T)
+      if(length(clade.ib) > 0) logdenom.ib <- sum(log(dpois(changes.ib, mledenom.ib * Time.ib * pctcomp.ib)), na.rm = TRUE)
       
       # Record within clade rate:
       node.results[j, "in.rate"] <- round(claderate, 2)
@@ -858,10 +851,10 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
       ifelse(length(clade.ib) > 0, node.results[j, "ml.chisq.ib"] <- teststat.ib <- -2 * (lognumer.ib - logdenom.ib), node.results[j, "ml.chisq.ib"] <- NA)
       
       # Record p-value for chi-squared test:
-      node.results[j, "ml.pval"] <- testresult <- pchisq(teststat, 2 - 1, lower.tail=F)
+      node.results[j, "ml.pval"] <- testresult <- pchisq(teststat, 2 - 1, lower.tail = FALSE)
       
       # Record p-value for chi-squared test for terminal branches:
-      node.results[j, "ml.pval.tb"] <- testresult.tb <- pchisq(teststat.tb, 2 - 1, lower.tail=F)
+      node.results[j, "ml.pval.tb"] <- testresult.tb <- pchisq(teststat.tb, 2 - 1, lower.tail = FALSE)
       
       # Record p-value for chi-squared test for terminal branches:
       ifelse(length(clade.ib) > 0, node.results[j, "ml.pval.ib"] <- testresult.ib <- pchisq(teststat.ib, 2 - 1, lower.tail=F), node.results[j, "ml.pval.ib"] <- NA)
@@ -1010,7 +1003,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha=0.01) {
     signif.ib <- order(node.pvals.ib)[indices.ib]
     
     # Add NAs for terminal branch only clades (cherries):
-    node.results[is.na(node.results[, "ml.chisq.ib"]), c("ml.signif.hi.ib", "ml.signif.lo.ib", "ml.signif.ib")] <-  NA
+    node.results[is.na(node.results[, "ml.chisq.ib"]), c("ml.signif.hi.ib", "ml.signif.lo.ib", "ml.signif.ib")] <- NA
     
     # Record significant clades:
     node.results[signif, "ml.signif"] <- 1
