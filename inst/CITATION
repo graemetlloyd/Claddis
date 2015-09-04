@@ -2,14 +2,14 @@ citHeader("To cite package ‘Claddis’ in a publication use:")
 
 citEntry(entry = "Article",
 	title = "Claddis: Measuring Morphological Diversity and Evolutionary Tempo",
-	author = personList(as.person("G. T. Lloyd")),
+	author = "G. T. Lloyd",
 	journal = "Methods in Ecology and Evolution",
   	year = "2015",
 	volume = "X",
-	pages = "Y-Z",
+	pages = "Y-Z”,
 
 	textVersion = "Lloyd, Graeme T. (2015). Claddis: Measuring Morphological Diversity and Evolutionary Tempo. R package version 0.2."
 
 )
 
-citFooter("As Claddis is evolving quickly, you may want to also cite its version number (found with ‘library(help = Claddis)’).")
+citFooter("As Claddis is evolving rapidly, you may want to also cite its version number (found with ‘library(help = Claddis)’).")
