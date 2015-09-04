@@ -48,8 +48,20 @@
 #' @import strap
 NULL
 
+#' @importFrom stats dist
+NULL
 
+#' @importFrom stats dpois
+NULL
 
+#' @importFrom stats pchisq
+NULL
+
+#' @importFrom stats runif
+NULL
+
+#' @importFrom utils combn
+NULL
 
 
 #' Character-taxon matrix from Gauthier 1986
