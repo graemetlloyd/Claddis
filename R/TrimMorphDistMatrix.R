@@ -39,7 +39,7 @@
 #' TrimMorphDistMatrix(distances$max.dist.matrix)
 #' 
 #' @export TrimMorphDistMatrix
-TrimMorphDistMatrix <- function(dist.matrix, tree=NULL) {
+TrimMorphDistMatrix <- function(dist.matrix, tree = NULL) {
 
   # If input is iof class "dist" first convert to a regular matrix:
   if(class(dist.matrix) == "dist") dist.matrix <- as.matrix(dist.matrix)
