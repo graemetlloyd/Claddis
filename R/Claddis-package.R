@@ -43,9 +43,11 @@
 #'
 #' @exportPattern "^[[:alpha:]]+"
 #' @import ape
-#' @import gdata
 #' @import phytools
 #' @import strap
+NULL
+
+#' @importFrom gdata trim
 NULL
 
 #' @importFrom stats dist
