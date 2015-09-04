@@ -5,7 +5,14 @@ Version: 0.2
 Date: 2015-08-02
 Author: Graeme T. Lloyd
 Maintainer: Graeme T. Lloyd <graemetlloyd@gmail.com>
-Depends: ape,phytools,strap
+Depends:
+	ape,
+	phytools,
+	strap
+Imports:
+	gdata,
+	stats,
+	utils
 Description: Measures morphological diversity from discrete character data and estimates evolutionary tempo on phylogenetic trees.
 License: GPL (>=2)
 LazyData: yes
