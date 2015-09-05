@@ -25,7 +25,23 @@ MorphMatrix2PCoA(morph.matrix, distance.method = "MORD",
 \item{estimate.tips}{If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link {AncStateEstMatrix} for more details.}
 }
 \value{
-\item{output}{The output.}
+\item{tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{TrimMorphDistMatrix}.}
+
+\item{dist.matrix}{The distance matrix. Note this may be pruned by \link{TrimMorphDistMatrix} and thus not include all taxa.}
+
+\item{removed.taxa}{A vector of taxa (or nodes) removed by \link{TrimMorphDistMatrix}. Returns NULL if none are removed.}
+
+\item{note}{See \link{pcoa}.}
+
+\item{values}{See \link{pcoa}.}
+
+\item{vectors}{See \link{pcoa}.}
+
+\item{trace}{See \link{pcoa}.}
+
+\item{vectors.cor}{See \link{pcoa}.}
+
+\item{trace.cor}{See \link{pcoa}.}
 }
 \description{
 Performs Principal Coordinates Analysis (PCoA) on a cladistic matrix.

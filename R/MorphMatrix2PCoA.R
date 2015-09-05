@@ -11,11 +11,16 @@
 #' @param tree If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.
 #' @param estimate.allchars If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link {AncStateEstMatrix} for more details.
 #' @param estimate.tips If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link {AncStateEstMatrix} for more details.
-
-# Other options to go to pcoa.
-
 #'
-#' @return \item{output}{The output.}
+#' @return \item{tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{TrimMorphDistMatrix}.}
+#' @return \item{dist.matrix}{The distance matrix. Note this may be pruned by \link{TrimMorphDistMatrix} and thus not include all taxa.}
+#' @return \item{removed.taxa}{A vector of taxa (or nodes) removed by \link{TrimMorphDistMatrix}. Returns NULL if none are removed.}
+#' @return \item{note}{See \link{pcoa}.}
+#' @return \item{values}{See \link{pcoa}.}
+#' @return \item{vectors}{See \link{pcoa}.}
+#' @return \item{trace}{See \link{pcoa}.}
+#' @return \item{vectors.cor}{See \link{pcoa}.}
+#' @return \item{trace.cor}{See \link{pcoa}.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -71,10 +76,13 @@ MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", transform.p
 
   }
   
-  output <- c(list(tree), list(trimmed_distances$removed.taxa), pcoa_results)
+  output <- c(list(tree), list(trimmed_distances$dist.matrix), list(trimmed_distances$removed.taxa), pcoa_results)
 
   names(output)[[1]] <- "tree"
-  names(output)[[2]] <- "removed.taxa"
+
+  names(output)[[2]] <- "dist.matrix"
+  
+  names(output)[[3]] <- "removed.taxa"
 
   invisible(output)
   
