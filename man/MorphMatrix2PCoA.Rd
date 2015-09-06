@@ -56,9 +56,9 @@ Gower (1966). Caillez (1983). Uses \link{pcoa} from the \link{ape} package.
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
 \references{
-Cailliez, F., 1983. The analytical solution of the additive constant problem. Psychometrika, 48, 305–308.
+Cailliez, F., 1983. The analytical solution of the additive constant problem. Psychometrika, 48, 305-308.
 
-Gower, J. C., 1966. Some distance properties of latent root and vector methods used in multivariate analysis. Biometrika, 53, 325–338.
+Gower, J. C., 1966. Some distance properties of latent root and vector methods used in multivariate analysis. Biometrika, 53, 325-338.
 }
 \keyword{coordinates}
 \keyword{principal}
