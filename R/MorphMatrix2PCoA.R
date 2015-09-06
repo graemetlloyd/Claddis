@@ -9,8 +9,8 @@
 #' @param transform.proportional.distances The transformation to apply to propotional (0 to 1) distances (one of "none", "sqrt", or "arcsine_sqrt" - the default). See \link{MorphDistMatrix} for more details.
 #' @param correction The negative eigenvalue correction to use (one of "lingoes", "none", or "cailliez" - the default). See \link{pcoa} for more details.
 #' @param tree If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.
-#' @param estimate.allchars If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link {AncStateEstMatrix} for more details.
-#' @param estimate.tips If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link {AncStateEstMatrix} for more details.
+#' @param estimate.allchars If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{AncStateEstMatrix} for more details.
+#' @param estimate.tips If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link{AncStateEstMatrix} for more details.
 #'
 #' @return \item{tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{TrimMorphDistMatrix}.}
 #' @return \item{dist.matrix}{The distance matrix. Note this may be pruned by \link{TrimMorphDistMatrix} and thus not include all taxa.}

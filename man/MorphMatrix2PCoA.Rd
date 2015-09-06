@@ -20,9 +20,9 @@ MorphMatrix2PCoA(morph.matrix, distance.method = "MORD",
 
 \item{tree}{If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.}
 
-\item{estimate.allchars}{If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link {AncStateEstMatrix} for more details.}
+\item{estimate.allchars}{If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{AncStateEstMatrix} for more details.}
 
-\item{estimate.tips}{If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link {AncStateEstMatrix} for more details.}
+\item{estimate.tips}{If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link{AncStateEstMatrix} for more details.}
 }
 \value{
 \item{tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{TrimMorphDistMatrix}.}
