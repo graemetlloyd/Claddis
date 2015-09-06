@@ -24,6 +24,12 @@
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
+#' @references
+#'
+#' Cailliez, F., 1983. The analytical solution of the additive constant problem. Psychometrika, 48, 305–308.
+#'
+#' Gower, J. C., 1966. Some distance properties of latent root and vector methods used in multivariate analysis. Biometrika, 53, 325–338.
+#'
 #' @keywords principal coordinates
 #'
 #' @examples
@@ -32,10 +38,11 @@
 #'
 #' @export MorphMatrix2PCoA
 MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", transform.proportional.distances = "arcsine_sqrt", correction = "cailliez", tree = NULL, estimate.allchars = FALSE, estimate.tips = FALSE) {
+    
+  # Add some top level conditionsl here to check input is valid.
   
   # If no tree is supplied:
   if(is.null(tree)) {
-    
     
     morph_distances <- MorphDistMatrix(morph.matrix, transform.proportional.distances = transform.proportional.distances)
     
