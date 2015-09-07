@@ -50,6 +50,9 @@ NULL
 #' @importFrom gdata trim
 NULL
 
+#' @importFrom grDevices adjustcolor
+NULL
+
 #' @importFrom grDevices chull
 NULL
 

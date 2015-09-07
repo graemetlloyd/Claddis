@@ -113,6 +113,13 @@ StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear =
       
       # Plot convex hulls
       
+      for(j in unique(groups)) {
+        edge_points <- names(which(groups[rownames(points_to_plot)] == j))[chull(x = points_to_plot[which(groups[rownames(points_to_plot)] == j), 1], y = points_to_plot[which(groups[rownames(points_to_plot)] == j), 2])]
+        edge_points <- c(edge_points, edge_points[1])
+        polygon(x = points_to_plot[edge_points, 1], y = points_to_plot[edge_points, 2], col = adjustcolor(j, alpha.f = 0.3) , border = 0)
+        
+      }
+  
       # Plot data points for ith stack:
       points(x = points_to_plot[, 1], y = points_to_plot[, 2], pch = 21, bg = groups[rownames(points_to_plot)], col = groups[rownames(points_to_plot)], cex = 0.5)
 
@@ -131,26 +138,26 @@ StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear =
   
 }
 
-#ordination_axes <- matrix(rnorm(10000), nrow = 100)
-#rownames(ordination_axes) <- apply(matrix(sample(LETTERS, 1000, replace = TRUE), nrow = 100), 1, paste, collapse = "")
-#ages <- t(apply(matrix(runif(200, 0, 100), ncol = 2), 1, sort, decreasing = TRUE))
-#colnames(ages) <- c("FAD", "LAD")
-#rownames(ages) <- rownames(ordination_axes)
-#time_slices <- seq(0, 100, length.out = 6)
-#groups <- sample(x = c("red", "blue"), size = nrow(ordination_axes), replace = TRUE)
-#names(groups) <- rownames(ordination_axes)
+ordination_axes <- matrix(rnorm(10000), nrow = 100)
+rownames(ordination_axes) <- apply(matrix(sample(LETTERS, 1000, replace = TRUE), nrow = 100), 1, paste, collapse = "")
+ages <- t(apply(matrix(runif(200, 0, 100), ncol = 2), 1, sort, decreasing = TRUE))
+colnames(ages) <- c("FAD", "LAD")
+rownames(ages) <- rownames(ordination_axes)
+time_slices <- seq(0, 100, length.out = 6)
+groups <- sample(x = c("red", "blue"), size = nrow(ordination_axes), replace = TRUE)
+names(groups) <- rownames(ordination_axes)
 
-#StackPlot(ordination_axes, ages, groups = groups, time_slices, shear = 0.2, x_axis = 1, y_axis = 2)
+StackPlot(ordination_axes, ages, groups, time_slices, shear = 0.2, x_axis = 1, y_axis = 2)
 
-#x <- c(c(seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101)), c(rep(20, 101), rep(40, 101), rep(60, 101), rep(80, 101)))
-#y <- c(c(rep(20, 101), rep(40, 101), rep(60, 101), rep(80, 101)), c(seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101)))
-#ordination_axes <- cbind(x, y)
-#rownames(ordination_axes) <- apply(matrix(sample(LETTERS, 8 * 8 * 101, replace = TRUE), nrow = 8 * 101), 1, paste, collapse = "")
-#ages <- cbind(rep(100, 8 * 101), rep(0, 8 * 101))
-#colnames(ages) <- c("FAD", "LAD")
-#rownames(ages) <- rownames(ordination_axes)
-#time_slices <- seq(0, 100, length.out = 6)
-#groups <- sample(x = c("red", "blue"), size = nrow(ordination_axes), replace = TRUE)
-#names(groups) <- rownames(ordination_axes)
+x <- c(c(seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101)), c(rep(20, 101), rep(40, 101), rep(60, 101), rep(80, 101)))
+y <- c(c(rep(20, 101), rep(40, 101), rep(60, 101), rep(80, 101)), c(seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101)))
+ordination_axes <- cbind(x, y)
+rownames(ordination_axes) <- apply(matrix(sample(LETTERS, 8 * 8 * 101, replace = TRUE), nrow = 8 * 101), 1, paste, collapse = "")
+ages <- cbind(rep(100, 8 * 101), rep(0, 8 * 101))
+colnames(ages) <- c("FAD", "LAD")
+rownames(ages) <- rownames(ordination_axes)
+time_slices <- seq(0, 100, length.out = 6)
+groups <- sample(x = c("red", "blue"), size = nrow(ordination_axes), replace = TRUE)
+names(groups) <- rownames(ordination_axes)
 
-#StackPlot(ordination_axes, ages, groups = groups, time_slices, shear = 0.2, x_axis = 1, y_axis = 2)
+StackPlot(ordination_axes, ages, groups = groups, time_slices, shear = 0.2, x_axis = 1, y_axis = 2)
