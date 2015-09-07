@@ -1,3 +1,5 @@
+# devtools::build_win(version = "R-devel")
+
 #' Measuring Morphological Diversity and Evolutionary Tempo
 #' 
 #' Measures morphological diversity from discrete character data and estimates evolutionary tempo on phylogenetic trees.
@@ -50,6 +52,21 @@ NULL
 #' @importFrom gdata trim
 NULL
 
+#' @importFrom graphics par
+NULL
+
+#' @importFrom graphics plot
+NULL
+
+#' @importFrom graphics points
+NULL
+
+#' @importFrom graphics polygon
+NULL
+
+#' @importFrom graphics text
+NULL
+
 #' @importFrom grDevices adjustcolor
 NULL
 
@@ -68,9 +85,11 @@ NULL
 #' @importFrom stats runif
 NULL
 
-#' @importFrom utils combn
+#' @importFrom stats var
 NULL
 
+#' @importFrom utils combn
+NULL
 
 #' Character-taxon matrix from Gauthier 1986
 #' 
