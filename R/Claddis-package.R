@@ -50,6 +50,9 @@ NULL
 #' @importFrom gdata trim
 NULL
 
+#' @importFrom grDevices chull
+NULL
+
 #' @importFrom stats dist
 NULL
 

@@ -25,11 +25,15 @@
 #' # Nothing yet
 #'
 #' @export StackPlot
-StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear = 0.1, x_axis = 1, y_axis = 2) {
+StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2, x_axis = 1, y_axis = 2) {
 
 # ages is FAD and LAD, so can assume range through for first start, but may want to change later.
 # Add spaces between stacks? Could even have this be negative to allow overlapping of highly sheared plots.
 # check axes asked for exist in data
+# cushioning so points don't plot at very edges of plots.
+
+  # Maybe let user set this later, but not yet:
+  plot_cushion <- 0.1
 
   # Put time slices in order of oldest to youngest:
   time_bins <- sort(time_slices, decreasing = TRUE)
@@ -78,6 +82,9 @@ StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear =
     # Place y-axis points on proportional scale:
     points_to_plot[, 2] <- points_to_plot[, 2] / (max(ordination_axes[, y_axis]) - min(ordination_axes[, y_axis]))
   
+    # Add plot cushioning:
+    points_to_plot <- (points_to_plot * (1 - plot_cushion)) + (plot_cushion / 2)
+  
     # Values to add to x_axis values in order to shear them:
     x_shear_additions <- points_to_plot[, 2] * (shear * (100 - shear))
 
@@ -95,21 +102,30 @@ StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear =
 
     # Draw bounding lines for ith stack:
     lines(x = c(0, shear * 100, 100, 100 - (shear * 100), 0), y = c((100 / N_stacks) * (i - 1), (100 / N_stacks) * i, (100 / N_stacks) * i, (100 / N_stacks) * (i - 1), (100 / N_stacks) * (i - 1)), col = "black")
-    
+
+    # 0, 0 lines?
+
     # Tick marks?
     
-    # Plot data points for ith stack:
-    points(x = points_to_plot[, 1], y = points_to_plot[, 2], pch = 21, bg = "black", cex = 0.5)
     
     # Case if groups are specified:
     if(!is.null(groups)) {
       
       # Plot convex hulls
-    
+      
+      # Plot data points for ith stack:
+      points(x = points_to_plot[, 1], y = points_to_plot[, 2], pch = 21, bg = groups[rownames(points_to_plot)], col = groups[rownames(points_to_plot)], cex = 0.5)
+
+    # Case if no groups are specified:
+    } else {
+        
+      # Plot data points for ith stack:
+      points(x = points_to_plot[, 1], y = points_to_plot[, 2], pch = 21, bg = "black", cex = 0.5)
+
     }
 
-    # Text for ages somewhere (e.g., "100 - 80 Ma")
-    # 0, 0 lines?
+    # Plot ages of time slice at bottom left:
+    text(x = 0, y = min_y - 2, pos = 4, labels = paste(time_bins[i], "-", time_bins[(i + 1)], " Ma", sep = ""))
 
   }
   
@@ -121,8 +137,10 @@ StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear =
 #colnames(ages) <- c("FAD", "LAD")
 #rownames(ages) <- rownames(ordination_axes)
 #time_slices <- seq(0, 100, length.out = 6)
+#groups <- sample(x = c("red", "blue"), size = nrow(ordination_axes), replace = TRUE)
+#names(groups) <- rownames(ordination_axes)
 
-#StackPlot(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2, x_axis = 1, y_axis = 2)
+#StackPlot(ordination_axes, ages, groups = groups, time_slices, shear = 0.2, x_axis = 1, y_axis = 2)
 
 #x <- c(c(seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101)), c(rep(20, 101), rep(40, 101), rep(60, 101), rep(80, 101)))
 #y <- c(c(rep(20, 101), rep(40, 101), rep(60, 101), rep(80, 101)), c(seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101)))
@@ -132,5 +150,7 @@ StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear =
 #colnames(ages) <- c("FAD", "LAD")
 #rownames(ages) <- rownames(ordination_axes)
 #time_slices <- seq(0, 100, length.out = 6)
+#groups <- sample(x = c("red", "blue"), size = nrow(ordination_axes), replace = TRUE)
+#names(groups) <- rownames(ordination_axes)
 
-#StackPlot(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2, x_axis = 1, y_axis = 2)
+#StackPlot(ordination_axes, ages, groups = groups, time_slices, shear = 0.2, x_axis = 1, y_axis = 2)

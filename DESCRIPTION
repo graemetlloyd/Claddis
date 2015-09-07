@@ -11,6 +11,7 @@ Depends:
 	strap
 Imports:
 	gdata,
+	grDevices,
 	stats,
 	utils
 Description: Measures morphological diversity from discrete character data and estimates evolutionary tempo on phylogenetic trees.

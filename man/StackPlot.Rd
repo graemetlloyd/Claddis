@@ -4,7 +4,7 @@
 \alias{StackPlot}
 \title{Plot Stacked Ordination Spaces}
 \usage{
-StackPlot(ordination_axes, ages, groups = NULL, time_slices, shear = 0.1,
+StackPlot(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2,
   x_axis = 1, y_axis = 2)
 }
 \arguments{
