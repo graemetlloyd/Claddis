@@ -5,7 +5,7 @@
 \title{Plot Stacked Ordination Spaces}
 \usage{
 StackPlot(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2,
-  x_axis = 1, y_axis = 2)
+  x_axis = 1, y_axis = 2, axis_label = "PC")
 }
 \arguments{
 \item{ordination_axes}{A matrix of the ordination axes supplied (rownames should be object names). First column should be values for first axis, second for second axis and so on.}
@@ -21,6 +21,8 @@ StackPlot(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2,
 \item{x_axis}{The ordination axis to plot on the x-axis.}
 
 \item{y_axis}{The ordination axis to plot nn the y-axis.}
+
+\item{axis_label}{The text used to precede the axis number. Here "PC" (for principal components/coordinates) is the assumed default, but the user may wish to use something else like "RW" instead.}
 }
 \description{
 Plots a stack of ordination spaces representing multiple time-slices.

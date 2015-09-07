@@ -11,6 +11,7 @@
 #' @param shear A single value (0 to 1) for the degree of shearing in the stacked ordination spaces.
 #' @param x_axis The ordination axis to plot on the x-axis.
 #' @param y_axis The ordination axis to plot nn the y-axis.
+#' @param axis_label The text used to precede the axis number. Here "PC" (for principal components/coordinates) is the assumed default, but the user may wish to use something else like "RW" instead.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Emma Sherratt \email{emma.sherratt@@gmail.com}
 #'
@@ -62,14 +63,15 @@
 #' StackPlot(ordination_axes, ages, groups, time_slices)
 #'
 #' @export StackPlot
-StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2, x_axis = 1, y_axis = 2) {
+StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2, x_axis = 1, y_axis = 2, axis_label = "PC") {
 
 # Other options for treatment of age data than just ranges?
 # Add spaces between stacks? Could even have this be negative to allow overlapping of highly sheared plots.
 # Check axes asked for exist in data (top level conditional).
 # Add geologic time at left with geoscale at some point?
+# Am assuming PC axes, but could be RW...
 
-  # Maybe let user set this later, but not yet:
+  # Maybe let user set this later:
   plot_cushion <- 0.1
 
   # Put time slices in order of oldest to youngest:
@@ -79,10 +81,10 @@ StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear =
   N_stacks <- length(time_bins) - 1
 
   # Define x-axis label:
-  xlab <- paste("PC", x_axis, " (", round((apply(ordination_axes, 2, var) / sum(apply(ordination_axes, 2, var)) * 100)[x_axis], 2), "% of total variance)", sep = "")
+  xlab <- paste(axis_label, x_axis, " (", round((apply(ordination_axes, 2, var) / sum(apply(ordination_axes, 2, var)) * 100)[x_axis], 2), "% of total variance)", sep = "")
 
   # Define y-axis label:
-  ylab <- paste("PC", y_axis, " (", round((apply(ordination_axes, 2, var) / sum(apply(ordination_axes, 2, var)) * 100)[y_axis], 2), "% of total variance)", sep = "")
+  ylab <- paste(axis_label, y_axis, " (", round((apply(ordination_axes, 2, var) / sum(apply(ordination_axes, 2, var)) * 100)[y_axis], 2), "% of total variance)", sep = "")
   
   # Set some margins before plotting:
   par(mar = c(0, 0, 0, 0), oma = c(1, 1, 1, 1))
@@ -168,7 +170,7 @@ StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear =
     }
 
     # Plot ages of time slice at bottom left:
-    text(x = 0, y = min_y - 2, pos = 4, labels = paste(time_bins[i], "-", time_bins[(i + 1)], " Ma", sep = ""))
+    text(x = 0, y = min_y - 2, pos = 4, labels = paste(round(time_bins[i], 1), "-", round(time_bins[(i + 1)], 1), " Ma", sep = ""))
 
   }
   
