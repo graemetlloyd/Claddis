@@ -28,6 +28,8 @@
 StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear = 0.1, x_axis = 1, y_axis = 2) {
 
 # ages is FAD and LAD, so can assume range through for first start, but may want to change later.
+# Add spaces between stacks? Could even have this be negative to allow overlapping of highly sheared plots.
+# check axes asked for exist in data
 
   # Put time slices in order of oldest to youngest:
   time_bins <- sort(time_slices, decreasing = TRUE)
@@ -64,17 +66,17 @@ StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear =
     # Isolate just points present in ith stack:
     points_to_plot <- ordination_axes[taxa_in_bin, c(x_axis, y_axis)]
   
-    # Zero x-aixs points:
+    # Shift x-axis points so minimum is zero:
     points_to_plot[, 1] <- points_to_plot[, 1] - min(ordination_axes[, x_axis])
     
-    # Zero y-aixs points:
+    # Shift y-axis points so minimum is zero:
     points_to_plot[, 2] <- points_to_plot[, 2] - min(ordination_axes[, y_axis])
   
     # Place x-axis points on proportional scale:
     points_to_plot[, 1] <- points_to_plot[, 1] / (max(ordination_axes[, x_axis]) - min(ordination_axes[, x_axis]))
     
     # Place y-axis points on proportional scale:
-    points_to_plot[, 2] <- points_to_plot[, 2] / (max(ordination_axes[, y_axis]) - min(ordination_axes[, x_axis]))
+    points_to_plot[, 2] <- points_to_plot[, 2] / (max(ordination_axes[, y_axis]) - min(ordination_axes[, y_axis]))
   
     # Values to add to x_axis values in order to shear them:
     x_shear_additions <- points_to_plot[, 2] * (shear * (100 - shear))
@@ -120,4 +122,15 @@ StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear =
 #rownames(ages) <- rownames(ordination_axes)
 #time_slices <- seq(0, 100, length.out = 6)
 
-#StackPlot(ordination_axes, ages, groups = NULL, time_slices, shear = 0.5, x_axis = 3, y_axis = 14)
+#StackPlot(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2, x_axis = 1, y_axis = 2)
+
+#x <- c(c(seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101)), c(rep(20, 101), rep(40, 101), rep(60, 101), rep(80, 101)))
+#y <- c(c(rep(20, 101), rep(40, 101), rep(60, 101), rep(80, 101)), c(seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101), seq(0, 100, length.out = 101)))
+#ordination_axes <- cbind(x, y)
+#rownames(ordination_axes) <- apply(matrix(sample(LETTERS, 8 * 8 * 101, replace = TRUE), nrow = 8 * 101), 1, paste, collapse = "")
+#ages <- cbind(rep(100, 8 * 101), rep(0, 8 * 101))
+#colnames(ages) <- c("FAD", "LAD")
+#rownames(ages) <- rownames(ordination_axes)
+#time_slices <- seq(0, 100, length.out = 6)
+
+#StackPlot(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2, x_axis = 1, y_axis = 2)
