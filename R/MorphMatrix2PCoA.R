@@ -2,8 +2,16 @@
 #' 
 #' Performs Principal Coordinates Analysis (PCoA) on a cladistic matrix.
 #' 
-#' Gower (1966). Caillez (1983). Uses \link{pcoa} from the \link{ape} package.
-#' 
+#' Takes a cladistic matrix in the format imported by \link{ReadMorphNexus} and performs Principal Coordinates (Gower 1966) analysis on it.
+#'
+#' This function is effectively a wrapper for \link{pcoa} from the \link{ape} package and the user is referred there for some of the options (e.g., using the Caillez 1983 approach to avoiding negative eigenvalues).
+#'
+#' If providing a tree and inferring ancestral states then options to also infer missing or uncertain tips and whether to infer values for all characters at all internal nodes are provided (via \link{AncStateEstMatrix}).
+#'
+#' Other options within the function concern the distance metric to use and the transfrmation to be used if selecting a propotional distance (see \link{MorphDistMatrix}).
+#'
+#' IMPORTANT: The function can remove taxa (or if including a tree, nodes as well) if they lead to an incomplete distance matrix (see \link{TrimMorphDistMatrix}).
+#'
 #' @param morph.matrix A vector of mode character representing the tip names for which an ancestor is sought.
 #' @param distance.method The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{MorphDistMatrix} for more details.
 #' @param transform.proportional.distances The transformation to apply to propotional (0 to 1) distances (one of "none", "sqrt", or "arcsine_sqrt" - the default). See \link{MorphDistMatrix} for more details.
@@ -63,7 +71,19 @@ MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", transform.p
       
     ancestral_values <- AncStateEstMatrix(morph.matrix, tree, estimate.allchars = FALSE, estimate.tips = FALSE)
 
-    morph.matrix$matrix <- rbind(morph.matrix$matrix, ancestral_values)
+    # Case if estimating tip values:
+    if(estimate.tips) {
+    
+      # Overwrite entire matrix with ancestral values as they include tips too.
+      morph.matrix$matrix <- ancestral_values
+    
+    # Case if not estimating tip values:
+    } else {
+    
+      # Add ancestral values into matrix with existing tip values:
+      morph.matrix$matrix <- rbind(morph.matrix$matrix, ancestral_values)
+    
+    }
 
     morph_distances <- MorphDistMatrix(morph.matrix, transform.proportional.distances = transform.proportional.distances)
 

@@ -47,7 +47,15 @@ MorphMatrix2PCoA(morph.matrix, distance.method = "MORD",
 Performs Principal Coordinates Analysis (PCoA) on a cladistic matrix.
 }
 \details{
-Gower (1966). Caillez (1983). Uses \link{pcoa} from the \link{ape} package.
+Takes a cladistic matrix in the format imported by \link{ReadMorphNexus} and performs Principal Coordinates (Gower 1966) analysis on it.
+
+This function is effectively a wrapper for \link{pcoa} from the \link{ape} package and the user is referred there for some of the options (e.g., using the Caillez 1983 approach to avoiding negative eigenvalues).
+
+If providing a tree and inferring ancestral states then options to also infer missing or uncertain tips and whether to infer values for all characters at all internal nodes are provided (via \link{AncStateEstMatrix}).
+
+Other options within the function concern the distance metric to use and the transfrmation to be used if selecting a propotional distance (see \link{MorphDistMatrix}).
+
+IMPORTANT: The function can remove taxa (or if including a tree, nodes as well) if they lead to an incomplete distance matrix (see \link{TrimMorphDistMatrix}).
 }
 \examples{
 # Nothing yet
