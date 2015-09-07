@@ -3,6 +3,8 @@ CHANGES IN CLADDIS VERSION 0.2
   NEW FEATURES
     o Added citation file to package.
     o Added internal and terminal branch versions of the time series output for DiscreteCharacterRate. This was added to complete the internal and terminal test and was used as an additional set of sensitivity tests in Close et al. (2015).
+    o Added new MorphMatrix2PCoA function for performing principal coordinates analysis on cladistic data sets.
+    o Added new StackPlot function for plotting time-sliced ordination spaces as a vertical stack (oldest at bottom, youngest at top).
     o Added this NEWS file to keep users abreast of changes to Claddis.
 
   BUG FIXES
@@ -13,6 +15,7 @@ CHANGES IN CLADDIS VERSION 0.2
   OTHER CHANGES
     o Added reference to Close et al. (2015): technically the first published paper to use Claddis itself. (Older papers made use of earlier versions of the core functions.)
     o Added warning to help file for CorrectRootTime to tell user that this can only be used for trees of minimally three taxa (thanks to Dave Bapst). This is really an edge case issue, but for some other functions trees with two taxa are allowed.
+    o Changes made to how functions are imported to meet the new CRAN upload rules.
     o Converted entire package to Roxygen. This should not affect the user experience at all.
     o Fixed typo in Yang et al. (1995) citation.
     o Removed an .Rhistory file that was accidentally being included in the tarball.
