@@ -4,6 +4,7 @@ CHANGES IN CLADDIS VERSION 0.2
     o Added citation file to package.
     o Added internal and terminal branch versions of the time series output for DiscreteCharacterRate. This was added to complete the internal and terminal test and was used as an additional set of sensitivity tests in Close et al. (2015).
     o Added new MorphMatrix2PCoA function for performing principal coordinates analysis on cladistic data sets.
+    o Added new MorphospacePlot function for performing basic morphospace plots from MorphMatrix2PCoA output.
     o Added new StackPlot function for plotting time-sliced ordination spaces as a vertical stack (oldest at bottom, youngest at top).
     o Added this NEWS file to keep users abreast of changes to Claddis.
 
