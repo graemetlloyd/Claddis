@@ -42,7 +42,7 @@ pcoa_data <- MorphMatrix2PCoA(Michaux1989, tree = tree)
 ChronoPhyloMorphospacePlot(pcoa_data)
 }
 \author{
-Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Emma Sherratt \email{emma.sherratt@gmail.com}
+Emma Sherratt \email{emma.sherratt@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
 \references{
 Sakamoto and Ruta

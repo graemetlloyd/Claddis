@@ -9,7 +9,7 @@
 #' @param y_axis Text.
 #' @param shadow Text.
 #'
-#' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Emma Sherratt \email{emma.sherratt@@gmail.com}
+#' @author Emma Sherratt \email{emma.sherratt@@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
 #' @references
 #'
@@ -85,8 +85,14 @@ ChronoPhyloMorphospacePlot <- function(pcoa_data, x_axis = 1, y_axis = 2, shadow
   # Get node ages for z-axis in plotting:
   z_axis <- GetNodeAges(tree)
 
-  # empty plot
-  plot3d(pcoa_data, type = "n", xlim = limits(pcoa_data[, x_axis], 1.5), ylim = limits(pcoa_data[, y_axis], 1.5), zlim = limits(z_axis, 0), asp = c(1, 1, 0.5), xlab = "PC 1", ylab = "PC 2", zlab = "Time")
+  # Make x label for plot:
+  xlab <- paste("PC", x_axis, sep = "")
+  
+  # Make y label for plot:
+  ylab <- paste("PC", y_axis, sep = "")
+
+  # Make empty plot:
+  plot3d(pcoa_data, type = "n", xlim = limits(pcoa_data[, x_axis], 1.5), ylim = limits(pcoa_data[, y_axis], 1.5), zlim = limits(z_axis, 0), asp = c(1, 1, 0.5), xlab = xlab, ylab = ylab, zlab = "Time (Ma)", view3d(phi = 90, fov = 30))
 
   #plots tips
   points3d(pcoa_data[1:N, 1], pcoa_data[1:N, 2], z_axis[1:N], col = p.p$t.bg, size = p.p$t.cex * 4)
