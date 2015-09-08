@@ -17,7 +17,8 @@
 #'
 #' @references
 #'
-#' Friedman coelacanth paper and others?
+#' Foote
+#' Friedman coelacanth paper
 #'
 #' @keywords principal coordinates
 #'

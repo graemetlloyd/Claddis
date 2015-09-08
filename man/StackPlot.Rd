@@ -86,7 +86,8 @@ StackPlot(ordination_axes, ages, groups, time_slices)
 Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Emma Sherratt \email{emma.sherratt@gmail.com}
 }
 \references{
-Friedman coelacanth paper and others?
+Foote
+Friedman coelacanth paper
 }
 \keyword{coordinates}
 \keyword{principal}
