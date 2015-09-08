@@ -28,7 +28,11 @@ StackPlot(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2,
 Plots a stack of ordination spaces representing multiple time-slices.
 }
 \details{
-Default is oldest at bottom to youngest at top. Can be used for non-Claddis data too (just a way to plot ordinations as time-slices).
+This style of plot is taken from various papers by Michael Foote (Foote 1993; his Figures 2, 4, 6, 8, 10, 12, and 14; Foote 1994; his Figure 2; Foote 1995; his Figure 3; Foote 1999; his Figure 22), and can be seen elsehwere in the litarture (e.g., Friedman and Coates 2006; their Figure 2c).
+
+Here multiple ordination (or morpho-) spaces are plotted as a seriours of successive "stacks" representing specific intervals of time. Following geologic conventions the oldest time-slice is plotted at the base and the sequence gets younger towards the top.
+
+Note that the user needs to supply three pieces of data: 1) a matrix representing the ordination axes (NB: these can come from any source, they do not have to be from \link{Claddis} functions), 2) a set of ages (first adn last appearances) in the same format as required by the \link{DatePhylo} function in the \link{strap} library, and 3) a vector of ages marking the boundaries of the time-slices.
 }
 \examples{
 # Create x-values that will form a grid:
@@ -86,8 +90,15 @@ StackPlot(ordination_axes, ages, groups, time_slices)
 Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Emma Sherratt \email{emma.sherratt@gmail.com}
 }
 \references{
-Foote
-Friedman coelacanth paper
+Foote, M., 1993. Discordance and concordance between morphological and taxonomic diversity. Paleobiology, 19, 185-204.
+
+Foote, M., 1994. Morphological disparity in Ordovician-Devonian crinoids and the early saturation of morphological space. Paleobiology, 20, 320-344.
+
+Foote, M., 1995. Morphological diversification of Paleozoic crinoids. Paleobiology, 21, 273-299.
+
+Foote, M., 1999. Morphological diversity in the evolutionary radiation of Paleozoic and post-Paleozoic crinoids. Paleobiology, 25, 1-115.
+
+Friedman, M. and Coates, M. I., 2006. A newly recognized fossil coelacanth highlights the early morphological diversification of the clade. Proceedings of the Royal Society of London B, 273, 245-250
 }
 \keyword{coordinates}
 \keyword{principal}
