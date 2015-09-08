@@ -5,7 +5,8 @@
 \title{Plot Morphopace}
 \usage{
 MorphospacePlot(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL,
-  plot_taxon_names = FALSE)
+  plot_taxon_names = FALSE, plot_internal_nodes = FALSE, plot_root = TRUE,
+  root_colour = "grey")
 }
 \arguments{
 \item{pcoa_input}{Text.}
@@ -17,21 +18,44 @@ MorphospacePlot(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL,
 \item{z_axis}{Text.}
 
 \item{plot_taxon_names}{Text.}
+
+\item{plot_internal_nodes}{Text.}
+
+\item{plot_root}{Text.}
+
+\item{root_colour}{Text.}
 }
 \description{
 Plots a morphospace using the output from MorphMatrix2PCoA.
 }
 \details{
 Input must come from \link{MorphMatrix2PCoA}.
+
+Allows plotting of a third axis using the technique of Matthew Wills (Wills et al. 1994; their Figures 4 and 8; Wills 1998; his Figure 4).
 }
 \examples{
-# Nothing yet
+# Set random seed:
+set.seed(4)
+
+# Generate a random tree for the Michaux 1989 data set:
+tree <- rtree(length(rownames(Michaux1989$matrix)))
+
+# Add taxon names to the tree:
+tree$tip.label <- rownames(Michaux1989$matrix)
+
+# Perform a phylogenetic Principal Coordinates Analysis:
+pcoa_input <- MorphMatrix2PCoA(Michaux1989, tree = tree)
+
+# Plot the results:
+MorphospacePlot(pcoa_input, plot_taxon_names = TRUE)
 }
 \author{
-Graeme T. Lloyd \email{graemetlloyd@gmail.com}
+Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Emma Sherratt \email{emma.sherratt@gmail.com}
 }
 \references{
-Wills? Brusatte?
+Wills, M. A., 1998. Cambrian and Recent disparity: the picture from priapulids. Paleobiology, 24, 177-199.
+
+Wills, M. A., Briggs, D. E. G. and Fortey, R. A., 1994. Disparity as an evolutionary index: a comparison of Cambrian and Recent arthropods. Paleobiology, 20, 93-130.
 }
 \keyword{coordinates}
 \keyword{principal}

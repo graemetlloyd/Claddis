@@ -4,76 +4,148 @@
 #' 
 #' Input must come from \link{MorphMatrix2PCoA}.
 #'
+#' Allows plotting of a third axis using the technique of Matthew Wills (Wills et al. 1994; their Figures 4 and 8; Wills 1998; his Figure 4).
+#'
 #' @param pcoa_input Text.
 #' @param x_axis Text.
 #' @param y_axis Text.
 #' @param z_axis Text.
 #' @param plot_taxon_names Text.
+#' @param plot_internal_nodes Text.
+#' @param plot_root Text.
+#' @param root_colour Text.
 #'
-#' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Emma Sherratt \email{emma.sherratt@@gmail.com}
 #'
 #' @references
 #'
-#' Wills? Brusatte?
+#' Wills, M. A., 1998. Cambrian and Recent disparity: the picture from priapulids. Paleobiology, 24, 177-199.
+#'
+#' Wills, M. A., Briggs, D. E. G. and Fortey, R. A., 1994. Disparity as an evolutionary index: a comparison of Cambrian and Recent arthropods. Paleobiology, 20, 93-130.
 #'
 #' @keywords principal coordinates
 #'
 #' @examples
 #'
-#' # Nothing yet
+#' # Set random seed:
+#' set.seed(4)
+#'
+#' # Generate a random tree for the Michaux 1989 data set:
+#' tree <- rtree(length(rownames(Michaux1989$matrix)))
+#'
+#' # Add taxon names to the tree:
+#' tree$tip.label <- rownames(Michaux1989$matrix)
+#'
+#' # Perform a phylogenetic Principal Coordinates Analysis:
+#' pcoa_input <- MorphMatrix2PCoA(Michaux1989, tree = tree)
+#'
+#' # Plot the results:
+#' MorphospacePlot(pcoa_input, plot_taxon_names = TRUE)
 #'
 #' @export MorphospacePlot
-MorphospacePlot <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, plot_taxon_names = FALSE) {
+MorphospacePlot <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, plot_taxon_names = FALSE, plot_internal_nodes = FALSE, plot_root = TRUE, root_colour = "grey") {
 
 # Option to plot names but not points
+# Add legend to z-axis if using it
+# Group colours
+# Group colours will conflict with z-axis so have conditional to turn z off and warn user if doing so.
 
+  # Get vector of values that correspond to scree plot:
   scree_values <- apply(pcoa_input$vectors, 2, var) / sum(apply(pcoa_input$vectors, 2, var)) * 100
 
+  # Make x-axis label:
   x_lab <- paste("PC", x_axis, " (", round(scree_values[x_axis], 2), "% of total variance)", sep = "")
+  
+  # Make y-axis label:
   y_lab <- paste("PC", y_axis, " (", round(scree_values[y_axis], 2), "% of total variance)", sep = "")
 
+  # Create the basic plot space (will be empty for now):
   plot(pcoa_input$vectors[, x_axis], pcoa_input$vectors[, y_axis], type="n", bg = "black", xlab = x_lab, ylab = y_lab)
 
   # Case if no z-axis chosen:
   if(is.null(z_axis)) {
 
+    # Make all z-axis colours black:
     z_colours <- rep("black", nrow(pcoa_input$vectors))
     
+    # Make all z-axis values equal in size:
     z_sizes <- rep(1, nrow(pcoa_input$vectors))
 
   # Case if a z-axis is specified:
   } else {
     
+    # Create vector of colours for z-axis (default of white):
     z_colours <- rep("white", nrow(pcoa_input$vectors))
     
+    # CUpdate z-axis colours for positive values to black:
     z_colours[which(pcoa_input$vectors[, z_axis] > 0)] <- "black"
     
+    # Create z-axis vector for absolute size of values (up to a max of 3):
     z_sizes <- abs(pcoa_input$vectors[, z_axis]) / max(abs(pcoa_input$vectors[, z_axis])) * 3
     
   }
 
-  points(pcoa_input$vectors[, x_axis], pcoa_input$vectors[, y_axis], pch = 21, bg = z_colours, cex = z_sizes)
-
-  if(plot_taxon_names) {
-
-    x_positions <- rep(2, nrow(pcoa_input$vectors))
-
-    x_positions[which(pcoa_input$vectors[, x_axis] < 0)] <- 4
-
-    text(x = pcoa_input$vectors[, x_axis], y = pcoa_input$vectors[, y_axis], labels = rownames(pcoa_input$vectors), pos = x_positions, cex = 0.7)
-
-  }
-
   # Case if tree supplied:
   if(!is.null(pcoa_input$tree)) {
+
+    # Sort axes by node number in tree:
+    pcoa_input$vectors <- pcoa_input$vectors[c(pcoa_input$tree$tip.label, setdiff(rownames(pcoa_input$vectors), pcoa_input$tree$tip.label)), ]
+
+    # For each branch, plot branch:
+    for(i in 1:nrow(pcoa_input$tree$edge)) lines(x = pcoa_input$vectors[pcoa_input$tree$edge[i, ], x_axis], y = pcoa_input$vectors[pcoa_input$tree$edge[i, ], y_axis], col = "black")
+
+    # Establish tip node numbers:
+    tip_numbers <- c(1:Ntip(pcoa_input$tree))
     
+    # Establish internal node numbers:
+    node_numbers <- setdiff(1:nrow(pcoa_input$vectors), tip_numbers)
+    
+    # Establish root number:
+    root_number <- Ntip(pcoa_input$tree) + 1
+
+    # If plotting internal nodes, plot internal nodes:
+    if(plot_internal_nodes) points(pcoa_input$vectors[node_numbers, x_axis], pcoa_input$vectors[node_numbers, y_axis], pch = 21, bg = z_colours[node_numbers], cex = z_sizes[node_numbers])
+
+    # If plotting root separately, plot root:
+    if(plot_root) points(pcoa_input$vectors[root_number, x_axis], pcoa_input$vectors[root_number, y_axis], pch = 21, col = root_colour, bg = root_colour, cex = z_sizes[root_number])
+
+    # Plot tip data:
+    points(pcoa_input$vectors[tip_numbers, x_axis], pcoa_input$vectors[tip_numbers, y_axis], pch = 21, bg = z_colours[tip_numbers], cex = z_sizes[tip_numbers])
+
+    # If plotting taxon names:
+    if(plot_taxon_names) {
+    
+      # First establish a default position for names (to the left of the point):
+      x_positions <- rep(2, nrow(pcoa_input$vectors))
+    
+      # Now changes negative values to plot on the right instead:
+      x_positions[which(pcoa_input$vectors[, x_axis] < 0)] <- 4
+    
+      # Plot taxon names (for tips only):
+      text(x = pcoa_input$vectors[tip_numbers, x_axis], y = pcoa_input$vectors[tip_numbers, y_axis], labels = rownames(pcoa_input$vectors)[tip_numbers], pos = x_positions[tip_numbers], cex = 0.7)
+    
+    }
 
   # Case if no tree supplied:
   } else {
 
+    # Plot points:
+    points(pcoa_input$vectors[, x_axis], pcoa_input$vectors[, y_axis], pch = 21, bg = z_colours, cex = z_sizes)
+
+    # If plotting taxon names:
+    if(plot_taxon_names) {
+    
+      # First establish a default position for names (to the left of the point):
+      x_positions <- rep(2, nrow(pcoa_input$vectors))
+    
+      # Now changes negative values to plot on the right instead:
+      x_positions[which(pcoa_input$vectors[, x_axis] < 0)] <- 4
+    
+      # Plot taxon names:
+      text(x = pcoa_input$vectors[, x_axis], y = pcoa_input$vectors[, y_axis], labels = rownames(pcoa_input$vectors), pos = x_positions, cex = 0.7)
+    
+    }
 
   }
 
 }
-
-#pcoa_input <- MorphMatrix2PCoA(Michaux1989)
