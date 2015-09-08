@@ -42,7 +42,10 @@
 #'
 #' @examples
 #'
-#' # Nothing yet
+#' # Run on Michaux (189) data set with defaults:
+#' x <- MorphMatrix2PCoA(Michaux1989)
+#'
+#' x
 #'
 #' @export MorphMatrix2PCoA
 MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", transform.proportional.distances = "arcsine_sqrt", correction = "cailliez", tree = NULL, estimate.allchars = FALSE, estimate.tips = FALSE) {

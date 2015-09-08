@@ -58,7 +58,10 @@ Other options within the function concern the distance metric to use and the tra
 IMPORTANT: The function can remove taxa (or if including a tree, nodes as well) if they lead to an incomplete distance matrix (see \link{TrimMorphDistMatrix}).
 }
 \examples{
-# Nothing yet
+# Run on Michaux (189) data set with defaults:
+x <- MorphMatrix2PCoA(Michaux1989)
+
+x
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
