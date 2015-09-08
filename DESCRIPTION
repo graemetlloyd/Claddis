@@ -8,6 +8,7 @@ Maintainer: Graeme T. Lloyd <graemetlloyd@gmail.com>
 Depends:
 	ape,
 	phytools,
+	rgl,
 	strap
 Imports:
 	gdata,
