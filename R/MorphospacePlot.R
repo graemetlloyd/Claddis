@@ -50,6 +50,19 @@ MorphospacePlot <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, p
 # Group colours
 # Group colours will conflict with z-axis so have conditional to turn z off and warn user if doing so.
 
+
+
+
+#gp is a vector with n species and p groups
+#is.factor() # to check if group names, otherwise is assumed to be colours
+
+#col.gp <- rainbow(length(levels(gp))) # generates a set of different colors length p
+#names(col.gp) <- levels(gp) # assign those colurs to the p groups
+#col.gp <- col.gp[match(gp, names(col.gp))] # creates a vector length n with a group and colour for each
+
+
+
+
   # Get vector of values that correspond to scree plot:
   scree_values <- apply(pcoa_input$vectors, 2, var) / sum(apply(pcoa_input$vectors, 2, var)) * 100
 
@@ -60,7 +73,7 @@ MorphospacePlot <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, p
   y_lab <- paste("PC", y_axis, " (", round(scree_values[y_axis], 2), "% of total variance)", sep = "")
 
   # Create the basic plot space (will be empty for now):
-  plot(pcoa_input$vectors[, x_axis], pcoa_input$vectors[, y_axis], type="n", bg = "black", xlab = x_lab, ylab = y_lab)
+  plot(pcoa_input$vectors[, x_axis], pcoa_input$vectors[, y_axis], type="n", bg = "black", xlab = x_lab, ylab = y_lab, asp = TRUE)
 
   # Case if no z-axis chosen:
   if(is.null(z_axis)) {
