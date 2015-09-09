@@ -6,6 +6,7 @@ CHANGES IN CLADDIS VERSION 0.2
     o Added new ChronoPhyloMorphospacePlot function to make three-dimensional plots of two ordination axes against time.
     o Added new MorphMatrix2PCoA function for performing principal coordinates analysis on cladistic data sets.
     o Added new MorphospacePlot function for performing basic morphospace plots from MorphMatrix2PCoA output.
+    o Added new MultiMorphospacePlot function for performing plots of multiple axes from MorphMatrix2PCoA output.
     o Added new StackPlot function for plotting time-sliced ordination spaces as a vertical stack (oldest at bottom, youngest at top).
     o Added this NEWS file to keep users abreast of changes to Claddis.
 
