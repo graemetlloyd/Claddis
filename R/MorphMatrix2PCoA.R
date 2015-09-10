@@ -47,31 +47,47 @@
 #'
 #' x
 #'
+#' tree <- rtree(length(rownames(Michaux1989$matrix)))
+#'
+#' tree$tip.label <- rownames(Michaux1989$matrix)
+#'
+#' y <- MorphMatrix2PCoA(Michaux1989, tree = tree)
+#'
+#' y
+#'
 #' @export MorphMatrix2PCoA
 MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", transform.proportional.distances = "arcsine_sqrt", correction = "cailliez", tree = NULL, estimate.allchars = FALSE, estimate.tips = FALSE) {
     
-  # Add some top level conditionsl here to check input is valid.
+# Add some top level conditionsl here to check input is valid.
   
   # If no tree is supplied:
   if(is.null(tree)) {
     
+    # Get morphological distances from the cladistic matrix:
     morph_distances <- MorphDistMatrix(morph.matrix, transform.proportional.distances = transform.proportional.distances)
     
+    # If using Raw Euclidean Distances:
     if(distance.method == "RED") trimmed_distances <- TrimMorphDistMatrix(morph_distances$raw.dist.matrix)
 
+    # If using Generalised Euclidean Distances:
     if(distance.method == "GED") trimmed_distances <- TrimMorphDistMatrix(morph_distances$GED.dist.matrix)
 
+    # If using Gower Coefficients:
     if(distance.method == "GC") trimmed_distances <- TrimMorphDistMatrix(morph_distances$gower.dist.matrix)
 
+    # If using Maximum Observable Rescaled Distances:
     if(distance.method == "MORD") trimmed_distances <- TrimMorphDistMatrix(morph_distances$max.dist.matrix)
     
+    # If trimming of matrix lead to taxa being removed warn user:
     if(!is.null(trimmed_distances$removed.taxa)) message(paste("The following taxa had to be removed to produce a complete distance matrix:", paste(trimmed_distances$removed.taxa, collapse = ", ")))
     
+    # Perform Principal Coordinates Analysis on the data:
     pcoa_results <- pcoa(trimmed_distances$dist.matrix, correction = correction, rn = rownames(trimmed_distances$dist.matrix))
     
   # Case if a tree is included (and a phylomorphospace is requested):
   } else {
       
+    # Get ancestral character states:
     ancestral_values <- AncStateEstMatrix(morph.matrix, tree, estimate.allchars = FALSE, estimate.tips = FALSE)
 
     # Case if estimating tip values:
@@ -88,44 +104,49 @@ MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", transform.p
     
     }
 
+    # Get morphological distances from the cladistic matrix:
     morph_distances <- MorphDistMatrix(morph.matrix, transform.proportional.distances = transform.proportional.distances)
 
+    # If using Raw Euclidean Distances:
     if(distance.method == "RED") trimmed_distances <- TrimMorphDistMatrix(morph_distances$raw.dist.matrix, tree = tree)
     
+    # If using Generalised Euclidean Distances:
     if(distance.method == "GED") trimmed_distances <- TrimMorphDistMatrix(morph_distances$GED.dist.matrix, tree = tree)
     
+    # If using Gower Coefficients:
     if(distance.method == "GC") trimmed_distances <- TrimMorphDistMatrix(morph_distances$gower.dist.matrix, tree = tree)
     
+    # If using Maximum Observable Rescaled Distances:
     if(distance.method == "MORD") trimmed_distances <- TrimMorphDistMatrix(morph_distances$max.dist.matrix, tree = tree)
 
+    # If trimming of matrix lead to taxa or nodes being removed warn user:
     if(!is.null(trimmed_distances$removed.taxa)) message(paste("The following taxa or nodes had to be removed to produce a complete distance matrix:", paste(trimmed_distances$removed.taxa, collapse = ", ")))
 
+    # Store (possibly trimmed) tree ready to be output:
     tree <- trimmed_distances$tree
 
+    # Perform Principal Coordinates Analysis on the data:
     pcoa_results <- pcoa(trimmed_distances$dist.matrix, correction = correction, rn = rownames(trimmed_distances$dist.matrix))
 
   }
   
+  # Compile output:
   output <- c(list(tree), list(trimmed_distances$dist.matrix), list(trimmed_distances$removed.taxa), pcoa_results)
 
+  # Add variable name for tree:
   names(output)[[1]] <- "tree"
 
+  # Add variable name for distaance matrix:
   names(output)[[2]] <- "dist.matrix"
   
+  # Add variable name for removed taxa and nodes:
   names(output)[[3]] <- "removed.taxa"
 
+  # Return output invisibly:
   invisible(output)
   
 }
 
-#tree <- rtree(length(rownames(Michaux1989$matrix)))
-#tree$tip.label <- rownames(Michaux1989$matrix)
-
-#x <- MorphMatrix2PCoA(Michaux1989)
-#y <- MorphMatrix2PCoA(Michaux1989, tree = tree)
-
-#x
-#y
 
 #tree <- rtree(length(rownames(Gauthier1986$matrix)))
 #tree$tip.label <- rownames(Gauthier1986$matrix)

@@ -62,6 +62,14 @@ IMPORTANT: The function can remove taxa (or if including a tree, nodes as well) 
 x <- MorphMatrix2PCoA(Michaux1989)
 
 x
+
+tree <- rtree(length(rownames(Michaux1989$matrix)))
+
+tree$tip.label <- rownames(Michaux1989$matrix)
+
+y <- MorphMatrix2PCoA(Michaux1989, tree = tree)
+
+y
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
