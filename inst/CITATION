@@ -3,7 +3,7 @@ citHeader("To cite package 'Claddis' in a publication use:")
 citEntry(entry = "Article",
 	title = "Claddis: Measuring Morphological Diversity and Evolutionary Tempo",
 	author = "G. T. Lloyd",
-	journal = “NA”,
+	journal = "NA",
   	year = "2015",
 	volume = "X",
 	pages = "Y-Z",
