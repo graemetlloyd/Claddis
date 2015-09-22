@@ -5,7 +5,9 @@
 #' Performs Safe Taxonomic Reduction (Wilkinson 1995).
 #' 
 #' If no taxa can be safely removed will print the text "No taxa can be safely removed", and the \code{str.list} and \code{removed.matrix} will have no rows.
-#' 
+#'
+#' NB: If your data contains inapplicable characters these will be treated as missing data, but this is inappropriate. Thus the user is advised to double check that any removed taxa make sense in the light of inapplicable states. (As far as I am aware this same behaviour occurs in the TAXEQ3 software.)
+#'
 #' @param morph.matrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
 #'
 #' @return
@@ -16,15 +18,13 @@
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
-#' @references Wilkinson, M., 1995. Coping with abundant missing entries in
-#' phylogenetic inference using parsimony. Systematic Biology, 44, 501-514.
+#' @references Wilkinson, M., 1995. Coping with abundant missing entries in phylogenetic inference using parsimony. Systematic Biology, 44, 501-514.
 #'
 #' @keywords Safe Taxonomic Reduction
 #'
 #' @examples
 #' 
-#' # Performs STR on the Gauthier 1986 dataset used
-#' # in the Wilkinson (1995) paper:
+#' # Performs STR on the Gauthier 1986 dataset used in Wilkinson (1995):
 #' str.out <- SafeTaxonomicReduction(Gauthier1986)
 #' 
 #' # View deleted taxa:
