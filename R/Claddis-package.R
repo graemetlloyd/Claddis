@@ -45,7 +45,7 @@
 #'
 #' @exportPattern "^[[:alpha:]]+"
 #' @import ape
-#' @import phytools
+# @import phytools
 #' @import rgl
 #' @import strap
 NULL
