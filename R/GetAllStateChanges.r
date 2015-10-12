@@ -43,8 +43,9 @@
 #' tree$root.time <- max(diag(vcv(tree)))
 #' 
 #' # Get all state changes:
-#' GetAllStateChanges(Michaux1989, tree,
-#'   seq(tree$root.time, 0, length.out=3), Nsim=2)
+#' # TURNED OFF FOR NOW UNTIL PHYTOOLS ISSUES ARE RESOLVED
+#' #GetAllStateChanges(Michaux1989, tree,
+#' #  seq(tree$root.time, 0, length.out=3), Nsim=2)
 #' 
 #' @export GetAllStateChanges
 GetAllStateChanges <- function(clad.matrix, tree, time.bins, Nsim = 10) {
