@@ -6,8 +6,7 @@ Date: 2015-08-02
 Author: Graeme T. Lloyd
 Maintainer: Graeme T. Lloyd <graemetlloyd@gmail.com>
 Depends:
-	ape,
-	msm,
+	phytools,
 	rgl,
 	strap
 Imports:

@@ -44,9 +44,7 @@
 #' distances
 #'
 #' @exportPattern "^[[:alpha:]]+"
-#' @import ape
-#' @import msm
-# @import phytools
+#' @import phytools
 #' @import rgl
 #' @import strap
 NULL
