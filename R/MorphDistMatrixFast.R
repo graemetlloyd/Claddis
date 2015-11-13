@@ -123,10 +123,10 @@ MorphDistMatrix.fast <- function(morph.matrix, transform.proportional.distances=
         if(length(intersection.value) > 0) {
           #~~~~~~~~     
           # Set ith value as zero (no difference):
-          firstrow[amper.element] <<- 0
+          firstrow[amper.element] <- 0
           #~~~~~~~~
           # Set jth value as zero (no difference)
-          secondrow[amper.element] <<- 0
+          secondrow[amper.element] <- 0
         }
         #~~~~~~~~
         # Case if polymorphic and non-polymorphic values do not overlap:
@@ -136,20 +136,20 @@ MorphDistMatrix.fast <- function(morph.matrix, transform.proportional.distances=
           if(ordering[compchar[amper.element]] == "unord") {
             #~~~~~~~~
             # Set ith value as zero:
-            firstrow[amper.element] <<- 0
+            firstrow[amper.element] <- 0
             #~~~~~~~~
             # Set jth value as 1 (making the ij difference equal to one):
-            secondrow[amper.element] <<- 1
+            secondrow[amper.element] <- 1
           }
           #~~~~~~~~           
           # Case if character is ordered (max difference is > 1):
           if(ordering[compchar[amper.element]] == "ord") {
             #~~~~~~~~
             # Get first row value(s):
-            firstrowvals <<- as.numeric(strsplit(firstrow[amper.element], "&")[[1]])
+            firstrowvals <- as.numeric(strsplit(firstrow[amper.element], "&")[[1]])
             #~~~~~~~~
             # Get second row value(s):
-            secondrowvals <<- as.numeric(strsplit(secondrow[amper.element], "&")[[1]])
+            secondrowvals <- as.numeric(strsplit(secondrow[amper.element], "&")[[1]])
             #~~~~~~~~
             # Make mini distance matrix:
             poly.dist.mat <- matrix(0, nrow=length(firstrowvals), ncol=length(secondrowvals))
@@ -164,10 +164,10 @@ MorphDistMatrix.fast <- function(morph.matrix, transform.proportional.distances=
             #TG: I leave it like it is for now
             #~~~~~~~~
             # Set first value as zero:
-            firstrow[amper.element] <<- 0
+            firstrow[amper.element] <- 0
             #~~~~~~~~
             # Set second value as minimum possible difference:
-            secondrow[amper.element] <<- min(poly.dist.mat)
+            secondrow[amper.element] <- min(poly.dist.mat)
           }
         }
         #TG: note that this functions doesn't return anything per se but just modifies the firstrow and secondrow objects

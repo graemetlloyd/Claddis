@@ -63,7 +63,7 @@ DolloSCM <- function(tree, tip.states) {
     if(length(non.matches) > 0) stop(paste("Non-matching names between tree and tips states found:", paste(non.matches, collapse=", ")))
     
     # Check for states other than zero or one:
-    non.binary.states <- setdiff(c(0, 1), unique(tip.states))
+    non.binary.states <- setdiff(unique(tip.states), c(0, 1))
     
     # If states other than zero or one found warn user:
     if(length(non.binary.states) > 0) stop("States other than 0 or 1 found. All states must be 0 or 1.")
@@ -83,8 +83,22 @@ DolloSCM <- function(tree, tip.states) {
         # Set acquisition time to root time:
         acquisition.time <- tree$root.time
         
-        # Get stochastic character map for full tree using Dollo model and a strong root prior of one:
-        SCM <- make.simmap(tree, tip.states[tree$tip.label], model = Dollo.model, pi = c(0, 1))$maps
+        # If tip states vary:
+        if(length(unique(tip.states)) > 1) {
+            
+            # Get stochastic character map for full tree using Dollo model and a strong root prior of one:
+            SCM <- make.simmap(tree, tip.states[tree$tip.label], model = Dollo.model, pi = c(0, 1))$maps
+            
+        # If tip states are constant:
+        } else {
+            
+            # Create SCM with no losses:
+            SCM <- as.list(tree$edge.length)
+            
+            # Label all states as derived:
+            for(i in 1:length(SCM)) names(SCM[[i]]) <- as.character(unique(tip.states))
+            
+        }
         
     # If new root reflects a subtree:
     } else {
