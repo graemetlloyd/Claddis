@@ -4,7 +4,7 @@
 #' 
 #' Reads in a #NEXUS (Maddison et al. 1997) data file representing the
 #' distribution of discrete morphological characters in a set of taxa. Unlike
-#' \link{read.nexus.data} this function can handle polymorphisms (e.g.,
+#' \code{read.nexus.data} (ape library) this function can handle polymorphisms (e.g.,
 #' \code{(012)}).
 #' 
 #' Note that the function is generally intolerant to excursions from a standard
