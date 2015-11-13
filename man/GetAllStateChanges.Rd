@@ -56,9 +56,8 @@ tree$tip.label <- rownames(Michaux1989$matrix)
 tree$root.time <- max(diag(vcv(tree)))
 
 # Get all state changes:
-# TURNED OFF FOR NOW UNTIL PHYTOOLS ISSUES ARE RESOLVED
-#GetAllStateChanges(Michaux1989, tree,
-#  seq(tree$root.time, 0, length.out=3), Nsim=2)
+GetAllStateChanges(Michaux1989, tree,
+  seq(tree$root.time, 0, length.out = 3), Nsim = 2)
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
