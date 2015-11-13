@@ -43,9 +43,8 @@
 #' tree$root.time <- max(diag(vcv(tree)))
 #' 
 #' # Get all state changes:
-#' # TURNED OFF FOR NOW UNTIL PHYTOOLS ISSUES ARE RESOLVED
-#' #GetAllStateChanges(Michaux1989, tree,
-#' #  seq(tree$root.time, 0, length.out=3), Nsim=2)
+#' GetAllStateChanges(Michaux1989, tree,
+#'   seq(tree$root.time, 0, length.out = 3), Nsim = 2)
 #' 
 #' @export GetAllStateChanges
 GetAllStateChanges <- function(clad.matrix, tree, time.bins, Nsim = 10) {
@@ -392,13 +391,13 @@ GetAllStateChanges <- function(clad.matrix, tree, time.bins, Nsim = 10) {
           trees <- make.simmap(pruned.tree, tip.states, nsim=Nsim, model=char.model, pi="estimated", message=FALSE)
           
           # If Nsim is 1 need to convert to multiPhylo object so handling below works out:
-          if(class(trees) != "multiPhylo") {
+          if(class(trees)[2] != "multiPhylo") {
             
             # Make trees into list:
             trees <- list(trees)
             
             # Make into multiPhylo object:
-            class(trees) <- "multiPhylo"
+            class(trees)[2] <- "multiPhylo"
             
           }
           
