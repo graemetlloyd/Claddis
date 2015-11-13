@@ -4,7 +4,7 @@
 #' 
 #' Reads in a #NEXUS (Maddison et al. 1997) data file representing the
 #' distribution of discrete morphological characters in a set of taxa. Unlike
-#' \code{read.nexus.data} (ape library) this function can handle polymorphisms (e.g.,
+#' \link{read.nexus.data} this function can handle polymorphisms (e.g.,
 #' \code{(012)}).
 #' 
 #' Note that the function is generally intolerant to excursions from a standard
@@ -34,7 +34,7 @@
 #' used in the input data (these are replaced here by the digits 0-9 and the
 #' letters A-V in order).}
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
-#' @seealso \code{read.nexus.data} in the ape library.
+#' @seealso \link{read.nexus.data}
 #' @references Maddison, D. R., Swofford, D. L. and Maddison, W. P., 1997.
 #' NEXUS: an extensible file format for systematic information. Systematic
 #' Biology, 46, 590-621.
