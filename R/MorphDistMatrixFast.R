@@ -401,66 +401,66 @@ MorphDistMatrix.fast <- function(morph.matrix, transform.proportional.distances=
 #####################
 
 # Loading the packages
-library(Claddis)
-library(testthat)
+#  library(Claddis)
+#  library(testthat)
 
 # Testing with the Michaux 1989 matrix
-time_base <- system.time(results_base <- MorphDistMatrix(Michaux1989))
-time_fast <- system.time(results_fast <- MorphDistMatrix.fast(Michaux1989))
+#  time_base <- system.time(results_base <- MorphDistMatrix(Michaux1989))
+#  time_fast <- system.time(results_fast <- MorphDistMatrix.fast(Michaux1989))
 # What's the time difference?
-time_base/time_fast
+#  time_base/time_fast
 
 #Is it actually the same output?
-test_that("Are both version giving the exact same results (no rounding nor random seeds)", {
-  expect_equal(results_base, results_fast)
-})
+#  test_that("Are both version giving the exact same results (no rounding nor random seeds)", {
+#    expect_equal(results_base, results_fast)
+#  })
 
 # Testing with the Gauthier 1986 matrix
-time_base <- system.time(results_base <- MorphDistMatrix(Gauthier1986))
-time_fast <- system.time(results_fast <- MorphDistMatrix.fast(Gauthier1986))
+#  time_base <- system.time(results_base <- MorphDistMatrix(Gauthier1986))
+#  time_fast <- system.time(results_fast <- MorphDistMatrix.fast(Gauthier1986))
 # What's the time difference?
-time_base/time_fast
+#  time_base/time_fast
 
 #Is it actually the same output?
-test_that("Are both version giving the exact same results (no rounding nor random seeds)", {
-  expect_equal(results_base, results_fast)
-})
+#  test_that("Are both version giving the exact same results (no rounding nor random seeds)", {
+#    expect_equal(results_base, results_fast)
+#  })
 
 # Testing with a more complex (bigger) matrix
 # Some random matrix
-matrix <- matrix(sample(c("0", "1", "2", "0&1", "0&2", "1&2", "0&1&2"), 5000, replace=TRUE, prob=c(0.425, 0.42, 0.12, 0.01, 0.01, 0.01, 0.005))
-  , nrow=50, ncol=100, dimnames=list(c(1:50)))
+#  matrix <- matrix(sample(c("0", "1", "2", "0&1", "0&2", "1&2", "0&1&2"), 5000, replace=TRUE, prob=c(0.425, 0.42, 0.12, 0.01, 0.01, 0.01, 0.005))
+#    , nrow=50, ncol=100, dimnames=list(c(1:50)))
 # Adding 25% of missing characters
-matrix[sample(1:5000, 200)] <- NA
+#  matrix[sample(1:5000, 200)] <- NA
 
 # ordering
-ordering <- sample(c("unord", "ord"), 100, replace=TRUE, prob=c(0.9,0.1))
+#  ordering <- sample(c("unord", "ord"), 100, replace=TRUE, prob=c(0.9,0.1))
 
 # weights
-weights <- sample(c(1:3), 100, replace=TRUE, prob=c(0.85,0.1,0.05))
+#  weights <- sample(c(1:3), 100, replace=TRUE, prob=c(0.85,0.1,0.05))
 
 # Function for making a morph.matrix like object
-make.nexus<-function(matrix, header, ordering, weights) {
-    nexus<-list()
-    nexus$header<-header
-    nexus$matrix<-matrix
-    nexus$ordering<-ordering
-    nexus$weights<-weights
-    nexus$max.vals<-apply(matrix, 2, max, na.rm=TRUE)
-    nexus$min.vals<-apply(matrix, 2, min, na.rm=TRUE)
-    return(nexus)
-}
+#  make.nexus<-function(matrix, header, ordering, weights) {
+#      nexus<-list()
+#      nexus$header<-header
+#      nexus$matrix<-matrix
+#      nexus$ordering<-ordering
+#      nexus$weights<-weights
+#      nexus$max.vals<-apply(matrix, 2, max, na.rm=TRUE)
+#      nexus$min.vals<-apply(matrix, 2, min, na.rm=TRUE)
+#      return(nexus)
+#  }
 
-morph.matrix <- make.nexus(matrix, header="example", ordering, weights)
+#  morph.matrix <- make.nexus(matrix, header="example", ordering, weights)
 
 # Testing with the random matrix
-time_base <- system.time(results_base <- MorphDistMatrix(morph.matrix))
-time_fast <- system.time(results_fast <- MorphDistMatrix.fast(morph.matrix))
+#  time_base <- system.time(results_base <- MorphDistMatrix(morph.matrix))
+#  time_fast <- system.time(results_fast <- MorphDistMatrix.fast(morph.matrix))
 # What's the time difference?
-time_base/time_fast
+#  time_base/time_fast
 
 #Is it actually the same output?
-test_that("Are both version giving the exact same results (no rounding nor random seeds)", {
-  expect_equal(results_base, results_fast)
-})
+#  test_that("Are both version giving the exact same results (no rounding nor random seeds)", {
+#    expect_equal(results_base, results_fast)
+#  })
 
