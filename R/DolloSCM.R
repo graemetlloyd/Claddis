@@ -139,8 +139,22 @@ DolloSCM <- function(tree, tip.states) {
         # Add acquisition branch to the SCM:
         SCM[[acquisition.branch]] <- acquisition.branch.SCM
         
-        # Now do real SCM on pruned tree using Dollo model and a strong root prior of one:
-        SCM_real <- make.simmap(new.tree, new.tips[new.tree$tip.label], model = Dollo.model, pi = c(0, 1))$maps
+        # If tip states vary:
+        if(length(unique(new.tips)) > 1) {
+        
+            # Now do real SCM on pruned tree using Dollo model and a strong root prior of one:
+            SCM_real <- make.simmap(new.tree, new.tips[new.tree$tip.label], model = Dollo.model, pi = c(0, 1))$maps
+            
+        # If tip state is constant:
+        } else {
+            
+            # Create SCM with no losses:
+            SCM_real <- as.list(new.tree$edge.length)
+            
+            # Label all states as derived:
+            for(i in 1:length(SCM_real)) names(SCM_real[[i]]) <- "1"
+            
+        }
         
         # Create edge matrix for original tree:
         orig.edges <- tree$edge
