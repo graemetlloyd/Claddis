@@ -34,7 +34,7 @@
 #' used in the input data (these are replaced here by the digits 0-9 and the
 #' letters A-V in order).}
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
-#' @seealso \link{read.nexus.data}
+#' @seealso \code{read.nexus.data} in the ape library.
 #' @references Maddison, D. R., Swofford, D. L. and Maddison, W. P., 1997.
 #' NEXUS: an extensible file format for systematic information. Systematic
 #' Biology, 46, 590-621.
