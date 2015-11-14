@@ -77,7 +77,7 @@ DolloSCM <- function(tree, tip.states) {
     # If new root is really the old root:
     if((Ntip(tree) + 1) == new.root) {
         
-        # Setacqusition branch to zero as precedes root:
+        # Set acqusition branch to zero as precedes root:
         acquisition.branch <- 0
         
         # Set acquisition time to root time:
@@ -103,102 +103,194 @@ DolloSCM <- function(tree, tip.states) {
     # If new root reflects a subtree:
     } else {
         
-        # Find members of the least inclusive clade:
-        clade.members <- tree$tip.label[FindDescendants(new.root, tree)]
-        
-        # Find non-members of the least inclusive clade:
-        nonclade.members <- setdiff(tree$tip.label, clade.members)
-        
-        # Prune taxa external to least inclusive clade to create a pruned tree:
-        new.tree <- drop.tip(tree, nonclade.members)
-        
-        # Ensure root time is correct:
-        new.tree <- CorrectRootTime(tree, new.tree)
-        
-        # Update tip states for new pruned tree:
-        new.tips <- tip.states[clade.members]
-        
-        # Get branch along which (single) acqusition of derived state occurs:
-        acquisition.branch <- match(new.root, tree$edge[, 2])
-        
-        # Get bounds for acquisition times:
-        acquisition.bounds <- GetNodeAges(tree)[tree$edge[acquisition.branch, ]]
-        
-        # Draw an acusition time from a uniform distribution between the bounds:
-        acquisition.time <- runif(1, min = acquisition.bounds[2], max = acquisition.bounds[1])
-        
-        # Create base stochastic character map (SCM:
-        SCM <- as.list(c(1:nrow(tree$edge)))
-        
-        # For each branch in the SCM:
-        for(i in 1:length(SCM)) {
+        # Case if character is an autapomorphy:
+        if(sum(tip.states == 1) == 1) {
             
-            # Create a null value (vector equal to branch length):
-            x <- tree$edge.length[i]
+            # Create base stochastic character map (SCM:
+            SCM <- as.list(c(1:nrow(tree$edge)))
             
-            # Label null vector with null (root) state of zero:
-            names(x) <- "0"
+            # For each branch in the SCM:
+            for(i in 1:length(SCM)) {
+                
+                # Create a null value (vector equal to branch length):
+                x <- tree$edge.length[i]
+                
+                # Label null vector with null (root) state of zero:
+                names(x) <- "0"
+                
+                # Update base SCM with null value:
+                SCM[[i]] <- x
+                
+            }
             
-            # Update base SCM with null value:
-            SCM[[i]] <- x
+            # Get branch along which (single) acqusition of derived state occurs:
+            acquisition.branch <- match(which(tip.states == 1), tree$edge[, 2])
             
-        }
-        
-        # Create an SCM branch for the acquisition:
-        acquisition.branch.SCM <- c(acquisition.bounds[1] - acquisition.time, acquisition.time - acquisition.bounds[2])
-        
-        # Add labels to the acqusition branch:
-        names(acquisition.branch.SCM) <- c("0", "1")
-        
-        # Add acquisition branch to the SCM:
-        SCM[[acquisition.branch]] <- acquisition.branch.SCM
-        
-        # If tip states vary:
-        if(length(unique(new.tips)) > 1) {
-        
-            # Now do real SCM on pruned tree using Dollo model and a strong root prior of one:
-            SCM_real <- make.simmap(new.tree, new.tips[new.tree$tip.label], model = Dollo.model, pi = c(0, 1))$maps
+            # Get bounds for acquisition times:
+            acquisition.bounds <- GetNodeAges(tree)[tree$edge[acquisition.branch, ]]
             
-        # If tip state is constant:
+            # Draw an acusition time from a uniform distribution between the bounds:
+            acquisition.time <- runif(1, min = acquisition.bounds[2], max = acquisition.bounds[1])
+            
+            # Create an SCM branch for the acquisition:
+            acquisition.branch.SCM <- c(acquisition.bounds[1] - acquisition.time, acquisition.time - acquisition.bounds[2])
+            
+            # Add labels to the acquisition branch:
+            names(acquisition.branch.SCM) <- c("0", "1")
+            
+            # Add acquisition branch to the SCM:
+            SCM[[acquisition.branch]] <- acquisition.branch.SCM
+
+        # Case if at least two taxa exhibit the derived state:
         } else {
+        
+            # Find members of the least inclusive clade:
+            clade.members <- tree$tip.label[FindDescendants(new.root, tree)]
+        
+            # Find non-members of the least inclusive clade:
+            nonclade.members <- setdiff(tree$tip.label, clade.members)
+        
+            # Case if only two members in clade:
+            if(length(clade.members) == 2) {
+        
+                # Get branch along which (single) acqusition of derived state occurs:
+                acquisition.branch <- match(new.root, tree$edge[, 2])
+        
+                # Get bounds for acquisition times:
+                acquisition.bounds <- GetNodeAges(tree)[tree$edge[acquisition.branch, ]]
+        
+                # Draw an acusition time from a uniform distribution between the bounds:
+                acquisition.time <- runif(1, min = acquisition.bounds[2], max = acquisition.bounds[1])
+
+                # Create base stochastic character map (SCM):
+                SCM <- as.list(c(1:nrow(tree$edge)))
+
+                # For each branch in the SCM:
+                for(i in 1:length(SCM)) {
+    
+                    # Create a null value (vector equal to branch length):
+                    x <- tree$edge.length[i]
+    
+                    # Label null vector with null (root) state of zero:
+                    names(x) <- "0"
+    
+                    # Update base SCM with null value:
+                    SCM[[i]] <- x
+    
+                }
+                
+                # Create an SCM branch for the acquisition:
+                acquisition.branch.SCM <- c(acquisition.bounds[1] - acquisition.time, acquisition.time - acquisition.bounds[2])
+                
+                # Add labels to the acqusition branch:
+                names(acquisition.branch.SCM) <- c("0", "1")
+                
+                # Add acquisition branch to the SCM:
+                SCM[[acquisition.branch]] <- acquisition.branch.SCM
+                
+                # Get two descending edges:
+                descendant.edges <- GetDescendantEdges(new.root, tree)
+                
+                # Update state of descending edges to derived (1):
+                for(i in descendant.edges) names(SCM[[i]]) <- "1"
+
+            # Case if at least three members in clade:
+            } else {
+        
+                # Prune taxa external to least inclusive clade to create a pruned tree:
+                new.tree <- drop.tip(tree, nonclade.members)
+        
+                # Ensure root time is correct:
+                new.tree <- CorrectRootTime(tree, new.tree)
+        
+                # Update tip states for new pruned tree:
+                new.tips <- tip.states[clade.members]
+        
+                # Get branch along which (single) acqusition of derived state occurs:
+                acquisition.branch <- match(new.root, tree$edge[, 2])
+        
+                # Get bounds for acquisition times:
+                acquisition.bounds <- GetNodeAges(tree)[tree$edge[acquisition.branch, ]]
+        
+                # Draw an acusition time from a uniform distribution between the bounds:
+                acquisition.time <- runif(1, min = acquisition.bounds[2], max = acquisition.bounds[1])
+        
+                # Create base stochastic character map (SCM):
+                SCM <- as.list(c(1:nrow(tree$edge)))
+        
+                # For each branch in the SCM:
+                for(i in 1:length(SCM)) {
             
-            # Create SCM with no losses:
-            SCM_real <- as.list(new.tree$edge.length)
+                    # Create a null value (vector equal to branch length):
+                    x <- tree$edge.length[i]
             
-            # Label all states as derived:
-            for(i in 1:length(SCM_real)) names(SCM_real[[i]]) <- "1"
+                    # Label null vector with null (root) state of zero:
+                    names(x) <- "0"
             
+                    # Update base SCM with null value:
+                    SCM[[i]] <- x
+            
+                }
+        
+                # Create an SCM branch for the acquisition:
+                acquisition.branch.SCM <- c(acquisition.bounds[1] - acquisition.time, acquisition.time - acquisition.bounds[2])
+        
+                # Add labels to the acqusition branch:
+                names(acquisition.branch.SCM) <- c("0", "1")
+        
+                # Add acquisition branch to the SCM:
+                SCM[[acquisition.branch]] <- acquisition.branch.SCM
+        
+                # If tip states vary:
+                if(length(unique(new.tips)) > 1) {
+            
+                    # Now do real SCM on pruned tree using Dollo model and a strong root prior of one:
+                    SCM_real <- make.simmap(new.tree, new.tips[new.tree$tip.label], model = Dollo.model, pi = c(0, 1))$maps
+            
+                # If tip state is constant:
+                } else {
+            
+                    # Create SCM with no losses:
+                    SCM_real <- as.list(new.tree$edge.length)
+            
+                    # Label all states as derived:
+                    for(i in 1:length(SCM_real)) names(SCM_real[[i]]) <- "1"
+            
+                }
+        
+                # Create edge matrix for original tree:
+                orig.edges <- tree$edge
+        
+                # Create edge matrix for pruned tree:
+                new.edges <- new.tree$edge
+        
+                # Update tip names for original tree edge matrix:
+                for(i in 1:Ntip(tree)) orig.edges[which(orig.edges[, 2] == i), 2] <- tree$tip.label[i]
+        
+                # Update tip names for pruned tree edge matrix:
+                for(i in 1:Ntip(new.tree)) new.edges[which(new.edges[, 2] == i), 2] <- new.tree$tip.label[i]
+        
+                # Update node names for original tree edge matrix:
+                for(i in (Ntip(tree) + 1):(Ntip(tree) + Nnode(tree))) orig.edges[which(orig.edges == i)] <- paste(sort(tree$tip.label[FindDescendants(i, tree)]), collapse="")
+        
+                # Update node names for pruned tree edge matrix:
+                for(i in (Ntip(new.tree) + 1):(Ntip(new.tree) + Nnode(new.tree))) new.edges[which(new.edges == i)] <- paste(sort(new.tree$tip.label[FindDescendants(i, new.tree)]), collapse="")
+        
+                # Collapse original edge matrix to from-to straings for matching:
+                orig.edges <- apply(orig.edges, 1, paste, collapse="%%TO%%")
+        
+                # Collapse pruned edge matrix to from-to straings for matching:
+                new.edges <- apply(new.edges, 1, paste, collapse="%%TO%%")
+        
+                # Match edges between pruned and original trees:
+                edge.matches <- match(new.edges, orig.edges)
+        
+                # Store real SCM in SCM for full tree:
+                SCM[edge.matches] <- SCM_real
+            
+            }
+        
         }
-        
-        # Create edge matrix for original tree:
-        orig.edges <- tree$edge
-        
-        # Create edge matrix for pruned tree:
-        new.edges <- new.tree$edge
-        
-        # Update tip names for original tree edge matrix:
-        for(i in 1:Ntip(tree)) orig.edges[which(orig.edges[, 2] == i), 2] <- tree$tip.label[i]
-        
-        # Update tip names for pruned tree edge matrix:
-        for(i in 1:Ntip(new.tree)) new.edges[which(new.edges[, 2] == i), 2] <- new.tree$tip.label[i]
-        
-        # Update node names for original tree edge matrix:
-        for(i in (Ntip(tree) + 1):(Ntip(tree) + Nnode(tree))) orig.edges[which(orig.edges == i)] <- paste(sort(tree$tip.label[FindDescendants(i, tree)]), collapse="")
-        
-        # Update node names for pruned tree edge matrix:
-        for(i in (Ntip(new.tree) + 1):(Ntip(new.tree) + Nnode(new.tree))) new.edges[which(new.edges == i)] <- paste(sort(new.tree$tip.label[FindDescendants(i, new.tree)]), collapse="")
-        
-        # Collapse original edge matrix to from-to straings for matching:
-        orig.edges <- apply(orig.edges, 1, paste, collapse="%%TO%%")
-        
-        # Collapse pruned edge matrix to from-to straings for matching:
-        new.edges <- apply(new.edges, 1, paste, collapse="%%TO%%")
-        
-        # Match edges between pruned and original trees:
-        edge.matches <- match(new.edges, orig.edges)
-        
-        # Store real SCM in SCM for full tree:
-        SCM[edge.matches] <- SCM_real
         
     }
     
