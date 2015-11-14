@@ -24,5 +24,5 @@ CHANGES IN CLADDIS VERSION 0.2
     o Changes made to how functions are imported to meet the new CRAN upload rules.
     o Converted entire package to Roxygen. This should not affect the user experience at all.
     o Fixed typo in Yang et al. (1995) citation.
-    o Made some temporary changes as a workaround to the phytools dependency breakage issue. These will need to be removed in future.
+    o Made some minor internal changes to deal with the new phytools formatted output from make.simmap.
     o Removed an .Rhistory file that was accidentally being included in the tarball.
