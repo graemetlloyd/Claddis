@@ -14,11 +14,9 @@ You can install and load Claddis into R using the following:
 # Install the devtools package from CRAN:
 install.packages("devtools")
 
-# Load the devtools package into R:
-library(devtools)
-
-# Install the Claddis package from github:
-install_github("graemetlloyd/Claddis")
+# Install the phytools and Claddis packages from github:
+devtools::install_github("liamrevell/phytools")
+devtools::install_github("graemetlloyd/Claddis")
 
 # Load the Claddis package into R:
 library(Claddis)
@@ -32,6 +30,6 @@ More will be added here in future to show the basic features of the package.
 Citation
 ========
 
-Claddis is now on [CRAN](http://cran.r-project.org/web/packages/Claddis/index.html) and a publication is on the way. Until then, please cite:
+Claddis is now on [CRAN](http://cran.r-project.org/web/packages/Claddis/index.html), but the current version (0.1) is broken due to changes in a dependent package (phytools). Users are advised to install directly from github (version 0.2) using the code above. The first formal paper describing Claddis is now in press at *Biological Journal of the Linnean Society* and can be cited as:
 
-Lloyd, Graeme T. (2015). Claddis: Measuring Morphological Diversity and Evolutionary Tempo. R package version 0.1.
+Lloyd, G. T., in press. Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. *Biological Journal of the Linnean Society*.

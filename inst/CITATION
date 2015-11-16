@@ -1,13 +1,12 @@
 citHeader("To cite package 'Claddis' in a publication use:")
 
 citEntry(entry = "Article",
-	title = "Claddis: Measuring Morphological Diversity and Evolutionary Tempo",
+	title = "Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. Biological Journal of the Linnean Society",
 	author = "G. T. Lloyd",
-	journal = "NA",
-  	year = "2015",
-	volume = "X",
-	pages = "Y-Z",
-	textVersion = "Lloyd, Graeme T. (2015). Claddis: Measuring Morphological Diversity and Evolutionary Tempo. R package version 0.2."
-)
+	journal = "Biological Journal of the Linnean Society",
+  	year = "in press",
+	volume = "TBD",
+	pages = "TBD",
+	textVersion = "Lloyd, Graeme T. (in press). Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. Biological Journal of the Linnean Society.")
 
 citFooter("As Claddis is evolving rapidly, you may want to also cite its version number (found with 'library(help = Claddis)').")
