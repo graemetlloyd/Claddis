@@ -16,6 +16,7 @@ DiscreteCharacterRate(tree, clad.matrix, time.bins, alpha = 0.01)
 \item{alpha}{The alpha value to be used for the significance tests. The default is 0.01.}
 }
 \value{
+\item{character.changes}{A matrix containing information on all the character changes reconstructed and used to measure rates.}
 \item{node.results}{A table displaying the results of the per-clade rate tests.}
 \item{branch.results}{A table displaying the results of the per-branch rate tests.}
 \item{per.bin.rates}{Per time-bin rates (use with caution).}

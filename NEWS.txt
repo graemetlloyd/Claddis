@@ -2,6 +2,7 @@ CHANGES IN CLADDIS VERSION 0.2
 
   NEW FEATURES
     o Added citation file to package.
+    o Added character changes output to DiscreteCharacterRate function.
     o Added internal and terminal branch versions of the time series output for DiscreteCharacterRate. This was added to complete the internal and terminal test and was used as an additional set of sensitivity tests in Close et al. (2015).
     o Added new ChronoPhyloMorphospacePlot function to make three-dimensional plots of two ordination axes against time.
     o Added new DolloSCM function for producing stochastic Dollo character maps.

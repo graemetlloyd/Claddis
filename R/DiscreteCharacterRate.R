@@ -13,6 +13,7 @@
 #'
 #' @return
 #'
+#' \item{character.changes}{A matrix containing information on all the character changes reconstructed and used to measure rates.}
 #' \item{node.results}{A table displaying the results of the per-clade rate tests.}
 #' \item{branch.results}{A table displaying the results of the per-branch rate tests.}
 #' \item{per.bin.rates}{Per time-bin rates (use with caution).}
@@ -108,6 +109,11 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   
   # Create trees to store branch lengths with respect to completeness and observed and observable character changes:
   completeness.tree <- observed.tree <- observable.tree <- tree
+  
+  # Matrix to store character changes:
+  character.changes <- matrix(nrow = 0, ncol = 4, dimnames = list(c(), c("Branch", "Character", "From", "To")))
+  
+  # EVENTUTALLY THIS SHOULD INCLUDE CHANGE TIMES AS AN EXTRA COLUMN
   
   # For each branch of the phylogenetic tree:
   for(i in 1:length(tree$edge[, 1])) {
@@ -206,6 +212,17 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
     
     # Update branch lengths for observable tree:
     observable.tree$edge.length[i] <- sum(ranges * weightings)
+    
+    # If change(s) are observed:
+    if(sum(comp.diffs) > 0) {
+    
+      # Which characters change:
+      char.changes <- which(comp.diffs > 0)
+      
+      # Add character changes to all changes matrix:
+      character.changes <- rbind(character.changes, cbind(rep(i, length(char.changes)), comp.chars[char.changes], t(comp.states[, char.changes, drop = FALSE])))
+
+    }
     
   }
 
@@ -1064,10 +1081,10 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
 # COMBINE TIME BIN RESULTS INTO SINGLE VARIABLE?
 
   # List output matrices:
-  out <- list(node.results, branch.results, bin.results, bin.results.tb, bin.results.ib)
+  out <- list(character.changes, node.results, branch.results, bin.results, bin.results.tb, bin.results.ib)
   
   # Add names to them:
-  names(out) <- c("node.results", "branch.results", "per.bin.rates", "per.bin.rates.tb", "per.bin.rates.ib")
+  names(out) <- c("character.changes", "node.results", "branch.results", "per.bin.rates", "per.bin.rates.tb", "per.bin.rates.ib")
   
   # Return results:
   return(out)
