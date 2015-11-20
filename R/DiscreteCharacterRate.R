@@ -114,6 +114,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   character.changes <- matrix(nrow = 0, ncol = 4, dimnames = list(c(), c("Branch", "Character", "From", "To")))
   
   # EVENTUTALLY THIS SHOULD INCLUDE CHANGE TIMES AS AN EXTRA COLUMN
+  # AND ALSO NUMBER OF STEPS CHANGE IMPLIES
   
   # For each branch of the phylogenetic tree:
   for(i in 1:length(tree$edge[, 1])) {
