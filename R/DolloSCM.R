@@ -50,10 +50,10 @@
 #' @export DolloSCM
 DolloSCM <- function(tree, tip.states) {
     
-    # Check tree ahs branch lengths:
+    # Check tree has branch lengths:
     if(is.null(tree$edge.length)) stop("Tree must have branch lengths.")
     
-    # Check tree ahs a root time:
+    # Check tree has a root time:
     if(is.null(tree$root.time)) stop("Tree must have a $root.time value.")
     
     # Record non-matching names:
@@ -75,7 +75,7 @@ DolloSCM <- function(tree, tip.states) {
     new.root <- FindAncestor(names(which(tip.states == 1)), tree)
     
     # If new root is really the old root:
-    if((Ntip(tree) + 1) == new.root) {
+    if((Ntip(tree) + 1) == new.root && sum(tip.states == 1) > 1) {
         
         # Set acqusition branch to zero as precedes root:
         acquisition.branch <- 0
