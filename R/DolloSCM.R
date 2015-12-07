@@ -87,7 +87,7 @@ DolloSCM <- function(tree, tip.states) {
         if(length(unique(tip.states)) > 1) {
             
             # Get stochastic character map for full tree using Dollo model and a strong root prior of one:
-            SCM <- make.simmap(tree, tip.states[tree$tip.label], model = Dollo.model, pi = c(0, 1))$maps
+            SCM <- make.simmap(tree, tip.states[tree$tip.label], model = Dollo.model, pi = c(0, 1), message = FALSE)$maps
             
         # If tip states are constant:
         } else {
@@ -245,7 +245,7 @@ DolloSCM <- function(tree, tip.states) {
                 if(length(unique(new.tips)) > 1) {
             
                     # Now do real SCM on pruned tree using Dollo model and a strong root prior of one:
-                    SCM_real <- make.simmap(new.tree, new.tips[new.tree$tip.label], model = Dollo.model, pi = c(0, 1))$maps
+                    SCM_real <- make.simmap(new.tree, new.tips[new.tree$tip.label], model = Dollo.model, pi = c(0, 1), message = FALSE)$maps
             
                 # If tip state is constant:
                 } else {
