@@ -26,36 +26,50 @@ GetNodeAges <- function(tree) {
   # Store root node number:
   rootnode <- Ntip(tree) + 1
   
-  # Create initial paths list with end nodes (terminal and internal, excluding the root):
-  paths <- split(c(1:Ntip(tree), (Ntip(tree) + 2):(Ntip(tree) + Nnode(tree))), f=1:(Ntip(tree) + Nnode(tree) - 1))
-  
-  # Strip names:
-  names(paths) <- NULL
-
-  # For each path:
-  for(i in 1:length(paths)) {
-    
-    # Set counter as 1:
-    j <- 1
-    
-    # Identify current node:
-    currentnode <- paths[[i]][j]
-    
-    # While current node is not the root (path has not terminated):
-    while(currentnode != rootnode) {
+  # If tree is a complete polytomy:
+  if(tree$Nnode == 1) {
       
-      # Update current node and add to path:
-      currentnode <- paths[[i]][j + 1] <- tree$edge[match(currentnode, tree$edge[, 2]), 1]
+    # Create paths for just tips:
+    paths <- as.list(1:Ntip(tree))
+    
+    # Add root to each path:
+    for(i in 1:length(paths)) paths[[i]] <- c(paths[[i]], Ntip(tree) + 1)
+    
+  # If tree is not a complete polytomy:
+  } else {
       
-      # Update counter:
-      j <- j + 1
+    # Create initial paths list with end nodes (terminal and internal, excluding the root):
+    paths <- split(c(1:Ntip(tree), (Ntip(tree) + 2):(Ntip(tree) + Nnode(tree))), f = 1:(Ntip(tree) + Nnode(tree) - 1))
       
+    # Strip names:
+    names(paths) <- NULL
+      
+    # For each path:
+    for(i in 1:length(paths)) {
+          
+      # Set counter as 1:
+      j <- 1
+          
+      # Identify current node:
+      currentnode <- paths[[i]][j]
+          
+      # While current node is not the root (path has not terminated):
+      while(currentnode != rootnode) {
+              
+        # Update current node and add to path:
+        currentnode <- paths[[i]][j + 1] <- tree$edge[match(currentnode, tree$edge[, 2]), 1]
+              
+        # Update counter:
+        j <- j + 1
+              
+      }
+          
     }
-    
+      
   }
-  
+
   # Create vector to store node ages:
-  nodeages <- vector(mode="numeric", length=Ntip(tree) + Nnode(tree))
+  nodeages <- vector(mode = "numeric", length = Ntip(tree) + Nnode(tree))
   
   # For each path:
   for(i in 1:length(paths)) {
