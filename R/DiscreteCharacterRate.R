@@ -49,6 +49,9 @@
 #'   seq(tree$root.time, 0, length.out = 3), alpha = 0.01)
 #' 
 #' @export DiscreteCharacterRate
+
+# NEED TO GENERALISE LRT INTO SINGLE SUBFUNCTION
+
 DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   
   # Ensure time bins are in correct order:
@@ -115,6 +118,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   
   # EVENTUTALLY THIS SHOULD INCLUDE CHANGE TIMES AS AN EXTRA COLUMN
   # AND ALSO NUMBER OF STEPS CHANGE IMPLIES
+  # NEED TO DEAL WITH CASES WHERE ORDERED CHARACTER GOES FROM SAY 2 TO 4 AS REALLY TWO SEPARATE CHANGES
   
   # For each branch of the phylogenetic tree:
   for(i in 1:length(tree$edge[, 1])) {
@@ -237,7 +241,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   internal.branches <- setdiff(1:nrow(tree$edge), terminal.branches)
   
   # Vectors to store time series values:
-  changes <- changes.tb <- changes.ib <- Time <- Time.tb <- Time.ib <- pctcomp <- pctcomp.tb <- pctcomp.ib <- vector(mode="numeric")
+  changes <- changes.tb <- changes.ib <- Time <- Time.tb <- Time.ib <- pctcomp <- pctcomp.tb <- pctcomp.ib <- vector(mode = "numeric")
   
   # For each time bin:
   for(i in 2:length(time.bins)) {
@@ -291,6 +295,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   
   
 # MAYBE USE CONTINUOUS APPROXIMATION FOR POISSON INSTEAD OF ROUNDING?
+# NOPE, USE NEWER METHOD OF TIME SUBTREES!
   
   
   # Get log numerator:
@@ -1072,7 +1077,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   } else {
     
     # If not then print notification and stop:
-    cat(paste("H_0 - all rates equal across the tree - cannot be rejected at an alpha of ", alpha, " (Actual p = ", chisq.p, ").\nCalculations of per-branch and per-clade rates aborted.", sep=""))
+    cat(paste("H_0 - all rates equal across the tree - cannot be rejected at an alpha of ", alpha, " (Actual p = ", chisq.p, ").\nCalculations of per-branch and per-clade rates aborted.", sep = ""))
     
     # Create NULL outputs:
     branch.results <- node.results <- NULL
