@@ -6,17 +6,19 @@ Date: 2015-08-02
 Author: Graeme T. Lloyd
 Maintainer: Graeme T. Lloyd <graemetlloyd@gmail.com>
 Depends:
-	ape,
-	phytools,
-	rgl,
-	strap
+    ape,
+    phytools,
+    rgl,
+    strap
 Imports:
-	gdata,
-	graphics,
-	grDevices,
-	stats,
-	utils
-Description: Measures morphological diversity from discrete character data and estimates evolutionary tempo on phylogenetic trees.
+    gdata,
+    graphics,
+    grDevices,
+    stats,
+    utils
+Description: Measures morphological diversity from discrete character data and
+    estimates evolutionary tempo on phylogenetic trees.
 License: GPL (>=2)
 LazyData: yes
 ByteCompile: yes
+RoxygenNote: 5.0.1
