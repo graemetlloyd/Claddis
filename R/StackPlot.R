@@ -93,7 +93,7 @@ StackPlot <- function(ordination_axes, ages, groups = NULL, time_slices, shear =
 # Add spaces between stacks? Could even have this be negative to allow overlapping of highly sheared plots.
 # Check axes asked for exist in data (top level conditional).
 # Add geologic time at left with geoscale at some point?
-# Am assuming PC axes, but could be RW...
+# Am assuming PC axes, but could be Relative Warp...
 
   # Maybe let user set this later:
   plot_cushion <- 0.1
