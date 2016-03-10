@@ -315,7 +315,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   if(length(grep("interleave", X, ignore.case = TRUE)) > 0) {
 
     # Get start of matrix block(s):
-    matrix.startlines <- setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nhar(X) == 6)), grep("stepmatrix", X, ignore.case=T)), grep(";", X))
+    matrix.startlines <- setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case=T)), grep(";", X))
 
     # Get end of matrix block(s):
     matrix.endlines <- setdiff(grep(";", X), grep("end", X, ignore.case=T))[setdiff(grep(";", X), grep("end", X, ignore.case=T)) > matrix.startlines]
@@ -368,10 +368,10 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   }
 
   # First sort of getting rows that correspond to the actual data matri(ces):
-  matrixblocks <- matrix(rep(1:ntax, length(setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nhar(X) == 6)), grep("stepmatrix", X, ignore.case=T)), grep(";", X)))), ncol=length(setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nhar(X) == 6)), grep("stepmatrix", X, ignore.case=T)), grep(";", X))))
+  matrixblocks <- matrix(rep(1:ntax, length(setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case=T)), grep(";", X)))), ncol=length(setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case=T)), grep(";", X))))
   
   # Add start values:
-  for(i in 1:length(setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nhar(X) == 6)), grep("stepmatrix", X, ignore.case=T)), grep(";", X)))) matrixblocks[, i] <- matrixblocks[, i] + (setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nhar(X) == 6)), grep("stepmatrix", X, ignore.case=T)), grep(";", X))[i])
+  for(i in 1:length(setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case=T)), grep(";", X)))) matrixblocks[, i] <- matrixblocks[, i] + (setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case=T)), grep(";", X))[i])
 
   # Convert to vector for use:
   matrixblocks <- sort(matrixblocks)
