@@ -58,7 +58,7 @@
 #' morph.matrix
 #' 
 #' @export ReadMorphNexus
-ReadMorphNexus <- function(file, equalise.weights=FALSE) {
+ReadMorphNexus <- function(file, equalise.weights = FALSE) {
     
 # ADD WARNINGS FOR discrete.matrix AND continuous.matrix IF ROWS DO NOT HAVE THE RIGHT NUMBER OF CHARACTERS
 
@@ -66,28 +66,28 @@ ReadMorphNexus <- function(file, equalise.weights=FALSE) {
   Sys.setlocale('LC_ALL','C')
 
   # Read in NEXUS file as raw text:
-  X <- readLines(file, warn=FALSE)
+  X <- readLines(file, warn = FALSE)
 
   # Check that this is a #NEXUS file:
-  if(length(grep("#NEXUS", X, ignore.case=T)) == 0) stop("This is not a #NEXUS file.")
+  if(length(grep("#NEXUS", X, ignore.case = TRUE)) == 0) stop("This is not a #NEXUS file.")
 
-  # Check that this is a #NEXUS file:
-  if(length(grep("MATRIX", X, ignore.case=T)) == 0) stop("There is no matrix present.")
+  # Check that the #NEXUS file includes a matrix:
+  if(length(grep("MATRIX", X, ignore.case = TRUE)) == 0) stop("There is no matrix present.")
 
   # Are there blocks of the NEXUS file that can be removed? (i.e., trees, macclade, mesquite etc.:
-  if(length(grep("begin trees|begin mesquite|begin mrbayes|begin macclade|begin treebase|begin notes|begin paup", X, ignore.case=T)) > 0) {
+  if(length(grep("begin trees|begin mesquite|begin mrbayes|begin macclade|begin treebase|begin notes|begin paup", X, ignore.case = TRUE)) > 0) {
 
     # Get position of all Begin tags:
-    all.begins <- grep("begin ", X, ignore.case=T)
+    all.begins <- grep("begin ", X, ignore.case = TRUE)
 
     # Get position of all End tags:
-    all.ends <- grep("end;|endblock;|end ;|endblock ;", X, ignore.case=T)
+    all.ends <- grep("end;|endblock;|end ;|endblock ;", X, ignore.case = TRUE)
 
     # Check Begin and End are in balance:
     if(length(all.begins) != length(all.ends)) stop("Begin and End tags are not equal in number.")
 
     # Get rows for blocks to delete:
-    block.rows <- match(grep("begin trees|begin mesquite|begin mrbayes|begin macclade|begin treebase|begin notes|begin paup", X, ignore.case=T), all.begins)
+    block.rows <- match(grep("begin trees|begin mesquite|begin mrbayes|begin macclade|begin treebase|begin notes|begin paup", X, ignore.case = TRUE), all.begins)
 
     # Find start lines:
     block.begins <- all.begins[block.rows]
@@ -101,13 +101,13 @@ ReadMorphNexus <- function(file, equalise.weights=FALSE) {
   }
 
   # Case if there are superflous taxon, character, or state labels:
-  if(length(grep("taxlabels|charstatelabels|charlabels|statelabels", X, ignore.case=T)) > 0) {
+  if(length(grep("taxlabels|charstatelabels|charlabels|statelabels", X, ignore.case = TRUE)) > 0) {
 
     # Find label beginning rows:
-    label.ends <- label.begins <- grep("taxlabels|charstatelabels|charlabels|statelabels", X, ignore.case=T)
+    label.ends <- label.begins <- grep("taxlabels|charstatelabels|charlabels|statelabels", X, ignore.case = TRUE)
 
     # For each label find the end tag that corresponds to it:
-    for(i in 1:length(label.begins)) label.ends[i] <- min(grep(";", X, ignore.case=T)[grep(";", X, ignore.case=T) > label.begins[i]])
+    for(i in 1:length(label.begins)) label.ends[i] <- min(grep(";", X, ignore.case = TRUE)[grep(";", X, ignore.case = TRUE) > label.begins[i]])
 
     # Incerementally remove superflouous labels:
     for(i in length(label.begins):1) X <- X[c(c(1:(label.begins[i] - 1)), c((label.ends[i] + 1):length(X)))]
@@ -253,10 +253,10 @@ ReadMorphNexus <- function(file, equalise.weights=FALSE) {
   }
 
   # Get start of matrix block(s):
-  matrix.startlines <- setdiff(setdiff(grep("matrix", X, ignore.case=T), grep("stepmatrix", X, ignore.case=T)), grep(";", X))
+  matrix.startlines <- setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case = TRUE)), grep(";", X))
 
   # Get end of matrix blocks:
-  matrix.endlines <- setdiff(grep(";", X), grep("end", X, ignore.case=T))[setdiff(grep(";", X), grep("end", X, ignore.case=T)) > matrix.startlines]
+  matrix.endlines <- setdiff(grep(";", X), grep("end", X, ignore.case = TRUE))[setdiff(grep(";", X), grep("end", X, ignore.case = TRUE)) > matrix.startlines]
 
   # For each block of matrix:
   for(i in length(matrix.startlines):1) {
