@@ -798,7 +798,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   }
 
   # Vectors to store minimum and maximum values:
-  min.vals <- max.vals <- vector(length=nchar)
+  min.vals <- max.vals <- vector(length = nchar)
     
   # For each character find the minimum and maximum value:
   for(i in 1:nchar) {
