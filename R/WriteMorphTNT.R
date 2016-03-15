@@ -145,7 +145,7 @@ WriteMorphTNT <- function(clad.matrix, filename, add.analysis.block = FALSE) {
         mrp.name <- c("mrp;", paste("export ", out.file, "mrp.nex;", sep=""))
         
         # Add analysis block to output file:
-        out <- paste(paste(anal, collapse = "\n"), "nelsen*;", strict.name, paste(mrp.name, collapse = "\n"), "proc/;\n")
+        out <- gsub("proc/;\n", paste(paste(anal, collapse = "\n"), "nelsen*;", strict.name, paste(mrp.name, collapse = "\n"), "proc/;\n"), out)
 
     }
 
