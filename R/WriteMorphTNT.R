@@ -10,6 +10,7 @@
 #' 
 #' @param clad.matrix The cladistic matrix in the format imported by \link{ReadMorphNexus}.
 #' @param filename The file name to write to. Should end in \code{.tnt}.
+#' @param add.analysis.block Whether or not to add analysis block (i.e., tree search commands).
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -25,7 +26,7 @@
 #' WriteMorphTNT(clad.matrix = Michaux1989, filename = "Michaux1989.tnt")
 #' 
 #' @export WriteMorphTNT
-WriteMorphTNT <- function(clad.matrix, filename) {
+WriteMorphTNT <- function(clad.matrix, filename, add.analysis.block = FALSE) {
 
 # NEED TO ADD WAY TO DEAL WITH MULTIPLE MATRICES (DISCRETE MORPHOLOGY, CONTINUOUS CHARACTERS, DNA).
 
@@ -33,13 +34,13 @@ WriteMorphTNT <- function(clad.matrix, filename) {
     if(nchar(paste(clad.matrix$header, collapse = "")) > 0) {
         
         # Create header line:
-        headlines <- paste("xread", paste(paste("'", clad.matrix$header, "'", sep = ""), collapse= " "), sep = "\n")
+        headlines <- paste(paste("taxname=;\nmxram 4096;\n", paste("taxname +", max(nchar(rownames(clad.matrix$matrix))), ";\n", sep = ""), "nstates num 32;\nxread", sep = ""), paste(paste("'", clad.matrix$header, "'", sep = ""), collapse= " "), sep = "\n")
         
     # If no text
     } else {
         
         # Create header line:
-        headlines <- "xread\n"
+        headlines <- paste("taxname=;\nmxram 4096;\n", paste("taxname +", max(nchar(rownames(clad.matrix$matrix))), ";\n", sep = ""), "nstates num 32;\nxread\n", sep = "")
         
     }
     
@@ -109,7 +110,45 @@ WriteMorphTNT <- function(clad.matrix, filename) {
     ord.block <- paste("ccode", paste(paste(ordering, onoff, "/", weights, " ", c(0:(ncol(clad.matrix$matrix) - 1)), sep = ""), collapse = " "), ";\nproc/;\n", collapse = " ")
     
     # Compile output:
-    out <- paste(paste(headlines, datablock, sep ="\n"), "\n", matrixblock, ord.block, sep = "")
+    out <- paste(paste(headlines, datablock, sep = "\n"), "\n", matrixblock, ord.block, sep = "")
+
+    # If adding analysis block:
+    if(add.analysis.block) {
+        
+        # If there are few enough taxa for an exact solution:
+        if(nrow(clad.matrix$matrix) <= 24) {
+            
+            # Use implicit enumeration:
+            anal <- c("collapse [;", "ienum;")
+            
+        # If there are too many taxa (requiring heuristics):
+        } else {
+            
+            # First iteration with new tech (where scratch.tre is created):
+            anal <- c("rseed*;", "hold 999;", "xmult=rss fuse 50 drift 50 ratchet 50;", "mult 50 =tbr drift;", "tsave scratch.tre;", "save;", "tsave /;")
+            
+            # Iterations 2-20 (where trees are appended to scratch.tre):
+            anal <- c(anal, rep(c("rseed*;", "hold 999;", "xmult=rss fuse 50 drift 50 ratchet 50;", "mult 50 =tbr drift;", "tsave scratch.tre +;", "save;", "tsave /;"), 19))
+            
+            # Read in new technology trees (scratch.tre) and finish with a heuristic (tbr) search for all mpts:
+            anal <- c(anal, c("hold 100000;", "shortread scratch.tre;", "bbreak=tbr;"))
+            
+        }
+        
+        # Get stripped file name for use in export lines:
+        out.file <- strsplit(strsplit(filename, "/")[[1]][length(strsplit(filename, "/")[[1]])], "\\.")[[1]][1]
+        
+        # Make name for strict consensus and MPTs tree:
+        strict.name <- paste("export -", out.file, "tntmpts_plus_strict.nex;", sep="")
+        
+        # Make MRP file name:
+        mrp.name <- c("mrp;", paste("export ", out.file, "mrp.nex;", sep=""))
+        
+        # Add analysis block to output file:
+        out <- paste(paste(anal, collapse = "\n"), "nelsen*;", strict.name, paste(mrp.name, collapse = "\n"), "proc/;\n")
+
+    }
+
 
     # Write to file:
     write(out, filename)

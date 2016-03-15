@@ -4,12 +4,14 @@
 \alias{WriteMorphTNT}
 \title{Writes out a morphological TNT data file}
 \usage{
-WriteMorphTNT(clad.matrix, filename)
+WriteMorphTNT(clad.matrix, filename, add.analysis.block = FALSE)
 }
 \arguments{
 \item{clad.matrix}{The cladistic matrix in the format imported by \link{ReadMorphNexus}.}
 
 \item{filename}{The file name to write to. Should end in \code{.tnt}.}
+
+\item{add.analysis.block}{Whether or not to add analysis block (i.e., tree search commands).}
 }
 \description{
 Writes out a morphological data file in Hennig86/TNT format.
