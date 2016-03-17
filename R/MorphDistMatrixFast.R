@@ -6,7 +6,7 @@
   # The original description of your step
 #TG: See the end of the script for performance testing
 
-MorphDistMatrix.fast <- function(morph.matrix, transform.proportional.distances="arcsine_sqrt") {
+MorphDistMatrix.fast <- function(morph.matrix, distance = c("Raw", "GED", "Gower", "Max", "Comp"), transform.proportional.distances="arcsine_sqrt") {
   # Check format of transform.proportional.distances:
   if(transform.proportional.distances != "none" && transform.proportional.distances != "sqrt" && transform.proportional.distances != "arcsine_sqrt") {
 
@@ -14,6 +14,11 @@ MorphDistMatrix.fast <- function(morph.matrix, transform.proportional.distances=
     stop("ERROR: transform.proportional.distances must be one of \"none\", \"sqrt\", or \"arcsine_sqrt\".")
 
   }
+
+  #TG: Sanitizing the distance argument
+  all_distances <- c("Raw", "GED", "Gower", "Max", "Comp")
+  if(all(is.na(match(distance, all_distances)))) stop("distance must be one or more of the following: ", paste(all_distances, collapse=", "), ".", sep="")
+  #TG: Note that when distance != Raw, raw distance is still calculated but not exported.
 
   #~~~~~~~
   # Isolate ordering element of morphology matrix:
@@ -218,20 +223,6 @@ MorphDistMatrix.fast <- function(morph.matrix, transform.proportional.distances=
   # incompchar <- lapply(list.of.compchar, find.incomp.char, morph.matrix)
 
   #~~~~~~~ 
-  # Store data for GED with NAs for missing distances:
-  #TG: this one is slightly modified, the output is now a list of matrices 2*ncol(morph.matrix) with the first row being the differences and the second row the weighting
-  store.data.GED <- function(differences, comparable.characters, morph.matrix, weights) {
-    return(rbind(c(differences, rep(NA, length(find.incomp.char(comparable.characters, morph.matrix)))), c(weights[comparable.characters], weights[find.incomp.char(comparable.characters, morph.matrix)])))
-  }
-  #TG: now with the mapply (I'll apply this scheme again further below so I'll stop writing obvious comments for this structure ;))
-  GED.data <- mapply(store.data.GED, diffs, list.of.compchar, MoreArgs=list(morph.matrix, weights), SIMPLIFY = FALSE)
-  #TG: output GED.data as a matrix (as in the original function)
-  #TG: first let's transpose the matrices to facilitate the output
-  GED.data <- lapply(GED.data, t)
-  #TG: second, create the matrix
-  GED.data <- matrix(data=(unlist(GED.data)), ncol=ncol(morph.matrix), byrow=TRUE)
-
-  #~~~~~~~ 
   # Get weighted differences:
   weight.differences <- function(differences, comparable.characters, weights) {
     return(list(as.numeric(weights[comparable.characters]) * differences))
@@ -286,19 +277,8 @@ MorphDistMatrix.fast <- function(morph.matrix, transform.proportional.distances=
   # dist.matrix[i, j] <- dist.matrix[j, i] <- raw.dist
   #TG: same for the other matrices below.
 
-  #~~~~~~~
-  # Store Gower distance:
-  gower.dist <- function(differences, comparable.characters, weights) {
-    sum(differences) / sum(weights[comparable.characters])
-  }
-  gower.dist.matrix <- list.to.matrix(as.list(mapply(gower.dist, diffs, list.of.compchar, MoreArgs=list(weights))), morph.matrix)
-  
-  #~~~~~~~
-  # Store maximum-rescaled distance:
-  max.distance <- function(differences, maximum.differences) {
-    sum(differences) / sum(maximum.differences)
-  }
-  max.dist.matrix <- list.to.matrix(mapply(max.distance, diffs, maxdiffs), morph.matrix)
+  # Add row and column names (taxa) to distance matrix:
+  rownames(dist.matrix) <- colnames(dist.matrix) <- rownames(morph.matrix)
 
   #~~~~~~~
   # Store N comparable characters:
@@ -309,41 +289,107 @@ MorphDistMatrix.fast <- function(morph.matrix, transform.proportional.distances=
   #TG: now we can feed that to the diag argument from list.to.matrix
   comp.char.matrix <- list.to.matrix(lapply(list.of.compchar, length), morph.matrix, diag=apply(morph.matrix, 1, count.comp.char))
 
-  #~~~~~~~
-  # Add to maximum differences (S_ijk * W_ijk in equation 1 of Wills 2001):
-  differences <- unlist(diffs)
+  # Add row and column names (taxa) to distance matrix:
+  rownames(comp.char.matrix) <- colnames(comp.char.matrix) <- rownames(morph.matrix)
+ 
 
-  #~~~~~~~
-  # Add to maximum differences (S_ijk_max * W_ijk in equation 1 of Wills 2001):
-  maximum.differences <- unlist(maxdiffs)
-  #TG: Note that therefore the line near the start defining the differences/maximum.differences vectors is not necessary.
+  ###########
+  #TG: computing the Gower distance
+  ###########
 
-  #~~~~~~~
-  # Calculated weighted mean univariate distance for calculating GED (equation 2 in Wills 2001):
-  S_ijk_bar <- sum(differences) / sum(maximum.differences)
+  if(any(distance == "Gower")) {
+    #~~~~~~~
+    # Store Gower distance:
+    gower.dist <- function(differences, comparable.characters, weights) {
+      sum(differences) / sum(weights[comparable.characters])
+    }
+    gower.dist.matrix <- list.to.matrix(as.list(mapply(gower.dist, diffs, list.of.compchar, MoreArgs=list(weights))), morph.matrix)
 
-  #~~~~~~~
-  # Replace missing distances with S_ijk_bar (i.e., results of equation 2 in Wills 2001 into equation 1 of Wills 2001):
-  GED.data[is.na(GED.data)] <- S_ijk_bar
+    # Add row and column names (taxa) to distance matrix:
+    rownames(gower.dist.matrix) <- colnames(gower.dist.matrix) <- rownames(morph.matrix)
+ 
+   }
 
-  #~~~~~~~
-  # Isolate the distances:
-  S_ijk <- GED.data[which((1:nrow(GED.data) %% 2) == 1), ]
 
-  #~~~~~~~
-  # Isolate the weights:
-  W_ijk <- GED.data[which((1:nrow(GED.data) %% 2) == 0), ]
+  ###########
+  #TG: computing the Max distance
+  ###########
 
-  #~~~~~~~
-  # Calculate the GED (equation 1 of Wills 2001) for each pairwise comparison (ij):
-  GED_ij <- sqrt(apply(W_ijk * (S_ijk ^ 2), 1, sum))
+  if(any(distance == "Max")) {
+    #~~~~~~~
+    # Store maximum-rescaled distance:
+    max.distance <- function(differences, maximum.differences) {
+      sum(differences) / sum(maximum.differences)
+    }
+    max.dist.matrix <- list.to.matrix(mapply(max.distance, diffs, maxdiffs), morph.matrix)
 
-  #~~~~~~~
-  # Create empty GED distance matrix:
-  GED.dist.matrix <- list.to.matrix(as.list(GED_ij), morph.matrix)
+    # Add row and column names (taxa) to distance matrix:
+    rownames(max.dist.matrix) <- colnames(max.dist.matrix) <- rownames(morph.matrix)
+
+  }
+
+
+  ###########
+  #TG: computing the GED distance
+  ###########
+
+  if(any(distance == "GED")) {
+    #~~~~~~~ 
+    # Store data for GED with NAs for missing distances:
+    #TG: this one is slightly modified, the output is now a list of matrices 2*ncol(morph.matrix) with the first row being the differences and the second row the weighting
+    store.data.GED <- function(differences, comparable.characters, morph.matrix, weights) {
+      return(rbind(c(differences, rep(NA, length(find.incomp.char(comparable.characters, morph.matrix)))), c(weights[comparable.characters], weights[find.incomp.char(comparable.characters, morph.matrix)])))
+    }
+    #TG: now with the mapply (I'll apply this scheme again further below so I'll stop writing obvious comments for this structure ;))
+    GED.data <- mapply(store.data.GED, diffs, list.of.compchar, MoreArgs=list(morph.matrix, weights), SIMPLIFY = FALSE)
+    #TG: output GED.data as a matrix (as in the original function)
+    #TG: first let's transpose the matrices to facilitate the output
+    GED.data <- lapply(GED.data, t)
+    #TG: second, create the matrix
+    GED.data <- matrix(data=(unlist(GED.data)), ncol=ncol(morph.matrix), byrow=TRUE)
+
+    #~~~~~~~
+    # Add to maximum differences (S_ijk * W_ijk in equation 1 of Wills 2001):
+    differences <- unlist(diffs)
+
+    #~~~~~~~
+    # Add to maximum differences (S_ijk_max * W_ijk in equation 1 of Wills 2001):
+    maximum.differences <- unlist(maxdiffs)
+    #TG: Note that therefore the line near the start defining the differences/maximum.differences vectors is not necessary.
+
+    #~~~~~~~
+    # Calculated weighted mean univariate distance for calculating GED (equation 2 in Wills 2001):
+    S_ijk_bar <- sum(differences) / sum(maximum.differences)
+
+    #~~~~~~~
+    # Replace missing distances with S_ijk_bar (i.e., results of equation 2 in Wills 2001 into equation 1 of Wills 2001):
+    GED.data[is.na(GED.data)] <- S_ijk_bar
+
+    #~~~~~~~
+    # Isolate the distances:
+    S_ijk <- GED.data[which((1:nrow(GED.data) %% 2) == 1), ]
+
+    #~~~~~~~
+    # Isolate the weights:
+    W_ijk <- GED.data[which((1:nrow(GED.data) %% 2) == 0), ]
+
+    #~~~~~~~
+    # Calculate the GED (equation 1 of Wills 2001) for each pairwise comparison (ij):
+    GED_ij <- sqrt(apply(W_ijk * (S_ijk ^ 2), 1, sum))
+
+    #~~~~~~~
+    # Create empty GED distance matrix:
+    GED.dist.matrix <- list.to.matrix(as.list(GED_ij), morph.matrix)
+
+    # Add row and column names (taxa) to distance matrix:
+    rownames(GED.dist.matrix) <- colnames(GED.dist.matrix) <- rownames(morph.matrix)
+
+  }
+  
 
   # Add row and column names (taxa) to distance matrices:
-  rownames(comp.char.matrix) <- colnames(comp.char.matrix) <- rownames(GED.dist.matrix) <- colnames(GED.dist.matrix) <- rownames(gower.dist.matrix) <- colnames(gower.dist.matrix) <- rownames(max.dist.matrix) <- colnames(max.dist.matrix) <- rownames(dist.matrix) <- colnames(dist.matrix) <- rownames(morph.matrix)
+  #rownames(comp.char.matrix) <- colnames(comp.char.matrix) <- rownames(GED.dist.matrix) <- colnames(GED.dist.matrix) <- rownames(gower.dist.matrix) <- colnames(gower.dist.matrix) <- rownames(max.dist.matrix) <- colnames(max.dist.matrix) <- rownames(dist.matrix) <- colnames(dist.matrix) <- rownames(morph.matrix)
+  #TG: This step is now dealt individually for each matrix
 
   # If transformation option is not "none":
   if(transform.proportional.distances != "none") {
@@ -352,44 +398,69 @@ MorphDistMatrix.fast <- function(morph.matrix, transform.proportional.distances=
     if(transform.proportional.distances == "sqrt") {
 
       # Replace NaN with NA for Gower distances and take square root:
-      gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(gower.dist.matrix))), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+      if(any(distance == "Gower")) {
+        gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(gower.dist.matrix))), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+      }
 
       # Replace NaN with NA for Max distances and take square root:
-      max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(max.dist.matrix))), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+      if(any(distance == "Max")) {
+        max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(max.dist.matrix))), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+      }
 
     # If transformation option is "arcsine_sqrt":
     } else {
 
-      # Establish correction factor to ensure Gower data is proportional:
-      gower.correction <- max(c(max(sort(gower.dist.matrix)), 1))
+      if(any(distance == "Gower")) {
+        # Establish correction factor to ensure Gower data is proportional:
+        gower.correction <- max(c(max(sort(gower.dist.matrix)), 1))
 
-      # Ensure all Gower values are on 0 to 1 scale then take arcsine of sqrt to get values that better approximate a normal distribution:
-      gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(gower.dist.matrix / gower.correction)))), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+        # Ensure all Gower values are on 0 to 1 scale then take arcsine of sqrt to get values that better approximate a normal distribution:
+        gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(gower.dist.matrix / gower.correction)))), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+      }
 
-      # Take arcsine square root of all MOD dist values:
-      max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(max.dist.matrix)))), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+      if(any(distance == "Max")) {
+        # Take arcsine square root of all MOD dist values:
+        max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(max.dist.matrix)))), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+      }
 
     }
 
   # If transformation option is "none":
   } else {
 
-    # Replace NaN with NA for Gower distances:
-    gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, gower.dist.matrix)), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+    if(any(distance == "Gower")) {
+      # Replace NaN with NA for Gower distances:
+      gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, gower.dist.matrix)), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+    }
 
-    # Replace NaN with NA for Max distances:
-    max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, max.dist.matrix)), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+    if(any(distance == "Max")) {
+      # Replace NaN with NA for Max distances:
+      max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, max.dist.matrix)), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+    }
 
   }
 
   # Compile results as a list:
-  result <- list(dist.matrix, GED.dist.matrix, gower.dist.matrix, max.dist.matrix, comp.char.matrix)
+  #result <- list(dist.matrix, GED.dist.matrix, gower.dist.matrix, max.dist.matrix, comp.char.matrix)
+
+  result <- list()
+  # Adding the raw distance
+  if(any(distance == "Raw")) result$raw.dist.matrix <- dist.matrix
+  # Adding the GED distance
+  if(any(distance == "GED")) result$GED.dist.matrix <- GED.dist.matrix
+  # Adding the Gower distance
+  if(any(distance == "Gower")) result$gower.dist.matrix <- gower.dist.matrix
+  # Adding the max distance
+  if(any(distance == "Max")) result$max.dist.matrix <- max.dist.matrix
+  # Adding the comparable characters
+  if(any(distance == "Comp")) result$comp.char.matrix <- comp.char.matrix
     
   # Add names to results list:
-  names(result) <- c("raw.dist.matrix", "GED.dist.matrix", "gower.dist.matrix", "max.dist.matrix", "comp.char.matrix")
+  #names(result) <- c("raw.dist.matrix", "GED.dist.matrix", "gower.dist.matrix", "max.dist.matrix", "comp.char.matrix")
 
   # Output result:
   return(result)
+  }
 
 #TG: actually allowing the users to chose which distance to compute might also speed up the whole thing significantly (especially if users just want the comp.char.matrix ;)).
 }
@@ -463,4 +534,30 @@ MorphDistMatrix.fast <- function(morph.matrix, transform.proportional.distances=
 #  test_that("Are both version giving the exact same results (no rounding nor random seeds)", {
 #    expect_equal(results_base, results_fast)
 #  })
+
+#####################
+# Output testing
+#####################
+
+# results_base <- MorphDistMatrix(Michaux1989)
+# results_fast <- MorphDistMatrix.fast(Michaux1989)
+# results_raw <- MorphDistMatrix.fast(Michaux1989, distance = "Raw")
+# results_GED <- MorphDistMatrix.fast(Michaux1989, distance = "GED")
+# results_Gower <- MorphDistMatrix.fast(Michaux1989, distance = "Gower")
+# results_Max <- MorphDistMatrix.fast(Michaux1989, distance = "Max")
+# results_Comp <- MorphDistMatrix.fast(Michaux1989, distance = "Comp")
+
+# # Testing if the algorithm gives the same output with default argument (all matrices)
+# test_that("Are both the base and fast algorithms equal?", {
+#   expect_equal(results_base, results_fast)
+# })
+
+# # Testing if each individual matrix is corrects
+# test_that("Are each matrix calculated individually correct?", {
+#   expect_equal(results_base$raw.dist.matrix, results_raw$raw.dist.matrix)
+#   expect_equal(results_base$GED.dist.matrix, results_GED$GED.dist.matrix)
+#   expect_equal(results_base$gower.dist.matrix, results_Gower$gower.dist.matrix)
+#   expect_equal(results_base$max.dist.matrix, results_Max$max.dist.matrix)
+#   expect_equal(results_base$comp.char.matrix, results_Comp$comp.char.matrix)
+# })
 
