@@ -460,12 +460,7 @@ MorphDistMatrix.fast <- function(morph.matrix, distance = c("Raw", "GED", "Gower
 
   # Output result:
   return(result)
-  }
-
-#TG: actually allowing the users to chose which distance to compute might also speed up the whole thing significantly (especially if users just want the comp.char.matrix ;)).
 }
-
-
 
 #####################
 # Performance testing
