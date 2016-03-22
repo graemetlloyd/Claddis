@@ -145,7 +145,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
     for(i in names.in.single.quotes) X <- gsub(i, gsub("\\(|)", "", gsub(" ", "_", i)), X, fixed=T)
 
     # Remove all single quotes from text file:
-    X <- gsub("'", "", X, fixed=T)
+    X <- gsub("'", "", X, fixed = TRUE)
 
   }
 
@@ -155,7 +155,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   # Remove weird characters (may need to add to the list or not if Sys.setlocale fixes the issues):
   X <- gsub("\x94|\x93|\xd5|\xd4|\xd3|\xd2|'", "", X)
 
-  # Replace tabs wth spaces and trim leading and trailing spaces from each line:
+  # Replace tabs with spaces and trim leading and trailing spaces from each line:
   X <- apply(matrix(gsub("\t", " ", X)), 2, trim)
 
   # Delete any empty lines (if present):
@@ -165,13 +165,13 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   if(length(grep("\\[", X)) > 0) {
 
     # Work out beginning and ending lines for text:
-    textlines <- apply(cbind(setdiff(grep("\\[", X), grep("\\[[0-9:A-Z:a-z]{1}\\]", X)), setdiff(grep("\\]", X), grep("\\[[0-9:A-Z:a-z]{1}\\]", X))), 1, paste, collapse=":")
+    textlines <- apply(cbind(setdiff(grep("\\[", X), grep("\\[[0-9:A-Z:a-z]{1}\\]", X)), setdiff(grep("\\]", X), grep("\\[[0-9:A-Z:a-z]{1}\\]", X))), 1, paste, collapse = ":")
 
     # Convert beginning and endings to numerics for finding in vector:
-    lines.to.delete <- textlines <- eval(parse(text=paste("c(", paste(textlines, collapse=","), ")", sep="")))  
+    lines.to.delete <- textlines <- eval(parse(text=paste("c(", paste(textlines, collapse = ","), ")", sep = "")))
   
     # Grab text and store:
-    textlines <- paste(gsub("\\[|\\]", "", X[textlines]), collapse="\n")
+    textlines <- paste(gsub("\\[|\\]", "", X[textlines]), collapse = "\n")
   
     # Delete text lines to avoid regular expression errors later:
     X <- X[-lines.to.delete]
@@ -185,16 +185,16 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   }
 
   # Little test for valid NEXUS formatting for number of taxa:
-  if(length(grep("ntax", X, ignore.case=T)) == 0) stop("Number of taxa not defined.")
+  if(length(grep("ntax", X, ignore.case = TRUE)) == 0) stop("Number of taxa not defined.")
 
   # Little test for valid NEXUS formatting for number of characters:
-  if(length(grep("nchar", X, ignore.case=T)) == 0) stop("Number of characters not defined.")
+  if(length(grep("nchar", X, ignore.case = TRUE)) == 0) stop("Number of characters not defined.")
 
   # Get number of taxa:
   ntax <- as.numeric(strsplit(strsplit(gsub(";|\t", "", X[grep("NTAX=|Ntax=|ntax=", X)]), "NTAX=|Ntax=|ntax=")[[1]][2], " ")[[1]][1])
 
   # Grab and format nchar line(s):
-  nchar <- matrix(unlist(strsplit(gsub(";|\t", "", X[grep("NCHAR=|Nchar=|nchar=", X)]), "NCHAR=|Nchar=|nchar=")), ncol=2, byrow=TRUE)[,2]
+  nchar <- matrix(unlist(strsplit(gsub(";|\t", "", X[grep("NCHAR=|Nchar=|nchar=", X)]), "NCHAR=|Nchar=|nchar=")), ncol = 2, byrow = TRUE)[,2]
 
   # Isolate just the number(s) of characters:
   for(i in 1:length(nchar)) nchar[i] <- strsplit(nchar[i], " ")[[1]][1]
@@ -206,10 +206,10 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   if((nchar * ntax) == 0) stop("Matrix has no dimensions.")
 
   # If symbols are specified in the file:
-  if(length(grep("symbols", X, ignore.case=T)) > 0) {
+  if(length(grep("symbols", X, ignore.case = TRUE)) > 0) {
 
     # Get initial set of symbols:
-    symbols <- strsplit(strsplit(strsplit(X[grep("symbols", X, ignore.case=T)], "SYMBOLS=|Symbols=|symbols=")[[1]][2], "\"")[[1]][2], " |")[[1]]
+    symbols <- strsplit(strsplit(strsplit(X[grep("symbols", X, ignore.case = TRUE)], "SYMBOLS=|Symbols=|symbols=")[[1]][2], "\"")[[1]][2], " |")[[1]]
     
     # Collapse to just the symbols themselves:
     symbols <- symbols[nchar(symbols) == 1]
@@ -225,10 +225,10 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
 # ADD BIT HERE FOR STANDARD AND DNA AND PROTEIN ETC.
 
   # If the missing character is specified:
-  if(length(grep("missing", X, ignore.case=T)) > 0) {
+  if(length(grep("missing", X, ignore.case = TRUE)) > 0) {
 
     # Get missing character:
-    missing <- strsplit(strsplit(X[grep("missing", X, ignore.case=T)][1], "MISSING=|Missing=|missing=")[[1]][2], "")[[1]][1]
+    missing <- strsplit(strsplit(X[grep("missing", X, ignore.case = TRUE)][1], "MISSING=|Missing=|missing=")[[1]][2], "")[[1]][1]
 
   # If the missing character is not specified:
   } else {
@@ -239,10 +239,10 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   }
 
   # If the gap character is specified:
-  if(length(grep("gap", X, ignore.case=T)) > 0) {
+  if(length(grep("gap", X, ignore.case = TRUE)) > 0) {
 
     # Get gap character:
-    gap <- strsplit(strsplit(X[grep("gap", X, ignore.case=T)][1], "GAP=|Gap=|gap=")[[1]][2], "")[[1]][1]
+    gap <- strsplit(strsplit(X[grep("gap", X, ignore.case = TRUE)][1], "GAP=|Gap=|gap=")[[1]][2], "")[[1]][1]
 
   # If the gap character is not specified:
   } else {
@@ -277,7 +277,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
         start.rows <- which(nchar(naked.matrixblock) > 0)
 
         # Create empty block to store new matrixblock:
-        new.matrixblock <- vector(mode="character")
+        new.matrixblock <- vector(mode = "character")
 
         # For each taxon:
         for(j in 1:length(start.rows)) {
@@ -292,14 +292,14 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
           if(length(grep(" ", taxon.block[1])) == 0) taxon.block[1] <- paste(taxon.block[1], "  ", sep="")
 
           # Make into single line and add to new matrix block:
-          new.matrixblock <- c(new.matrixblock, paste(taxon.block, collapse=""))
+          new.matrixblock <- c(new.matrixblock, paste(taxon.block, collapse = ""))
 
         }
 
         # Replace matrix block with line breaks with one without:
         X <- c(X[1:matrix.startlines[i]], new.matrixblock, X[matrix.endlines[i]:length(X)])
 
-      # Case if apparent line breaks do not add up to nmber of taxa:
+      # Case if apparent line breaks do not add up to number of taxa:
       } else {
 
         # Stop and print warning.:
@@ -315,10 +315,10 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   if(length(grep("interleave", X, ignore.case = TRUE)) > 0) {
 
     # Get start of matrix block(s):
-    matrix.startlines <- setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case=T)), grep(";", X))
+    matrix.startlines <- setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case = TRUE)), grep(";", X))
 
     # Get end of matrix block(s):
-    matrix.endlines <- setdiff(grep(";", X), grep("end", X, ignore.case=T))[setdiff(grep(";", X), grep("end", X, ignore.case=T)) > matrix.startlines]
+    matrix.endlines <- setdiff(grep(";", X), grep("end", X, ignore.case = TRUE))[setdiff(grep(";", X), grep("end", X, ignore.case = TRUE)) > matrix.startlines]
 
     # For each block:
     for(i in length(matrix.startlines):1) {
@@ -368,10 +368,10 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   }
 
   # First sort of getting rows that correspond to the actual data matri(ces):
-  matrixblocks <- matrix(rep(1:ntax, length(setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case=T)), grep(";", X)))), ncol=length(setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case=T)), grep(";", X))))
+  matrixblocks <- matrix(rep(1:ntax, length(setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case = TRUE)), grep(";", X)))), ncol=length(setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case = TRUE)), grep(";", X))))
   
   # Add start values:
-  for(i in 1:length(setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case=T)), grep(";", X)))) matrixblocks[, i] <- matrixblocks[, i] + (setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case=T)), grep(";", X))[i])
+  for(i in 1:length(setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case = TRUE)), grep(";", X)))) matrixblocks[, i] <- matrixblocks[, i] + (setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case = TRUE)), grep(";", X))[i])
 
   # Convert to vector for use:
   matrixblocks <- sort(matrixblocks)
@@ -401,13 +401,13 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   if(length(grep("\\([0-9:A-Z:a-z]{1}[ |,|/|\\&]{1}", matrixblock)) > 0) {
   
     # First collapse lines with polymorphisms to just polymorphisms:
-    polymorphism.combos <- gsub(paste(")[", paste(c(symbols, missing, gap, "\\?"), collapse="|"), "]*", sep=""), ")", gsub(paste("[", paste(c(symbols, missing, gap, "\\?"), collapse="|"), "]*\\(", sep=""), "\\(", matrixblock))
+    polymorphism.combos <- gsub(paste(")[", paste(c(symbols, missing, gap, "\\?"), collapse = "|"), "]*", sep = ""), ")", gsub(paste("[", paste(c(symbols, missing, gap, "\\?"), collapse = "|"), "]*\\(", sep = ""), "\\(", matrixblock))
   
     # Now get just the polymorphisms
     polymorphism.combos <- unique(strsplit(paste(polymorphism.combos[grep(")", polymorphism.combos)], collapse=""), ")|\\(")[[1]])[-1]
 
     # Get the symbols that break up the polymorphism (e.g., space, comma, slash, ampersand):
-    split.symbols <- unique(strsplit(paste(gsub(paste(symbols, collapse="|"), "", polymorphism.combos), collapse=""), "")[[1]])
+    split.symbols <- unique(strsplit(paste(gsub(paste(symbols, collapse = "|"), "", polymorphism.combos), collapse = ""), "")[[1]])
 
     # Get replacements for polymorphism combinations:
     polymorphism.combo.replacements <- gsub(paste(split.symbols, collapse="|"), "", polymorphism.combos)
@@ -487,13 +487,13 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   rownames(MATRIX) <- MATRIXrn
 
   # Convert matrix block to actual matrix with nrows equal to number of taxa:
-  matrixblock <- matrix(matrixblock, nrow=ntax)
+  matrixblock <- matrix(matrixblock, nrow = ntax)
 
   # Get discrete columns:
-  discrete.columns <- setdiff(1:ncol(matrixblock), which(unlist(lapply(apply(matrixblock, 2, grep, pattern="\\."), length)) > 0))
+  discrete.columns <- setdiff(1:ncol(matrixblock), which(unlist(lapply(apply(matrixblock, 2, grep, pattern = "\\."), length)) > 0))
 
   # Collapse discrete columns and repeat:
-  matrixblock[, discrete.columns] <- apply(as.matrix(matrixblock[, discrete.columns], nrow=ntax), 1, paste, collapse="")
+  matrixblock[, discrete.columns] <- apply(as.matrix(matrixblock[, discrete.columns], nrow = ntax), 1, paste, collapse = "")
 
   # If repeats:
   if(length(discrete.columns) > 1) {
@@ -507,7 +507,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   }
 
   # Find columns in matrix that contain continuous data:
-  continuous.columns <- which(unlist(lapply(apply(matrixblock, 2, grep, pattern="\\."), length)) > 0)
+  continuous.columns <- which(unlist(lapply(apply(matrixblock, 2, grep, pattern = "\\."), length)) > 0)
 
   # Find columns in matrix that contain discrete data:
   discrete.columns <- setdiff(c(1:ncol(matrixblock)), continuous.columns)
@@ -519,7 +519,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   if(length(continuous.columns) > 0) {
 
     # Make continuous characters into a matrix block (with columns for each character):
-    continuous.matrix <- matrix(unlist(strsplit(apply(matrix(matrixblock[, continuous.columns], ncol=length(continuous.columns)), 1, paste, collapse=" "), " ")), ncol=sum(nchar[continuous.columns]), byrow=TRUE)
+    continuous.matrix <- matrix(unlist(strsplit(apply(matrix(matrixblock[, continuous.columns], ncol = length(continuous.columns)), 1, paste, collapse = " "), " ")), ncol = sum(nchar[continuous.columns]), byrow = TRUE)
 
     # Replace missing symbol with NA:
     continuous.matrix[continuous.matrix == missing] <- NA
@@ -545,16 +545,22 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   if(length(discrete.columns) > 0) {
 
     # Grab columns of discrete data and form into matrix:
-    discrete.matrix <- matrix(matrixblock[, discrete.columns], ncol=length(discrete.columns))
+    discrete.matrix <- matrix(matrixblock[, discrete.columns], ncol = length(discrete.columns))
 
     # Delete any remaining whitespace:
     discrete.matrix <- gsub("\n|\t| ", "", discrete.matrix)
 
     # Collapse matrix to a single column:
-    discrete.matrix <- matrix(apply(discrete.matrix, 1, paste, collapse=""), ncol=1)
+    discrete.matrix <- matrix(apply(discrete.matrix, 1, paste, collapse = ""), ncol = 1)
 
     # Convert into list by splitting into single characters:
     discrete.matrix <- strsplit(discrete.matrix, "")
+    
+    # Check to see if there are unaccounted for symbols in the data:
+    undeclared.symbols <- strsplit(gsub(paste(c(symbols, missing, gap, "\\?", "\\(", "\\)", "\\{", "\\}"), collapse = "|"), "", paste(unique(unlist(discrete.matrix)), collapse = "")), "")[[1]]
+    
+    # Stop and warn user if unaccounted for symbols found:
+    if(length(undeclared.symbols) > 0) stop(paste("Unaccounted for symbols found in matrix:", undeclared.symbols, collapse = " "))
 
     # Get numeric characters to replace symbols with:
     symbol.replacements <- 0:(length(symbols) - 1)
@@ -573,7 +579,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
     }
   
     # Find rows with parentheses and by extension polymorphisms:
-    polymorphism.rows <- which(unlist(lapply(lapply(discrete.matrix, grep, pattern="\\("), length)) > 0)
+    polymorphism.rows <- which(unlist(lapply(lapply(discrete.matrix, grep, pattern = "\\("), length)) > 0)
 
     # As long as there are polymorphisms:
     if(length(polymorphism.rows) > 0) {
@@ -609,7 +615,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
     if(length(which(unlist(lapply(discrete.matrix, length)) != nchar)) > 0) stop("Some lines have too many or too few characters.")
 
     # Convert into matrix format:
-    discrete.matrix <- matrix(unlist(discrete.matrix), byrow=TRUE, nrow=ntax)
+    discrete.matrix <- matrix(unlist(discrete.matrix), byrow = TRUE, nrow = ntax)
 
     # Replace missing symbol with NA:
     discrete.matrix[discrete.matrix == missing] <- NA
@@ -638,7 +644,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   if(length(grep("DEFTYPE", X)) > 0) {
 
     # Set default ordering of characters:
-    default.ordering <- strsplit(strsplit(X[grep("deftype", X, ignore.case=T)], "DEFTYPE=|Deftype=|deftype=")[[1]][2], " ")[[1]][1]
+    default.ordering <- strsplit(strsplit(X[grep("deftype", X, ignore.case = TRUE)], "DEFTYPE=|Deftype=|deftype=")[[1]][2], " ")[[1]][1]
 
   # If minimum level of ordering is not specified:
   } else {
@@ -671,10 +677,10 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   step.matrices <- NULL
 
   # Special case if there are user-defined characters, i.e. step matrices:
-  if(length(grep("USERTYPE", X, ignore.case=T)) > 0) {
+  if(length(grep("USERTYPE", X, ignore.case = TRUE)) > 0) {
 
     # Get rows corresponding to start of stepmatrices:
-    step.matrix.rows <- grep("USERTYPE", X, ignore.case=T)
+    step.matrix.rows <- grep("USERTYPE", X, ignore.case = TRUE)
   
     # Create empty list to store step matrices:
     step.matrices <- list()
@@ -689,7 +695,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
       step.matrix.block <- X[i:(i + as.numeric(strsplit(X[i], "\\(STEPMATRIX\\)=")[[1]][2]) + 1)]
   
       # Get the step matrix as a matrix (might still need to think about how to define e.g. infinity):
-      step.matrix <- gsub("\\.", "0", matrix(unlist(strsplit(step.matrix.block[3:length(step.matrix.block)], " ")), ncol=as.numeric(strsplit(X[i], "\\(STEPMATRIX\\)=")[[1]][2]) + 1, byrow=TRUE)[, -1])
+      step.matrix <- gsub("\\.", "0", matrix(unlist(strsplit(step.matrix.block[3:length(step.matrix.block)], " ")), ncol = as.numeric(strsplit(X[i], "\\(STEPMATRIX\\)=")[[1]][2]) + 1, byrow = TRUE)[, -1])
 
       # Add row and column names:
       rownames(step.matrix) <- colnames(step.matrix) <- symbols[1:nrow(step.matrix)]
@@ -711,10 +717,10 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   }
   
   # Deal with ordering, if present:
-  if(length(grep("TYPESET", X, ignore.case=T)) > 0) {
+  if(length(grep("TYPESET", X, ignore.case = TRUE)) > 0) {
         
     # Find appropriate information line:
-    ordering.line <- X[grep("TYPESET", X, ignore.case=T)]
+    ordering.line <- X[grep("TYPESET", X, ignore.case = TRUE)]
 
     # Make sure ordering is on single line or rest of code will not work:
     if(length(grep(";", ordering.line)) == 0) stop("Ordering breaks over multiple lines. Place on single line.")
@@ -729,7 +735,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
     types <- gsub("\\", "", strsplit(gsub("[0-9]|-| ", "", ordering.line), ":")[[1]][1:ntype], fixed=TRUE)
   
     # Get initial list of numbers of characters of each type:
-    ordering.numbers <- strsplit(ordering.line, paste(paste(types, ": ", sep=""), collapse="|"))[[1]]
+    ordering.numbers <- strsplit(ordering.line, paste(paste(types, ": ", sep = ""), collapse = "|"))[[1]]
 
     # Conditional to deal with weird slashes in numbering:
     if(length(grep("\\3", ordering.numbers, fixed=T)) > 0) {
@@ -773,16 +779,16 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   weights <- rep(1, sum(nchar))
     
   # Deal with differential weighting, if present:
-  if(length(grep("WTSET", X, ignore.case=T)) > 0) {
+  if(length(grep("WTSET", X, ignore.case = TRUE)) > 0) {
 
     # Grab weighting line:
-    weighting.line <- gsub(",|;", "", strsplit(X[grep("WTSET", X, ignore.case=T)], "=")[[1]][2])
+    weighting.line <- gsub(",|;", "", strsplit(X[grep("WTSET", X, ignore.case = TRUE)], "=")[[1]][2])
   
     # Isolate weight values:
     weight.values <- gsub(":", "", strsplit(weighting.line, " ")[[1]][grep(":", strsplit(weighting.line, " ")[[1]])])
   
     # Get initial list of numbers of characters of each type:
-    weighting.numbers <- strsplit(weighting.line, paste(paste(weight.values, ": ", sep=""), collapse="|"))[[1]]
+    weighting.numbers <- strsplit(weighting.line, paste(paste(weight.values, ": ", sep = ""), collapse = "|"))[[1]]
   
     # Modify further ready for parsinga nd evaluating:
     weighting.numbers <- paste("c(", gsub(" ", ",", trim(gsub("-", ":", weighting.numbers[nchar(weighting.numbers) > 0]))), ")", sep="")
