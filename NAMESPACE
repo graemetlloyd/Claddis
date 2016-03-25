@@ -3,6 +3,7 @@
 export(AncStateEstMatrix)
 export(ChangesInBins)
 export(ChronoPhyloMorphospacePlot)
+export(CompactifyMatrix)
 export(CorrectRootTime)
 export(DiscreteCharacterRate)
 export(DolloSCM)
