@@ -56,10 +56,10 @@ MatrixPruner <- function(clad.matrix, taxa2prune = c(), characters2prune = c()) 
     }
     
     # Update maximum values (post pruning):
-    clad.matrix$max.vals <- unlist(lapply(lapply(lapply(lapply(lapply(lapply(apply(clad.matrix$matrix, 2, sort), unique), strsplit, split = "&"), unlist), unique), as.numeric), max))
+    clad.matrix$max.vals <- unlist(lapply(lapply(lapply(lapply(lapply(lapply(lapply(apply(clad.matrix$matrix, 2, list), unlist), strsplit, split = "&"), unlist), sort), unique), as.numeric), max))
     
     # Update minimum values (post pruning):
-    clad.matrix$min.vals <- unlist(lapply(lapply(lapply(lapply(lapply(lapply(apply(clad.matrix$matrix, 2, sort), unique), strsplit, split = "&"), unlist), unique), as.numeric), min))
+    clad.matrix$min.vals <- unlist(lapply(lapply(lapply(lapply(lapply(lapply(lapply(apply(clad.matrix$matrix, 2, list), unlist), strsplit, split = "&"), unlist), sort), unique), as.numeric), min))
 
     # Return pruned matrix:
     return(clad.matrix)
