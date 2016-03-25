@@ -213,6 +213,9 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
     
     # Collapse to just the symbols themselves:
     symbols <- symbols[nchar(symbols) == 1]
+    
+    # Special case of a tilda indicating a range:
+    if(length(symbols) == 3 && symbols[2] == "~") symbols <- as.character(as.numeric(symbols[1]):as.numeric(symbols[3]))
 
   # If symbols are not specified in the file:
   } else {
