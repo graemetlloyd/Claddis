@@ -8,6 +8,7 @@
 #' @param tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{morph.matrix}.
 #' @param estimate.allchars An optional that allows the user to make estimates for all ancestral values. The default will only make estimates for nodes that link coded terminals.
 #' @param estimate.tips An optional that allows the user to make estimates for tip values. The default only makes estimates for internal nodes.
+#' @param uncertainty.threshold An optional value between 0 and 1 for transforming ancestral states estimations with a scaled likelihood below that value into NAs.
 #'
 #' @return \item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral states.}
 #'
@@ -37,7 +38,7 @@
 #' AncStateEstMatrix(Michaux1989, tree)
 #' 
 #' @export AncStateEstMatrix
-AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, estimate.tips = FALSE) {
+AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, estimate.tips = FALSE, uncertainty.threshold = 0) {
 
   # Catch problem with trees with no branch lengths:
   if(is.null(tree$edge.length)) stop("ERROR:\n Tree must have branch lengths.")
@@ -49,7 +50,8 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
   if(any(tree$edge.length == 0)) stop("ERROR:\n Tree must not have zero-length branches.")
 
   # Remove node labels from tree (causes bug downstream):
-  tree$node.label <- NULL
+  #tree$node.label <- NULL
+  #TG: I suggest leaving node labels in the original tree. Node labels are already removed from the "chartree" objects that are passed to rerootingMethod, making either this line or the removal of the node.labels in chartree redundant. No big deal though, it's not doing anything to the CPU time.
 
   # Collapse matrix to vectors for each character (state and ordering combination):
   collapse.matrix <- apply(rbind(morph.matrix$matrix, morph.matrix$ordering), 2, paste, collapse="")
@@ -62,6 +64,9 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
     
     # Create ancestral storage matrix:
     anc.lik.matrix <- matrix(nrow=Nnode(tree), ncol=length(morph.matrix$matrix[1, ]))
+
+    #TG: Create ancestral states scaled likelihood storage matrix:
+    sca.lik.matrix <- anc.lik.matrix
     
     # Label matrix to record ancestral state estimates:
     rownames(anc.lik.matrix) <- c((Ntip(tree) + 1):(Ntip(tree) + Nnode(tree)))
@@ -71,6 +76,9 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
 
     # Create ancestral storage matrix (including tips):
     anc.lik.matrix <- matrix(nrow=Ntip(tree) + Nnode(tree), ncol=length(morph.matrix$matrix[1, ]))
+
+    #TG: Create ancestral states scaled likelihood storage matrix:
+    sca.lik.matrix <- anc.lik.matrix
 
     # Label matrix to record ancestral state estimates:
     rownames(anc.lik.matrix) <- c(tree$tip.label, (Ntip(tree) + 1):(Ntip(tree) + Nnode(tree)))
@@ -169,7 +177,20 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
                     
             # Get maximum likelihood:
             max.lik <- apply(state.likelihoods, 1, max)
-                    
+
+            #TG: Fill in the scaled likelihoods matrix for each character
+            if(estimate.tips == FALSE) {
+              
+              # Only fill in the scaled likelihoods for the nodes
+              sca.lik.matrix[,i] <- max.lik[-(1:Ntip(chartree))]
+
+            } else {
+
+              #TG: Fill the all the scaled likelihood values
+              sca.lik.matrix[,i] <- max.lik
+
+            }
+
             # Create vector to store maximum likelihood states:
             max.lik.state <- vector(mode = "character", length = length(rownames(state.likelihoods)))
       
@@ -248,6 +269,17 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
 
   # Fill in repeating characters to give full matrix:
   anc.lik.matrix <- anc.lik.matrix[, unique.characters[match(collapse.matrix, unique(collapse.matrix))]]
+
+  #TG: Fill in repeating characters to give full matrix (for the scaled likelihood values):
+  sca.lik.matrix <- sca.lik.matrix[, unique.characters[match(collapse.matrix, unique(collapse.matrix))]]
+
+  #TG: If any scaled likelihood is inferior to the uncertainty threshold...
+  if(any(sca.lik.matrix < uncertainty.threshold)) {
+
+    #TG: ... replace ancestral states estimations < uncertainty.threshold by NAs
+    anc.lik.matrix <- ifelse(sca.lik.matrix < uncertainty.threshold, NA, anc.lik.matrix)
+
+  }
     
   # Return completed discrete ancestral character estimation matrix:
   return(anc.lik.matrix)
