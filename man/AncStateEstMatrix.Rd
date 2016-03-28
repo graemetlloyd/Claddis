@@ -5,7 +5,7 @@
 \title{Ancestral State Estimation}
 \usage{
 AncStateEstMatrix(morph.matrix, tree, estimate.allchars = FALSE,
-  estimate.tips = FALSE)
+  estimate.tips = FALSE, uncertainty.threshold = 0)
 }
 \arguments{
 \item{morph.matrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
@@ -15,6 +15,8 @@ AncStateEstMatrix(morph.matrix, tree, estimate.allchars = FALSE,
 \item{estimate.allchars}{An optional that allows the user to make estimates for all ancestral values. The default will only make estimates for nodes that link coded terminals.}
 
 \item{estimate.tips}{An optional that allows the user to make estimates for tip values. The default only makes estimates for internal nodes.}
+
+\item{uncertainty.threshold}{An optional value between 0 and 1 for transforming ancestral states estimations with a scaled likelihood below that value into NAs.}
 }
 \value{
 \item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral states.}
