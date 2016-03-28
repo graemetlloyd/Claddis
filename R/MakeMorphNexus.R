@@ -137,6 +137,7 @@ MakeMorphNexus <- function(matrix, header, ordering, weights, step.matrices, com
             header <- combine.morph.matrix$header
             ordering <- combine.morph.matrix$ordering
             weights <- combine.morph.matrix$weights
+            step.matrices <- combine.morph.matrix$step.matrices
 
             #Combine the matrices
             matrix <- rbind(Michaux1989$matrix, matrix)
@@ -189,7 +190,7 @@ MakeMorphNexus <- function(matrix, header, ordering, weights, step.matrices, com
         #"step.matrices" argument
         if(missing(step.matrices)) {
             #Set to default if missing
-            step.matrices <- list(NULL)
+            step.matrices <- NULL
         }
     }
 
@@ -202,9 +203,13 @@ MakeMorphNexus <- function(matrix, header, ordering, weights, step.matrices, com
     morph_nexus$weights <- weights
     morph_nexus$max.vals <- apply(matrix, 2, max, na.rm=TRUE)
     morph_nexus$min.vals <- apply(matrix, 2, min, na.rm=TRUE)
-    morph_nexus$step.matrices <- step.matrices    
-    morph_nexus$step.matrices <- 
-    morph_nexus$symbols <- unique(as.vector(matrix))
+    if(is.null(step.matrices)) {
+        morph_nexus[7] <- list(NULL)
+        names(morph_nexus)[7] <- "step.matrices"
+    } else {
+        morph_nexus$step.matrices <- step.matrices
+    }
+    morph_nexus$symbols <- as.character(unique(as.vector(matrix)))
 
     return(morph_nexus)
 }
