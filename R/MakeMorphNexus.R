@@ -53,7 +53,7 @@
 #' 
 #' @export MakeMorphNexus
 
-MakeMorphNexus <- function(matrix, header, ordering, weights, combine.morph.matrix) {
+MakeMorphNexus <- function(matrix, header, ordering, weights, step.matrices, combine.morph.matrix) {
 
     #~~~~~
     # SANITIZING FUNCTIONS, NO NEED TO EXPORT THEM
@@ -117,7 +117,7 @@ MakeMorphNexus <- function(matrix, header, ordering, weights, combine.morph.matr
             }        
         }
     }
-        
+
     #Get function's call
     match_call <- match.call()
 
@@ -185,6 +185,12 @@ MakeMorphNexus <- function(matrix, header, ordering, weights, combine.morph.matr
             check.class(weights, "integer")
             check.length(weights, ncol(matrix), " must be the same length as the matrix.", errorif=FALSE)
         }
+
+        #"step.matrices" argument
+        if(missing(step.matrices)) {
+            #Set to default if missing
+            step.matrices <- list(NULL)
+        }
     }
 
 
@@ -196,6 +202,9 @@ MakeMorphNexus <- function(matrix, header, ordering, weights, combine.morph.matr
     morph_nexus$weights <- weights
     morph_nexus$max.vals <- apply(matrix, 2, max, na.rm=TRUE)
     morph_nexus$min.vals <- apply(matrix, 2, min, na.rm=TRUE)
+    morph_nexus$step.matrices <- step.matrices    
+    morph_nexus$step.matrices <- 
+    morph_nexus$symbols <- unique(as.vector(matrix))
 
     return(morph_nexus)
 }
