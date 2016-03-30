@@ -105,7 +105,7 @@ MorphDistMatrix.fast <- function(morph.matrix, distance = c("Raw", "GED", "Gower
 
   #~~~~~~~
   # Deal with polymorphic characters (if present):
-  deal.with.poly <- function(comparisons, comparable.characters) {
+  deal.with.poly <- function(comparisons, comparable.characters, ordering) {
     #TG: where comparisons are the columns of matrix.of.char.comp
 
     #TG: Setting the arguments as in the original function
@@ -119,7 +119,7 @@ MorphDistMatrix.fast <- function(morph.matrix, distance = c("Raw", "GED", "Gower
       ampersand.elements <- sort(c(grep("&", firstrow), grep("&", secondrow)))
       #~~~~~~~~
       # Go through each polymorphic character:
-      go.through.poly.char <- function(amper.element, firstrow, secondrow) {
+      go.through.poly.char <- function(amper.element, firstrow, secondrow, ordering) {
         #~~~~~~~~
         # Find out if two codings overlap once all polymorphism resolutions are considered:
         intersection.value <- intersect(strsplit(firstrow[amper.element], "&")[[1]], strsplit(secondrow[amper.element], "&")[[1]])
@@ -128,10 +128,10 @@ MorphDistMatrix.fast <- function(morph.matrix, distance = c("Raw", "GED", "Gower
         if(length(intersection.value) > 0) {
           #~~~~~~~~     
           # Set ith value as zero (no difference):
-          firstrow[amper.element] <- 0
+          firstrow[amper.element] <<- 0
           #~~~~~~~~
           # Set jth value as zero (no difference)
-          secondrow[amper.element] <- 0
+          secondrow[amper.element] <<- 0
         }
         #~~~~~~~~
         # Case if polymorphic and non-polymorphic values do not overlap:
@@ -141,20 +141,20 @@ MorphDistMatrix.fast <- function(morph.matrix, distance = c("Raw", "GED", "Gower
           if(ordering[compchar[amper.element]] == "unord") {
             #~~~~~~~~
             # Set ith value as zero:
-            firstrow[amper.element] <- 0
+            firstrow[amper.element] <<- 0
             #~~~~~~~~
             # Set jth value as 1 (making the ij difference equal to one):
-            secondrow[amper.element] <- 1
+            secondrow[amper.element] <<- 1
           }
           #~~~~~~~~           
           # Case if character is ordered (max difference is > 1):
           if(ordering[compchar[amper.element]] == "ord") {
             #~~~~~~~~
             # Get first row value(s):
-            firstrowvals <- as.numeric(strsplit(firstrow[amper.element], "&")[[1]])
+            firstrowvals <<- as.numeric(strsplit(firstrow[amper.element], "&")[[1]])
             #~~~~~~~~
             # Get second row value(s):
-            secondrowvals <- as.numeric(strsplit(secondrow[amper.element], "&")[[1]])
+            secondrowvals <<- as.numeric(strsplit(secondrow[amper.element], "&")[[1]])
             #~~~~~~~~
             # Make mini distance matrix:
             poly.dist.mat <- matrix(0, nrow=length(firstrowvals), ncol=length(secondrowvals))
@@ -169,26 +169,27 @@ MorphDistMatrix.fast <- function(morph.matrix, distance = c("Raw", "GED", "Gower
             #TG: I leave it like it is for now
             #~~~~~~~~
             # Set first value as zero:
-            firstrow[amper.element] <- 0
+            firstrow[amper.element] <<- 0
             #~~~~~~~~
             # Set second value as minimum possible difference:
-            secondrow[amper.element] <- min(poly.dist.mat)
+            secondrow[amper.element] <<- min(poly.dist.mat)
           }
         }
         #TG: note that this functions doesn't return anything per se but just modifies the firstrow and secondrow objects
       }
     
       #TG: applying this function to the ampersand elements
-      silent <- lapply(as.list(ampersand.elements), go.through.poly.char, firstrow, secondrow)
+      silent <- lapply(as.list(ampersand.elements), go.through.poly.char, firstrow, secondrow, ordering)
     }
+
+    #TG: return the arguments without polymorphism
     return(list(firstrow, secondrow))
   }
-   
 
   #TG: here we have to make the matrix list into a list to feed into mapply
   #unlist(apply(matrix.of.char.comp, 2, list), recursive=FALSE)
   #TG: dealing with polymorphic characters
-  matrix.of.char.comp <- mapply(deal.with.poly, unlist(apply(matrix.of.char.comp, 2, list), recursive=FALSE), list.of.compchar)
+  matrix.of.char.comp <- mapply(deal.with.poly, unlist(apply(matrix.of.char.comp, 2, list), recursive=FALSE), list.of.compchar, MoreArgs = list(ordering))
 
   #~~~~~~~ 
   # Get the absolute difference between the two rows:
@@ -236,19 +237,22 @@ MorphDistMatrix.fast <- function(morph.matrix, distance = c("Raw", "GED", "Gower
   }
   raw.dist <- lapply(diffs, raw.eucl.dist)
 
-  #~~~~~~~
-  # Work out maximum difference (again, checked against ordering) using compchar characters only:
-  max.difference <- function(comparable.characters, max.vals, min.vals) {
-    as.numeric(max.vals[comparable.characters]) - as.numeric(min.vals[comparable.characters])
-  }
-  raw.maxdiffs <- maxdiffs <- lapply(list.of.compchar, max.difference, max.vals, min.vals)
+  #TG: Only calculate the max differences for "GED" or "Max" matrices
+  if(any(distance == "GED") || any(distance == "Max")) {
+    #~~~~~~~
+    # Work out maximum difference (again, checked against ordering) using compchar characters only:
+    max.difference <- function(comparable.characters, max.vals, min.vals) {
+      as.numeric(max.vals[comparable.characters]) - as.numeric(min.vals[comparable.characters])
+    }
+    maxdiffs <- lapply(list.of.compchar, max.difference, max.vals, min.vals)
 
-  #~~~~~~~
-  # Correct maximum possible differences for unordered characters:
-  #~~~~~~~
-  # Get vector of maximum differences (corrected for character weights):
-  #TG: both ones are easy since the functions are already defined above (we can even integrate them to reduce RAM demand):
-  maxdiffs <- mapply(weight.differences, mapply(replace.unord, maxdiffs, list.of.compchar, MoreArgs=list(ordering)), list.of.compchar, MoreArgs=list(weights))
+    #~~~~~~~
+    # Correct maximum possible differences for unordered characters:
+    #~~~~~~~
+    # Get vector of maximum differences (corrected for character weights):
+    #TG: both ones are easy since the functions are already defined above (we can even integrate them to reduce RAM demand):
+    maxdiffs <- mapply(weight.differences, mapply(replace.unord, maxdiffs, list.of.compchar, MoreArgs=list(ordering)), list.of.compchar, MoreArgs=list(weights))
+  }
 
   #~~~~~~~
   # Store raw distance:
@@ -308,7 +312,7 @@ MorphDistMatrix.fast <- function(morph.matrix, distance = c("Raw", "GED", "Gower
     # Add row and column names (taxa) to distance matrix:
     rownames(gower.dist.matrix) <- colnames(gower.dist.matrix) <- rownames(morph.matrix)
  
-   }
+  }
 
 
   ###########
@@ -441,8 +445,6 @@ MorphDistMatrix.fast <- function(morph.matrix, distance = c("Raw", "GED", "Gower
   }
 
   # Compile results as a list:
-  #result <- list(dist.matrix, GED.dist.matrix, gower.dist.matrix, max.dist.matrix, comp.char.matrix)
-
   result <- list()
   # Adding the raw distance
   if(any(distance == "Raw")) result$raw.dist.matrix <- dist.matrix
@@ -455,86 +457,354 @@ MorphDistMatrix.fast <- function(morph.matrix, distance = c("Raw", "GED", "Gower
   # Adding the comparable characters
   if(any(distance == "Comp")) result$comp.char.matrix <- comp.char.matrix
     
-  # Add names to results list:
-  #names(result) <- c("raw.dist.matrix", "GED.dist.matrix", "gower.dist.matrix", "max.dist.matrix", "comp.char.matrix")
-
   # Output result:
-  return(result)
+  if(length(result) == 1) {
+    # Just return the matrix if the result is a list of one element
+    return(result[[1]])
+  } else {
+    # Return the full list
+    return(result)
+  }
+
 }
 
-#####################
-# Performance testing
-#####################
+MorphDistMatrix.weight <- function(morph.matrix, transform.proportional.distances="arcsine_sqrt") {
 
-# Loading the packages
+  # Check format of transform.proportional.distances:
+  if(transform.proportional.distances != "none" && transform.proportional.distances != "sqrt" && transform.proportional.distances != "arcsine_sqrt") {
+
+    # Give error if something other than three possible settings is given:
+    stop("ERROR: transform.proportional.distances must be one of \"none\", \"sqrt\", or \"arcsine_sqrt\".")
+
+  }
+
+  # Isolate ordering element of morphology matrix:
+  ordering <- morph.matrix$ordering
+
+  # Isolate max values element of morphology matrix:
+  max.vals <- morph.matrix$max.vals
+  
+  # Isolate min values element of morphology matrix:
+  min.vals <- morph.matrix$min.vals
+  
+  # Isolate weighting element of morphology matrix:
+  weights <- morph.matrix$weights
+  
+  # Isolate character-taxon matrix element of morphology matrix:
+  morph.matrix <- morph.matrix$matrix
+
+  # Create empty vectors to store S and W value for Wills 2001 equations (1 and 2):
+  differences <- maximum.differences <- vector(mode="numeric")
+    
+  # Distance matrices for storing:
+  comp.char.matrix <- gower.dist.matrix <- max.dist.matrix <- dist.matrix <- matrix(0, nrow=length(rownames(morph.matrix)), ncol=length(rownames(morph.matrix)))
+    
+  # Fill comparable characters diagonal:
+  for(i in 1:length(morph.matrix[, 1])) comp.char.matrix[i,i] <- length(morph.matrix[i, ]) - length(which(is.na(morph.matrix[i, ])))
+
+  # Set up empty matrix for storing data to calculate the Generalised Euclidean Distance of Wills (2001):
+  GED.data <- matrix(nrow=0, ncol=ncol(morph.matrix))
+
+  # Go through matrix rows:
+  for(i in 1:(length(morph.matrix[, 1]) - 1)) {
+        
+    # Go through matrix columns:
+    for(j in (i + 1):length(morph.matrix[, 1])) {
+            
+      # Get just the comparable characters (those coded for both taxa):
+      compchar <- intersect(which(!is.na(morph.matrix[rownames(morph.matrix)[i], ])), which(!is.na(morph.matrix[rownames(morph.matrix)[j], ])))
+            
+      # Get comparable characters for ith taxon:
+      firstrow <- morph.matrix[rownames(morph.matrix)[i], compchar]
+
+      # Get comparable characters for jth taxon:
+      secondrow <- morph.matrix[rownames(morph.matrix)[j], compchar]
+            
+      # Deal with polymorphic characters (if present):
+      if(length(grep("&", unique(c(firstrow, secondrow)))) > 0) {
+                
+        # Find ampersands (polymorphisms):
+        ampersand.elements <- sort(c(grep("&", firstrow), grep("&", secondrow)))
+                
+        # Go through each polymorphic character:
+        for(k in 1:length(ampersand.elements)) {
+                    
+          # Find out if two codings overlap once all polymorphism resolutions are considered:
+          intersection.value <- intersect(strsplit(firstrow[ampersand.elements[k]], "&")[[1]], strsplit(secondrow[ampersand.elements[k]], "&")[[1]])
+                    
+          # Case if polymorphic and non-polymorphic values overlap:
+          if(length(intersection.value) > 0) {
+                        
+            # Set ith value as zero (no difference):
+            firstrow[ampersand.elements[k]] <- 0
+
+            # Set jth value as zero (no difference)
+            secondrow[ampersand.elements[k]] <- 0
+
+          }
+                    
+          # Case if polymorphic and non-polymorphic values do not overlap:
+          if(length(intersection.value) == 0) {
+                        
+            # Case if character is unordered (max difference is 1):
+            if(ordering[compchar[ampersand.elements[k]]] == "unord") {
+                            
+              # Set ith value as zero:
+              firstrow[ampersand.elements[k]] <- 0
+
+              # Set jth value as 1 (making the ij difference equal to one):
+              secondrow[ampersand.elements[k]] <- 1
+
+            }
+                        
+            # Case if character is ordered (max difference is > 1):
+            if(ordering[compchar[ampersand.elements[k]]] == "ord") {
+                            
+              # Get first row value(s):
+              firstrowvals <- as.numeric(strsplit(firstrow[ampersand.elements[k]], "&")[[1]])
+                            
+              # Get second row value(s):
+              secondrowvals <- as.numeric(strsplit(secondrow[ampersand.elements[k]], "&")[[1]])
+                            
+              # Make mini distance matrix:
+              poly.dist.mat <- matrix(0, nrow=length(firstrowvals), ncol=length(secondrowvals))
+                            
+              # Go through each comparison:
+              for(l in 1:length(firstrowvals)) {
+                                
+                # Record absolute difference:
+                for(m in 1:length(secondrowvals)) poly.dist.mat[l, m] <- sqrt((firstrowvals[l] - secondrowvals[m]) ^ 2)
+
+              }
+                            
+              # Set first value as zero:
+              firstrow[ampersand.elements[k]] <- 0
+                            
+              # Set second value as minimum possible difference:
+              secondrow[ampersand.elements[k]] <- min(poly.dist.mat)
+
+            }
+
+          }
+
+        }
+
+      }
+            
+      # Get the absolute difference between the two rows:
+      raw.diffs <- diffs <- abs(as.numeric(firstrow) - as.numeric(secondrow))
+            
+      # If there are differences greater than 1 for unordered characters then rescore as 1:
+      if(length(which(diffs > 1)) > 0) diffs[which(diffs > 1)[which(ordering[compchar[which(diffs > 1)]] == "unord")]] <- 1
+
+      # Find the incomparable characters:
+      incompchar <- setdiff(1:ncol(morph.matrix), compchar)
+
+      # Get weighted differences:
+      diffs <- as.numeric(weights[compchar]) * diffs
+
+      # Store data for GED with NAs for missing distances:
+      GED.data <- rbind(GED.data, rbind(c(diffs, rep(NA, length(incompchar))), c(weights[compchar], weights[incompchar])))
+
+      # Get raw Euclidean distance:
+      raw.dist <- dist(rbind(diffs, rep(0, length(diffs))), method="euclidean")
+
+      # Work out maximum difference (again, checked against ordering) using compchar characters only:
+      raw.maxdiffs <- maxdiffs <- as.numeric(max.vals[compchar]) - as.numeric(min.vals[compchar])
+
+      # Correct maximum possible differences for unordered characters:
+      if(length(which(maxdiffs > 1)) > 0) maxdiffs[which(maxdiffs > 1)[which(ordering[compchar[which(maxdiffs > 1)]] == "unord")]] <- 1
+
+      # Get vector of maximum differences (corrected for character weights):
+      maxdiffs <- as.numeric(weights[compchar]) * maxdiffs
+
+      # Store raw distance:
+      dist.matrix[i, j] <- dist.matrix[j, i] <- raw.dist
+
+      # Store Gower distance:
+      gower.dist.matrix[i, j] <- gower.dist.matrix[j, i] <- sum(diffs) / sum(weights[compchar])
+
+      # Store maximum-rescaled distance:
+      max.dist.matrix[i, j] <- max.dist.matrix[j, i] <- sum(diffs) / sum(maxdiffs)
+
+      # Store N comparable characters:
+      comp.char.matrix[i, j] <- comp.char.matrix[j, i] <- length(compchar)
+
+      # Add to maximum differences (S_ijk * W_ijk in equation 1 of Wills 2001):
+      differences <- c(differences, diffs)
+
+      # Add to maximum differences (S_ijk_max * W_ijk in equation 1 of Wills 2001):
+      maximum.differences <- c(maximum.differences, maxdiffs)
+
+    }
+
+  }
+
+  # Calculated weighted mean univariate distance for calculating GED (equation 2 in Wills 2001):
+  S_ijk_bar <- sum(differences) / sum(maximum.differences)
+
+  # Replace missing distances with S_ijk_bar (i.e., results of equation 2 in Wills 2001 into equation 1 of Wills 2001):
+  GED.data[is.na(GED.data)] <- S_ijk_bar
+
+  # Isolate the distances:
+  S_ijk <- GED.data[which((1:nrow(GED.data) %% 2) == 1), ]
+
+  # Isolate the weights:
+  W_ijk <- GED.data[which((1:nrow(GED.data) %% 2) == 0), ]
+
+  # Calculate the GED (equation 1 of Wills 2001) for each pairwise comparison (ij):
+  GED_ij <- sqrt(apply(W_ijk * (S_ijk ^ 2), 1, sum))
+
+  # Create empty GED distance matrix:
+  GED.dist.matrix <- matrix(0, nrow=nrow(morph.matrix), ncol=nrow(morph.matrix))
+
+  # Set initial value for counter:
+  counter <- 1
+
+  # Go through matrix rows:
+  for(i in 1:(length(morph.matrix[, 1]) - 1)) {
+
+    # Go through matrix columns:
+    for(j in (i + 1):length(morph.matrix[, 1])) {
+
+      # Store distance:
+      GED.dist.matrix[i, j] <- GED.dist.matrix[j, i] <- GED_ij[counter]
+
+      # Update counter:
+      counter <- counter + 1
+
+    }
+
+  }
+    
+  # Set diagonals as zero:
+  diag(gower.dist.matrix) <- diag(max.dist.matrix) <- 0
+
+  # Add row and column names (taxa) to distance matrices:
+  rownames(comp.char.matrix) <- colnames(comp.char.matrix) <- rownames(GED.dist.matrix) <- colnames(GED.dist.matrix) <- rownames(gower.dist.matrix) <- colnames(gower.dist.matrix) <- rownames(max.dist.matrix) <- colnames(max.dist.matrix) <- rownames(dist.matrix) <- colnames(dist.matrix) <- rownames(morph.matrix)
+
+  # If transformation option is not "none":
+  if(transform.proportional.distances != "none") {
+
+    # If transformation option is "sqrt":
+    if(transform.proportional.distances == "sqrt") {
+
+      # Replace NaN with NA for Gower distances and take square root:
+      gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(gower.dist.matrix))), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+
+      # Replace NaN with NA for Max distances and take square root:
+      max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(max.dist.matrix))), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+
+    # If transformation option is "arcsine_sqrt":
+    } else {
+
+      # Establish correction factor to ensure Gower data is proportional:
+      gower.correction <- max(c(max(sort(gower.dist.matrix)), 1))
+
+      # Ensure all Gower values are on 0 to 1 scale then take arcsine of sqrt to get values that better approximate a normal distribution:
+      gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(gower.dist.matrix / gower.correction)))), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+
+      # Take arcsine square root of all MOD dist values:
+      max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(max.dist.matrix)))), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+
+    }
+
+  # If transformation option is "none":
+  } else {
+
+    # Replace NaN with NA for Gower distances:
+    gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, gower.dist.matrix)), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+
+    # Replace NaN with NA for Max distances:
+    max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, max.dist.matrix)), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+
+  }
+
+  # Compile results as a list:
+  result <- list(dist.matrix, GED.dist.matrix, gower.dist.matrix, max.dist.matrix, comp.char.matrix)
+    
+  # Add names to results list:
+  names(result) <- c("raw.dist.matrix", "GED.dist.matrix", "gower.dist.matrix", "max.dist.matrix", "comp.char.matrix")
+    
+  # Output result:
+  return(result)
+
+}
+
+
+####################
+#Performance testing
+####################
+
+#Loading the packages
 #  library(Claddis)
 #  library(testthat)
 
-# Testing with the Michaux 1989 matrix
-#  time_base <- system.time(results_base <- MorphDistMatrix(Michaux1989))
+# #Testing with the Michaux 1989 matrix
+#  time_base <- system.time(results_base <- MorphDistMatrix.weight(Michaux1989))
 #  time_fast <- system.time(results_fast <- MorphDistMatrix.fast(Michaux1989))
-# What's the time difference?
+# #What's the time difference?
 #  time_base/time_fast
 
-#Is it actually the same output?
+# #Is it actually the same output?
 #  test_that("Are both version giving the exact same results (no rounding nor random seeds)", {
 #    expect_equal(results_base, results_fast)
 #  })
 
-# Testing with the Gauthier 1986 matrix
-#  time_base <- system.time(results_base <- MorphDistMatrix(Gauthier1986))
+# #Testing with the Gauthier 1986 matrix
+#  time_base <- system.time(results_base <- MorphDistMatrix.weight(Gauthier1986))
 #  time_fast <- system.time(results_fast <- MorphDistMatrix.fast(Gauthier1986))
-# What's the time difference?
+# #What's the time difference?
 #  time_base/time_fast
 
-#Is it actually the same output?
+# #Is it actually the same output?
 #  test_that("Are both version giving the exact same results (no rounding nor random seeds)", {
 #    expect_equal(results_base, results_fast)
 #  })
 
-# Testing with a more complex (bigger) matrix
-# Some random matrix
+# #Testing with a more complex (bigger) matrix
+# #Some random matrix
 #  matrix <- matrix(sample(c("0", "1", "2", "0&1", "0&2", "1&2", "0&1&2"), 5000, replace=TRUE, prob=c(0.425, 0.42, 0.12, 0.01, 0.01, 0.01, 0.005))
 #    , nrow=50, ncol=100, dimnames=list(c(1:50)))
-# Adding 25% of missing characters
+# #Adding 25% of missing characters
 #  matrix[sample(1:5000, 200)] <- NA
 
-# ordering
+# #ordering
 #  ordering <- sample(c("unord", "ord"), 100, replace=TRUE, prob=c(0.9,0.1))
 
-# weights
+# #weights
 #  weights <- sample(c(1:3), 100, replace=TRUE, prob=c(0.85,0.1,0.05))
 
-# Function for making a morph.matrix like object
+# #Function for making a morph.matrix like object
 #  make.nexus<-function(matrix, header, ordering, weights) {
 #      nexus<-list()
 #      nexus$header<-header
 #      nexus$matrix<-matrix
 #      nexus$ordering<-ordering
 #      nexus$weights<-weights
-#      nexus$max.vals<-apply(matrix, 2, max, na.rm=TRUE)
-#      nexus$min.vals<-apply(matrix, 2, min, na.rm=TRUE)
+#      nexus$max.vals<-as.numeric(apply(matrix, 2, max, na.rm=TRUE))
+#      nexus$min.vals<-as.numeric(apply(matrix, 2, min, na.rm=TRUE))
 #      return(nexus)
 #  }
 
 #  morph.matrix <- make.nexus(matrix, header="example", ordering, weights)
 
-# Testing with the random matrix
-#  time_base <- system.time(results_base <- MorphDistMatrix(morph.matrix))
+# #Testing with the random matrix
+#  time_base <- system.time(results_base <- MorphDistMatrix.weight(morph.matrix))
 #  time_fast <- system.time(results_fast <- MorphDistMatrix.fast(morph.matrix))
-# What's the time difference?
+# #What's the time difference?
 #  time_base/time_fast
 
-#Is it actually the same output?
+# #Is it actually the same output?
 #  test_that("Are both version giving the exact same results (no rounding nor random seeds)", {
 #    expect_equal(results_base, results_fast)
 #  })
 
-#####################
-# Output testing
-#####################
+# ####################
+# #Output testing
+# ####################
 
-# results_base <- MorphDistMatrix(Michaux1989)
+# results_base <- MorphDistMatrix.weight(Michaux1989)
 # results_fast <- MorphDistMatrix.fast(Michaux1989)
 # results_raw <- MorphDistMatrix.fast(Michaux1989, distance = "Raw")
 # results_GED <- MorphDistMatrix.fast(Michaux1989, distance = "GED")
@@ -549,10 +819,10 @@ MorphDistMatrix.fast <- function(morph.matrix, distance = c("Raw", "GED", "Gower
 
 # # Testing if each individual matrix is corrects
 # test_that("Are each matrix calculated individually correct?", {
-#   expect_equal(results_base$raw.dist.matrix, results_raw$raw.dist.matrix)
-#   expect_equal(results_base$GED.dist.matrix, results_GED$GED.dist.matrix)
-#   expect_equal(results_base$gower.dist.matrix, results_Gower$gower.dist.matrix)
-#   expect_equal(results_base$max.dist.matrix, results_Max$max.dist.matrix)
-#   expect_equal(results_base$comp.char.matrix, results_Comp$comp.char.matrix)
+#   expect_equal(results_base$raw.dist.matrix, results_raw)
+#   expect_equal(results_base$GED.dist.matrix, results_GED)
+#   expect_equal(results_base$gower.dist.matrix, results_Gower)
+#   expect_equal(results_base$max.dist.matrix, results_Max)
+#   expect_equal(results_base$comp.char.matrix, results_Comp)
 # })
 
