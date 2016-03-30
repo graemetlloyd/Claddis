@@ -786,21 +786,27 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
 
     # Grab weighting line:
     weighting.line <- gsub(",|;", "", strsplit(X[grep("WTSET", X, ignore.case = TRUE)], "=")[[1]][2])
-  
+    
     # Isolate weight values:
     weight.values <- gsub(":", "", strsplit(weighting.line, " ")[[1]][grep(":", strsplit(weighting.line, " ")[[1]])])
+    
+    # Make weight markers vector:
+    weight.markers <- rev(paste(sort(as.numeric(weight.values)), ":", sep = ""))
+    
+    # Replace each weight with a percentage symbol (to later be used as the split character):
+    for(i in 1:length(weight.markers)) weighting.line <- gsub(weight.markers[i], "%", weighting.line)
   
     # Get initial list of numbers of characters of each type:
-    weighting.numbers <- strsplit(weighting.line, paste(paste(weight.values, ": ", sep = ""), collapse = "|"))[[1]]
+    weighting.numbers <- trim(strsplit(weighting.line, "%")[[1]])[2:length(strsplit(weighting.line, "%")[[1]])]
   
-    # Modify further ready for parsinga nd evaluating:
+    # Modify further ready for parsing and evaluating:
     weighting.numbers <- paste("c(", gsub(" ", ",", trim(gsub("-", ":", weighting.numbers[nchar(weighting.numbers) > 0]))), ")", sep="")
   
     # For each weight value:
     for(i in 1:length(weight.values)) {
   
       # Store updated weights:
-      weights[eval(parse(text=weighting.numbers[i]))] <- as.numeric(weight.values[i])
+      weights[eval(parse(text = weighting.numbers[i]))] <- as.numeric(weight.values[i])
   
     }
   
