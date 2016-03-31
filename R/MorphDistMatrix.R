@@ -220,11 +220,11 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcs
       # Find the incomparable characters:
       incompchar <- setdiff(1:ncol(morph.matrix), compchar)
 
-      # Store data for GED with NAs for missing distances:
-      GED.data <- rbind(GED.data, rbind(c(diffs, rep(NA, length(incompchar))), c(weights[compchar], weights[incompchar])))
-
       # Get weighted differences:
       diffs <- as.numeric(weights[compchar]) * diffs
+
+      # Store data for GED with NAs for missing distances:
+      GED.data <- rbind(GED.data, rbind(c(diffs, rep(NA, length(incompchar))), c(weights[compchar], weights[incompchar])))
 
       # Get raw Euclidean distance:
       raw.dist <- dist(rbind(diffs, rep(0, length(diffs))), method="euclidean")
