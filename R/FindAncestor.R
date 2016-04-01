@@ -2,8 +2,7 @@
 #' 
 #' Finds last common ancestor (node) of a set of two or more descendant tips.
 #' 
-#' Intended for use as an internal function for \link{TrimMorphDistMatrix}, but
-#' potentially of more general use.
+#' Intended for use as an internal function for \link{TrimMorphDistMatrix}, but potentially of more general use.
 #' 
 #' @param descs A vector of mode character representing the tip names for which an ancestor is sought.
 #' @param tree The tree as a phylo object.
