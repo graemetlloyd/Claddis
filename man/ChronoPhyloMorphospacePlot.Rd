@@ -8,19 +8,21 @@ ChronoPhyloMorphospacePlot(pcoa_data, x_axis = 1, y_axis = 2,
   shadow = TRUE)
 }
 \arguments{
-\item{pcoa_data}{Text.}
+\item{pcoa_data}{Principal coordinate data in the format output by \link{MorphMatrix2PCoA} that includes a tree and ancestral states.}
 
-\item{x_axis}{Text.}
+\item{x_axis}{Which ordination axis to plot as the x-axis.}
 
-\item{y_axis}{Text.}
+\item{y_axis}{Which ordination axis to plot as the y-axis.}
 
-\item{shadow}{Text.}
+\item{shadow}{Whether or not to plot a shadow (2D plot) on the bottom face of the 3D plot (defaults to TRUE).}
 }
 \description{
 Plots a 3D chronophylomorphospace.
 }
 \details{
-Text.
+Creates a movable three-dimensional (two ordination axes plus time) plot of a phylomorphospace.
+
+Intended to mimic the data visualisation of Sakamoto adn Ruta (2012; their Video S1).
 }
 \examples{
 
@@ -47,7 +49,7 @@ ChronoPhyloMorphospacePlot(pcoa_data)
 Emma Sherratt \email{emma.sherratt@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
 \references{
-Sakamoto and Ruta
+Sakamoto, M. and Ruta, M. 2012. Convergence and divergence in the evolution of cat skulls: temporal and spatial patterns of morphological diversity. PLoS ONE, 7, e39752.
 }
 \keyword{coordinates}
 \keyword{principal}
