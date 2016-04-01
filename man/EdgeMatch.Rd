@@ -9,7 +9,7 @@ EdgeMatch(original.tree, pruned.tree)
 \arguments{
 \item{original.tree}{A tree in phylo format.}
 
-\item{pruned.tree}{A tree in phylo format that represents a pruned version \code{original.tree}.}
+\item{pruned.tree}{A tree in phylo format that represents a pruned version of \code{original.tree}.}
 }
 \value{
 \item{matching.edges}{A list of the matching edges.}
