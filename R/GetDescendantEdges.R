@@ -2,14 +2,13 @@
 #' 
 #' Returns all descendant edges of an internal node for a phylo object.
 #' 
-#' Returns a vector of integers corresponding to row numbers in \code{$edge} or
-#' cells in \code{$edge.length} of the descendant edges of the internal node
-#' supplied.
+#' Returns a vector of integers corresponding to row numbers in \code{$edge} or cells in \code{$edge.length} of the descendant edges of the internal node supplied.
 #' 
-#' @param n An integer corresponding to the internal node for which the
-#' descendant edges are sought.
+#' @param n An integer corresponding to the internal node for which the descendant edges are sought.
 #' @param tree A tree as a phylo object.
+#'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#'
 #' @examples
 #' 
 #' # Create simple four-taxon tree:

@@ -7,8 +7,7 @@
 GetDescendantEdges(n, tree)
 }
 \arguments{
-\item{n}{An integer corresponding to the internal node for which the
-descendant edges are sought.}
+\item{n}{An integer corresponding to the internal node for which the descendant edges are sought.}
 
 \item{tree}{A tree as a phylo object.}
 }
@@ -16,9 +15,7 @@ descendant edges are sought.}
 Returns all descendant edges of an internal node for a phylo object.
 }
 \details{
-Returns a vector of integers corresponding to row numbers in \code{$edge} or
-cells in \code{$edge.length} of the descendant edges of the internal node
-supplied.
+Returns a vector of integers corresponding to row numbers in \code{$edge} or cells in \code{$edge.length} of the descendant edges of the internal node supplied.
 }
 \examples{
 
