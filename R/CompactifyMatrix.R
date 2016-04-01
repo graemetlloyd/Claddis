@@ -2,7 +2,11 @@
 #' 
 #' Collapses matrix to unique character state distributions.
 #' 
-#' Removing characters or taxa from a matrix imported using \link{ReadMorphNexus} is not simple due to asscoiated vectors for ordering, character weights etc. To save repetitively pruning each part this function takes the matrix as input and vectors of either taxon names, character numbers, or one of each and removes those from the matrix. Minimum and maximum values (used by \link{MorphDistMatrix}) are also updated.
+#' Important: not recommended for general use.
+#'
+#' This function is intended to make a matrix with redundant character state distributions smaller by collapsing these to single characters and upweighting them accordingly. It is intended purely for us with MRP matrices, but may have some very restricted uses elsewhere.
+#'
+#' The function also deletes any characters weighted zero from the matrix.
 #' 
 #' @param clad.matrix The cladistic matrix in the format imported by \link{ReadMorphNexus}.
 #'
@@ -14,10 +18,21 @@
 #'
 #' @examples
 #' 
-#' # Remove the outgroup taxon and characters 11 and 53 from Gauthier1986:
-#' prunedmatrix <- MatrixPruner(clad.matrix = Gauthier1986, taxa2prune = c("Outgroup"),
-#'   characters2prune = c(11, 53))
+#' # Examine the matrix pre-compactification:
+#' Michaux1989$matrix
+#'
+#' # Examine the wieights pre-compactification:
+#' Michaux1989$weights
+#'
+#' # Compactify the matrix:
+#' Michaux1989compact <- CompactifyMatrix(Michaux1989)
 #' 
+#' # Examine the matrix post-compactification:
+#' Michaux1989compact$matrix
+#'
+#' # Examine the wieights post-compactification:
+#' Michaux1989compact$weights
+#'
 #' @export CompactifyMatrix
 CompactifyMatrix <- function(clad.matrix) {
 
