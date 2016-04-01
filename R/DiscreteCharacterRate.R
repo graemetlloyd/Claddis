@@ -4,7 +4,7 @@
 #' 
 #' Uses \link{AncStateEstMatrix} to estimate ancestral states and parsimony to count changes on branches, then applies the methods outlined in Lloyd et al. (2012), and updated in Brusatte et al. (2014) to test for significantly high or low rates on a branch or within a clade.
 #' 
-#' Please note that the time series method used here is an attempt to deal with the problem of correcting for completeness (something that Lloyd et al. 2012 were not able to do) and should be used with caution. (This is the apporach used in Close et al. 2015.)
+#' Please note that the time series method used here is an attempt to deal with the problem of correcting for completeness (something that Lloyd et al. 2012 were not able to do) and should be used with caution. (This is the approach used in Close et al. 2015.)
 #' 
 #' @param tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{clad.matrix}.
 #' @param clad.matrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
