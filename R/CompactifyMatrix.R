@@ -71,7 +71,7 @@ CompactifyMatrix <- function(clad.matrix) {
     } else {
         
         # Print message to user:
-        print("Matrix cannot be compactified. All character dsitributions are unique and weights are greater than zero.")
+        print("Matrix cannot be compactified. All character distributions are unique and weights are greater than zero.")
     
         # Output unaltered matrix:
         return(clad.matrix)

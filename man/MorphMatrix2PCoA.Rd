@@ -53,7 +53,7 @@ This function is effectively a wrapper for \link{pcoa} from the \link{ape} packa
 
 If providing a tree and inferring ancestral states then options to also infer missing or uncertain tips and whether to infer values for all characters at all internal nodes are provided (via \link{AncStateEstMatrix}).
 
-Other options within the function concern the distance metric to use and the transfrmation to be used if selecting a propotional distance (see \link{MorphDistMatrix}).
+Other options within the function concern the distance metric to use and the transformation to be used if selecting a propotional distance (see \link{MorphDistMatrix}).
 
 IMPORTANT: The function can remove taxa (or if including a tree, nodes as well) if they lead to an incomplete distance matrix (see \link{TrimMorphDistMatrix}).
 }
@@ -62,14 +62,19 @@ IMPORTANT: The function can remove taxa (or if including a tree, nodes as well) 
 # Run on Michaux (189) data set with defaults:
 x <- MorphMatrix2PCoA(Michaux1989)
 
+# Show output:
 x
 
+# Generate a (mde up) tree:
 tree <- rtree(length(rownames(Michaux1989$matrix)))
 
+# Add taxon names to it:
 tree$tip.label <- rownames(Michaux1989$matrix)
 
+# Run with tree:
 y <- MorphMatrix2PCoA(Michaux1989, tree = tree)
 
+# Show new output:
 y
 
 }

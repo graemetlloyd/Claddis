@@ -17,7 +17,7 @@ MatrixPruner(clad.matrix, taxa2prune = c(), characters2prune = c())
 Prunes a character matrix of characters, taxa, or both.
 }
 \details{
-Removing characters or taxa from a matrix imported using \link{ReadMorphNexus} is not simple due to asscoiated vectors for ordering, character weights etc. To save repetitively pruning each part this function takes the matrix as input and vectors of either taxon names, character numbers, or one of each and removes those from the matrix. Minimum and maximum values (used by \link{MorphDistMatrix}) are also updated.
+Removing characters or taxa from a matrix imported using \link{ReadMorphNexus} is not simple due to associated vectors for ordering, character weights etc. To save repetitively pruning each part this function takes the matrix as input and vectors of either taxon names, character numbers, or both and removes those from the matrix. Minimum and maximum values (used by \link{MorphDistMatrix}) are also updated.
 }
 \examples{
 
