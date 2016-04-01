@@ -52,7 +52,7 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
   tree$node.label <- NULL
 
   # Collapse matrix to vectors for each character (state and ordering combination):
-  collapse.matrix <- apply(rbind(morph.matrix$matrix, morph.matrix$ordering), 2, paste, collapse="")
+  collapse.matrix <- apply(rbind(morph.matrix$matrix, morph.matrix$ordering), 2, paste, collapse = "")
 
   # Find just unique characters (no point repeating ancestral state reconstruction if codings and ordering are identical):
   unique.characters <- match(unique(collapse.matrix), collapse.matrix)
@@ -61,7 +61,7 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
   if(estimate.tips == FALSE) {
     
     # Create ancestral storage matrix:
-    anc.lik.matrix <- matrix(nrow=Nnode(tree), ncol=length(morph.matrix$matrix[1, ]))
+    anc.lik.matrix <- matrix(nrow = Nnode(tree), ncol = length(morph.matrix$matrix[1, ]))
     
     # Label matrix to record ancestral state estimates:
     rownames(anc.lik.matrix) <- c((Ntip(tree) + 1):(Ntip(tree) + Nnode(tree)))
@@ -70,7 +70,7 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
   } else {
 
     # Create ancestral storage matrix (including tips):
-    anc.lik.matrix <- matrix(nrow=Ntip(tree) + Nnode(tree), ncol=length(morph.matrix$matrix[1, ]))
+    anc.lik.matrix <- matrix(nrow = Ntip(tree) + Nnode(tree), ncol = length(morph.matrix$matrix[1, ]))
 
     # Label matrix to record ancestral state estimates:
     rownames(anc.lik.matrix) <- c(tree$tip.label, (Ntip(tree) + 1):(Ntip(tree) + Nnode(tree)))
@@ -93,7 +93,7 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
       if(maxval != minval) {
             
         # If estimating states for all taxa then treat missing values as all possible states:
-        if(estimate.allchars) morph.matrix$matrix[which(is.na(morph.matrix$matrix[, i])), i] <- paste(minval:maxval, collapse="&")
+        if(estimate.allchars) morph.matrix$matrix[which(is.na(morph.matrix$matrix[, i])), i] <- paste(minval:maxval, collapse = "&")
             
         # Find tips which cannot be used due to missing data:
         tipstogo <- rownames(morph.matrix$matrix)[which(is.na(morph.matrix$matrix[, i]))]
@@ -120,7 +120,7 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
             if(maxval - minval > 1 && morph.matrix$ordering[i] == "ord") {
                         
               # Create all zero matrix:
-              mymodel <- matrix(0, nrow=(maxval - minval) + 1, ncol=(maxval - minval) + 1)
+              mymodel <- matrix(0, nrow = (maxval - minval) + 1, ncol = (maxval - minval) + 1)
                         
               # Name rows and columns as states:
               rownames(mymodel) <- colnames(mymodel) <- minval:maxval
@@ -131,7 +131,7 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
             }
                     
             # Create matrix to store probabilities of tip values:
-            tipvals.mat <- matrix(0, nrow=length(tipvals), ncol=maxval - minval + 1)
+            tipvals.mat <- matrix(0, nrow = length(tipvals), ncol = maxval - minval + 1)
       
             # Add rownames (tip labels):
             rownames(tipvals.mat) <- names(tipvals)
