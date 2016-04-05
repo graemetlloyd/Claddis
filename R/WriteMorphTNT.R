@@ -24,6 +24,9 @@
 #' 
 #' # Write out Michaux 1989 to current working directory:
 #' WriteMorphTNT(clad.matrix = Michaux1989, filename = "Michaux1989.tnt")
+#'
+#' # Remove file when finished:
+#' file.remove("Michaux1989.tnt")
 #' 
 #' @export WriteMorphTNT
 WriteMorphTNT <- function(clad.matrix, filename, add.analysis.block = FALSE) {

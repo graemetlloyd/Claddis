@@ -23,6 +23,9 @@
 #' 
 #' # Write out Michaux 1989 to current working directory:
 #' WriteMorphNexus(clad.matrix = Michaux1989, filename = "Michaux1989.nex")
+#'
+#' # Remove file when finished:
+#' file.remove("Michaux1989.nex")
 #' 
 #' @export WriteMorphNexus
 WriteMorphNexus <- function(clad.matrix, filename) {

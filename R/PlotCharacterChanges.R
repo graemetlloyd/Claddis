@@ -1,6 +1,8 @@
 #' Plots character changes on branches
 #' 
-#' Plots character changes on branches.
+#' Plots character changes in boxes on branches.
+#'
+#' Takes the \code{character.changes} output from \link{DiscreteCharacterRate} and plots it on the tree used to generate it.
 #' 
 #' @param character.changes A matrix of character changes.
 #' @param tree Tree on which character changes occur.
@@ -11,8 +13,25 @@
 #'
 #' @examples
 #'
-#' # Nothing yet
-#' 
+#' # Set random seed:
+#' set.seed(17)
+#'
+#' # Generate a random tree for the Michaux data set:
+#' tree <- rtree(nrow(Michaux1989$matrix))
+#'
+#' # Update taxon names to match those in the data matrix:
+#' tree$tip.label <- rownames(Michaux1989$matrix)
+#'
+#' # Set root time by making youngest taxon extant:
+#' tree$root.time <- max(diag(vcv(tree)))
+#'
+#' # Get discrete character rates (includes changes):
+#' out <- DiscreteCharacterRate(tree, Michaux1989,
+#'   seq(tree$root.time, 0, length.out = 3), alpha = 0.01)
+#'
+#' # Plot character changes on the tree:
+#' PlotCharacterChanges(out$character.changes, tree)
+#'
 #' @export PlotCharacterChanges
 PlotCharacterChanges <- function(character.changes, tree) {
 	

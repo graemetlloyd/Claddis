@@ -9,29 +9,29 @@ MorphospacePlot(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL,
   root_colour = "grey")
 }
 \arguments{
-\item{pcoa_input}{Text.}
+\item{pcoa_input}{The main input in the format output from \link{MorphMatrix2PCoA}.}
 
-\item{x_axis}{Text.}
+\item{x_axis}{Which ordination axis to plot as the x-axis (defaults to 1).}
 
-\item{y_axis}{Text.}
+\item{y_axis}{Which ordination axis to plot as the y-axis (defaults to 2).}
 
-\item{z_axis}{Text.}
+\item{z_axis}{Which ordination axis to plot as the z-axis (defaults to NULL, i.e., is not plotted).}
 
-\item{plot_taxon_names}{Text.}
+\item{plot_taxon_names}{Optional to plot the names of the taxa (defaults to FALSE).}
 
-\item{plot_internal_nodes}{Text.}
+\item{plot_internal_nodes}{Optional to plot the internal nodes of the tree (if included in \code{pcoa_input}) (defaults to FALSE).}
 
-\item{plot_root}{Text.}
+\item{plot_root}{Optional to plot the root separately (defaults to FALSE).}
 
-\item{root_colour}{Text.}
+\item{root_colour}{If plotting the root separately (previous option) sets the root colour.}
 }
 \description{
 Plots a morphospace using the output from MorphMatrix2PCoA.
 }
 \details{
-Input must come from \link{MorphMatrix2PCoA}.
+uses output from \link{MorphMatrix2PCoA} as input.
 
-Allows plotting of a third axis using the technique of Matthew Wills (Wills et al. 1994; their Figures 4 and 8; Wills 1998; his Figure 4).
+Allows plotting of a third axis using the technique of Matthew Wills (Wills et al. 1994; their Figures 4 and 8; Wills 1998; his Figure 4), where black and white indicate postivie and negative values respectovely, and the size of points there magnitudes.
 }
 \examples{
 

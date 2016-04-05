@@ -2,43 +2,36 @@
 #' 
 #' Reads in a morphological data file in #NEXUS format.
 #' 
-#' Reads in a #NEXUS (Maddison et al. 1997) data file representing the
-#' distribution of discrete morphological characters in a set of taxa. Unlike
-#' \link{read.nexus.data} this function can handle polymorphisms (e.g.,
-#' \code{(012)}).
+#' Reads in a #NEXUS (Maddison et al. 1997) data file representing the distribution of discrete morphological characters in a set of taxa. Unlike \link{read.nexus.data} this function can handle polymorphisms (e.g., \code{(012)}).
 #' 
-#' Note that the function is generally intolerant to excursions from a standard
-#' format and it is recommended your data be formatted like the
-#' \code{morphmatrix.nex} example below.
+#' Note that the function is generally intolerant to excursions from a standard format and it is recommended your data be formatted like the \code{morphmatrix.nex} example below.
 #' 
 #' All empty values (missing or inapplicable) are treated as NAs.
 #' 
-#' @param file A file name specified by either a variable of mode character, or
-#' a double-quoted string.
-#' @param equalise.weights Optional that overrides the weights specified in the
-#' file to make all characters truly equally weighted.
-#' @return \item{header}{Any header text included in the file given between
-#' square brackets as character.} \item{matrix}{A matrix of taxa (rows) and
-#' characters (columns). The matrix is in character format in order to deal
-#' with polymorphisms, which are separated by ampersands.} \item{ordering}{A
-#' character vector of the same length as the number of morphological
-#' characters indicating whether they are ordered (\code{ORD}) or unordered
-#' (\code{UNORD}).} \item{weights}{A numeric vector of the same length as the
-#' number of morphological characters indicating their weights.}
-#' \item{max.vals}{A numeric vector of the same length as the number of
-#' morphological characters indicating the maximum state values.}
-#' \item{min.vals}{A numeric vector of the same length as the number of
-#' morphological characters indicating the minimum state values.}
-#' \item{step.matrices}{A list of any step matrices supplied in the input file.
-#' Is \code{NULL} if none are specified.} \item{symbols}{The original symbols
-#' used in the input data (these are replaced here by the digits 0-9 and the
-#' letters A-V in order).}
+#' @param file A file name specified by either a variable of mode character, or a double-quoted string.
+#' @param equalise.weights Optional that overrides the weights specified in the file to make all characters truly equally weighted.
+#'
+#' @return
+#'
+#' \item{header}{Any header text included in the file given between square brackets as character.}
+#' \item{matrix}{A matrix of taxa (rows) and characters (columns). The matrix is in character format in order to deal with polymorphisms, which are separated by ampersands.}
+#' \item{ordering}{A character vector of the same length as the number of morphological characters indicating whether they are ordered (\code{ord}) or unordered (\code{unord}).}
+#' \item{weights}{A numeric vector of the same length as the number of morphological characters indicating their weights.}
+#' \item{max.vals}{A numeric vector of the same length as the number of morphological characters indicating the maximum state values.}
+#' \item{min.vals}{A numeric vector of the same length as the number of morphological characters indicating the minimum state values.}
+#' \item{step.matrices}{A list of any step matrices supplied in the input file. Is \code{NULL} if none are specified.}
+#' \item{symbols}{The original symbols used in the input data (these are replaced in the matrix by integers starting at zero.}
+#'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#'
 #' @seealso \link{read.nexus.data}
-#' @references Maddison, D. R., Swofford, D. L. and Maddison, W. P., 1997.
-#' NEXUS: an extensible file format for systematic information. Systematic
-#' Biology, 46, 590-621.
+#'
+#' @references
+#'
+#' Maddison, D. R., Swofford, D. L. and Maddison, W. P., 1997. NEXUS: an extensible file format for systematic information. Systematic Biology, 46, 590-621.
+#'
 #' @keywords NEXUS
+#'
 #' @examples
 #' 
 #' # Create example matrix (NB: creates a file in the current
@@ -56,6 +49,9 @@
 #' 
 #' # View example matrix in R:
 #' morph.matrix
+#'
+#' # Remove the generated data set:
+#' file.remove("morphmatrix.nex")
 #' 
 #' @export ReadMorphNexus
 ReadMorphNexus <- function(file, equalise.weights = FALSE) {

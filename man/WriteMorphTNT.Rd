@@ -28,6 +28,9 @@ Currently all empty values (missing or inapplicable) are treated as missing and 
 # Write out Michaux 1989 to current working directory:
 WriteMorphTNT(clad.matrix = Michaux1989, filename = "Michaux1989.tnt")
 
+# Remove file when finished:
+file.remove("Michaux1989.tnt")
+
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
