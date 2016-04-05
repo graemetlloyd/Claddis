@@ -32,4 +32,4 @@ Citation
 
 Claddis is now on [CRAN](https://cran.r-project.org/package=Claddis), but the current version (0.1) is broken due to changes in a dependent package (phytools). Users are advised to install directly from github (version 0.2) using the code above. The first formal paper describing Claddis is now published in *Biological Journal of the Linnean Society* and can be cited as:
 
-Lloyd, G. T., 2016. Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. *Biological Journal of the Linnean Society*, '''118''', 131-151.
+Lloyd, G. T., 2016. Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. *Biological Journal of the Linnean Society*, **118**, 131-151.
