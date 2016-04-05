@@ -84,16 +84,16 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances = "ar
   morph.matrix <- morph.matrix$matrix
 
   # Create empty vectors to store S and W value for Wills 2001 equations (1 and 2):
-  differences <- maximum.differences <- vector(mode="numeric")
+  differences <- maximum.differences <- vector(mode = "numeric")
     
   # Distance matrices for storing:
-  comp.char.matrix <- gower.dist.matrix <- max.dist.matrix <- dist.matrix <- matrix(0, nrow=length(rownames(morph.matrix)), ncol=length(rownames(morph.matrix)))
+  comp.char.matrix <- gower.dist.matrix <- max.dist.matrix <- dist.matrix <- matrix(0, nrow = length(rownames(morph.matrix)), ncol = length(rownames(morph.matrix)))
     
   # Fill comparable characters diagonal:
   for(i in 1:length(morph.matrix[, 1])) comp.char.matrix[i,i] <- length(morph.matrix[i, ]) - length(which(is.na(morph.matrix[i, ])))
 
   # Set up empty matrix for storing data to calculate the Generalised Euclidean Distance of Wills (2001):
-  GED.data <- matrix(nrow=0, ncol=ncol(morph.matrix))
+  GED.data <- matrix(nrow = 0, ncol = ncol(morph.matrix))
 
   # Go through matrix rows:
   for(i in 1:(length(morph.matrix[, 1]) - 1)) {
@@ -157,7 +157,7 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances = "ar
               secondrowvals <- as.numeric(strsplit(secondrow[ampersand.elements[k]], "&")[[1]])
                             
               # Make mini distance matrix:
-              poly.dist.mat <- matrix(0, nrow=length(firstrowvals), ncol=length(secondrowvals))
+              poly.dist.mat <- matrix(0, nrow = length(firstrowvals), ncol = length(secondrowvals))
                             
               # Go through each comparison:
               for(l in 1:length(firstrowvals)) {
@@ -190,14 +190,14 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances = "ar
       # Find the incomparable characters:
       incompchar <- setdiff(1:ncol(morph.matrix), compchar)
 
-      # Store data for GED with NAs for missing distances:
-      GED.data <- rbind(GED.data, rbind(c(diffs, rep(NA, length(incompchar))), c(weights[compchar], weights[incompchar])))
-
       # Get weighted differences:
       diffs <- as.numeric(weights[compchar]) * diffs
 
+      # Store data for GED with NAs for missing distances:
+      GED.data <- rbind(GED.data, rbind(c(diffs, rep(NA, length(incompchar))), c(weights[compchar], weights[incompchar])))
+
       # Get raw Euclidean distance:
-      raw.dist <- dist(rbind(diffs, rep(0, length(diffs))), method="euclidean")
+      raw.dist <- dist(rbind(diffs, rep(0, length(diffs))), method = "euclidean")
 
       # Work out maximum difference (again, checked against ordering) using compchar characters only:
       raw.maxdiffs <- maxdiffs <- as.numeric(max.vals[compchar]) - as.numeric(min.vals[compchar])
@@ -246,7 +246,7 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances = "ar
   GED_ij <- sqrt(apply(W_ijk * (S_ijk ^ 2), 1, sum))
 
   # Create empty GED distance matrix:
-  GED.dist.matrix <- matrix(0, nrow=nrow(morph.matrix), ncol=nrow(morph.matrix))
+  GED.dist.matrix <- matrix(0, nrow = nrow(morph.matrix), ncol = nrow(morph.matrix))
 
   # Set initial value for counter:
   counter <- 1
@@ -280,10 +280,10 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances = "ar
     if(transform.proportional.distances == "sqrt") {
 
       # Replace NaN with NA for Gower distances and take square root:
-      gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(gower.dist.matrix))), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+      gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(gower.dist.matrix))), nrow = nrow(gower.dist.matrix), dimnames = list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
 
       # Replace NaN with NA for Max distances and take square root:
-      max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(max.dist.matrix))), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+      max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(max.dist.matrix))), nrow = nrow(max.dist.matrix), dimnames = list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
 
     # If transformation option is "arcsine_sqrt":
     } else {
@@ -292,10 +292,10 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances = "ar
       gower.correction <- max(c(max(sort(gower.dist.matrix)), 1))
 
       # Ensure all Gower values are on 0 to 1 scale then take arcsine of sqrt to get values that better approximate a normal distribution:
-      gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(gower.dist.matrix / gower.correction)))), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+      gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(gower.dist.matrix / gower.correction)))), nrow = nrow(gower.dist.matrix), dimnames = list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
 
       # Take arcsine square root of all MOD dist values:
-      max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(max.dist.matrix)))), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+      max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(max.dist.matrix)))), nrow = nrow(max.dist.matrix), dimnames = list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
 
     }
 
@@ -303,10 +303,10 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances = "ar
   } else {
 
     # Replace NaN with NA for Gower distances:
-    gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, gower.dist.matrix)), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+    gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, gower.dist.matrix)), nrow = nrow(gower.dist.matrix), dimnames = list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
 
     # Replace NaN with NA for Max distances:
-    max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, max.dist.matrix)), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+    max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, max.dist.matrix)), nrow = nrow(max.dist.matrix), dimnames = list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
 
   }
 
