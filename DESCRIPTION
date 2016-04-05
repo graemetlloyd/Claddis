@@ -2,7 +2,7 @@ Package: Claddis
 Type: Package
 Title: Measuring Morphological Diversity and Evolutionary Tempo
 Version: 0.2
-Date: 2015-08-02
+Date: 2016-04-05
 Author: Graeme T. Lloyd
 Maintainer: Graeme T. Lloyd <graemetlloyd@gmail.com>
 Depends:
