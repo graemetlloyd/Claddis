@@ -18,6 +18,7 @@ CHANGES IN CLADDIS VERSION 0.2
     o Added this NEWS file to keep users abreast of changes to Claddis.
 
   BUG FIXES
+    o Fixed bug in MorphDistMatri where GED values were not taking into account differentially weighted data (thanks to Thomas Guillerme).
     o Fixed minor bugs in ReadMorphNexus, for example, where a taxon name includes the string "matrix". This would have caused errors previously.
     o Fixed bug in output from SafeTaxonomicReduction that stops matrices being converted to vectors (thanks to Dave Bapst).
     o Removed random seed file that could corrupt stochastic functions (thanks to Dave Bapst). This should not have caused problems as no core functions are stochastic at present.
