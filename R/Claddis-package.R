@@ -46,6 +46,12 @@ NULL
 #' @importFrom gdata trim
 NULL
 
+#' @importFrom graphics layout
+NULL
+
+#' @importFrom graphics lines
+NULL
+
 #' @importFrom graphics par
 NULL
 
@@ -65,6 +71,9 @@ NULL
 NULL
 
 #' @importFrom grDevices chull
+NULL
+
+#' @importFrom stats as.dist
 NULL
 
 #' @importFrom stats dist
