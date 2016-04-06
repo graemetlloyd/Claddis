@@ -7,6 +7,7 @@ CHANGES IN CLADDIS VERSION 0.2
     o Added new ChronoPhyloMorphospacePlot function to make three-dimensional plots of two ordination axes against time.
     o Added new CompactifyMatrix function for collapsing redundant characters.
     o Added new DolloSCM function for producing stochastic Dollo character maps.
+    o Added new MakeMorphMatrix function to create Claddis formatted data from within R.
     o Added new MatrixPruner function to safely remove characters or taxa from discrete character-taxon matrices.
     o Added new MorphDistMatrixFast function for producing faster distance matrices.
     o Added new MorphMatrix2PCoA function for performing principal coordinates analysis on cladistic data sets.
