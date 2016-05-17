@@ -88,8 +88,19 @@ WriteMorphTNT <- function(clad.matrix, filename, add.analysis.block = FALSE) {
     # Remake matrixblock as single string:
     matrixblock <- paste(paste(rownames(matrixblock), collapse = "\n"), "\n;\n", sep = "")
 
-    # Get ordering (as plus = ordered or minus = unordered):
-    ordering <- gsub("ord", "+", gsub("unord", "-", clad.matrix$ordering))
+    # If no step matrices:
+    if(is.null(clad.matrix$step.matrices)) {
+
+        # Get ordering (as plus = ordered or minus = unordered):
+        ordering <- gsub("ord", "+", gsub("unord", "-", clad.matrix$ordering))
+
+    # If step matrices
+    } else {
+        
+        # Get ordering (as plus = ordered or minus = unordered or starting setup for step matrices):
+        ordering <- gsub(paste(names(clad.matrix$step.matrices), collapse = "|"), "-", gsub("ord", "+", gsub("unord", "-", clad.matrix$ordering)))
+        
+    }
 
     # Set default for all characters as "on":
     onoff <- rep("[", ncol(clad.matrix$matrix))
@@ -109,8 +120,67 @@ WriteMorphTNT <- function(clad.matrix, filename, add.analysis.block = FALSE) {
     # Remove leading zero from decimal weights (i.e., make 0.5 into .5) to fit TNT format:
     if(sum(weights < 1) > 0) weights[which(weights < 1)] <- gsub("0.", ".", as.character(weights[which(weights < 1)]))
     
-    # Make orderin block (includes weights and on/off):
-    ord.block <- paste("ccode", paste(paste(ordering, onoff, "/", weights, " ", c(0:(ncol(clad.matrix$matrix) - 1)), sep = ""), collapse = " "), ";\nproc/;\n", collapse = " ")
+    # If no step matrices:
+    if(is.null(clad.matrix$step.matrices)) {
+
+        # Make ordering block (includes weights and on/off):
+        ord.block <- paste("ccode", paste(paste(ordering, onoff, "/", weights, " ", c(0:(ncol(clad.matrix$matrix) - 1)), sep = ""), collapse = " "), ";\nproc/;\n", collapse = " ")
+    
+    # If step matrices:
+    } else {
+        
+        # Empty vector to store hits (characters assigned to a step matrix):
+        global_hits <- vector(mode = "numeric")
+        
+        # Empty vector to store all step matrix lines:
+        all_step_matrix_lines <- vector(mode = "character")
+        
+        # Check there are not too many step matrices:
+        if(length(clad.matrix$step.matrices) > 32) stop("Too many (>32) step matrices for TNT!")
+        
+        # For each step matrix:
+        for(i in 1:length(clad.matrix$step.matrices)) {
+            
+            # Set up costs vector:
+            costs <- vector(mode = "character")
+            
+            # For each row state (from):
+            for(j in rownames(clad.matrix$step.matrices[[i]])) {
+                
+                # For each column state (to):
+                for(k in colnames(clad.matrix$step.matrices[[i]])) {
+                    
+                    # Add cost of j to k transition to costs vector:
+                    costs <- c(costs, paste(j, ">", k, " ", clad.matrix$step.matrices[[i]][j, k], sep = ""))
+                    
+                }
+            
+            }
+            
+            # Format top of step matrix code:
+            step_matrix_top <- paste("smatrix = ", i - 1, " (", names(clad.matrix$step.matrices)[i], ")", sep = "")
+            
+            # Get hits (characters assigned to ith step matrix):
+            hits <- which(clad.matrix$ordering == names(clad.matrix$step.matrices)[i])
+            
+            # Add huts to global hits for all step matrices:
+            global_hits <- c(global_hits, hits)
+            
+            # Stop if no hits!:
+            if(length(hits) == 0) stop(paste("No characters assigned to step matrix: ", names(clad.matrix$step.matrices)[i], ".", sep = ""))
+            
+            # Build step matrix lines:
+            step_matrix_lines <- paste(c(step_matrix_top, costs, ";", paste("smatrix + ", names(clad.matrix$step.matrices)[i], " ", paste(hits - 1, collapse = " "), ";", sep = "")), collapse = "\n")
+            
+            # Ad step matrix lines to all step matrix lines:
+            all_step_matrix_lines <- c(all_step_matrix_lines, step_matrix_lines)
+            
+        }
+        
+        # Make ordering block (includes weights and on/off):
+        ord.block <- paste("ccode ", paste(paste(ordering, onoff, "/", weights, " ", c(0:(ncol(clad.matrix$matrix) - 1)), sep = ""), collapse = " "), ";\n", paste(c(all_step_matrix_lines, paste("ccode ( ", paste(sort(global_hits - 1), collapse = " "), ";", sep = "")), collapse = "\n"), "\nproc/;\n", collapse = "")
+        
+    }
     
     # Compile output:
     out <- paste(paste(headlines, datablock, sep = "\n"), "\n", matrixblock, ord.block, sep = "")
@@ -151,7 +221,6 @@ WriteMorphTNT <- function(clad.matrix, filename, add.analysis.block = FALSE) {
         out <- gsub("proc/;\n", paste(paste(anal, collapse = "\n"), "nelsen*;", strict.name, paste(mrp.name, collapse = "\n"), "proc/;\n"), out)
 
     }
-
 
     # Write to file:
     write(out, filename)
