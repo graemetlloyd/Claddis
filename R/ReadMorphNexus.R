@@ -693,6 +693,9 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
       # Grab text block corresponding to step matrix:
       step.matrix.block <- X[i:(i + as.numeric(strsplit(X[i], "\\(STEPMATRIX\\)=")[[1]][2]) + 1)]
   
+      # Replace diagonal (dots) with zeroes:
+      step.matrix.block <- gsub("\\.", "0", step.matrix.block)
+  
       # Get the step matrix as a matrix (might still need to think about how to define e.g. infinity):
       step.matrix <- gsub("\\.", "0", matrix(unlist(strsplit(step.matrix.block[3:length(step.matrix.block)], " ")), ncol = as.numeric(strsplit(X[i], "\\(STEPMATRIX\\)=")[[1]][2]) + 1, byrow = TRUE)[, -1])
 
