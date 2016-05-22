@@ -4,7 +4,7 @@
 #' 
 #' Writes out a #NEXUS (Maddison et al. 1997) data file representing the distribution of discrete morphological characters in a set of taxa. Data must be in the format created by importing data with \link{ReadMorphNexus}.
 #' 
-#' Note that the function cannot yet deal with continuous characters or step matrices.
+#' Note that the function cannot yet deal with continuous characters, but can write out step matrices.
 #' 
 #' Currently all empty values (missing or inapplicable) are treated as missing and will be written to file as question marks.
 #' 
@@ -169,7 +169,7 @@ WriteMorphNexus <- function(clad.matrix, filename) {
         
     }
     
-    # If diferent weights are specified:
+    # If different weights are specified:
     if(length(unique(clad.matrix$weights)) > 1) {
         
         # Empty vector to store weight strings:
@@ -247,9 +247,39 @@ WriteMorphNexus <- function(clad.matrix, filename) {
         ord.block <- paste(ord.block, "\n", weight.block, sep = "")
         
     }
-
-    # Finish assumptions block:
-    ass.block <- paste("BEGIN ASSUMPTIONS;\n", ord.block, "\nEND;\n", sep = "")
+    
+    # If there are step matrices:
+    if(!is.null(clad.matrix$step.matrices)) {
+        
+        # Create empty step matrices vector:
+        step_matrices <- vector(mode = "character")
+        
+        # For each step matrix:
+        for(i in 1:length(clad.matrix$step.matrices)) {
+            
+            # Replace diagonal with a period:
+            diag(clad.matrix$step.matrices[[i]]) <- "."
+            
+            # Add ith step matrix to step matrices:
+            step_matrices[i] <- paste(c(paste("\tUSERTYPE '", names(clad.matrix$step.matrices)[i], "' (STEPMATRIX) = ", ncol(clad.matrix$step.matrices[[i]]), sep = ""), paste("\t", paste(colnames(clad.matrix$step.matrices[[i]]), collapse = " "), sep = ""), paste("\t", apply(clad.matrix$step.matrices[[i]], 1, paste, collapse = " "), sep = ""), "\t;\n"), collapse = "\n")
+            
+        }
+        
+    }
+    
+    # If there are no step matrices:
+    if(is.null(clad.matrix$step.matrices)) {
+    
+        # Finish assumptions block:
+        ass.block <- paste("BEGIN ASSUMPTIONS;\n", ord.block, "\nEND;\n", sep = "")
+    
+    # If there are step matrices:
+    } else {
+        
+        # Finish assumptions block:
+        ass.block <- paste("BEGIN ASSUMPTIONS;\n", paste(step_matrices, collapse = ""), ord.block, "\nEND;\n", collapse = "")
+        
+    }
 
     # Compile output:
     out <- paste(headlines, datablock, matrixblock, ass.block, sep = "")

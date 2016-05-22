@@ -17,7 +17,7 @@ Writes out a morphological data file in #NEXUS format.
 \details{
 Writes out a #NEXUS (Maddison et al. 1997) data file representing the distribution of discrete morphological characters in a set of taxa. Data must be in the format created by importing data with \link{ReadMorphNexus}.
 
-Note that the function cannot yet deal with continuous characters or step matrices.
+Note that the function cannot yet deal with continuous characters, but can write out step matrices.
 
 Currently all empty values (missing or inapplicable) are treated as missing and will be written to file as question marks.
 }
