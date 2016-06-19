@@ -48,9 +48,6 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
   # Catch problem with zero-length branches:
   if(any(tree$edge.length == 0)) stop("ERROR:\n Tree must not have zero-length branches.")
 
-  # Remove node labels from tree (causes bug downstream):
-  tree$node.label <- NULL
-
   # Collapse matrix to vectors for each character (state and ordering combination):
   collapse.matrix <- apply(rbind(morph.matrix$matrix, morph.matrix$ordering), 2, paste, collapse = "")
 
