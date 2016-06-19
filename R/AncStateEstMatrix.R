@@ -11,7 +11,7 @@
 #'
 #' @return \item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral states.}
 #'
-#' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Thomas Guillerme \email{guillert@@tcd.ie}
 #'
 #' @references
 #'
