@@ -55,11 +55,22 @@ MatrixPruner <- function(clad.matrix, taxa2prune = c(), characters2prune = c()) 
         
     }
     
+    # Get unique values for each character:
+    unique.values <- lapply(lapply(lapply(lapply(lapply(lapply(apply(clad.matrix$matrix, 2, list), unlist), strsplit, split = "&"), unlist), sort), unique), as.numeric)
+    
+    # If any character is now all missing data:
+    if(length(which(unlist(lapply(unique.values, length)) == 0)) > 0) {
+        
+        # For each such character insert a single zero:
+        for(i in which(unlist(lapply(unique.values, length)) == 0)) unique.values[[i]] <- c(0)
+        
+    }
+    
     # Update maximum values (post pruning):
-    clad.matrix$max.vals <- unlist(lapply(lapply(lapply(lapply(lapply(lapply(lapply(apply(clad.matrix$matrix, 2, list), unlist), strsplit, split = "&"), unlist), sort), unique), as.numeric), max))
+    clad.matrix$max.vals <- unlist(lapply(unique.values, max))
     
     # Update minimum values (post pruning):
-    clad.matrix$min.vals <- unlist(lapply(lapply(lapply(lapply(lapply(lapply(lapply(apply(clad.matrix$matrix, 2, list), unlist), strsplit, split = "&"), unlist), sort), unique), as.numeric), min))
+    clad.matrix$min.vals <- unlist(lapply(unique.values, min))
 
     # Return pruned matrix:
     return(clad.matrix)
