@@ -56,7 +56,7 @@ MatrixPruner <- function(clad.matrix, taxa2prune = c(), characters2prune = c()) 
     }
     
     # Get unique values for each character:
-    unique.values <- lapply(lapply(lapply(lapply(lapply(lapply(apply(clad.matrix$matrix, 2, list), unlist), strsplit, split = "&"), unlist), sort), unique), as.numeric)
+    unique.values <- lapply(lapply(lapply(lapply(lapply(lapply(lapply(apply(clad.matrix$matrix, 2, list), unlist), as.character), strsplit, split = "&"), unlist), sort), unique), as.numeric)
     
     # If any character is now all missing data:
     if(length(which(unlist(lapply(unique.values, length)) == 0)) > 0) {
