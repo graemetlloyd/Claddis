@@ -23,6 +23,8 @@
 #' @export MatrixPruner
 MatrixPruner <- function(clad.matrix, taxa2prune = c(), characters2prune = c()) {
 
+# ADD OPTION TO REMOVE CONSTANT CHARACTERS
+
     # Check that something to prune has been specified:
     if(is.null(taxa2prune) && is.null(characters2prune)) stop("No taxa or characters to prune specified.")
 
