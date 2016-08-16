@@ -56,7 +56,7 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
   if(!is.null(colnames(CTmatrix))) colnames(CTmatrix) <- NULL
   
   # List any mystery character types:
-  mystery.characters <- setdiff(unique(unlist(strsplit(unique(as.vector(CTmatrix)), "&"))), c(as.character(0:31), NA))
+  mystery.characters <- setdiff(unique(unlist(strsplit(as.character(unique(as.vector(CTmatrix))), "&"))), c(as.character(0:31), NA))
   
   # If mystery character types are present warn user:
   if(length(mystery.characters) > 0) stop("Characters must either be the integers 0 to 31, NA for missing, or & for polymorphisms.")
@@ -77,7 +77,7 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
   if(!is.null(ordering) && length(setdiff(ordering, c("unord", "ord"))) > 0) stop("Ordering must be unord or ord only.")
   
   # Check symbols are of correct length:
-  if(!is.null(symbols) && length(symbols) >= (diff(range(sort(as.numeric(unique(unlist(strsplit(unique(as.vector(CTmatrix)), "&"))))))) + 1)) stop("Symbols must be at least as long as the range of character values in CTmatrix.")
+  if(!is.null(symbols) && length(symbols) >= (diff(range(sort(as.numeric(unique(unlist(strsplit(as.character(unique(as.vector(CTmatrix))), "&"))))))) + 1)) stop("Symbols must be at least as long as the range of character values in CTmatrix.")
 
   # Check symbols are single characters only:
   if(!is.null(symbols) && any(nchar(symbols) != 1)) stop("Symbols must be single characters only.")
