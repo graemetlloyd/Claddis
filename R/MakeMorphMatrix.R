@@ -92,10 +92,10 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
   if(is.null(weights)) weights <- rep(1, ncol(CTmatrix))
 
   # Calculate minimum values:
-  min.vals <- unlist(lapply(lapply(lapply(lapply(apply(CTmatrix, 2, strsplit, split = "&"), unlist), as.numeric), sort), min))
+  min.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CTmatrix, 2, as.character), 2, strsplit, split = "&"), unlist), as.numeric), sort), min))
 
   # Calculate maximum values:
-  max.vals <- unlist(lapply(lapply(lapply(lapply(apply(CTmatrix, 2, strsplit, split = "&"), unlist), as.numeric), sort), max))
+  max.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CTmatrix, 2, as.character), 2, strsplit, split = "&"), unlist), as.numeric), sort), max))
 
   # Default step matrices to NULL for now (may add this option in future):
   step.matrices <- NULL
