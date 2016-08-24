@@ -72,7 +72,7 @@ SafeTaxonomicReduction <- function(morph.matrix) {
   }
   
   # Get distance matrix:
-  dist.matrix <- MorphDistMatrix(morph.matrix)$raw.dist.matrix
+  dist.matrix <- MorphDistMatrixFast(morph.matrix)$raw.dist.matrix
   
   # Vector for storing zero value pairs:
   pairs <- c(NA, NA)
