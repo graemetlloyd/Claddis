@@ -118,7 +118,7 @@ WriteMorphTNT <- function(clad.matrix, filename, add.analysis.block = FALSE) {
     weights <- round(weights, 2)
 
     # Remove leading zero from decimal weights (i.e., make 0.5 into .5) to fit TNT format:
-    if(sum(weights < 1) > 0) weights[which(weights < 1)] <- gsub("0.", ".", as.character(weights[which(weights < 1)]))
+    if(sum(weights < 1) > 0) weights[which(weights < 1)] <- gsub("0.", ".", as.character(weights[which(weights < 1)]), fixed = TRUE)
     
     # If no step matrices:
     if(is.null(clad.matrix$step.matrices)) {
