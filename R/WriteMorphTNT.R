@@ -66,7 +66,7 @@ WriteMorphTNT <- function(clad.matrix, filename, add.analysis.block = FALSE) {
         state.positions <- which(clad.matrix$matrix == i)
         
         # Get state symbol:
-        state.symbol <- clad.matrix$symbols[as.numeric(strsplit(i, "&")[[1]]) + 1]
+        ifelse(length(grep("&", i)) > 0, state.symbol <- clad.matrix$symbols[as.numeric(strsplit(i, "&")[[1]]) + 1], state.symbol <- clad.matrix$symbols[as.numeric(i) + 1])
         
         # If state symbol is a polymorphisms modify for writing:
         if(length(state.symbol) > 1) state.symbol <- paste("[", paste(state.symbol, collapse = ""), "]", sep = "")
