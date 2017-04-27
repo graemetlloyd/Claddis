@@ -111,7 +111,7 @@ SafeTaxonomicReinsertion <- function(treefile.in, treefile.out, str.list, multi.
         }
         
         # Trims str list down to remaining taxa:
-        for(i in 1:length(taxa.to.delete)) str.list <- str.list[-grep(TRUE, str.list[, "Junior"] == taxa.to.delete[i]), ]
+        for(i in 1:length(taxa.to.delete)) str.list <- str.list[-grep(TRUE, str.list[, "Junior"] == taxa.to.delete[i]), , drop = FALSE]
     
     }
     
