@@ -10,6 +10,7 @@
 #' 
 #' @param file A file name specified by either a variable of mode character, or a double-quoted string.
 #' @param equalise.weights Optional that overrides the weights specified in the file to make all characters truly equally weighted.
+#' @param gap.as.missing Optional, whether to treat gaps as \code{NA} (\code{TRUE}; default) or not (\code{FALSE}).
 #'
 #' @return
 #'
@@ -54,7 +55,7 @@
 #' file.remove("morphmatrix.nex")
 #' 
 #' @export ReadMorphNexus
-ReadMorphNexus <- function(file, equalise.weights = FALSE) {
+ReadMorphNexus <- function(file, equalise.weights = FALSE, gap.as.missing = TRUE) {
     
 # ADD WARNINGS FOR discrete.matrix AND continuous.matrix IF ROWS DO NOT HAVE THE RIGHT NUMBER OF CHARACTERS
 
@@ -620,7 +621,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
     discrete.matrix[discrete.matrix == missing] <- NA
 
     # Replace gap symbol with NA:
-    discrete.matrix[discrete.matrix == gap] <- NA
+    if(gap.as.missing) discrete.matrix[discrete.matrix == gap] <- NA
 
     # Make from-to matrix for discrete character numbers:
     discrete.character.numbers <- matrix(column.numbers[discrete.columns, ], ncol=2)
@@ -819,6 +820,16 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
         
     # List non-missing values for character:
     non.nas <- sort(MATRIX[, i])
+
+    if(!gap.as.missing) {
+      ## Finding eventual gaps
+      gaps <- as.numeric(which(non.nas == gap))
+
+      if(length(gaps) > 0) {
+        ## Removing eventual gaps
+        non.nas <- non.nas[-gaps]
+      }
+    }
     
     # As long as there are non-NAs (i.e., there is not missing data for all taxa):
     if(length(non.nas) > 0) {
