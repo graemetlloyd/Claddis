@@ -1,3 +1,102 @@
+#' Get distance matrices from a cladistic matrix
+#' 
+#' Takes a cladistic morphological dataset and converts it into a set of
+#' pairwise distances.
+#' 
+#' This function is an important preliminary step in performing multivariate
+#' ordination(s) upon a cladistic dataset of discrete characters and deals with
+#' three peculiarities of such data: 1) the prevalence of missing values, 2)
+#' the use of unordered multistate characters, and 3) the presence of
+#' polymorphisms.
+#' 
+#' Missing data is dealt with by providing three rescaled distances as well as
+#' the uncorrected raw distances. These are: 1) the Generalised Euclidean
+#' Distance (GED) of Wills (2001) which replaces all incalculable taxon-taxon
+#' character distances with a weighted fractional mean distance, 2) Gower
+#' (1971) dissimilarity, which rescales each pairwise distance by dividing by
+#' the number of comparable characters upon which that distance is based, and
+#' 3) a set of distances rescaled against the maximum possible observable
+#' distance based on the set of comparable characters upon which that distance
+#' is based (using the difference between \code{max.vals} and \code{min.vals}
+#' supplied by the input matrix). In practice the user is not recommended to
+#' use raw distances unless the input matrix is complete.
+#' 
+#' The method automatically treats distances between unordered characters as
+#' zero (if the two states are identical) or one (if the two states are
+#' different). So, for example, the distances between 0 and 3 and between 2 and
+#' 3 for an unordered character are both 1.
+#' 
+#' Finally, polymorphisms are dealt with by using the minimum possible distance
+#' by considering all possible values implied by the polymorphism. So, for
+#' example, the distance between (01) and 3 will be considered to be 1 for an
+#' unordered character and 2 (the minimum distance, between 1 and 3) for an
+#' ordered character.
+#' 
+#' All metrics are rescaled according to character weightings, as supplied by
+#' the \code{weights} vector of the input matrix.
+#' 
+#' It is important to note that in practice not all pairwise distances can be
+#' calculated due to missing data. In these cases incomplete distance matrices
+#' will be returned, with incalculable values scored as \code{NA}. In such
+#' cases the user is advised to apply the \link{TrimMorphDistMatrix} function
+#' before ordination.
+#' 
+#' @param morph.matrix A character-taxon matrix in the format imported by
+#' \link{ReadMorphNexus}.
+#' @param distance Which distance matrix to return. Can be one or more of the following \code{"Raw"}, \code{"GED"}, \code{"Gower"}, \code{"Max"}, \code{"Comp"}. By default, the functions returns all 5 matrices.
+#' @param transform.proportional.distances Whether to transform the
+#' proportional distances (Gower and max). Options are \code{none},
+#' \code{sqrt}, or \code{arcsine_sqrt} (the default).
+#' 
+#' @return
+#' If only one type of distance is given to the \code{distance} argument. The function returns a single \code{matrix} corresponding to the type of distance. Else, the function returns a \code{list} of two or more of the following:
+#' \item{raw.dist.matrix}{A distance matrix indicating the raw
+#' distances (based on the method set in \code{dist.method}) of each pairwise
+#' comparison.}
+#' \item{GED.dist.matrix}{A Generalised Euclidean Distance (GED)
+#' matrix (Wills 2001).}
+#' \item{gower.dist.matrix}{A distance matrix where raw
+#' distances have been rescaled using Gower (1971) dissimilarity (then rescaled
+#' from 0 to 1 and the arcsine of the square root taken).}
+#' \item{max.dist.matrix}{A distance matrix where raw distances have been
+#' rescaled against the maximum possible observable distance (then the arcsine
+#' of the square root taken).}
+#' \item{comp.char.matrix}{A matrix showing the
+#' number of coded characters that were used to make each pairwise comparison.}
+#' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#' @references Gower, J. C., 1971. A general coefficient of similarity and some
+#' of its properties. Biometrics, 27, 857-871.
+#' 
+#' Wills, M. A., 2001a. Morphological disparity: a primer. In: Adrain, J. M.,
+#' Edgecombe, G. D. and Lieberman, B. S. (eds.), Fossils, Phylogeny, and Form:
+#' An Analytical Approach. Kluwer Academic/Plenum Publishers, New York,
+#' p55-144.
+#' @keywords distance
+#' @examples
+#' 
+#' # Get morphological distances for Michaux (1989)
+#' # data set:
+#' distances <- MorphDistMatrix(Michaux1989)
+#' 
+#' # Show raw Euclidean distances:
+#' distances$raw.dist.matrix
+#' 
+#' # Show Generailsed Euclidean Distances:
+#' distances$GED.dist.matrix
+#' 
+#' # Show Gower rescaled distances:
+#' distances$gower.dist.matrix
+#' 
+#' # Show maximum observable rescaled distances:
+#' distances$max.dist.matrix
+#' 
+#' # Show number of characters that can be scored for
+#' # each pairwise comparison:
+#' distances$comp.char.matrix
+#' 
+#' @export MorphDistMatrix
+
+
 #TG: The basic idea is that now everything is done at the same time successively, i.e. in your version, every step is calculated in a serial way (get the comparable characters for i and j, then calculate the distance between i and j etc...)
 #TG: as in this version, every step is calculated at the same time successively (get all the comparable characters, calculate all the distances etc...). I feel this could still be optimised but for that the best solution would be to start again from scratch.
 #TG: I tried as much as possible to keep your own structure so you can find your way easily through the code.
@@ -6,7 +105,7 @@
   # The original description of your step
 #TG: See the end of the script for performance testing
 
-MorphDistMatrix.fast <- function(morph.matrix, distance = c("Raw", "GED", "Gower", "Max", "Comp"), transform.proportional.distances="arcsine_sqrt") {
+MorphDistMatrix <- function(morph.matrix, distance = c("Raw", "GED", "Gower", "Max", "Comp"), transform.proportional.distances="arcsine_sqrt") {
   # Check format of transform.proportional.distances:
   if(transform.proportional.distances != "none" && transform.proportional.distances != "sqrt" && transform.proportional.distances != "arcsine_sqrt") {
 
@@ -471,6 +570,7 @@ MorphDistMatrix.fast <- function(morph.matrix, distance = c("Raw", "GED", "Gower
 ####################
 #Performance testing
 ####################
+# For the performance testing, it is important to differentiate the base function and the fast function. I've renamed the base function "MorphDistMatrix.weight" (making sure that the differences object "diffs" is weighted before starting to store data for the GED distance in "GED.data"). The fast algorithm is renamed "MorphDistMatrix.fast".
 
 #Loading the packages
 #  library(Claddis)
