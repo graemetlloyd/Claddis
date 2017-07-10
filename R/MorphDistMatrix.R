@@ -1,70 +1,40 @@
 #' Get distance matrices from a cladistic matrix
 #' 
-#' Takes a cladistic morphological dataset and converts it into a set of
-#' pairwise distances.
+#' Takes a cladistic morphological dataset and converts it into a set of pairwise distances.
 #' 
-#' This function is an important preliminary step in performing multivariate
-#' ordination(s) upon a cladistic dataset of discrete characters and deals with
-#' three peculiarities of such data: 1) the prevalence of missing values, 2)
-#' the use of unordered multistate characters, and 3) the presence of
-#' polymorphisms.
+#' This function is an important preliminary step in performing multivariate ordination(s) upon a cladistic dataset of discrete characters and deals with three peculiarities of such data: 1) the prevalence of missing values, 2) the use of unordered multistate characters, and 3) the presence of polymorphisms.
 #' 
-#' Missing data is dealt with by providing three rescaled distances as well as
-#' the uncorrected raw distances. These are: 1) the Generalised Euclidean
-#' Distance (GED) of Wills (2001) which replaces all incalculable taxon-taxon
-#' character distances with a weighted fractional mean distance, 2) Gower
-#' (1971) dissimilarity, which rescales each pairwise distance by dividing by
-#' the number of comparable characters upon which that distance is based, and
-#' 3) a set of distances rescaled against the maximum possible observable
-#' distance based on the set of comparable characters upon which that distance
-#' is based (using the difference between \code{max.vals} and \code{min.vals}
-#' supplied by the input matrix). In practice the user is not recommended to
-#' use raw distances unless the input matrix is complete.
+#' Missing data is dealt with by providing three rescaled distances as well as the uncorrected raw distances. These are: 1) the Generalised Euclidean Distance (GED) of Wills (2001) which replaces all incalculable taxon-taxon character distances with a weighted fractional mean distance, 2) Gower (1971) dissimilarity, which rescales each pairwise distance by dividing by the number of comparable characters upon which that distance is based, and 3) a set of distances rescaled against the maximum possible observable distance based on the set of comparable characters upon which that distance is based (using the difference between \code{max.vals} and \code{min.vals} supplied by the input matrix). In practice the user is not recommended to use raw distances unless the input matrix is complete.
 #' 
-#' The method automatically treats distances between unordered characters as
-#' zero (if the two states are identical) or one (if the two states are
-#' different). So, for example, the distances between 0 and 3 and between 2 and
-#' 3 for an unordered character are both 1.
+#' The method automatically treats distances between unordered characters as zero (if the two states are identical) or one (if the two states are different). So, for example, the distances between 0 and 3 and between 2 and 3 for an unordered character are both 1.
 #' 
-#' Finally, polymorphisms are dealt with by using the minimum possible distance
-#' by considering all possible values implied by the polymorphism. So, for
-#' example, the distance between (01) and 3 will be considered to be 1 for an
-#' unordered character and 2 (the minimum distance, between 1 and 3) for an
-#' ordered character.
+#' Finally, polymorphisms are dealt with by using the minimum possible distance by considering all possible values implied by the polymorphism. So, for example, the distance between (01) and 3 will be considered to be 1 for an unordered character and 2 (the minimum distance, between 1 and 3) for an ordered character.
 #' 
-#' All metrics are rescaled according to character weightings, as supplied by
-#' the \code{weights} vector of the input matrix.
+#' All metrics are rescaled according to character weightings, as supplied by the \code{weights} vector of the input matrix.
 #' 
-#' It is important to note that in practice not all pairwise distances can be
-#' calculated due to missing data. In these cases incomplete distance matrices
-#' will be returned, with incalculable values scored as \code{NA}. In such
-#' cases the user is advised to apply the \link{TrimMorphDistMatrix} function
-#' before ordination.
+#' It is important to note that in practice not all pairwise distances can be calculated due to missing data. In these cases incomplete distance matrices will be returned, with incalculable values scored as \code{NA}. In such cases the user is advised to apply the \link{TrimMorphDistMatrix} function before ordination.
 #' 
-#' @param morph.matrix A character-taxon matrix in the format imported by
-#' \link{ReadMorphNexus}.
-#' @param transform.proportional.distances Whether to transform the
-#' proportional distances (Gower and max). Options are \code{none},
-#' \code{sqrt}, or \code{arcsine_sqrt} (the default).
-#' @return \item{raw.dist.matrix}{A distance matrix indicating the raw
-#' distances (based on the method set in \code{dist.method}) of each pairwise
-#' comparison.} \item{GED.dist.matrix}{A Generalised Euclidean Distance (GED)
-#' matrix (Wills 2001).} \item{gower.dist.matrix}{A distance matrix where raw
-#' distances have been rescaled using Gower (1971) dissimilarity (then rescaled
-#' from 0 to 1 and the arcsine of the square root taken).}
-#' \item{max.dist.matrix}{A distance matrix where raw distances have been
-#' rescaled against the maximum possible observable distance (then the arcsine
-#' of the square root taken).} \item{comp.char.matrix}{A matrix showing the
-#' number of coded characters that were used to make each pairwise comparison.}
+#' @param morph.matrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#' @param transform.proportional.distances Whether to transform the proportional distances (Gower and max). Options are \code{none}, \code{sqrt}, or \code{arcsine_sqrt} (the default).
+#'
+#' @return
+#'
+#' \item{raw.dist.matrix}{A distance matrix indicating the raw distances (based on the method set in \code{dist.method}) of each pairwise comparison.}
+#' \item{GED.dist.matrix}{A Generalised Euclidean Distance (GED) matrix (Wills 2001).}
+#' \item{gower.dist.matrix}{A distance matrix where raw distances have been rescaled using Gower (1971) dissimilarity (then rescaled from 0 to 1 and the arcsine of the square root taken).}
+#' \item{max.dist.matrix}{A distance matrix where raw distances have been rescaled against the maximum possible observable distance (then the arcsine of the square root taken).}
+#' \item{comp.char.matrix}{A matrix showing the number of coded characters that were used to make each pairwise comparison.}
+#'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
-#' @references Gower, J. C., 1971. A general coefficient of similarity and some
-#' of its properties. Biometrics, 27, 857-871.
+#'
+#' @references
+#'
+#' Gower, J. C., 1971. A general coefficient of similarity and some of its properties. Biometrics, 27, 857-871.
 #' 
-#' Wills, M. A., 2001a. Morphological disparity: a primer. In: Adrain, J. M.,
-#' Edgecombe, G. D. and Lieberman, B. S. (eds.), Fossils, Phylogeny, and Form:
-#' An Analytical Approach. Kluwer Academic/Plenum Publishers, New York,
-#' p55-144.
+#' Wills, M. A., 2001a. Morphological disparity: a primer. In: Adrain, J. M., Edgecombe, G. D. and Lieberman, B. S. (eds.), Fossils, Phylogeny, and Form: An Analytical Approach. Kluwer Academic/Plenum Publishers, New York, p55-144.
+#'
 #' @keywords distance
+#'
 #' @examples
 #' 
 #' # Get morphological distances for Michaux (1989)
@@ -88,7 +58,7 @@
 #' distances$comp.char.matrix
 #' 
 #' @export MorphDistMatrix
-MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcsine_sqrt") {
+MorphDistMatrix <- function(morph.matrix, transform.proportional.distances = "arcsine_sqrt") {
 
   # Check format of transform.proportional.distances:
   if(transform.proportional.distances != "none" && transform.proportional.distances != "sqrt" && transform.proportional.distances != "arcsine_sqrt") {
@@ -114,16 +84,16 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcs
   morph.matrix <- morph.matrix$matrix
 
   # Create empty vectors to store S and W value for Wills 2001 equations (1 and 2):
-  differences <- maximum.differences <- vector(mode="numeric")
+  differences <- maximum.differences <- vector(mode = "numeric")
     
   # Distance matrices for storing:
-  comp.char.matrix <- gower.dist.matrix <- max.dist.matrix <- dist.matrix <- matrix(0, nrow=length(rownames(morph.matrix)), ncol=length(rownames(morph.matrix)))
+  comp.char.matrix <- gower.dist.matrix <- max.dist.matrix <- dist.matrix <- matrix(0, nrow = length(rownames(morph.matrix)), ncol = length(rownames(morph.matrix)))
     
   # Fill comparable characters diagonal:
   for(i in 1:length(morph.matrix[, 1])) comp.char.matrix[i,i] <- length(morph.matrix[i, ]) - length(which(is.na(morph.matrix[i, ])))
 
   # Set up empty matrix for storing data to calculate the Generalised Euclidean Distance of Wills (2001):
-  GED.data <- matrix(nrow=0, ncol=ncol(morph.matrix))
+  GED.data <- matrix(nrow = 0, ncol = ncol(morph.matrix))
 
   # Go through matrix rows:
   for(i in 1:(length(morph.matrix[, 1]) - 1)) {
@@ -187,7 +157,7 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcs
               secondrowvals <- as.numeric(strsplit(secondrow[ampersand.elements[k]], "&")[[1]])
                             
               # Make mini distance matrix:
-              poly.dist.mat <- matrix(0, nrow=length(firstrowvals), ncol=length(secondrowvals))
+              poly.dist.mat <- matrix(0, nrow = length(firstrowvals), ncol = length(secondrowvals))
                             
               # Go through each comparison:
               for(l in 1:length(firstrowvals)) {
@@ -227,7 +197,7 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcs
       GED.data <- rbind(GED.data, rbind(c(diffs, rep(NA, length(incompchar))), c(weights[compchar], weights[incompchar])))
 
       # Get raw Euclidean distance:
-      raw.dist <- dist(rbind(diffs, rep(0, length(diffs))), method="euclidean")
+      raw.dist <- dist(rbind(diffs, rep(0, length(diffs))), method = "euclidean")
 
       # Work out maximum difference (again, checked against ordering) using compchar characters only:
       raw.maxdiffs <- maxdiffs <- as.numeric(max.vals[compchar]) - as.numeric(min.vals[compchar])
@@ -276,7 +246,7 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcs
   GED_ij <- sqrt(apply(W_ijk * (S_ijk ^ 2), 1, sum))
 
   # Create empty GED distance matrix:
-  GED.dist.matrix <- matrix(0, nrow=nrow(morph.matrix), ncol=nrow(morph.matrix))
+  GED.dist.matrix <- matrix(0, nrow = nrow(morph.matrix), ncol = nrow(morph.matrix))
 
   # Set initial value for counter:
   counter <- 1
@@ -310,10 +280,10 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcs
     if(transform.proportional.distances == "sqrt") {
 
       # Replace NaN with NA for Gower distances and take square root:
-      gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(gower.dist.matrix))), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+      gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(gower.dist.matrix))), nrow = nrow(gower.dist.matrix), dimnames = list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
 
       # Replace NaN with NA for Max distances and take square root:
-      max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(max.dist.matrix))), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+      max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, sqrt(max.dist.matrix))), nrow = nrow(max.dist.matrix), dimnames = list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
 
     # If transformation option is "arcsine_sqrt":
     } else {
@@ -322,10 +292,10 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcs
       gower.correction <- max(c(max(sort(gower.dist.matrix)), 1))
 
       # Ensure all Gower values are on 0 to 1 scale then take arcsine of sqrt to get values that better approximate a normal distribution:
-      gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(gower.dist.matrix / gower.correction)))), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+      gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(gower.dist.matrix / gower.correction)))), nrow = nrow(gower.dist.matrix), dimnames = list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
 
       # Take arcsine square root of all MOD dist values:
-      max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(max.dist.matrix)))), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+      max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, asin(sqrt(max.dist.matrix)))), nrow = nrow(max.dist.matrix), dimnames = list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
 
     }
 
@@ -333,10 +303,10 @@ MorphDistMatrix <- function(morph.matrix, transform.proportional.distances="arcs
   } else {
 
     # Replace NaN with NA for Gower distances:
-    gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, gower.dist.matrix)), nrow=nrow(gower.dist.matrix), dimnames=list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
+    gower.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, gower.dist.matrix)), nrow = nrow(gower.dist.matrix), dimnames = list(rownames(gower.dist.matrix), rownames(gower.dist.matrix)))
 
     # Replace NaN with NA for Max distances:
-    max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, max.dist.matrix)), nrow=nrow(max.dist.matrix), dimnames=list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
+    max.dist.matrix <- matrix(as.numeric(gsub(NaN, NA, max.dist.matrix)), nrow = nrow(max.dist.matrix), dimnames = list(rownames(max.dist.matrix), rownames(max.dist.matrix)))
 
   }
 

@@ -5,7 +5,7 @@
 #' Finds matching edge(s) and node(s) for a pruned tree in the original tree from which it was created. This is intended as an internal function, but may be of use to someone.
 #' 
 #' @param original.tree A tree in phylo format.
-#' @param pruned.tree A tree in phylo format that represents a pruned version \code{original.tree}.
+#' @param pruned.tree A tree in phylo format that represents a pruned version of \code{original.tree}.
 #'
 #' @return
 #'

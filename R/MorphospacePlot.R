@@ -2,18 +2,18 @@
 #' 
 #' Plots a morphospace using the output from MorphMatrix2PCoA.
 #' 
-#' Input must come from \link{MorphMatrix2PCoA}.
+#' uses output from \link{MorphMatrix2PCoA} as input.
 #'
-#' Allows plotting of a third axis using the technique of Matthew Wills (Wills et al. 1994; their Figures 4 and 8; Wills 1998; his Figure 4).
+#' Allows plotting of a third axis using the technique of Matthew Wills (Wills et al. 1994; their Figures 4 and 8; Wills 1998; his Figure 4), where black and white indicate postivie and negative values respectovely, and the size of points there magnitudes.
 #'
-#' @param pcoa_input Text.
-#' @param x_axis Text.
-#' @param y_axis Text.
-#' @param z_axis Text.
-#' @param plot_taxon_names Text.
-#' @param plot_internal_nodes Text.
-#' @param plot_root Text.
-#' @param root_colour Text.
+#' @param pcoa_input The main input in the format output from \link{MorphMatrix2PCoA}.
+#' @param x_axis Which ordination axis to plot as the x-axis (defaults to 1).
+#' @param y_axis Which ordination axis to plot as the y-axis (defaults to 2).
+#' @param z_axis Which ordination axis to plot as the z-axis (defaults to NULL, i.e., is not plotted).
+#' @param plot_taxon_names Optional to plot the names of the taxa (defaults to FALSE).
+#' @param plot_internal_nodes Optional to plot the internal nodes of the tree (if included in \code{pcoa_input}) (defaults to FALSE).
+#' @param plot_root Optional to plot the root separately (defaults to FALSE).
+#' @param root_colour If plotting the root separately (previous option) sets the root colour.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Emma Sherratt \email{emma.sherratt@@gmail.com}
 #'

@@ -26,7 +26,7 @@
 ChangesInBins <- function(change.times, time.bins) {
 	
 	# Enforce old-to-young order of time bins:
-	time.bins <- sort(time.bins, decreasing=T)
+	time.bins <- sort(time.bins, decreasing = TRUE)
 	
 	# Create all-zero vector to store ouput in:
 	changes.in.bin <- rep(0, length(time.bins) - 1)
@@ -40,7 +40,7 @@ ChangesInBins <- function(change.times, time.bins) {
 	}
 	
 	# Add time bin max-mins as names:
-	names(changes.in.bin) <- apply(cbind(time.bins[1:(length(time.bins) - 1)], time.bins[2:length(time.bins)]), 1, paste, collapse="-")
+	names(changes.in.bin) <- apply(cbind(time.bins[1:(length(time.bins) - 1)], time.bins[2:length(time.bins)]), 1, paste, collapse = "-")
 	
 	# Return edge lengths in bins:
 	return(changes.in.bin)

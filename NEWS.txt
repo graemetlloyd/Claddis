@@ -5,7 +5,9 @@ CHANGES IN CLADDIS VERSION 0.2
     o Added character changes output to DiscreteCharacterRate function.
     o Added internal and terminal branch versions of the time series output for DiscreteCharacterRate. This was added to complete the internal and terminal test and was used as an additional set of sensitivity tests in Close et al. (2015).
     o Added new ChronoPhyloMorphospacePlot function to make three-dimensional plots of two ordination axes against time.
+    o Added new CompactifyMatrix function for collapsing redundant characters.
     o Added new DolloSCM function for producing stochastic Dollo character maps.
+    o Added new MakeMorphMatrix function to create Claddis formatted data from within R.
     o Added new MatrixPruner function to safely remove characters or taxa from discrete character-taxon matrices.
     o Added new MorphDistMatrixFast function for producing faster distance matrices.
     o Added new MorphMatrix2PCoA function for performing principal coordinates analysis on cladistic data sets.
@@ -17,6 +19,7 @@ CHANGES IN CLADDIS VERSION 0.2
     o Added this NEWS file to keep users abreast of changes to Claddis.
 
   BUG FIXES
+    o Fixed bug in MorphDistMatri where GED values were not taking into account differentially weighted data (thanks to Thomas Guillerme).
     o Fixed minor bugs in ReadMorphNexus, for example, where a taxon name includes the string "matrix". This would have caused errors previously.
     o Fixed bug in output from SafeTaxonomicReduction that stops matrices being converted to vectors (thanks to Dave Bapst).
     o Removed random seed file that could corrupt stochastic functions (thanks to Dave Bapst). This should not have caused problems as no core functions are stochastic at present.

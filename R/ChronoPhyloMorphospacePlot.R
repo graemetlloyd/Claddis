@@ -2,18 +2,20 @@
 #' 
 #' Plots a 3D chronophylomorphospace.
 #'
-#' Text.
+#' Creates a movable three-dimensional (two ordination axes plus time) plot of a phylomorphospace.
 #'
-#' @param pcoa_data Text.
-#' @param x_axis Text.
-#' @param y_axis Text.
-#' @param shadow Text.
+#' Intended to mimic the data visualisation of Sakamoto adn Ruta (2012; their Video S1).
+#'
+#' @param pcoa_data Principal coordinate data in the format output by \link{MorphMatrix2PCoA} that includes a tree and ancestral states.
+#' @param x_axis Which ordination axis to plot as the x-axis.
+#' @param y_axis Which ordination axis to plot as the y-axis.
+#' @param shadow Whether or not to plot a shadow (2D plot) on the bottom face of the 3D plot (defaults to TRUE).
 #'
 #' @author Emma Sherratt \email{emma.sherratt@@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
 #' @references
 #'
-#' Sakamoto and Ruta
+#' Sakamoto, M. and Ruta, M. 2012. Convergence and divergence in the evolution of cat skulls: temporal and spatial patterns of morphological diversity. PLoS ONE, 7, e39752.
 #'
 #' @keywords principal coordinates
 #'
@@ -40,7 +42,7 @@
 #' @export ChronoPhyloMorphospacePlot
 ChronoPhyloMorphospacePlot <- function(pcoa_data, x_axis = 1, y_axis = 2, shadow = TRUE) {
 
-# Top level conditionals to check for a tree etc.
+# Add top level conditionals to check for a tree etc.
 
   # Default plotting parameters for a 2D morphospace. Need to change node colour for 3D using rgl
   p.p <- list()

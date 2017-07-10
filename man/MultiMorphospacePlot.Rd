@@ -8,27 +8,33 @@ MultiMorphospacePlot(pcoa_input, N_axes = 4, plot_taxon_names = FALSE,
   plot_internal_nodes = FALSE, plot_root = TRUE, root_colour = "grey")
 }
 \arguments{
-\item{pcoa_input}{Text.}
+\item{pcoa_input}{The main input in the format output from \link{MorphMatrix2PCoA}.}
 
-\item{N_axes}{Text.}
+\item{N_axes}{An integer indicatingthe  total number of axes to plot (should minimally be three).}
 
-\item{plot_taxon_names}{Text.}
+\item{plot_taxon_names}{Optional to plot the names of the taxa (defaults to FALSE).}
 
-\item{plot_internal_nodes}{Text.}
+\item{plot_internal_nodes}{Optional to plot the internal nodes of the tree (if included in \code{pcoa_input}) (defaults to FALSE).}
 
-\item{plot_root}{Text.}
+\item{plot_root}{Optional to plot the root separately (defaults to FALSE).}
 
-\item{root_colour}{Text.}
+\item{root_colour}{If plotting the root separately (previous option) sets the root colour.}
 }
 \description{
-Plots morphospaces for any number of axes using the output from MorphMatrix2PCoA.
+Plots morphospaces for any number of axes.
 }
 \details{
-Input must come from \link{MorphMatrix2PCoA}. Is a wrapper for \link{MorphospacePlot}.
+Takes output from \link{MorphMatrix2PCoA} as input and serves as a wrapper function for \link{MorphospacePlot}.
+
+Plots multiple bivariate plots of ordination axes starting with 1 and up to N, such that every possible bivariate plot is produced.
 }
 \examples{
 
-# Nothing yet
+# Create PCOA data:
+pcoa_input <- MorphMatrix2PCoA(Michaux1989)
+
+# Plot first three axes:
+MultiMorphospacePlot(pcoa_input, N_axes = 3)
 
 }
 \author{

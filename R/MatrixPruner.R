@@ -2,7 +2,7 @@
 #' 
 #' Prunes a character matrix of characters, taxa, or both.
 #' 
-#' Removing characters or taxa from a matrix imported using \link{ReadMorphNexus} is not simple due to asscoiated vectors for ordering, character weights etc. To save repetitively pruning each part this function takes the matrix as input and vectors of either taxon names, character numbers, or one of each and removes those from the matrix. Minimum and maximum values (used by \link{MorphDistMatrix}) are also updated.
+#' Removing characters or taxa from a matrix imported using \link{ReadMorphNexus} is not simple due to associated vectors for ordering, character weights etc. To save repetitively pruning each part this function takes the matrix as input and vectors of either taxon names, character numbers, or both and removes those from the matrix. Minimum and maximum values (used by \link{MorphDistMatrix}) are also updated.
 #' 
 #' @param clad.matrix The cladistic matrix in the format imported by \link{ReadMorphNexus}.
 #' @param taxa2prune A vector of taxon names to prune (these must be present in \code{rownames(clad.matrix$matrix}).
@@ -22,6 +22,8 @@
 #' 
 #' @export MatrixPruner
 MatrixPruner <- function(clad.matrix, taxa2prune = c(), characters2prune = c()) {
+
+# ADD OPTION TO REMOVE CONSTANT CHARACTERS
 
     # Check that something to prune has been specified:
     if(is.null(taxa2prune) && is.null(characters2prune)) stop("No taxa or characters to prune specified.")
@@ -55,11 +57,22 @@ MatrixPruner <- function(clad.matrix, taxa2prune = c(), characters2prune = c()) 
         
     }
     
+    # Get unique values for each character:
+    unique.values <- lapply(lapply(lapply(lapply(lapply(lapply(lapply(apply(clad.matrix$matrix, 2, list), unlist), as.character), strsplit, split = "&"), unlist), sort), unique), as.numeric)
+    
+    # If any character is now all missing data:
+    if(length(which(unlist(lapply(unique.values, length)) == 0)) > 0) {
+        
+        # For each such character insert a single zero:
+        for(i in which(unlist(lapply(unique.values, length)) == 0)) unique.values[[i]] <- c(0)
+        
+    }
+    
     # Update maximum values (post pruning):
-    clad.matrix$max.vals <- unlist(lapply(lapply(lapply(lapply(lapply(lapply(lapply(apply(clad.matrix$matrix, 2, list), unlist), strsplit, split = "&"), unlist), sort), unique), as.numeric), max))
+    clad.matrix$max.vals <- unlist(lapply(unique.values, max))
     
     # Update minimum values (post pruning):
-    clad.matrix$min.vals <- unlist(lapply(lapply(lapply(lapply(lapply(lapply(lapply(apply(clad.matrix$matrix, 2, list), unlist), strsplit, split = "&"), unlist), sort), unique), as.numeric), min))
+    clad.matrix$min.vals <- unlist(lapply(unique.values, min))
 
     # Return pruned matrix:
     return(clad.matrix)

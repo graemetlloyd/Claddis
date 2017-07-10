@@ -10,21 +10,19 @@ MinSpanTreeEdges(dist.matrix)
 \item{dist.matrix}{A square matrix of distances between objects.}
 }
 \value{
-A vector of named edges (X->Y) with their distances. The sum of this
-vector is the length of the minimum spanning tree.
+A vector of named edges (X->Y) with their distances. The sum of this vector is the length of the minimum spanning tree.
 }
 \description{
 Returns edges of a minimum spanning tree given a distance matrix.
 }
 \details{
-This function is a wrapper for \link{mst} in the \link{ape} package, but
-returns a vector of edges rather than a square matrix of links.
+This function is a wrapper for \link{mst} in the \link{ape} package, but returns a vector of edges rather than a square matrix of links.
 }
 \examples{
 
 # Create a simple square matrix of distances:
-dist.matrix <- matrix(c(0,1,2,3,1,0,1,2,2,1,0,1,3,2,1,0), nrow=4,
-  dimnames=list(LETTERS[1:4], LETTERS[1:4]))
+dist.matrix <- matrix(c(0,1,2,3,1,0,1,2,2,1,0,1,3,2,1,0), nrow = 4,
+  dimnames = list(LETTERS[1:4], LETTERS[1:4]))
 
 # Show matrix to confirm that the off diagonal has the shortest
 # distances:

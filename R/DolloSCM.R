@@ -9,7 +9,7 @@
 #' 1) Establishes least inclusive clade exhibiting the derived state (1).
 #' 2) Assumes single gain occurred on branch subtending this clade and with equal probability of occurring at any point along the branch.
 #' 3) Treats inclusive clade as a subtree and places a strong prior on the root of the derived state (1).
-#' 4) Calls \code{make.simmap} from the phytools package to generate a stochastic character map using a model where only losses are possible.
+#' 4) Calls \code{make.simmap} from the \code{phytools} package to generate a stochastic character map using a model where only losses are possible.
 #' 5) Outputs both the stochastic character map (time spent in each state on each branch) and a matrix of state changes.
 #'
 #' (NB: As the map is stochastic the answer will be different each time the function is run and multiple replicates are strongly advised in order to ascertain uncertainty.)

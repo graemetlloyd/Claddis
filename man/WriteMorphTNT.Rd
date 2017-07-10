@@ -19,7 +19,7 @@ Writes out a morphological data file in Hennig86/TNT format.
 \details{
 Writes out a TNT (Goloboff et al. 2008) data file representing the distribution of discrete morphological characters in a set of taxa. Data must be in the format created by importing data with \link{ReadMorphNexus}.
 
-Note that the function cannot yet deal with continuous characters or step matrices.
+Note that the function cannot yet deal with continuous characters, but can use step matrices.
 
 Currently all empty values (missing or inapplicable) are treated as missing and will be written to file as question marks.
 }
@@ -27,6 +27,9 @@ Currently all empty values (missing or inapplicable) are treated as missing and 
 
 # Write out Michaux 1989 to current working directory:
 WriteMorphTNT(clad.matrix = Michaux1989, filename = "Michaux1989.tnt")
+
+# Remove file when finished:
+file.remove("Michaux1989.tnt")
 
 }
 \author{

@@ -1,33 +1,28 @@
 #' Finds all state changes on a tree using stochastic character mapping
 #' 
-#' Takes a cladistic matrix and time-scaled tree and makes points estimates for
-#' every character change using stochastic character mapping.
+#' Takes a cladistic matrix and time-scaled tree and makes point estimates for every character change using stochastic character mapping.
 #' 
+#' Important: this function is not yet complete and should not be used.
+#'
 #' A wrapper function for \link{make.simmap} in the \link{phytools} package.
 #' 
-#' This function is intended to numerate all possible changes on a tree
-#' (including to and from missing or inapplicable states) under the assumptions
-#' of stochastic character mapping as an alternative means of establishing
-#' branch-lengths (for rate analyses) or recording the state occupied at a
-#' particular point in time for disparity analyses.
+#' This function is intended to numerate all possible changes on a tree (including to and from missing or inapplicable states) under the assumptions of stochastic character mapping as an alternative means of establishing branch-lengths (for rate analyses) or recording the state occupied at a particular point in time for disparity analyses.
 #' 
-#' @param clad.matrix A character-taxon matrix in the format imported by
-#' \link{ReadMorphNexus}.
-#' @param tree A time-scaled tree (phylo object) that represents the
-#' relationships of the taxa in \code{clad.matrix}.
-#' @param time.bins A vector of ages representing the boundaries of a series of
-#' time bins.
-#' @param Nsim The number of simulations to perform (passed to
-#' \code{make.simmap}.
-#' @return \item{all.state.changes}{A matrix of rows for each change with
-#' columns corresponding to: the character concerned, the simulation number,
-#' the edge number, the time, and the start and end states.}
-#' \item{character.times}{A vector of the sampled tree-length (in Ma) for each
-#' character.} \item{edge.length.per.bin}{A matrix of time bins (columns) and
-#' characters (rows) indicating the sampled tree-length (in Ma).}
+#' @param clad.matrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#' @param tree A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{clad.matrix}.
+#' @param time.bins A vector of ages representing the boundaries of a series of time bins.
+#' @param Nsim The number of simulations to perform (passed to \code{make.simmap}.
+#'
+#' @return
+#'
+#' \item{all.state.changes}{A matrix of rows for each change with columns corresponding to: the character concerned, the simulation number, the edge number, the time, and the start and end states.}
+#' \item{character.times}{A vector of the sampled tree-length (in Ma) for each character.}
+#' \item{edge.length.per.bin}{A matrix of time bins (columns) and characters (rows) indicating the sampled tree-length (in Ma).}
 #' \item{terminal.edge.length.per.bin}{As above, but for terminal edges only.}
 #' \item{internal.edge.length.per.bin}{As above, but for internal edges only.}
+#'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#'
 #' @examples
 #' 
 #' # Set random seed:

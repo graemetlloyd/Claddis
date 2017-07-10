@@ -46,7 +46,7 @@ AncStateEstMatrix(Michaux1989, tree)
 
 }
 \author{
-Graeme T. Lloyd \email{graemetlloyd@gmail.com}
+Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Thomas Guillerme \email{guillert@tcd.ie}
 }
 \references{
 Brusatte, S. L., Lloyd, G. T., Wang, S. C. and Norell, M. A., 2014. Gradual assembly of avian body plan culminated in rapid rates of evolution across dinosaur-bird transition. Current Biology, 24, 2386-2392.

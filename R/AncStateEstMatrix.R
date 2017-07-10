@@ -12,7 +12,7 @@
 #'
 #' @return \item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral states.}
 #'
-#' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Thomas Guillerme \email{guillert@@tcd.ie}
 #'
 #' @references
 #'
@@ -49,12 +49,15 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
   # Catch problem with zero-length branches:
   if(any(tree$edge.length == 0)) stop("ERROR:\n Tree must not have zero-length branches.")
 
+<<<<<<< HEAD
   # Remove node labels from tree (causes bug downstream):
   #tree$node.label <- NULL
   #TG: I suggest leaving node labels in the original tree. Node labels are already removed from the "chartree" objects that are passed to rerootingMethod, making either this line or the removal of the node.labels in chartree redundant. No big deal though, it's not doing anything to the CPU time.
 
+=======
+>>>>>>> graemetlloyd/master
   # Collapse matrix to vectors for each character (state and ordering combination):
-  collapse.matrix <- apply(rbind(morph.matrix$matrix, morph.matrix$ordering), 2, paste, collapse="")
+  collapse.matrix <- apply(rbind(morph.matrix$matrix, morph.matrix$ordering), 2, paste, collapse = "")
 
   # Find just unique characters (no point repeating ancestral state reconstruction if codings and ordering are identical):
   unique.characters <- match(unique(collapse.matrix), collapse.matrix)
@@ -63,10 +66,14 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
   if(estimate.tips == FALSE) {
     
     # Create ancestral storage matrix:
+<<<<<<< HEAD
     anc.lik.matrix <- matrix(nrow=Nnode(tree), ncol=length(morph.matrix$matrix[1, ]))
 
     #TG: Create ancestral states scaled likelihood storage matrix:
     sca.lik.matrix <- anc.lik.matrix
+=======
+    anc.lik.matrix <- matrix(nrow = Nnode(tree), ncol = length(morph.matrix$matrix[1, ]))
+>>>>>>> graemetlloyd/master
     
     # Label matrix to record ancestral state estimates:
     rownames(anc.lik.matrix) <- c((Ntip(tree) + 1):(Ntip(tree) + Nnode(tree)))
@@ -75,7 +82,7 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
   } else {
 
     # Create ancestral storage matrix (including tips):
-    anc.lik.matrix <- matrix(nrow=Ntip(tree) + Nnode(tree), ncol=length(morph.matrix$matrix[1, ]))
+    anc.lik.matrix <- matrix(nrow = Ntip(tree) + Nnode(tree), ncol = length(morph.matrix$matrix[1, ]))
 
     #TG: Create ancestral states scaled likelihood storage matrix:
     sca.lik.matrix <- anc.lik.matrix
@@ -101,7 +108,7 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
       if(maxval != minval) {
             
         # If estimating states for all taxa then treat missing values as all possible states:
-        if(estimate.allchars) morph.matrix$matrix[which(is.na(morph.matrix$matrix[, i])), i] <- paste(minval:maxval, collapse="&")
+        if(estimate.allchars) morph.matrix$matrix[which(is.na(morph.matrix$matrix[, i])), i] <- paste(minval:maxval, collapse = "&")
             
         # Find tips which cannot be used due to missing data:
         tipstogo <- rownames(morph.matrix$matrix)[which(is.na(morph.matrix$matrix[, i]))]
@@ -128,7 +135,7 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
             if(maxval - minval > 1 && morph.matrix$ordering[i] == "ord") {
                         
               # Create all zero matrix:
-              mymodel <- matrix(0, nrow=(maxval - minval) + 1, ncol=(maxval - minval) + 1)
+              mymodel <- matrix(0, nrow = (maxval - minval) + 1, ncol = (maxval - minval) + 1)
                         
               # Name rows and columns as states:
               rownames(mymodel) <- colnames(mymodel) <- minval:maxval
@@ -139,7 +146,7 @@ AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, est
             }
                     
             # Create matrix to store probabilities of tip values:
-            tipvals.mat <- matrix(0, nrow=length(tipvals), ncol=maxval - minval + 1)
+            tipvals.mat <- matrix(0, nrow = length(tipvals), ncol = maxval - minval + 1)
       
             # Add rownames (tip labels):
             rownames(tipvals.mat) <- names(tipvals)
