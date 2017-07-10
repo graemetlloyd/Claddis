@@ -4,12 +4,14 @@
 \alias{ReadMorphNexus}
 \title{Reads in a morphological #NEXUS data file}
 \usage{
-ReadMorphNexus(file, equalise.weights = FALSE)
+ReadMorphNexus(file, equalise.weights = FALSE, gap.as.missing = TRUE)
 }
 \arguments{
 \item{file}{A file name specified by either a variable of mode character, or a double-quoted string.}
 
 \item{equalise.weights}{Optional that overrides the weights specified in the file to make all characters truly equally weighted.}
+
+\item{gap.as.missing}{Optional, whether to treat gaps as \code{NA} (\code{TRUE}; default) or not (\code{FALSE}).}
 }
 \value{
 \item{header}{Any header text included in the file given between square brackets as character.}
@@ -53,14 +55,13 @@ morph.matrix
 file.remove("morphmatrix.nex")
 
 }
-\author{
-Graeme T. Lloyd \email{graemetlloyd@gmail.com}
-}
 \references{
 Maddison, D. R., Swofford, D. L. and Maddison, W. P., 1997. NEXUS: an extensible file format for systematic information. Systematic Biology, 46, 590-621.
 }
 \seealso{
 \link{read.nexus.data}
 }
+\author{
+Graeme T. Lloyd \email{graemetlloyd@gmail.com}
+}
 \keyword{NEXUS}
-

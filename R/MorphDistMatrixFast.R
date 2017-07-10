@@ -105,7 +105,7 @@
   # The original description of your step
 #TG: See the end of the script for performance testing
 
-MorphDistMatrix <- function(morph.matrix, distance = c("Raw", "GED", "Gower", "Max", "Comp"), transform.proportional.distances="arcsine_sqrt") {
+MorphDistMatrixFast <- function(morph.matrix, distance = c("Raw", "GED", "Gower", "Max", "Comp"), transform.proportional.distances="arcsine_sqrt") {
   # Check format of transform.proportional.distances:
   if(transform.proportional.distances != "none" && transform.proportional.distances != "sqrt" && transform.proportional.distances != "arcsine_sqrt") {
 
