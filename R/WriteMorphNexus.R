@@ -54,13 +54,21 @@ WriteMorphNexus <- function(clad.matrix, filename) {
     
     # Fill with question marks (missing state):
     matrixblock[1:length(matrixblock)] <- "?"
-    
+
     # Get unique states:
     unique.states <- unique(sort(clad.matrix$matrix))
+
+    # Are there any inapplicable tokens
+    if(any(clad.matrix$matrix == "-")) {
+        # Write the inapplicable tokens in the matrix block
+        matrixblock[which(clad.matrix$matrix == "-")] <- "-"
+        
+        # Remove the inapplicable token from the unique.states vector
+        unique.states <- unique.states[-which(unique.states == "-")]
+    }   
     
     # For each state (including polymorphisms):
     for(i in unique.states) {
-        
         # Store positions in matrix of ith state:
         state.positions <- which(clad.matrix$matrix == i)
         

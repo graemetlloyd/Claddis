@@ -56,7 +56,7 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
   if(!is.null(colnames(CTmatrix))) colnames(CTmatrix) <- NULL
   
   # List any mystery character types:
-  mystery.characters <- setdiff(unique(unlist(strsplit(as.character(unique(as.vector(CTmatrix))), "&"))), c(as.character(0:31), NA))
+  mystery.characters <- setdiff(unique(unlist(strsplit(as.character(unique(as.vector(CTmatrix))), "&"))), c(as.character(0:31), NA, "-"))
   
   # If mystery character types are present warn user:
   if(length(mystery.characters) > 0) stop("Characters must either be the integers 0 to 31, NA for missing, or & for polymorphisms.")
@@ -91,11 +91,18 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
   # If no weights are set:
   if(is.null(weights)) weights <- rep(1, ncol(CTmatrix))
 
+  # Converting the inapplicables in the matrix if any
+  if(any(CTmatrix == "-")) {
+    CTmatrix_tmp <- gsub("-", NA, CTmatrix)
+  } else {
+    CTmatrix_tmp <- CTmatrix
+  }
+
   # Calculate minimum values:
-  min.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CTmatrix, 2, as.character), 2, strsplit, split = "&"), unlist), as.numeric), sort), min))
+  min.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CTmatrix_tmp, 2, as.character), 2, strsplit, split = "&"), unlist), as.numeric), sort), min))
 
   # Calculate maximum values:
-  max.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CTmatrix, 2, as.character), 2, strsplit, split = "&"), unlist), as.numeric), sort), max))
+  max.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CTmatrix_tmp, 2, as.character), 2, strsplit, split = "&"), unlist), as.numeric), sort), max))
 
   # Default step matrices to NULL for now (may add this option in future):
   step.matrices <- NULL
