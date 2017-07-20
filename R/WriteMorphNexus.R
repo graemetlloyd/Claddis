@@ -47,7 +47,7 @@ WriteMorphNexus <- function(clad.matrix, filename) {
     }
     
     # Make data block string:
-    datablock <- paste("BEGIN DATA;", paste("\t", "DIMENSIONS  NTAX=", nrow(clad.matrix$matrix), " NCHAR=", ncol(clad.matrix$matrix), ";", sep = ""), paste("\t", "FORMAT SYMBOLS= \" ", paste(clad.matrix$symbols, collapse = " "), "\" MISSING=? GAP=- ;", sep = ""), "\n", sep = "\n")
+    datablock <- paste("BEGIN DATA;", paste("\t", "DIMENSIONS  NTAX=", nrow(clad.matrix$matrix), " NCHAR=", ncol(clad.matrix$matrix), ";", sep = ""), paste("\t", "FORMAT DATATYPE=STANDARD SYMBOLS= \" ", paste(clad.matrix$symbols, collapse = " "), "\" MISSING=? GAP=- ;", sep = ""), "\n", sep = "\n")
     
     # Create matrix block:
     matrixblock <- clad.matrix$matrix
