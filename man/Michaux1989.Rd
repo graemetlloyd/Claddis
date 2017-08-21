@@ -14,4 +14,3 @@ Michaux, B., 1989. Cladograms can reconstruct phylogenies: an
 example from the fossil record. Alcheringa, 13, 21-36.
 }
 \keyword{datasets}
-

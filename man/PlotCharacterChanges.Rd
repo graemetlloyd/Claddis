@@ -45,4 +45,3 @@ PlotCharacterChanges(out$character.changes, tree)
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-

@@ -37,11 +37,10 @@ Michaux1989compact$matrix
 Michaux1989compact$weights
 
 }
-\author{
-Graeme T. Lloyd \email{graemetlloyd@gmail.com}
-}
 \seealso{
 \link{SafeTaxonomicReduction} and \link{MatrixPruner}
 }
+\author{
+Graeme T. Lloyd \email{graemetlloyd@gmail.com}
+}
 \keyword{NEXUS}
-

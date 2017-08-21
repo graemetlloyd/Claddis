@@ -43,12 +43,11 @@ tree$root.time <- max(diag(vcv(tree)))
 AncStateEstMatrix(Michaux1989, tree)
 
 }
-\author{
-Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Thomas Guillerme \email{guillert@tcd.ie}
-}
 \references{
 Brusatte, S. L., Lloyd, G. T., Wang, S. C. and Norell, M. A., 2014. Gradual assembly of avian body plan culminated in rapid rates of evolution across dinosaur-bird transition. Current Biology, 24, 2386-2392.
 
 Yang, Z., Kumar, S. and Nei, M., 1995. A new method of inference of ancestral nucleotide and amino acid sequences. Genetics, 141, 1641-1650.
 }
-
+\author{
+Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Thomas Guillerme \email{guillert@tcd.ie}
+}

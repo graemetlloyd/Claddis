@@ -48,4 +48,3 @@ pruned.tree$root.time
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-

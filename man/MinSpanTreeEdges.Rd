@@ -40,4 +40,3 @@ sum(MinSpanTreeEdges(dist.matrix))
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-

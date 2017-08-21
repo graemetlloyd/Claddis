@@ -44,4 +44,3 @@ EdgeLengthsInBins(tree, time.bins)
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-

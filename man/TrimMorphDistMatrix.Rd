@@ -38,4 +38,3 @@ TrimMorphDistMatrix(distances$max.dist.matrix)
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-

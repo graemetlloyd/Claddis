@@ -51,10 +51,9 @@ CTmatrix <- matrix(sample(c("0", "1", "0&1", NA), 500,
 MakeMorphMatrix(CTmatrix)
 
 }
-\author{
-Graeme T. Lloyd \email{graemetlloyd@gmail.com}
-}
 \seealso{
 \link{ReadMorphNexus}
 }
-
+\author{
+Graeme T. Lloyd \email{graemetlloyd@gmail.com}
+}

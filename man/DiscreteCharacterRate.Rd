@@ -50,9 +50,6 @@ DiscreteCharacterRate(tree, Michaux1989,
   seq(tree$root.time, 0, length.out = 3), alpha = 0.01)
 
 }
-\author{
-Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Steve C. Wang \email{scwang@swarthmore.edu}
-}
 \references{
 Brusatte, S. L., Lloyd, G. T., Wang, S. C. and Norell, M. A., 2014. Gradual assembly of avian body plan culminated in rapid rates of evolution across dinosaur-bird transition. Current Biology, 24, 2386-2392.
 
@@ -60,5 +57,7 @@ Close, R. A., Friedman, M., Lloyd, G. T. and Benson, R. B. J., 2015. Evidence fo
 
 Lloyd, G. T., Wang, S. C. and Brusatte, S. L., 2012. Identifying heterogeneity in rates of morphological evolution: discrete character change in the evolution of lungfish (Sarcopterygii; Dipnoi). Evolution, 66, 330-348.
 }
+\author{
+Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Steve C. Wang \email{scwang@swarthmore.edu}
+}
 \keyword{evolution,rates}
-

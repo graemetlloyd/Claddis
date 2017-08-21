@@ -88,9 +88,6 @@ names(groups) <- rownames(ordination_axes)
 StackPlot(ordination_axes, ages, groups, time_slices)
 
 }
-\author{
-Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Emma Sherratt \email{emma.sherratt@gmail.com}
-}
 \references{
 Foote, M., 1993. Discordance and concordance between morphological and taxonomic diversity. Paleobiology, 19, 185-204.
 
@@ -102,6 +99,8 @@ Foote, M., 1999. Morphological diversity in the evolutionary radiation of Paleoz
 
 Friedman, M. and Coates, M. I., 2006. A newly recognized fossil coelacanth highlights the early morphological diversification of the clade. Proceedings of the Royal Society of London B, 273, 245-250
 }
+\author{
+Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Emma Sherratt \email{emma.sherratt@gmail.com}
+}
 \keyword{coordinates}
 \keyword{principal}
-

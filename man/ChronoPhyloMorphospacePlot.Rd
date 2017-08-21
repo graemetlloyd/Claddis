@@ -45,12 +45,11 @@ pcoa_data <- MorphMatrix2PCoA(Michaux1989, tree = tree)
 ChronoPhyloMorphospacePlot(pcoa_data)
 
 }
-\author{
-Emma Sherratt \email{emma.sherratt@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@gmail.com}
-}
 \references{
 Sakamoto, M. and Ruta, M. 2012. Convergence and divergence in the evolution of cat skulls: temporal and spatial patterns of morphological diversity. PLoS ONE, 7, e39752.
 }
+\author{
+Emma Sherratt \email{emma.sherratt@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@gmail.com}
+}
 \keyword{coordinates}
 \keyword{principal}
-

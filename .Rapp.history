@@ -1,0 +1,262 @@
+# Install the devtools package from CRAN:#
+install.packages("devtools")#
+#
+# Install the phytools and Claddis packages from github:#
+devtools::install_github("liamrevell/phytools")#
+devtools::install_github("graemetlloyd/Claddis")#
+#
+# Load the Claddis package into R:#
+library(Claddis)
+devtools::install_github("graemetlloyd/metatree")
+library(gdata)
+# ADD CONDITIONAL SO DO NOT TRY TO RESOLVE NAMES THAT ARE ALREADY RESOLVED#
+# ADD CONDITIONAL SO ONLY ATTEMPT TO RESOLVE SPECIES NAMES (GENERAA OR OTHER SUPRASPECIFIC TAXA MAY REPRESENT SPECIFIC SPECIFIC TAXA!)#
+# NEED TO COME UP WITH SENSIBLE ORDER TO DO XML PARENT CHECKS SO FILLED OUT PARENT ALWAYS GIVES ITS FILLED OUT DATA TO FURTHER CHILDREN#
+#
+# Load libraries:#
+library(metatree)#
+library(Claddis)#
+#
+# Set working directory as XML folder:#
+setwd("~/Documents/Homepage/www.graemetlloyd.com/xml")#
+#
+# List all XML files:#
+xmlfiles <- list.files()#
+#
+# Create empty vector to store parent datasets:#
+parentdataset <- vector(mode = "character")#
+#
+# For each XML file:#
+for(i in xmlfiles) {#
+    # Read in ith XML file:#
+    currentxml <- readLines(i)#
+    # If there is a parent data set (from which to draw recinciliation data from):#
+    parentdataset <- c(parentdataset, ifelse(length(grep("<Parent>", currentxml)) > 0, strsplit(currentxml[grep("<Parent>", currentxml)], "<|>")[[1]][3], ""))#
+}#
+#
+# Add file names to parent data set vector:#
+names(parentdataset) <- gsub(".xml", "", xmlfiles)#
+#
+# get vector of "dead" parents, i.e., those not currently present in the data pool:#
+deadparents <- sort(setdiff(unique(parentdataset), names(parentdataset)))[which(nchar(sort(setdiff(unique(parentdataset), names(parentdataset)))) > 0)]#
+#
+# Remove dead parents from parent list:#
+for(i in deadparents) parentdataset[which(parentdataset == i)] <- ""#
+#
+# Create empty parent depth vector (number of links to original data set):#
+parentdepth <- vector(mode = "numeric")#
+#
+# For each data set:#
+for(i in names(parentdataset)) {#
+    # Set starting depth at zero (no parent at all):#
+    currentdepth <- 0#
+    # If there is at least an initial parent:#
+    if(parentdataset[i] != "") {#
+        # Increase depth by one:#
+        currentdepth <- currentdepth + 1#
+        # While there are further parents:#
+        while(parentdataset[i] != "") {#
+            # Increase depth by one#
+            currentdepth <- currentdepth + 1#
+            # Update new parent:#
+            i <- parentdataset[i]#
+        }#
+    }#
+    # Add parent depth to vector:#
+    parentdepth <- c(parentdepth, currentdepth)#
+}#
+#
+# reorder xml file lists by paret depth (ensures parents are filled out before children so names can always be carried forwards):#
+xmlfiles <- xmlfiles[order(parentdepth)]#
+#
+# For each XML file:#
+for(i in xmlfiles) {#
+    # Read in ith XML file:#
+    currentxml <- readLines(i)#
+    # If there is a parent data set (from which to draw recinciliation data from):#
+    if(length(grep("<Parent>", currentxml)) > 0) {#
+        # Get parent data set file name:#
+        parentdataset <- strsplit(currentxml[grep("<Parent>", currentxml)], "<|>")[[1]][3]#
+        # Check parent has been processed (has an XML file on which to draw):#
+        if(!is.na(match(paste(parentdataset, ".xml", sep = ""), xmlfiles))) {#
+            # Isolate taxon names block:#
+            taxonnameblock <- currentxml[(grep("<Taxa", currentxml) + 1):(grep("</Taxa", currentxml) - 1)]#
+            # Reformat as matrix:#
+            taxonnameblock <- matrix(unlist(lapply(strsplit(taxonnameblock, "\"|>|<"), '[', c(3, 5, 7))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("ReconName", "ReconNo", "OTUName")))#
+            # If there are unreconciled taxa:#
+            if(any(taxonnameblock[, "ReconNo"] == "-1")) {#
+                # Get just the unreconciled names (we don't care about ones already done):#
+                unreconcilednames <- taxonnameblock[which(taxonnameblock[, "ReconNo"] == "-1"), "OTUName"]#
+                # Read in ith XML file:#
+                parentxml <- readLines(paste(parentdataset, ".xml", sep = ""))#
+                # Isolate taxon names block:#
+                parenttaxonnameblock <- parentxml[(grep("<Taxa", parentxml) + 1):(grep("</Taxa", parentxml) - 1)]#
+                # Reformat as matrix:#
+                parenttaxonnameblock <- matrix(unlist(lapply(strsplit(parenttaxonnameblock, "\"|>|<"), '[', c(3, 5, 7))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("ReconName", "ReconNo", "OTUName")))#
+                # If at least one name can be reconciled using parent data set data:#
+                if(any(!is.na(match(unreconcilednames, parenttaxonnameblock[, "OTUName"])))) {#
+                    # Update unreconciled names as just those also present in parent data:#
+                    unreconcilednames <- unreconcilednames[!is.na(match(unreconcilednames, parenttaxonnameblock[, "OTUName"]))]#
+#
+                    # Update taxon names block with parent data:#
+                    taxonnameblock[match(unreconcilednames, taxonnameblock[, "OTUName"]), ] <- parenttaxonnameblock[match(unreconcilednames, parenttaxonnameblock[, "OTUName"]), ]#
+                }#
+            }#
+            # Add taxonblock back into currentxml:#
+            currentxml[(grep("<Taxa", currentxml) + 1):(grep("</Taxa", currentxml) - 1)] <- paste("\t\t<List recon_name=\"", taxonnameblock[, "ReconName"], "\" recon_no=\"", taxonnameblock[, "ReconNo"], "\">", taxonnameblock[, "OTUName"], "</List>", sep = "")#
+#
+        }#
+#
+    }#
+    # Write out XML:#
+    write(x = paste(currentxml, collapse = "\n"), file = i)#
+}
+# For each XML file:#
+for(i in xmlfiles) {#
+    # Read in ith XML file:#
+    currentxml <- readLines(i)#
+    # Isolate taxon names block:#
+    taxonnameblock <- currentxml[(grep("<Taxa", currentxml) + 1):(grep("</Taxa", currentxml) - 1)]#
+    # Convert into matrix:#
+    taxonnameblock <- matrix(unlist(lapply(strsplit(taxonnameblock, "\"|>|<"), '[', c(3, 5, 7))), ncol = 3, byrow = TRUE)#
+}
+taxonnameblock
+taxonnameblock[, 2]
+taxonnameblock[, 2] == "-1"
+any(taxonnameblock[, 2] == "-1")
+# Create empty to do list of remaining data sets:#
+newtodolist <- vector(mode = "character")#
+#
+# For each XML file:#
+for(i in xmlfiles) {#
+    # Read in ith XML file:#
+    currentxml <- readLines(i)#
+    # Isolate taxon names block:#
+    taxonnameblock <- currentxml[(grep("<Taxa", currentxml) + 1):(grep("</Taxa", currentxml) - 1)]#
+    # Convert into matrix:#
+    taxonnameblock <- matrix(unlist(lapply(strsplit(taxonnameblock, "\"|>|<"), '[', c(3, 5, 7))), ncol = 3, byrow = TRUE)#
+    if(any(taxonnameblock[, 2] == "-1")) newtodolist <- sort(c(newtodolist, i))#
+}
+newtodolist
+# Create empty to do list of remaining data sets:#
+newtodolist <- vector(mode = "character")#
+#
+# For each XML file:#
+for(i in xmlfiles) {#
+    # Read in ith XML file:#
+    currentxml <- readLines(i)#
+    # Isolate taxon names block:#
+    taxonnameblock <- currentxml[(grep("<Taxa", currentxml) + 1):(grep("</Taxa", currentxml) - 1)]#
+    # Convert into matrix:#
+    taxonnameblock <- matrix(unlist(lapply(strsplit(taxonnameblock, "\"|>|<"), '[', c(3, 5, 7))), ncol = 3, byrow = TRUE)#
+    # If data set has any unresolved names then add it to the to do list:#
+    if(any(taxonnameblock[, 2] == "-1")) {#
+        newtodolist <- c(newtodolist, sum(taxonnameblock[, 2] == "-1"))#
+        names(newtodolist)[length(newtodolist)] <- i#
+        newtodolist <- newtodolist[order(newtodolist)]#
+    }#
+}
+newtodolist
+# Create empty to do list of remaining data sets:#
+newtodolist <- vector(mode = "numeric")#
+#
+# For each XML file:#
+for(i in xmlfiles) {#
+    # Read in ith XML file:#
+    currentxml <- readLines(i)#
+    # Isolate taxon names block:#
+    taxonnameblock <- currentxml[(grep("<Taxa", currentxml) + 1):(grep("</Taxa", currentxml) - 1)]#
+    # Convert into matrix:#
+    taxonnameblock <- matrix(unlist(lapply(strsplit(taxonnameblock, "\"|>|<"), '[', c(3, 5, 7))), ncol = 3, byrow = TRUE)#
+    # If data set has any unresolved names then add it to the to do list:#
+    if(any(taxonnameblock[, 2] == "-1")) {#
+        newtodolist <- c(newtodolist, sum(taxonnameblock[, 2] == "-1"))#
+        names(newtodolist)[length(newtodolist)] <- i#
+        newtodolist <- newtodolist[order(newtodolist)]#
+    }#
+}
+newtodolist
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Cormohipparion sphenodus")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Cyonosaurus")
+newtodolist[1:20]
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Cyonosaurus")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Quetzalichthys")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Cleiothyridininae")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Cleiothyrininae")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Cleiothyridinae")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Cleiothyrididinae")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Pristidactylus")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Pteranodontidae")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Scaphonyx sanjuanensis")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Pinnarctidion bishopi")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Pelagiarctos")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Cyonosaurus")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Pucapampella")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Crocodylus acer")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Regaliceratops peterhewsi")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Regaliceratops")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Sillosuchus")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Procellariformes")
+PaleobiologyDBTaxonQuerier(taxon_no = "1", taxon_name = "Procellariiformes")
+# Create empty to do list of remaining data sets:#
+newtodolist <- vector(mode = "numeric")#
+#
+# For each XML file:#
+for(i in xmlfiles) {#
+    # Read in ith XML file:#
+    currentxml <- readLines(i)#
+    # Isolate taxon names block:#
+    taxonnameblock <- currentxml[(grep("<Taxa", currentxml) + 1):(grep("</Taxa", currentxml) - 1)]#
+    # Convert into matrix:#
+    taxonnameblock <- matrix(unlist(lapply(strsplit(taxonnameblock, "\"|>|<"), '[', c(3, 5, 7))), ncol = 3, byrow = TRUE)#
+    # If data set has any unresolved names:#
+    if(any(taxonnameblock[, 2] == "-1")) {#
+        # Count number still to do and add to list:#
+        newtodolist <- c(newtodolist, sum(taxonnameblock[, 2] == "-1"))#
+        # Add data set name to list:#
+        names(newtodolist)[length(newtodolist)] <- i#
+        # Reorder list:#
+        newtodolist <- newtodolist[order(newtodolist)]#
+    }#
+}#
+#
+newtodolist
+# Show new to do list ten easiest to finish:#
+newtodolist[1:10]
+length(xmfiles)
+length(xmlfiles)
+length(newtodolist)
+length(newtodolist) / length(newtodolist)
+length(newtodolist) / length(xmfiles)
+length(newtodolist) / length(xmlfiles)
+1 - (length(newtodolist) / length(xmlfiles))
+1 - (length(newtodolist) / length(xmlfiles)) * 100
+(1 - (length(newtodolist) / length(xmlfiles)))
+(1 - (length(newtodolist) / length(xmlfiles))) * 100
+# Create empty to do list of remaining data sets:#
+newtodolist <- vector(mode = "numeric")#
+#
+# For each XML file:#
+for(i in xmlfiles) {#
+    # Read in ith XML file:#
+    currentxml <- readLines(i)#
+    # Isolate taxon names block:#
+    taxonnameblock <- currentxml[(grep("<Taxa", currentxml) + 1):(grep("</Taxa", currentxml) - 1)]#
+    # Convert into matrix:#
+    taxonnameblock <- matrix(unlist(lapply(strsplit(taxonnameblock, "\"|>|<"), '[', c(3, 5, 7))), ncol = 3, byrow = TRUE)#
+    # If data set has any unresolved names:#
+    if(any(taxonnameblock[, 2] == "-1")) {#
+        # Count number still to do and add to list:#
+        newtodolist <- c(newtodolist, sum(taxonnameblock[, 2] == "-1"))#
+        # Add data set name to list:#
+        names(newtodolist)[length(newtodolist)] <- i#
+        # Reorder list:#
+        newtodolist <- newtodolist[order(newtodolist)]#
+    }#
+}#
+#
+# Show new to do list ten easiest to finish:#
+newtodolist[1:10]
+setwd("~/Documents/Packages/Claddis/Claddis")
+library(devtools)
+check()

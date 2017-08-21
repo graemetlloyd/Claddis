@@ -58,4 +58,3 @@ out$SCM
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-

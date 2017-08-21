@@ -54,4 +54,3 @@ GetAllStateChanges(Michaux1989, tree,
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-

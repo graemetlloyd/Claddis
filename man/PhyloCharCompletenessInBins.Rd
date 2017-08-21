@@ -44,4 +44,3 @@ PhyloCharCompletenessInBins(CladMatrix = Gauthier1986,
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-

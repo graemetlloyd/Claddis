@@ -55,4 +55,3 @@ distances$comp.char.matrix
 Thomas Guillerme \email{guillert@tcd.ie}
 }
 \keyword{distance}
-

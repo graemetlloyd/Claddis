@@ -33,4 +33,3 @@ Explanatory text.
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-
