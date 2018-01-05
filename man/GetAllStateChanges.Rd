@@ -30,7 +30,7 @@ Important: this function is not yet complete and should not be used.
 
 A wrapper function for \link{make.simmap} in the \link{phytools} package.
 
-This function is intended to numerate all possible changes on a tree (including to and from missing or inapplicable states) under the assumptions of stochastic character mapping as an alternative means of establishing branch-lengths (for rate analyses) or recording the state occupied at a particular point in time for disparity analyses.
+This function is intended to enumerate all possible changes on a tree (including to and from missing or inapplicable states) under the assumptions of stochastic character mapping as an alternative means of establishing branch-lengths (for rate analyses) or recording the state occupied at a particular point in time for disparity analyses.
 }
 \examples{
 
