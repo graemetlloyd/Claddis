@@ -32,14 +32,13 @@ WriteMorphTNT(clad.matrix = Michaux1989, filename = "Michaux1989.tnt")
 file.remove("Michaux1989.tnt")
 
 }
-\author{
-Graeme T. Lloyd \email{graemetlloyd@gmail.com}
-}
 \references{
 Goloboff, P., Farris, J. and Nixon, K., 2008. TNT, a free program for phylogenetic analysis. Cladistics, 24, 774-786.
 }
 \seealso{
 \link{WriteMorphNexus}
 }
+\author{
+Graeme T. Lloyd \email{graemetlloyd@gmail.com}
+}
 \keyword{TNT}
-

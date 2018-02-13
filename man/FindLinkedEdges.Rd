@@ -32,4 +32,3 @@ FindLinkedEdges(tree)
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-

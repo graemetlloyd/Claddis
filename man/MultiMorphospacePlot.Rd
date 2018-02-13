@@ -42,4 +42,3 @@ Emma Sherratt \email{emma.sherratt@gmail.com} and Graeme T. Lloyd \email{graemet
 }
 \keyword{coordinates}
 \keyword{principal}
-

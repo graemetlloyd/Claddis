@@ -26,11 +26,10 @@ prunedmatrix <- MatrixPruner(clad.matrix = Gauthier1986, taxa2prune = c("Outgrou
   characters2prune = c(11, 53))
 
 }
-\author{
-Graeme T. Lloyd \email{graemetlloyd@gmail.com}
-}
 \seealso{
 \link{ReadMorphNexus}
 }
+\author{
+Graeme T. Lloyd \email{graemetlloyd@gmail.com}
+}
 \keyword{NEXUS}
-

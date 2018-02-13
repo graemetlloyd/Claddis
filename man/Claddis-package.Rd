@@ -2,8 +2,8 @@
 % Please edit documentation in R/Claddis-package.R
 \docType{package}
 \name{Claddis-package}
-\alias{Claddis}
 \alias{Claddis-package}
+\alias{Claddis}
 \title{Measuring Morphological Diversity and Evolutionary Tempo}
 \description{
 Measures morphological diversity from discrete character data and estimates evolutionary tempo on phylogenetic trees.
@@ -16,9 +16,6 @@ distances <- MorphDistMatrix(Michaux1989)
 # Show distances:
 distances
 
-}
-\author{
-Graeme T. Lloyd <graemetlloyd@gmail.com>
 }
 \references{
 Brusatte, S. L., Benton, M. J., Ruta, M. and Lloyd, G. T., 2008a. Superiority, competition, and opportunism in the evolutionary radiation of dinosaurs. Science, 321, 1485-1488.
@@ -33,5 +30,7 @@ Lloyd, G. T., 2016. Estimating morphological diversity and tempo with discrete c
 
 Lloyd, G. T., Wang, S. C. and Brusatte, S. L., 2012. Identifying heterogeneity in rates of morphological evolution: discrete character change in the evolution of lungfish (Sarcopterygii; Dipnoi). Evolution, 66, 330-348.
 }
+\author{
+Graeme T. Lloyd <graemetlloyd@gmail.com>
+}
 \keyword{disparity,distance,morphology,phylogeny}
-

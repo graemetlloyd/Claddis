@@ -58,13 +58,12 @@ distances$max.dist.matrix
 distances$comp.char.matrix
 
 }
-\author{
-Graeme T. Lloyd \email{graemetlloyd@gmail.com}
-}
 \references{
 Gower, J. C., 1971. A general coefficient of similarity and some of its properties. Biometrics, 27, 857-871.
 
 Wills, M. A., 2001a. Morphological disparity: a primer. In: Adrain, J. M., Edgecombe, G. D. and Lieberman, B. S. (eds.), Fossils, Phylogeny, and Form: An Analytical Approach. Kluwer Academic/Plenum Publishers, New York, p55-144.
 }
+\author{
+Graeme T. Lloyd \email{graemetlloyd@gmail.com}
+}
 \keyword{distance}
-

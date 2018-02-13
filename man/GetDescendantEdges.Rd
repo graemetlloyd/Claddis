@@ -40,4 +40,3 @@ GetDescendantEdges(7, tree)
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-
