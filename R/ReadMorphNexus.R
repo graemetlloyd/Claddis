@@ -105,7 +105,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
     # For each label find the end tag that corresponds to it:
     for(i in 1:length(label.begins)) label.ends[i] <- min(grep(";", X, ignore.case = TRUE)[grep(";", X, ignore.case = TRUE) > label.begins[i]])
 
-    # Incerementally remove superflouous labels:
+    # Incrementally remove superflouous labels:
     for(i in length(label.begins):1) X <- X[c(c(1:(label.begins[i] - 1)), c((label.ends[i] + 1):length(X)))]
 
   }
@@ -310,7 +310,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
 
   }
 
-  # if there are interelaved lines:
+  # if there are interleaved lines:
   if(length(grep("interleave", X, ignore.case = TRUE)) > 0) {
 
     # Get start of matrix block(s):

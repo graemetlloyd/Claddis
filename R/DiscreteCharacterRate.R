@@ -54,6 +54,12 @@
 
 DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   
+  # Check tree has branch lengths:
+  if(is.null(tree$edge.length)) stop("Tree does not have branch lengths (durations). Try timescaling the tree, e.g., with DatePhylo.")
+  
+  # Check tree has root age:
+  if(is.null(tree$root.time)) stop("Tree is missing $root.time. Try setting this before continuing, e.g., tree$root.time <- 104.2.")
+  
   # Ensure time bins are in correct order:
   time.bins <- sort(time.bins, decreasing = TRUE)
 
