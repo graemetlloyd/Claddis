@@ -4,32 +4,26 @@
 \alias{ReadMorphNexus}
 \title{Reads in a morphological #NEXUS data file}
 \usage{
-ReadMorphNexus(file, equalise.weights = FALSE)
+ReadMorphNexus(File, EqualiseWeights = FALSE)
 }
 \arguments{
-\item{file}{A file name specified by either a variable of mode character, or a double-quoted string.}
+\item{EqualiseWeights}{Optional that overrides the weights specified in the file to make all characters truly equally weighted.}
 
-\item{equalise.weights}{Optional that overrides the weights specified in the file to make all characters truly equally weighted.}
+\item{file}{A file name specified by either a variable of mode character, or a double-quoted string.}
 }
 \value{
-\item{header}{Any header text included in the file given between square brackets as character.}
-\item{matrix}{A matrix of taxa (rows) and characters (columns). The matrix is in character format in order to deal with polymorphisms, which are separated by ampersands.}
-\item{ordering}{A character vector of the same length as the number of morphological characters indicating whether they are ordered (\code{ord}) or unordered (\code{unord}).}
-\item{weights}{A numeric vector of the same length as the number of morphological characters indicating their weights.}
-\item{max.vals}{A numeric vector of the same length as the number of morphological characters indicating the maximum state values.}
-\item{min.vals}{A numeric vector of the same length as the number of morphological characters indicating the minimum state values.}
-\item{step.matrices}{A list of any step matrices supplied in the input file. Is \code{NULL} if none are specified.}
-\item{symbols}{The original symbols used in the input data (these are replaced in the matrix by integers starting at zero.}
+\item{Topper}{Contains any header text or step matrices and pertains to the entire file.}
+\item{Matrix_N}{One or more matrix blocks (numbered 1 to N) with associated information pertaining only to that matrix block. This includes the block name (if specificed, NA if not), the block datatype (one of "CONTINUOUS", "DNA", "NUCLEOTIDE", "PROTEIN", "RESTRICTION", "RNA", or "STANDARD"), the actual matrix (taxa as rows, names stored as rownames and characters as columns), the ordering type of each character ("ord" = ordered, "unord" = unordered), the character weights, the minimum and maximum values (used by Claddis' distance functions), and the original characters (symbols, missing, and gap values) used for writing out the data.}
 }
 \description{
 Reads in a morphological data file in #NEXUS format.
 }
 \details{
-Reads in a #NEXUS (Maddison et al. 1997) data file representing the distribution of discrete morphological characters in a set of taxa. Unlike \link{read.nexus.data} this function can handle polymorphisms (e.g., \code{(012)}).
+Reads in a #NEXUS (Maddison et al. 1997) data file representing the distribution of characters (continuous, discrete, DNA etc.) in a set of taxa. Unlike \link{read.nexus.data} this function can handle polymorphisms (e.g., \code{(012)}).
 
-Note that the function is generally intolerant to excursions from a standard format and it is recommended your data be formatted like the \code{morphmatrix.nex} example below.
+Note that the function is generally intolerant to excursions from a standard format and it is recommended your data be formatted like the \code{morphmatrix.nex} example below. However, the function also produces informative error messages if (expected) excursions are discovered.
 
-All empty values (missing or inapplicable) are treated as NAs.
+Previously all empty values (missing or inapplicable) were treated as NAs. But now anything coded as a "gap" now appears as an empty text string ("") in the matrix. Additionally, previously polymorphisms and uncertianties were both considered as polymorphisms with multiple states separated by an ampersand ("&"), but now polymorphisms use the ampersand ("&") and uncertainties use a slash ("/"), allowing for different treatment later and correct outputting when writing to #NEXUS format. (NB: TNT does not allow this distinction and so both polymorphisms and uncertainties will be output as polymorphisms.)
 }
 \examples{
 

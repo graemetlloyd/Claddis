@@ -2,25 +2,19 @@
 #' 
 #' Reads in a morphological data file in #NEXUS format.
 #' 
-#' Reads in a #NEXUS (Maddison et al. 1997) data file representing the distribution of discrete morphological characters in a set of taxa. Unlike \link{read.nexus.data} this function can handle polymorphisms (e.g., \code{(012)}).
+#' Reads in a #NEXUS (Maddison et al. 1997) data file representing the distribution of characters (continuous, discrete, DNA etc.) in a set of taxa. Unlike \link{read.nexus.data} this function can handle polymorphisms (e.g., \code{(012)}).
 #' 
-#' Note that the function is generally intolerant to excursions from a standard format and it is recommended your data be formatted like the \code{morphmatrix.nex} example below.
+#' Note that the function is generally intolerant to excursions from a standard format and it is recommended your data be formatted like the \code{morphmatrix.nex} example below. However, the function also produces informative error messages if (expected) excursions are discovered.
 #' 
-#' All empty values (missing or inapplicable) are treated as NAs.
+#' Previously all empty values (missing or inapplicable) were treated as NAs. But now anything coded as a "gap" now appears as an empty text string ("") in the matrix. Additionally, previously polymorphisms and uncertianties were both considered as polymorphisms with multiple states separated by an ampersand ("&"), but now polymorphisms use the ampersand ("&") and uncertainties use a slash ("/"), allowing for different treatment later and correct outputting when writing to #NEXUS format. (NB: TNT does not allow this distinction and so both polymorphisms and uncertainties will be output as polymorphisms.)
 #' 
 #' @param file A file name specified by either a variable of mode character, or a double-quoted string.
-#' @param equalise.weights Optional that overrides the weights specified in the file to make all characters truly equally weighted.
+#' @param EqualiseWeights Optional that overrides the weights specified in the file to make all characters truly equally weighted.
 #'
 #' @return
 #'
-#' \item{header}{Any header text included in the file given between square brackets as character.}
-#' \item{matrix}{A matrix of taxa (rows) and characters (columns). The matrix is in character format in order to deal with polymorphisms, which are separated by ampersands.}
-#' \item{ordering}{A character vector of the same length as the number of morphological characters indicating whether they are ordered (\code{ord}) or unordered (\code{unord}).}
-#' \item{weights}{A numeric vector of the same length as the number of morphological characters indicating their weights.}
-#' \item{max.vals}{A numeric vector of the same length as the number of morphological characters indicating the maximum state values.}
-#' \item{min.vals}{A numeric vector of the same length as the number of morphological characters indicating the minimum state values.}
-#' \item{step.matrices}{A list of any step matrices supplied in the input file. Is \code{NULL} if none are specified.}
-#' \item{symbols}{The original symbols used in the input data (these are replaced in the matrix by integers starting at zero.}
+#' \item{Topper}{Contains any header text or step matrices and pertains to the entire file.}
+#' \item{Matrix_N}{One or more matrix blocks (numbered 1 to N) with associated information pertaining only to that matrix block. This includes the block name (if specificed, NA if not), the block datatype (one of "CONTINUOUS", "DNA", "NUCLEOTIDE", "PROTEIN", "RESTRICTION", "RNA", or "STANDARD"), the actual matrix (taxa as rows, names stored as rownames and characters as columns), the ordering type of each character ("ord" = ordered, "unord" = unordered), the character weights, the minimum and maximum values (used by Claddis' distance functions), and the original characters (symbols, missing, and gap values) used for writing out the data.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -54,15 +48,165 @@
 #' file.remove("morphmatrix.nex")
 #' 
 #' @export ReadMorphNexus
-ReadMorphNexus <- function(file, equalise.weights = FALSE) {
+ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
+  
+  # ADD ABILITY TO READ CHARSET LINES
+  
+  # Line formatting function to be used in lapply below to deal with polymorphic characters:
+  LineFormatter <- function(x, direction = "in") {
     
-# ADD WARNINGS FOR discrete.matrix AND continuous.matrix IF ROWS DO NOT HAVE THE RIGHT NUMBER OF CHARACTERS
+    # Split current line by character:
+    CurrentString <- strsplit(x, split = "")[[1]]
+    
+    # Check for square brackets:
+    if(any(CurrentString == "[")) stop("TNT-style square brackets, [], found in matrix. Replace with () or {} depending on whether a true polymorphism or uncertainty respectively.")
+    
+    # If polymorphisms (i.e., parentheses) are found:
+    if(any(c(CurrentString == "{", CurrentString == "("))) {
+      
+      # While there are polymorphisms:
+      while(any(c(CurrentString == "{", CurrentString == "("))) {
+        
+        # Find beginning of first polymorphism (will loop through first polymorphism until none are left):
+        FirstPolymorphismBegins <- c(which(CurrentString == "{"), which(CurrentString == "("))[1]
+        
+        # If polymorphsim begins with a parenthesis then it must end with a parenthesis:
+        if(CurrentString[FirstPolymorphismBegins] == "(") PolymorphismEndsWith <- ")"
+        
+        # If polymorphsim begins with a curly brace then it must end with a curly brace:
+        if(CurrentString[FirstPolymorphismBegins] == "{") PolymorphismEndsWith <- "}"
+        
+        # Find end of first polymorphism:
+        FirstPolymorphismEnds <- which(CurrentString == PolymorphismEndsWith)[1]
+        
+        # If a true polymorphism (two or more states observed) and reading data in use ampersand to separate states:
+        if(CurrentString[FirstPolymorphismBegins] == "(" && direction == "in") PolymorphicCharacter <- paste(sort(CurrentString[(FirstPolymorphismBegins + 1):(FirstPolymorphismEnds - 1)]), collapse = "&")
+        
+        # If an uncertainty (two or more possible states) and reading data in use slash to separate states:
+        if(CurrentString[FirstPolymorphismBegins] == "{" && direction == "in") PolymorphicCharacter <- paste(sort(CurrentString[(FirstPolymorphismBegins + 1):(FirstPolymorphismEnds - 1)]), collapse = "/")
+        
+        # If a true polymorphism (two or more states observed) and exporting data out use ampersand to separate states:
+        if(CurrentString[FirstPolymorphismBegins] == "(" && direction == "out") PolymorphicCharacter <- paste("(", paste(sort(CurrentString[(FirstPolymorphismBegins + 1):(FirstPolymorphismEnds - 1)]), collapse = ""), ")", sep = "")
+        
+        # If an uncertainty (two or more possible states) and exporting data out use slash to separate states:
+        if(CurrentString[FirstPolymorphismBegins] == "{" && direction == "out") PolymorphicCharacter <- paste("{", paste(sort(CurrentString[(FirstPolymorphismBegins + 1):(FirstPolymorphismEnds - 1)]), collapse = ""), "}", sep = "")
+        
+        # Remove now redundant characters from current string:
+        CurrentString <- CurrentString[-((FirstPolymorphismBegins + 1):FirstPolymorphismEnds)]
+        
+        # Store polymorphic character in string:
+        CurrentString[FirstPolymorphismBegins] <- PolymorphicCharacter
+        
+      }
+      
+    }
+    
+    # Return string with polymorphisms formatted to single characters:
+    return(CurrentString)
+    
+  }
+  
+  # Subfunction to extract ordering information:
+  AssumptionExtractor <- function(assumptionline) {
+    
+    # Reformat as a list:
+    x <- lapply(lapply(as.list(gsub(";", "", strsplit(assumptionline, split = ", ")[[1]])), strsplit, split = ": "), unlist)
+    
+    # Extarct just the numbers:
+    Numbers <- lapply(lapply(lapply(x, '[', 2), strsplit, split = " "), unlist)
+    
+    # If there are hyphens (ranges) in the data:
+    if(length(grep("-", Numbers)) > 0) {
+      
+      # Subfunction for unpacking ranges denoted by hyphens:
+      RangeUnpacker <- function(Numbers) {
+        
+        # Whilst hyphens remain in the data:
+        while(length(grep("-", Numbers)) > 0) {
+          
+          # Find first hyphen:
+          FirstHyphen <- grep("-", Numbers)[1]
+          
+          # Unpack and add at end whilst removing first hyphen:
+          Numbers <- c(Numbers[-FirstHyphen], as.character(c(as.numeric(strsplit(Numbers[FirstHyphen], split = "-")[[1]])[1]:as.numeric(strsplit(Numbers[FirstHyphen], split = "-")[[1]])[2])))
+          
+        }
+        
+        # Convert to actual numbers and sort back into increasing order:
+        Numbers <- sort(as.numeric(Numbers))
+        
+        # Return unpacked numbers:
+        return(Numbers)
+        
+      }
+      
+      # Apply unpacking function to data:
+      Numbers <- lapply(Numbers, RangeUnpacker)
+      
+    # If there are no hyphens:
+    } else {
+      
+      # Simply convert to numbers and ensure they are sorted in increasing order:
+      Numbers <- sort(as.numeric(Numbers))
+      
+    }
+    
+    # Add character type as names to numbers list:
+    names(Numbers) <- unlist(lapply(x, '[', 1))
+    
+    # Build empty vector to store output:
+    output <- vector(mode = "character", length = max(unlist(Numbers)))
+    
+    # Store character type in output:
+    for(i in 1:length(Numbers)) output[Numbers[[i]]] <- names(Numbers)[i]
+    
+    # Check all characters have some kind of ordering decsribed:
+    if(length(which(output == "")) > 0) stop(paste("The following characters have no specified ordering: ", paste(which(output == ""), collapse = ", "), ". Check ASSUMPTIONS block and edit appropriately.", sep = ""))
+    
+    # Return output:
+    return(output)
+    
+  }
+  
+  # Subfunction to find range of states for each character:
+  RangeFinder <- function(x) {
+    
+    # Convert each column of matrix to a list of numeric values:
+    x <- lapply(lapply(lapply(lapply(lapply(apply(x, 2, as.list), unlist), strsplit, split = "&|/"), unlist), as.numeric), sort)
+    
+    # Check for any empty columns (all NAs) and insert a dummy 0 if found:
+    if(any(lapply(x, length) == 0)) x[which(lapply(x, length) == 0)] <- 0
+    
+    # Convert to a min-max matrix:
+    x <- matrix(unlist(lapply(x, range)), ncol = 2, byrow = TRUE, dimnames = list(c(), c("Min", "Max")))
+    
+    # Return(x):
+    return(x)
+    
+  }
+  
+  # Sub function to get all factors of an integer (stolen from: "http://stackoverflow.com/questions/6424856/r-function-for-returning-all-factors"):
+  GetAllFactors <- function(x) {
+    
+    # Ensure input is an integer:
+    x <- as.integer(x)
+    
+    # Ensure x is positive and get sequence of 1 to x:
+    div <- seq_len(abs(x))
+    
+    # Get factors of x (i.e. numbers whose remainders are zero):
+    factors <- div[x %% div == 0L]
+    
+    # Output answer:
+    return(factors)
+    
+  }
 
   # Little piece of code to help deal with foreign characters:
   Sys.setlocale('LC_ALL','C')
 
   # Read in NEXUS file as raw text:
-  X <- readLines(file, warn = FALSE)
+  X <- readLines(File, warn = FALSE)
 
   # Check that this is a #NEXUS file:
   if(length(grep("#NEXUS", X, ignore.case = TRUE)) == 0) stop("This is not a #NEXUS file.")
@@ -91,7 +235,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
     # Find end lines:
     block.ends <- all.ends[block.rows]
 
-    # Incerementally remove superflouous blocks:
+    # Incrementally remove superflouous blocks:
     for(i in length(block.begins):1) X <- X[c(c(1:(block.begins[i] - 1)), c((block.ends[i] + 1):length(X)))]
 
   }
@@ -119,9 +263,6 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
     # Make sure nothing "" is not in this list:
     replacement.items <- setdiff(unique(unlist(strsplit(replacement.items, " "))), "")
 
-    # Need to add escape characters for regular expression to work:
-    #replacement.items <- gsub("\\?", "\\\\?", replacement.items)
-
     # Make block that isolates lines with single quotes:
     lines.to.edit <- X[grep("'", X)]
 
@@ -132,7 +273,7 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
     while(length(grep("  ", lines.to.edit)) > 0) lines.to.edit <- gsub("  ", " ", lines.to.edit, fixed=T)
 
     # Now isolate names within single quotes:
-    names.in.single.quotes <- unique(gsub("'", "", strsplit(trim(paste(lines.to.edit, collapse="")), "' '")[[1]]))
+    names.in.single.quotes <- unique(gsub("'", "", strsplit(gdata::trim(paste(lines.to.edit, collapse="")), "' '")[[1]]))
 
     # Make sure nothing "" is not in this list:
     names.in.single.quotes <- which(!names.in.single.quotes == "")
@@ -152,11 +293,11 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
   X <- gsub("\x94|\x93|\xd5|\xd4|\xd3|\xd2|'", "", X)
 
   # Replace tabs with spaces and trim leading and trailing spaces from each line:
-  X <- apply(matrix(gsub("\t", " ", X)), 2, trim)
+  X <- apply(matrix(gsub("\t", " ", X)), 2, gdata::trim)
 
   # Delete any empty lines (if present):
   if(length(which(X == "")) > 0) X <- X[-which(X == "")]
-
+  
   # If header text is present:
   if(length(grep("\\[", X)) > 0) {
 
@@ -164,7 +305,16 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
     textlines <- apply(cbind(setdiff(grep("\\[", X), grep("\\[[0-9:A-Z:a-z]{1}\\]", X)), setdiff(grep("\\]", X), grep("\\[[0-9:A-Z:a-z]{1}\\]", X))), 1, paste, collapse = ":")
 
     # Convert beginning and endings to numerics for finding in vector:
-    lines.to.delete <- textlines <- eval(parse(text=paste("c(", paste(textlines, collapse = ","), ")", sep = "")))
+    lines.to.delete <- textlines <- eval(parse(text = paste("c(", paste(textlines, collapse = ","), ")", sep = "")))
+    
+    # Find only lines beginning with a square bracket to avoid issue with polymorphic use of square brackets (can be caught later):
+    LinesToKeep <- which(unlist(lapply(strsplit(X[textlines], split = ""), '[', 1)) == "[")
+    
+    # Reduce textlines appropriately:
+    textlines <- textlines[LinesToKeep]
+    
+    # Reduce lines to delete appropriately:
+    lines.to.delete <- lines.to.delete[LinesToKeep]
   
     # Grab text and store:
     textlines <- paste(gsub("\\[|\\]", "", X[textlines]), collapse = "\n")
@@ -185,748 +335,892 @@ ReadMorphNexus <- function(file, equalise.weights = FALSE) {
 
   # Little test for valid NEXUS formatting for number of characters:
   if(length(grep("nchar", X, ignore.case = TRUE)) == 0) stop("Number of characters not defined.")
-
+  
   # Get number of taxa:
-  ntax <- as.numeric(strsplit(strsplit(gsub(";|\t", "", X[grep("NTAX=|Ntax=|ntax=", X)]), "NTAX=|Ntax=|ntax=")[[1]][2], " ")[[1]][1])
-
-  # Grab and format nchar line(s):
-  nchar <- matrix(unlist(strsplit(gsub(";|\t", "", X[grep("NCHAR=|Nchar=|nchar=", X)]), "NCHAR=|Nchar=|nchar=")), ncol = 2, byrow = TRUE)[,2]
-
-  # Isolate just the number(s) of characters:
-  for(i in 1:length(nchar)) nchar[i] <- strsplit(nchar[i], " ")[[1]][1]
-
-  # Convert to numeric:
-  nchar <- as.numeric(nchar)
-
-  # Check matrix has size:
-  if((nchar * ntax) == 0) stop("Matrix has no dimensions.")
-
-  # If symbols are specified in the file:
-  if(length(grep("symbols", X, ignore.case = TRUE)) > 0) {
-
-    # Get initial set of symbols:
-    symbols <- strsplit(strsplit(strsplit(X[grep("symbols", X, ignore.case = TRUE)], "SYMBOLS=|Symbols=|symbols=")[[1]][2], "\"")[[1]][2], " |")[[1]]
-    
-    # Collapse to just the symbols themselves:
-    symbols <- symbols[nchar(symbols) == 1]
-    
-    # Special case of a tilda indicating a range:
-    if(length(symbols) == 3 && symbols[2] == "~") symbols <- as.character(as.numeric(symbols[1]):as.numeric(symbols[3]))
-
-  # If symbols are not specified in the file:
-  } else {
+  NTax <- as.numeric(strsplit(strsplit(gsub(";|\t", "", X[grep("NTAX=|Ntax=|ntax=", X)]), "NTAX=|Ntax=|ntax=")[[1]][2], " ")[[1]][1])
   
-    # Use a default set of symbols:
-    symbols <- c(c(0:9), LETTERS[1:22])
+  # Create empty list to store matrix block(s):
+  MatrixBlockList <- list()
+
+  # If there are character blocks (rather than a data block):
+  if(length(grep("begin characters", X, ignore.case = TRUE)) > 0) {
+    
+    # Find line where character block(s) begin:
+    CharacterBlockBegins <- grep("begin characters", X, ignore.case = TRUE)
+    
+    # Find line where matching character block(s) end:
+    CharacterBlockEnds <- grep("end;", X, ignore.case = TRUE)[unlist(lapply(lapply(lapply(as.list(CharacterBlockBegins), '<', grep("end;", X, ignore.case = TRUE)), which), min))]
+    
+    # For each character block:
+    for(i in 1:length(CharacterBlockBegins)) {
+      
+      # isolate ith character block:
+      CurrentCharacterBlock <- X[CharacterBlockBegins[i]:CharacterBlockEnds[i]]
+      
+      # Locate dataype line:
+      DatatypeLine <- grep("datatype=", CurrentCharacterBlock, ignore.case = TRUE)
+      
+      # Check there is a dataype:
+      if(length(DatatypeLine) == 0) stop("Character datatype not specified.")
+      
+      # Check there are not multiple datatypes for a single character block:
+      if(length(DatatypeLine) > 1) stop("Multiple character datatypes specified.")
+      
+      # Get ith datatype:
+      CurrentDatatype <- strsplit(strsplit(CurrentCharacterBlock[DatatypeLine], "datatype=|DATATYPE=")[[1]][2], " ")[[c(1,1)]]
+      
+      # Add ith character block to list:
+      MatrixBlockList[[i]] <- CurrentCharacterBlock
+      
+      # Add datatype to names for ith matrix block:
+      names(MatrixBlockList)[i] <- CurrentDatatype
+
+    }
+    
+  }
+  
+  # If there is a data block:
+  if(length(grep("begin data", X, ignore.case = TRUE)) > 0) {
+    
+    # Get beginning line of data block:
+    BeginDataLine <- grep("begin data", X, ignore.case = TRUE)
+    
+    # Get end line of data block:
+    EndDataLine <- grep("end;", X, ignore.case = TRUE)[unlist(lapply(lapply(lapply(as.list(BeginDataLine), '<', grep("end;", X, ignore.case = TRUE)), which), min))]
+    
+    # Add data block to list:
+    MatrixBlockList[[1]] <- X[BeginDataLine:EndDataLine]
+    
+    # Locate datatype line:
+    DatatypeLine <- grep("datatype=", MatrixBlockList[[1]], ignore.case = TRUE)
+    
+    # If there is a stated datatype:
+    if(length(DatatypeLine) > 0) {
+      
+      # Store stated datatype as list name:
+      names(MatrixBlockList)[1] <- strsplit(strsplit(MatrixBlockList[[1]][DatatypeLine], "datatype=|DATATYPE=")[[1]][2], " ")[[c(1,1)]]
+      
+    # If there is no stated datatype:
+    } else {
+      
+      # Set datatype as "STANDARD":
+      names(MatrixBlockList)[1] <- "STANDARD"
+      
+    }
 
   }
-
-# ADD BIT HERE FOR STANDARD AND DNA AND PROTEIN ETC.
-
-  # If the missing character is specified:
-  if(length(grep("missing", X, ignore.case = TRUE)) > 0) {
-
-    # Get missing character:
-    missing <- strsplit(strsplit(X[grep("missing", X, ignore.case = TRUE)][1], "MISSING=|Missing=|missing=")[[1]][2], "")[[1]][1]
-
-  # If the missing character is not specified:
-  } else {
-
-    # Set as default symbol of the question mark:
-    missing <- "?"
+  
+  # If there are any interleaved block(s):
+  if(length(unlist(lapply(MatrixBlockList, grep, pattern = "INTERLEAVE"))) > 0) {
+    
+    # Get interleaved blocks:
+    InterleavedBlocks <- which(unlist(lapply(MatrixBlockList, grep, pattern = "INTERLEAVE") > 0))
+    
+    # For each interleaved block:
+    for(i in InterleavedBlocks) {
+      
+      # Isolate current matrix block:
+      CurrentBlock <- MatrixBlockList[[i]]
+      
+      # Remove interleave text:
+      CurrentBlock <- gsub("INTERLEAVE ", "", CurrentBlock)
+      
+      # Find line matrix begins on:
+      MatrixBegins <- which(toupper(CurrentBlock) == "MATRIX") + 1
+      
+      # Find line matrix ends:
+      MatrixEnds <- rev(which(CurrentBlock == ";")) - 1
+      
+      # Get number of blocks in interleaved matrix:
+      NumberOfBlocks <- length(MatrixBegins:MatrixEnds) / NTax
+      
+      # Check is divisible by number of taxa:
+      if((NumberOfBlocks %% 1) != 0) stop("Interleaved matrix has greater or fewer lines than a multiple of number of taxa.")
+      
+      # Empty lst to store interleaved blocks:
+      InterleavedBlockList <- list()
+      
+      # For each interleaved block:
+      for(j in 1:NumberOfBlocks) {
+        
+        # Get end of block:
+        BlockEnds <- j * NTax
+        
+        # Get beginning of block:
+        BlockBegins <- BlockEnds - NTax + 1
+        
+        # Isolate block:
+        JBlock <- CurrentBlock[MatrixBegins:MatrixEnds][BlockBegins:BlockEnds]
+        
+        # Remove any double spaces:
+        while(length(grep("  ", JBlock)) > 0) JBlock <- gsub("  ", " ", JBlock)
+        
+        # Check for rogue spaces and stop and warn if found:
+        if(any(unlist(lapply(strsplit(JBlock, split = " "), length)) > 2)) stop("Rogue spaces found in interleaved block. Check taxon names and polymorphisms and remove.")
+        
+        # Store jth block in interleaved blocks:
+        InterleavedBlockList[[j]] <- JBlock
+        
+      }
+      
+      # Reformat as matrices:
+      InterleavedBlockList <- lapply(lapply(lapply(InterleavedBlockList, strsplit, split = " "), unlist), matrix, ncol = 2, byrow = TRUE)
+      
+      # Combine as single large matrix:
+      InterleavedBlockList <- matrix(unlist(lapply(InterleavedBlockList, '[', , 2, drop = FALSE)), nrow = NTax, byrow = FALSE, dimnames = list(InterleavedBlockList[[1]][, 1], c()))
+      
+      # Collapse matrix to single lines:
+      InterleavedBlockList <- apply(cbind(cbind(rownames(InterleavedBlockList), rep(" ", NTax)), InterleavedBlockList), 1, paste, collapse = "")
+      
+      # Overwrite matrix block with now de-interleaved version:
+      MatrixBlockList[[i]] <- c(MatrixBlockList[[i]][1:(MatrixBegins - 1)], InterleavedBlockList, MatrixBlockList[[i]][(MatrixEnds + 1):length(MatrixBlockList[[i]])])
+      
+    }
+    
+  }
+  
+  # If any matrix blocks are of type "MIXED":
+  if(any(lapply(lapply(lapply(strsplit(names(MatrixBlockList), split = ""), '[', 1:5), paste, collapse = ""), "toupper") == "MIXED")) {
+    
+    # Get any mixed datatype block(s):
+    MixedBlocks <- which(lapply(lapply(lapply(strsplit(names(MatrixBlockList), split = ""), '[', 1:5), paste, collapse = ""), "toupper") == "MIXED")
+    
+    # For each mixed block:
+    for(i in MixedBlocks) {
+      
+      # Isolate current block:
+      CurrentBlock <- MatrixBlockList[[i]]
+      
+      # Reduce to MATRIX block:
+      CurrentBlock <- CurrentBlock[(which(toupper(CurrentBlock) == "MATRIX") + 1):(rev(which(CurrentBlock == ";")) - 1)]
+      
+      # Remove any double spaces:
+      while(length(grep("  ", CurrentBlock))) CurrentBlock <- gsub("  ", " ", CurrentBlock)
+      
+      # Check for any rogue spaces:
+      if(any(unlist(lapply(strsplit(CurrentBlock, split = " "), length)) > 2)) stop("Rogue spaces found in matrix block. Check taxon names and polymorphisms.")
+      
+      # Isolate taxon names:
+      TaxonNames <- matrix(unlist(strsplit(CurrentBlock, split = " ")), ncol = 2, nrow = NTax, byrow = TRUE)[, 1]
+      
+      # Reformat data block as list:
+      CurrentBlock <- as.list(matrix(unlist(strsplit(CurrentBlock, split = " ")), ncol = 2, nrow = NTax, byrow = TRUE)[, 2])
+      
+      # Convert data block into individual character vectors:
+      CurrentBlock <- lapply(CurrentBlock, LineFormatter, direction = "out")
+      
+      # Add taxon names to list:
+      names(CurrentBlock) <- TaxonNames
+      
+      # Isolate components of mixed block:
+      MixedComponents <- strsplit(names(MatrixBlockList)[i], "\\(|\\)")[[1]][2]
+      
+      # Isolate further (remove spaces so components can be isolated):
+      MixedComponents <- strsplit(gsub(" ", "", MixedComponents), split = ",")[[1]]
+      
+      # Format as list:
+      MixedComponents <- lapply(strsplit(MixedComponents, split = ":"), toupper)
+      
+      # Get total number of characters in block:
+      TotalCharacters <- max(as.numeric(unlist(lapply(lapply(MixedComponents, '[', 2), strsplit, split = "-")))) - min(as.numeric(unlist(lapply(lapply(MixedComponents, '[', 2), strsplit, split = "-")))) + 1
+      
+      # Check all rows have the same (correct) number of characters:
+      if(any(!unlist(lapply(CurrentBlock, length)) == TotalCharacters)) stop("Some lines of matrix have too many or too few characters.")
+      
+      # For each component:
+      for(j in 1:length(MixedComponents)) {
+        
+        # Isolate current partition as matrix:
+        CurrentMatrix <- matrix(unlist(lapply(CurrentBlock, '[', as.numeric(strsplit(MixedComponents[[j]][2], split = "-")[[1]])[1]:as.numeric(strsplit(MixedComponents[[j]][2], split = "-")[[1]])[2])), nrow = NTax, byrow = TRUE, dimnames = list(names(CurrentBlock), c()))
+        
+        # Add component of matrix to end of list:
+        MatrixBlockList[[(length(MatrixBlockList) + 1)]] <- c(toupper(MatrixBlockList[[i]][1:which(toupper(MatrixBlockList[[i]]) == "MATRIX")]), apply(cbind(cbind(rownames(CurrentMatrix), rep(" ", NTax)), CurrentMatrix), 1, paste, collapse = ""), toupper(MatrixBlockList[[i]][rev(which(MatrixBlockList[[i]] == ";"))[1]:length(MatrixBlockList[[i]])]))
+        
+        # Remove names:
+        names(MatrixBlockList[[length(MatrixBlockList)]]) <- NULL
+        
+        # Add datatype name as name to new list item:
+        names(MatrixBlockList)[length(MatrixBlockList)] <- MixedComponents[[j]][1]
+        
+        # Get number of characters in partition:
+        CharactersInPartition <- max(as.numeric(strsplit(MixedComponents[[j]][2], split = "-")[[1]])) - min(as.numeric(strsplit(MixedComponents[[j]][2], split = "-")[[1]])) + 1
+        
+        # Update number of characters for parition:
+        MatrixBlockList[[length(MatrixBlockList)]] <- gsub(pattern = paste("NCHAR=", TotalCharacters, sep = ""), replacement = paste("NCHAR=", CharactersInPartition, sep = ""), MatrixBlockList[[length(MatrixBlockList)]], fixed = TRUE)
+        
+        # Update datatype for partition:
+        MatrixBlockList[[length(MatrixBlockList)]] <- gsub(pattern = paste("DATATYPE=", toupper(names(MatrixBlockList)[i]), sep = ""), replacement = paste("DATATYPE=", MixedComponents[[j]][1], sep = ""), MatrixBlockList[[length(MatrixBlockList)]], fixed = TRUE)
+        
+      }
+      
+    }
+    
+    # Remove now redundant mixed blocks-:
+    MatrixBlockList <- MatrixBlockList[-MixedBlocks]
 
   }
-
-  # If the gap character is specified:
-  if(length(grep("gap", X, ignore.case = TRUE)) > 0) {
-
-    # Get gap character:
-    gap <- strsplit(strsplit(X[grep("gap", X, ignore.case = TRUE)][1], "GAP=|Gap=|gap=")[[1]][2], "")[[1]][1]
-
-  # If the gap character is not specified:
-  } else {
-
-    # Set as default symbol of the dash:
-    gap <- "-"
-
+  
+  # Will need to know datatypes before proceeding so check for nonstandard ones now:
+  NonstandardDatatypes <- setdiff(toupper(names(MatrixBlockList)), c("CONTINUOUS", "DNA", "NUCLEOTIDE", "PROTEIN", "RESTRICTION", "RNA", "STANDARD"))
+  
+  # Stop if non-standard datatype(s) found:
+  if(length(NonstandardDatatypes) > 0) stop("Non-standard datatype found (i.e., neither CONTINUOUS, DNA, NUCLEOTIDE, PROTEIN, RESTRICTION, RNA, or STANDARD).")
+  
+  # Create empty block names vector:
+  BlockNames <- rep(NA, length(MatrixBlockList))
+  
+  # For each matrix block:
+  for(i in 1:length(MatrixBlockList)) {
+    
+    # Isolate ith block:
+    CurrentBlock <- MatrixBlockList[[i]]
+    
+    # Get title line (if found) - should work even if there is a taxon whose name begins "TITLE":
+    TitleLine <- intersect(which(unlist(lapply(lapply(strsplit(CurrentBlock, split = ""), '[', 1:5), paste, collapse = "")) == "TITLE"), 1:which(unlist(lapply(lapply(strsplit(CurrentBlock, split = ""), '[', 1:5), paste, collapse = "")) == "MATRI")[1])
+    
+    # Store bock name:
+    if(length(TitleLine) > 0) BlockNames[i] <- gsub(";", "", rev(strsplit(CurrentBlock[TitleLine], split = " ")[[1]])[1])
+    
   }
 
-  # Get start of matrix block(s):
-  matrix.startlines <- setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case = TRUE)), grep(";", X))
-
-  # Get end of matrix block(s):
-  matrix.endlines <- setdiff(grep(";", X), grep("end", X, ignore.case = TRUE))[setdiff(grep(";", X), grep("end", X, ignore.case = TRUE)) > matrix.startlines]
-
-  # For each block of matrix:
-  for(i in length(matrix.startlines):1) {
-
-    # If lines break (and not interleaved:
-    if((matrix.endlines[i] - matrix.startlines[i] - 1) > ntax && length(grep("interleave", X, ignore.case = TRUE)) == 0) {
-
-      # Set current matrix block:
-      current.matrixblock <- X[(matrix.startlines[i] + 1):(matrix.endlines[i] - 1)]
-
-      # Remove all character symbols to find broken lines:
-      naked.matrixblock <- gsub(paste(c(symbols, missing, gap, "\\{", "\\(", ")", "}", "\\?", "[0-9]", "\\."), collapse="|"), "", current.matrixblock)
-
-      # Case if this seems to have identified the problem (i.e., once line breaks are removed number of lines is equal to number of taxa):
-      if(sum(nchar(naked.matrixblock) > 0) == ntax) {
-
-        # Get start rows for removing line breaks:
-        start.rows <- which(nchar(naked.matrixblock) > 0)
-
-        # Create empty block to store new matrixblock:
-        new.matrixblock <- vector(mode = "character")
-
-        # For each taxon:
-        for(j in 1:length(start.rows)) {
-
-          # If taxon is not the last taxon get the block corresponding to it:
-          if(j < length(start.rows)) taxon.block <- current.matrixblock[start.rows[j]:(start.rows[min(which(start.rows > start.rows[j]))] - 1)]
-
-          # If taxon is the last taxon get the block corresponding to it:
-          if(j == length(start.rows)) taxon.block <- current.matrixblock[start.rows[j]:length(current.matrixblock)]
-
-          # Ensure there are spaces at the end of the taxon name:
-          if(length(grep(" ", taxon.block[1])) == 0) taxon.block[1] <- paste(taxon.block[1], "  ", sep="")
-
-          # Make into single line and add to new matrix block:
-          new.matrixblock <- c(new.matrixblock, paste(taxon.block, collapse = ""))
-
-        }
-
-        # Replace matrix block with line breaks with one without:
-        X <- c(X[1:matrix.startlines[i]], new.matrixblock, X[matrix.endlines[i]:length(X)])
-
-      # Case if apparent line breaks do not add up to number of taxa:
+  # Get number of characters in each block:
+  NChars <- lapply(lapply(lapply(lapply(lapply(lapply(lapply(lapply(lapply(MatrixBlockList, function(x) x[grep("NCHAR=|Nchar=|nchar=", x)]), gsub, pattern = ";|\t", replacement = ""), strsplit, split = "NCHAR=|Nchar=|nchar="), '[[', 1), '[', 2), strsplit, split = " "), '[[', 1), '[', 1), as.numeric)
+  
+  # Check matri(ces) have dimension:
+  if(!(all(NChars > 0) && NTax > 0)) stop("One or more matrix blocks have no dimensions (i.e., zero characters or taxa).")
+  
+  # Function to get symbols from matrix block:
+  GetSymbols <- function(X) {
+    
+    # If symbols are specified in the file:
+    if(length(grep("symbols", X, ignore.case = TRUE)) > 0) {
+      
+      # Get initial set of symbols:
+      symbols <- strsplit(strsplit(strsplit(X[grep("symbols", X, ignore.case = TRUE)], "SYMBOLS=|Symbols=|symbols=")[[1]][2], "\"")[[1]][2], " |")[[1]]
+      
+      # Collapse to just the symbols themselves:
+      symbols <- symbols[nchar(symbols) == 1]
+      
+      # Special case of a tilda indicating a range:
+      if(length(symbols) == 3 && symbols[2] == "~") symbols <- as.character(as.numeric(symbols[1]):as.numeric(symbols[3]))
+      
+    # If symbols are not specified in the file:
+    } else {
+      
+      # Find datatype row (if specified):
+      DatatypeRow <- grep("datatype", X, ignore.case = TRUE)
+      
+      # If a datatype was specified:
+      if(length(DatatypeRow) > 0) {
+        
+        # Store datatype:
+        Datatype <- strsplit(strsplit(toupper(X[DatatypeRow]), split = "DATATYPE=")[[1]][2], split = " ")[[1]][1]
+        
+      # If datatype is not specified:
       } else {
-
-        # Stop and print warning.:
-        stop("Matrix block(s) have line breaks. Ensure each taxon is on a single line.")
-
+        
+        # Set datatype as STANDARD:
+        Datatype <- "STANDARD"
+        
       }
-
+      
+      # If CONTINUOUS use default symbols::
+      if(Datatype == "CONTINUOUS") symbols <- NULL
+      
+      # If DNA use default symbols::
+      if(Datatype == "DNA") symbols <- c("A", "C", "G", "T", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N")
+      
+      # If NUCLEOTIDE use default symbols::
+      if(Datatype == "NUCLEOTIDE") symbols <- c("A", "C", "G", "T", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N")
+      
+      # If PROTEIN use default symbols::
+      if(Datatype == "PROTEIN") symbols <- c("A", "R", "N", "D", "C", "Q", "E", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V")
+      
+      # If RESTRICTION use default symbols::
+      if(Datatype == "RESTRICTION") symbols <- c("0", "1")
+      
+      # If STANDARD use default symbols::
+      if(Datatype == "RNA") symbols <- c("A", "C", "G", "U", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N")
+      
+      # If STANDARD use default symbols::
+      if(Datatype == "STANDARD") symbols <- c(c(0:9), LETTERS[1:22])
+      
     }
-
-  }
-
-  # if there are interleaved lines:
-  if(length(grep("interleave", X, ignore.case = TRUE)) > 0) {
-
-    # Get start of matrix block(s):
-    matrix.startlines <- setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case = TRUE)), grep(";", X))
-
-    # Get end of matrix block(s):
-    matrix.endlines <- setdiff(grep(";", X), grep("end", X, ignore.case = TRUE))[setdiff(grep(";", X), grep("end", X, ignore.case = TRUE)) > matrix.startlines]
-
-    # For each block:
-    for(i in length(matrix.startlines):1) {
-
-      # Case if more lines than expected, number of lines is divisible by number of taxa and is a repetition of the number of taxa (i.e., is interleaved):
-      if((matrix.endlines[i] - matrix.startlines[i] - 1) > ntax && (matrix.endlines[i] - matrix.startlines[i] - 1) %% ntax == 0 && (matrix.endlines[i] - matrix.startlines[i] - 1) / ntax > 1) {
-
-        # Get number of repeated taxa (i.e. how many lines is matrix broken over):
-        number.of.repeats <- (matrix.endlines[i] - matrix.startlines[i] - 1) / ntax
-
-        # Get initial start lines:
-        startlines <- 1:number.of.repeats * ntax - ntax + 1
-
-        # Get intiial end lines:
-        endlines <- 1:number.of.repeats * ntax
-
-        # Get actual start line:
-        startline <- (matrix.startlines[i] + 1)
-
-        # Get actual end line:
-        endline <- (matrix.endlines[i] - 1)
-
-        # Update startlines:
-        startlines <- startlines + startline - 1
-
-        # Update endlines:
-        endlines <- endlines + startline - 1
-
-        # For each start line:
-        for(j in 1:length(startlines)) {
-
-          # If first start line create new block:
-          if(j == 1) new.block <- X[startlines[j]:endlines[j]]
-
-          # For subsequent start lines add to new block with matrix begin and end tags:
-          if(j > 1) new.block <- c(new.block, ";","END;", "MATRIX", X[startlines[j]:endlines[j]])
-
-        }
-
-        # Update file with ne blocks:
-        X <- c(X[1:(startline - 1)], new.block, X[(endline + 1):length(X)])
-
-      }
-
-    }
-
-  }
-
-  # First sort of getting rows that correspond to the actual data matri(ces):
-  matrixblocks <- matrix(rep(1:ntax, length(setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case = TRUE)), grep(";", X)))), ncol=length(setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case = TRUE)), grep(";", X))))
-  
-  # Add start values:
-  for(i in 1:length(setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case = TRUE)), grep(";", X)))) matrixblocks[, i] <- matrixblocks[, i] + (setdiff(setdiff(intersect(grep("matrix", X, ignore.case = TRUE), which(nchar(X) == 6)), grep("stepmatrix", X, ignore.case = TRUE)), grep(";", X))[i])
-
-  # Convert to vector for use:
-  matrixblocks <- sort(matrixblocks)
-
-  # Get matrix block:
-  matrixblock <- X[matrixblocks]
-
-  # Little check for length violation:
-  if(length(sort(match(";", matrixblock))) > 0) stop("Number of lines of matrix is less than the number of taxa. Check line breaks and NTAX.")
-
-  # Collapse all double spaces to single spaces in order to extract row names:
-  while(length(grep("  ", matrixblock)) > 0) matrixblock <- gsub("  ", " ", matrixblock)
-
-  # Little function for use in lapply on the line below:
-  getfirstitem <- function(x) return(x[1])
-
-  # Get row (taxon) names:
-  row.names <- unlist(lapply(strsplit(matrixblock, " "), getfirstitem))
-
-  # Strip out row (taxon) names:
-  matrixblock <- gsub(gsub("\\?", "\\\\?", paste(row.names, " ", sep="", collapse="|")), "", matrixblock)
-
-  # Relaces curly braces with parentheses for polymorphisms:
-  matrixblock <- gsub("}", ")", (gsub("\\{", "(", matrixblock)))
-
-  # If there are (potential) polymorphisms in the matrix block:
-  if(length(grep("\\([0-9:A-Z:a-z]{1}[ |,|/|\\&]{1}", matrixblock)) > 0) {
-  
-    # First collapse lines with polymorphisms to just polymorphisms:
-    polymorphism.combos <- gsub(paste(")[", paste(c(symbols, missing, gap, "\\?"), collapse = "|"), "]*", sep = ""), ")", gsub(paste("[", paste(c(symbols, missing, gap, "\\?"), collapse = "|"), "]*\\(", sep = ""), "\\(", matrixblock))
-  
-    # Now get just the polymorphisms
-    polymorphism.combos <- unique(strsplit(paste(polymorphism.combos[grep(")", polymorphism.combos)], collapse=""), ")|\\(")[[1]])[-1]
-
-    # Get the symbols that break up the polymorphism (e.g., space, comma, slash, ampersand):
-    split.symbols <- unique(strsplit(paste(gsub(paste(symbols, collapse = "|"), "", polymorphism.combos), collapse = ""), "")[[1]])
-
-    # Get replacements for polymorphism combinations:
-    polymorphism.combo.replacements <- gsub(paste(split.symbols, collapse="|"), "", polymorphism.combos)
-
-    # Ensure all polymorphisms combinations containing a space, ampersand, slash or comma are reduced to just the regular polymorphism:
-    for(i in 1:length(polymorphism.combos)) matrixblock <- gsub(paste("\\(", polymorphism.combos[i], ")", sep=""), paste("\\(", polymorphism.combo.replacements[i], ")", sep=""), matrixblock)
-
-  }
-
-# THE BIT BELOW NEEDS TO BE MADE MORE LIKE THE BIT ABOVE (ALTHOUGH STRAY NAMES MAKES THIS TRICKY)
-
-  # If there are spaces in every row of the matrix block (SHOULD ALSO ONLY BE DISCRETE MATRIX BLOCK(S)):
-  if(length(grep(" ", matrixblock)) == length(matrixblock)) {
-
-    # Little function to generate all possible character combinations (to help find those with spaces between that can be removed):
-    CharCombs <- function(chars) {
-
-      # Store combinations (both directions, i.e. 0 1 and 1 0):
-      combos <- apply(rbind(t(combn(chars, 2)), cbind(t(combn(chars, 2))[, 2], t(combn(chars, 2))[, 1])), 1, paste, collapse=" ")
-
-      # Add repeats (e.g., 0 0):
-      combos <- c(apply(rbind(chars, chars), 2, paste, collapse=" "), combos)
-
-      # Output combinations:
-      return(combos)
-
-    }
-
-    # Find all possible character combinations for matrix:
-    character.combinations <- CharCombs(gsub("\\?", "\\\\?", c(symbols, gap, missing, "\\(", ")")))
-
-    # For each character combination:
-    for(i in character.combinations) {
-
-      # Whilst it exists, replace it without space gap:
-      while(length(grep(i, matrixblock)) > 0) matrixblock <- gsub(i, gsub(" ", "", i), matrixblock)
-
-    }
-
-  }
-
-  # Check for any remaining stray row name parts (i.e., detached by spaces from the rest of the name):
-  while(length(grep(" ", matrixblock)) > 0) {
-
-    # Identify problem rows:
-    problem.rows <- grep(" ", matrixblock)
-
-    # Identify stray name parts:
-    stray.name.parts <- unlist(lapply(strsplit(matrixblock[problem.rows], " "), getfirstitem))
-
-    # Reunite stray name parts with rest of name:
-    row.names[problem.rows] <- paste(row.names[problem.rows], stray.name.parts, sep="_")
-
-    # Remove stray name parts from matrixblock:
-    matrixblock <- gsub(gsub("\\(", "\\\\(", paste(paste(stray.name.parts, " ", sep=""), collapse="|")), "", matrixblock)
-
-  }
-
-  # Create empty matrix to store character-taxon matrix:
-  MATRIX <- matrix(nrow=ntax, ncol=sum(nchar))
-
-  # If there are multiple matrix block elements:
-  if(length(row.names) > ntax) {
-
-    # Establish row order of first block:
-    row.order <- row.names[1:ntax]
-
-    # Ensure subsequent blocks share same order:
-    for(i in 1:(length(row.names) / ntax) - 1) matrixblock[((ntax * i) + 1):(ntax * (i + 1))] <- matrixblock[((ntax * i) + 1):(ntax * (i + 1))][match(row.order, row.names[((ntax * i) + 1):(ntax * (i + 1))])]
-
-  }
-
-  # Vector to store taxon names:
-  MATRIXrn <- row.names[1:ntax]
     
-  # Add taxon names to character-taxon matrix:
-  rownames(MATRIX) <- MATRIXrn
-
-  # Convert matrix block to actual matrix with nrows equal to number of taxa:
-  matrixblock <- matrix(matrixblock, nrow = ntax)
-
-  # Get discrete columns:
-  discrete.columns <- setdiff(1:ncol(matrixblock), which(unlist(lapply(apply(matrixblock, 2, grep, pattern = "\\."), length)) > 0))
-
-  # Collapse discrete columns and repeat:
-  matrixblock[, discrete.columns] <- apply(as.matrix(matrixblock[, discrete.columns], nrow = ntax), 1, paste, collapse = "")
-
-  # If repeats:
-  if(length(discrete.columns) > 1) {
-
-    # Get rid of repeats:
-    matrixblock <- matrixblock[, -discrete.columns[2:length(discrete.columns)]]
-
-    # Ensure is still a matrix:
-    if(!is.matrix(matrixblock)) matrixblock <- as.matrix(matrixblock, nrow=ntax)
+    # Return symbols:
+    return(symbols)
+    
+  }
+  
+  # Get symbols from each block:
+  Symbols <- lapply(MatrixBlockList, GetSymbols)
+  
+  # Get missing character function:
+  GetMissing <- function(X) {
+    
+    # If the missing character is specified:
+    if(length(grep("missing", X, ignore.case = TRUE)) > 0) {
+      
+      # Get missing character:
+      missing <- strsplit(strsplit(X[grep("missing", X, ignore.case = TRUE)][1], "MISSING=|Missing=|missing=")[[1]][2], "")[[1]][1]
+      
+    # If the missing character is not specified:
+    } else {
+      
+      # Set as default symbol of the question mark:
+      missing <- "?"
+      
+    }
+    
+    # Return gap character:
+    return(missing)
 
   }
-
-  # Find columns in matrix that contain continuous data:
-  continuous.columns <- which(unlist(lapply(apply(matrixblock, 2, grep, pattern = "\\."), length)) > 0)
-
-  # Find columns in matrix that contain discrete data:
-  discrete.columns <- setdiff(c(1:ncol(matrixblock)), continuous.columns)
-
-  # Get character numbers that correspond to each column (columns are from and to):
-  column.numbers <- cbind(c(1, (nchar + 1)[-length(nchar)]), cumsum(nchar))
-
-  # If there is continuous data:
-  if(length(continuous.columns) > 0) {
-
-    # Make continuous characters into a matrix block (with columns for each character):
-    continuous.matrix <- matrix(unlist(strsplit(apply(matrix(matrixblock[, continuous.columns], ncol = length(continuous.columns)), 1, paste, collapse = " "), " ")), ncol = sum(nchar[continuous.columns]), byrow = TRUE)
-
-    # Replace missing symbol with NA:
-    continuous.matrix[continuous.matrix == missing] <- NA
-
-    # Replace gap symbol with NA:
-    continuous.matrix[continuous.matrix == gap] <- NA
-
-    # Make from-to matrix for continuous character numbers:
-    continuous.character.numbers <- matrix(column.numbers[continuous.columns, ], ncol=2)
-
-    # Modify matrix to store all character numbers in to column:
-    for(i in 1:nrow(continuous.character.numbers)) continuous.character.numbers[i, 2] <- paste(continuous.character.numbers[i, 1]:continuous.character.numbers[i, 2], collapse=" ")
-
-    # Grab character numbers and convert back into numerics:
-    continuous.character.numbers <- as.numeric(strsplit(paste(continuous.character.numbers[, 2], collapse=" "), " ")[[1]])
-
-    # Store continuous characters in full matrix:
-    MATRIX[, continuous.character.numbers] <- continuous.matrix
-
+  
+  # Get missing symbol(s):
+  Missing <- lapply(MatrixBlockList, GetMissing)
+  
+  # Get gap character function:
+  GetGap <- function(X) {
+    
+    # If the gap character is specified:
+    if(length(grep("gap", X, ignore.case = TRUE)) > 0) {
+      
+      # Get gap character:
+      gap <- strsplit(strsplit(X[grep("gap", X, ignore.case = TRUE)][1], "GAP=|Gap=|gap=")[[1]][2], "")[[1]][1]
+      
+    # If the gap character is not specified:
+    } else {
+      
+      # Set as default symbol of the dash:
+      gap <- "-"
+      
+    }
+    
+    # Return gap character:
+    return(gap)
+    
   }
-
-  # If there is discrete data:
-  if(length(discrete.columns) > 0) {
-
-    # Grab columns of discrete data and form into matrix:
-    discrete.matrix <- matrix(matrixblock[, discrete.columns], ncol = length(discrete.columns))
-
-    # Delete any remaining whitespace:
-    discrete.matrix <- gsub("\n|\t| ", "", discrete.matrix)
-
-    # Collapse matrix to a single column:
-    discrete.matrix <- matrix(apply(discrete.matrix, 1, paste, collapse = ""), ncol = 1)
-
-    # Convert into list by splitting into single characters:
-    discrete.matrix <- strsplit(discrete.matrix, "")
+  
+  # Get gap symbol(s):
+  Gap <- lapply(MatrixBlockList, GetGap)
+  
+  # Find first line of each matrix:
+  MatrixStartLines <- lapply(lapply(lapply(MatrixBlockList, '==', "MATRIX"), which), '+', 1)
+  
+  # Find alst line of each matrix:
+  MatrixEndLines <- lapply(lapply(lapply(MatrixBlockList, '==', ";"), which), '-', 1)
+  
+  # Cut down matrices to just matrix block:
+  for(i in 1:length(MatrixBlockList)) MatrixBlockList[[i]] <- MatrixBlockList[[i]][MatrixStartLines[[i]]:MatrixEndLines[[i]]]
+  
+  # Stop if incorrect number of taxa found:
+  if(any(lapply(MatrixBlockList, length) != NTax)) stop("Some matrix block(s) have too many or too few taxa. Check for linebreaks or incorrect NTAX value.")
+  
+  # If any blocks are of type "CONTINUOUS":
+  if(any(toupper(names(MatrixBlockList)) == "CONTINUOUS")) {
     
-    # Check to see if there are unaccounted for symbols in the data:
-    undeclared.symbols <- strsplit(gsub(paste(c(symbols, missing, gap, "\\?", "\\(", "\\)", "\\{", "\\}"), collapse = "|"), "", paste(unique(unlist(discrete.matrix)), collapse = "")), "")[[1]]
+    # Get block(s) of type "CONTINUOUS":
+    ContinuousBlocks <- which(toupper(names(MatrixBlockList)) == "CONTINUOUS")
     
-    # Stop and warn user if unaccounted for symbols found:
-    if(length(undeclared.symbols) > 0) stop(paste("Unaccounted for symbols found in matrix:", undeclared.symbols, collapse = " "))
-
-    # Get numeric characters to replace symbols with:
-    symbol.replacements <- 0:(length(symbols) - 1)
-
-    # For each row of the discrete matrix:
-    for(i in 1:length(discrete.matrix)) {
+    # For each block of type "CONTINUOUS":
+    for(i in ContinuousBlocks) {
+      
+      # Isolate ith continuous matrix block:
+      CurrentBlock <- MatrixBlockList[[i]]
+      
+      # While there are double spaces (that will complicate strsplit later) replace these with single spaces:
+      while(length(grep("  ", CurrentBlock)) > 0) CurrentBlock <- gsub("  ", " ", CurrentBlock)
+      
+      # Check all rows are equal in length and stop and warn if not:
+      if(length(unique(unlist(lapply(strsplit(CurrentBlock, split = " "), length)))) > 1) stop("Continuous block has missing codings for some taxa (check for missing spaces or spaces in taxon names).")
+      
+      # Format data as matrix with rownames as taxa:
+      CurrentBlock <- matrix(unlist(strsplit(CurrentBlock, split = " ")), nrow = NTax, byrow = TRUE, dimnames = list(unlist(lapply(strsplit(CurrentBlock, split = " "), '[', 1)), c()))
+      
+      # Remove names (first column) from matrix:
+      CurrentBlock <- CurrentBlock[, -1, drop = FALSE]
+      
+      # Replace missing values with NA (if there are any):
+      if(length(grep(Missing[[ContinuousBlocks]], CurrentBlock)) > 0) CurrentBlock <- gsub(Missing[[ContinuousBlocks]], NA, CurrentBlock, fixed = TRUE)
+      
+      # Store newly formatted matrix back into matrix block list:
+      MatrixBlockList[[i]] <- CurrentBlock
+      
+    }
+    
+  }
   
-      # For each symbol:
-      for(j in 1:length(symbols)) {
-  
-        # Replace symbol with appropriate numerical equivalent:
-        discrete.matrix[[i]][discrete.matrix[[i]] == symbols[j]] <- symbol.replacements[j]
-  
+  # If there are non-continuous blocks:
+  if(length(setdiff(toupper(names(MatrixBlockList)), "CONTINUOUS")) > 0) {
+    
+    # Get non-continuous block number(s):
+    NonContinuousBlocks <- which(!toupper(names(MatrixBlockList)) == "CONTINUOUS")
+    
+    # For each non-continuous block:
+    for(i in NonContinuousBlocks) {
+      
+      # Isolate ith non-continuous matrix block:
+      CurrentBlock <- MatrixBlockList[[i]]
+      
+      # While there are double spaces (that will complicate strsplit later) replace these with single spaces:
+      while(length(grep("  ", CurrentBlock)) > 0) CurrentBlock <- gsub("  ", " ", CurrentBlock)
+      
+      # Check for rogue spaces (should just be one between taxon name and actual data (i.e., none in taxon names or polymorphisms):
+      if(any(unlist(lapply(strsplit(CurrentBlock, split = " "), length)) > 2)) stop("Rogue spaces found (check taxon names and polymorphisms and remove before trying again).")
+      
+      # Reformat as one-column matrix with taxa as row names:
+      CurrentBlock <- matrix(unlist(strsplit(CurrentBlock, split = " ")), ncol = 2, byrow = TRUE, dimnames = list(lapply(strsplit(CurrentBlock, split = " "), '[', 1), c()))[, 2, drop = FALSE]
+      
+      # Overwrite curentmatrix block with newly formatted matrix:
+      MatrixBlockList[[i]] <- CurrentBlock
+      
+      # Format current block as a list (loses taxon names for now hence storage line above):
+      CurrentBlock <- as.list(CurrentBlock)
+      
+      # Apply line formatting function to all rows:
+      CurrentBlock <- lapply(CurrentBlock, LineFormatter, direction = "in")
+      
+      # If any rows have too many or too few characters:
+      if(any(lapply(CurrentBlock, length) != NChars[[i]])) {
+        
+        # Isolate problem rows:
+        ProblemRows <- which(unlist(lapply(CurrentBlock, length)) != NChars[[i]])
+        
+        # Stop and warn user:
+        stop(paste("The following tax(a) have too many or too few characters: ", paste(rownames(MatrixBlockList[[i]])[ProblemRows], collapse = ", "), ". Check rows or NCHAR.", sep = ""))
+        
       }
+      
+      # Store formatted matrix in matrix block list:
+      MatrixBlockList[[i]] <- matrix(unlist(CurrentBlock), nrow = NTax, ncol = NChars[[i]], byrow = TRUE, dimnames = list(rownames(MatrixBlockList[[i]]), c()))
+      
+      # Find any unexpected (rogue) characters in matrix:
+      RogueCharacters <- setdiff(unique(unlist(strsplit(unique(as.vector(MatrixBlockList[[i]])), split = "&|/"))), c(Gap[[i]], Missing[[i]], Symbols[[i]]))
+      
+      # If any rogue characters were found stop and warn user:
+      if(length(RogueCharacters) > 0) stop(paste("The following rogue characters were found: ", paste(RogueCharacters, collapse = ", "), ". Consider adding these to SYMBOLS or check if they were intended to be replaced with polymorphisms in the source matrix.", sep = ""))
+      
+      # Replace missing values with NA (if there are any):
+      if(length(grep(Missing[[i]], MatrixBlockList[[i]])) > 0) MatrixBlockList[[i]] <- gsub(Missing[[i]], NA, MatrixBlockList[[i]], fixed = TRUE)
 
     }
-  
-    # Find rows with parentheses and by extension polymorphisms:
-    polymorphism.rows <- which(unlist(lapply(lapply(discrete.matrix, grep, pattern = "\\("), length)) > 0)
-
-    # As long as there are polymorphisms:
-    if(length(polymorphism.rows) > 0) {
-  
-      # For eaach row containing polymorphisms:
-      for(i in polymorphism.rows) {
-
-        # Store ith row as active row:
-        active.row <- discrete.matrix[[i]]
-
-        # Continue modifying ith row until all polymorphisms are specified correctly:
-        while(length(grep("\\(", active.row)) > 0) {
-
-          # Define columns that correspond to the first polymorphisms encountered:
-          column.hits <- match("(", active.row):match(")", active.row)
-
-          # Define polymorphisms and store:
-          active.row[column.hits[1]] <- paste(active.row[column.hits[2:(length(column.hits) - 1)]], collapse="&")
-
-          # Delete now redundnat additional characters:
-          active.row <- active.row[-column.hits[2:length(column.hits)]]
-
-        }
-
-        # Store row back in discrete matrix:
-        discrete.matrix[[i]] <- active.row
-
-      }
-
-    }
-  
-    # Little test to check the number of characters on each line is the same as nchar:
-    if(length(which(unlist(lapply(discrete.matrix, length)) != nchar)) > 0) stop("Some lines have too many or too few characters.")
-
-    # Convert into matrix format:
-    discrete.matrix <- matrix(unlist(discrete.matrix), byrow = TRUE, nrow = ntax)
-
-    # Replace missing symbol with NA:
-    discrete.matrix[discrete.matrix == missing] <- NA
-
-    # Replace gap symbol with NA:
-    discrete.matrix[discrete.matrix == gap] <- NA
-
-    # Make from-to matrix for discrete character numbers:
-    discrete.character.numbers <- matrix(column.numbers[discrete.columns, ], ncol=2)
-
-    # Modify matrix to store all character numbers in to column:
-    for(i in 1:nrow(discrete.character.numbers)) discrete.character.numbers[i, 2] <- paste(discrete.character.numbers[i, 1]:discrete.character.numbers[i, 2], collapse=" ")
-
-    # Grab character numbers and convert back into numerics:
-    discrete.character.numbers <- as.numeric(strsplit(paste(discrete.character.numbers[, 2], collapse=" "), " ")[[1]])
-
-    # Store discrete characters in full matrix:
-    MATRIX[, discrete.character.numbers] <- discrete.matrix
-
+    
   }
-
+  
+  # Get rownames from each matrix block (to check for any issues with these now they are isolated):
+  RowNames <- lapply(MatrixBlockList, rownames)
+  
+  # Check for cuplicate taxon names and stop and warn if found:
+  if(any(unlist(lapply(RowNames, duplicated)))) stop(paste("The following taxon name(s) are duplicated:", paste(unlist(RowNames)[which(unlist(lapply(RowNames, duplicated)))], collapse = ", "), ". Rename so that all taxon names are unique.", sep = ""))
+  
+  # Check names match across matrix blocks and stop and warn if not:
+  if(length(unlist(lapply(RowNames, setdiff, unique(unlist(RowNames))))) > 0) stop(paste("Taxa do no match across matrx blocks. Check the following names:", paste(unlist(lapply(RowNames, setdiff, unique(unlist(RowNames)))), collapse = ", "), ".", sep = ""))
+  
+  # Store taxon names:
+  TaxonNames <- unique(unlist(RowNames))
+  
+  # Find and special (non-underscore or alphanumeric) characters in taxon names:
+  SpecialCharactersInTaxonNames <- unique(strsplit(paste(gsub("[:A-Z:a-z:0-9:_:]", "", TaxonNames), collapse = ""), split = "")[[1]])
+  
+  # If any special characters are found stop and warn user:
+  if(length(SpecialCharactersInTaxonNames) > 0) stop(paste("The following special characters were found in the taxon names: ", paste(SpecialCharactersInTaxonNames, collapse = ", "), ". Remove or replace and try again.", sep = ""))
+  
   # Get rid of spaces around dashes to make later regular expresssions work:
   while(length(grep(" - |- | -", X))) X <- gsub(" - |- | -", "-", X)
-
-  # If minimum level of ordering is specified:
-  if(length(grep("DEFTYPE", X)) > 0) {
-
-    # Set default ordering of characters:
-    default.ordering <- strsplit(strsplit(X[grep("deftype", X, ignore.case = TRUE)], "DEFTYPE=|Deftype=|deftype=")[[1]][2], " ")[[1]][1]
-
-  # If minimum level of ordering is not specified:
-  } else {
-
-    # Set default ordering to unordered:
-    default.ordering <- "unord"
-
-  }
-
-# BELOW NEEDS SOME KIND OF IGNORE.CASE MODIFIER
-
-  # If default ordering is ordered:
-  if(default.ordering == "ord" || default.ordering == "Ord" || default.ordering == "ORD") {
-
-    # Set all characters as ordered:
-    ordering <- rep("ord", sum(nchar))
-
-  # If default ordering is unordered:
-  } else {
-
-    # Set all characters as unordered:
-    ordering <- rep("unord", sum(nchar))
-
-  }
-
-  # If there are continuous characters specify these:
-  if(length(continuous.columns) > 0) ordering[continuous.character.numbers] <- "CONT"
-
+  
   # Create null variable for step matrices:
-  step.matrices <- NULL
-
+  StepMatrices <- NULL
+  
   # Special case if there are user-defined characters, i.e. step matrices:
   if(length(grep("USERTYPE", X, ignore.case = TRUE)) > 0) {
-
+    
     # Get rows corresponding to start of stepmatrices:
-    step.matrix.rows <- grep("USERTYPE", X, ignore.case = TRUE)
-  
+    StepMatrixRows <- grep("USERTYPE", X, ignore.case = TRUE)
+    
     # Create empty list to store step matrices:
-    step.matrices <- list()
-
+    StepMatrices <- list()
+    
     # Little check in case of abnormally large number of step matrices:
-    if(length(step.matrix.rows) > length(LETTERS)) stop("Not enough letters to store the number of different step matrices.")
-  
+    if(length(StepMatrixRows) > length(LETTERS)) stop("Not enough letters to store the number of different step matrices.")
+    
     # For each step matrix:
-    for(i in step.matrix.rows) {
-  
+    for(i in StepMatrixRows) {
+      
       # Grab text block corresponding to step matrix:
-      step.matrix.block <- X[i:(i + as.numeric(strsplit(X[i], "\\(STEPMATRIX\\)=")[[1]][2]) + 1)]
-  
+      StepMatrixBlock <- X[i:(i + as.numeric(strsplit(X[i], "\\(STEPMATRIX\\)=")[[1]][2]) + 1)]
+      
       # Remove [] labels for rows:
-      step.matrix.block <- gsub("\\[[:A-Z:]\\] |\\[[:0-9:]\\] ", "", step.matrix.block)
-  
+      StepMatrixBlock <- gsub("\\[[:A-Z:]\\] |\\[[:0-9:]\\] ", "", StepMatrixBlock)
+      
       # Get the step matrix as a matrix (might still need to think about how to define e.g. infinity):
-      step.matrix <- gsub("\\.", "0", matrix(unlist(strsplit(step.matrix.block[3:length(step.matrix.block)], " ")), ncol = as.numeric(strsplit(X[i], "\\(STEPMATRIX\\)=")[[1]][2]), byrow = TRUE))
-
-      # Add row and column names:
-      rownames(step.matrix) <- colnames(step.matrix) <- symbols[1:nrow(step.matrix)]
-
+      StepMatrix <- gsub("\\.", "0", matrix(unlist(strsplit(StepMatrixBlock[3:length(StepMatrixBlock)], " ")), ncol = as.numeric(strsplit(X[i], "\\(STEPMATRIX\\)=")[[1]][2]), byrow = TRUE))
+      
+      # Add row and column names (assumes they start at zero and climb from there - i.e., should match symbols in order from 0 to N - 1):
+      rownames(StepMatrix) <- colnames(StepMatrix) <- as.character(0:(ncol(StepMatrix) - 1))
+      
       # Add step matrix to list:
-      step.matrices[[length(step.matrices) + 1]] <- step.matrix
-
+      StepMatrices[[length(StepMatrices) + 1]] <- StepMatrix
+      
       # Find step matrix name:
-      step.matrix.name <- strsplit(strsplit(X[i], "USERTYPE ")[[1]][2], " ")[[1]][1]
-
+      StepMatrixName <- strsplit(strsplit(X[i], "USERTYPE ")[[1]][2], " ")[[1]][1]
+      
       # Replace stpe matrix name with step_N:
-      X <- gsub(step.matrix.name, paste("step_", LETTERS[length(step.matrices)], sep=""), X)
-
+      X <- gsub(StepMatrixName, paste("step_", LETTERS[length(StepMatrices)], sep=""), X)
+      
       # Use step matrix name (step_N) in list for later calling:
-      names(step.matrices)[length(step.matrices)] <- paste("step_", LETTERS[length(step.matrices)], sep="")
-
+      names(StepMatrices)[length(StepMatrices)] <- paste("step_", LETTERS[length(StepMatrices)], sep="")
+      
     }
-
+    
   }
   
-  # Deal with ordering, if present:
-  if(length(grep("TYPESET", X, ignore.case = TRUE)) > 0) {
+  # Set default weights as 1:
+  Weights <- lapply(lapply(MatrixBlockList, ncol), rep, x = 1)
+  
+  # Set default ordering as unordered:
+  Ordering <- lapply(lapply(MatrixBlockList, ncol), rep, x = "unord")
+  
+  # For each matrix block:
+  for(i in 1:length(MatrixBlockList)) {
+    
+    # For each symbol replace with a number from 0 to N - 1 symbols (unless continuous which would be NULL for symbols):
+    if(!is.null(Symbols[[i]][1])) for(j in 1:length(Symbols[[i]])) MatrixBlockList[[i]] <- gsub(Symbols[[i]][j], as.character(j - 1), MatrixBlockList[[i]], fixed = TRUE)
+    
+    # Convert gap character(s) into empty text strings (""):
+    MatrixBlockList[[i]] <- gsub(pattern = Gap[[i]], replacement = "", MatrixBlockList[[i]], fixed = TRUE)
+    
+  }
+  
+  # Get minimum and maximum values for each character in each matrix:
+  MinMaxMatrixList <- lapply(MatrixBlockList, RangeFinder)
+  
+  # Now min-max is known need to check for continuous characters to amek sure default weights are all effectively 1:
+  if(any(names(MatrixBlockList) == "CONTINUOUS")) {
+    
+    # Get numbers of continuous blocks:
+    ContinuousBlocks <- which(names(MatrixBlockList) == "CONTINUOUS")
+    
+    # For each continuous blocks set weights as reciprocal of difference between min and max (i.e., effectively setting all weights as one):
+    for(i in ContinuousBlocks) Weights[[i]] <- 1 / (MinMaxMatrixList[[i]][, "Max"] - MinMaxMatrixList[[i]][, "Min"])
+    
+  }
+
+  # Set default ordering as unord:
+  DefaultOrdering <- "unord"
+  
+  # If deafult ordering is specified, store it:
+  if(length(grep("DEFTYPE", toupper(X))) > 0) DefaultOrdering <- strsplit(strsplit(X[grep("deftype", X, ignore.case = TRUE)], "DEFTYPE=|Deftype=|deftype=")[[1]][2], " ")[[1]][1]
+  
+  # If default ordering is ordered then update ordering as "ord":
+  if(DefaultOrdering == "ord") Ordering <- lapply(lapply(MatrixBlockList, ncol), rep, x = "ord")
+  
+  # If one or more blocks are of type CONTINUOUS:
+  if(any(toupper(names(MatrixBlockList)) == "CONTINUOUS")) {
+    
+    # Get continuous blocks:
+    ContinuousBlocks <- which(toupper(names(MatrixBlockList)) == "CONTINUOUS")
+    
+    # Update continuous ordering to "cont" to denote characters are tp be treated as continuous:
+    for(i in ContinuousBlocks) Ordering[[i]] <- gsub("unord", "cont", Ordering[[i]])
+    
+  }
+  
+  # Check assumptions block is supplied (to catch issue of character information appearing in a different block type (e.g., MRBAYES):
+  if(length(grep("begin assumptions", X, ignore.case = TRUE)) == 0) stop("No assumptions block specified. NB: Claddis can not read ordering information is stored in another type of block (e.g., MRBAYES).")
+  
+  # Find any TYPESET lines:
+  TypesetLines <- X[lapply(lapply(strsplit(X, split = ""), '[', 1:7), paste, collapse = "") == "TYPESET"]
+  
+  # If there are typeset line(s):
+  if(length(TypesetLines) > 0) {
+    
+    # Remove any double spaces found (fot easier strsplit later):
+    while(length(grep("  ", TypesetLines))) TypesetLines <- gsub("  ", " ", TypesetLines)
+    
+    # If there are any block names (i.e., names that may be used to differentiate assumptions by character block):
+    if(any(!is.na(BlockNames))) {
+      
+      # Get numbers of blocks with labels:
+      LabelledBlockNumbers <- which(!is.na(BlockNames))
+      
+      # For each labelled block:
+      for(i in LabelledBlockNumbers) {
         
-    # Find appropriate information line:
-    ordering.line <- X[grep("TYPESET", X, ignore.case = TRUE)]
-
-    # Make sure ordering is on single line or rest of code will not work:
-    if(length(grep(";", ordering.line)) == 0) stop("Ordering breaks over multiple lines. Place on single line.")
-
-    # Get clean text:
-    ordering.line <- trim(gsub(",|;", "", strsplit(ordering.line, "=")[[1]][2]))
-
-    # Number of character types specified:
-    ntype <- nchar(ordering.line) - nchar(gsub(":", "", ordering.line))
-  
-    # Get list of character types:
-    types <- gsub("\\", "", strsplit(gsub("[0-9]|-| ", "", ordering.line), ":")[[1]][1:ntype], fixed=TRUE)
-  
-    # Get initial list of numbers of characters of each type:
-    ordering.numbers <- strsplit(ordering.line, paste(paste(types, ": ", sep = ""), collapse = "|"))[[1]]
-
-    # Conditional to deal with weird slashes in numbering:
-    if(length(grep("\\3", ordering.numbers, fixed=T)) > 0) {
-
-      # Identify effected rows:
-      effected.rows <- grep("\\3", ordering.numbers, fixed=T)
-
-      # For each effected row:
-      for(i in 1:length(effected.rows)) {
-
-        # Isolate data:
-        effected.row <- ordering.numbers[effected.rows[i]]
-
-        # Split by spaces:
-        effected.row <- strsplit(effected.row, " ")[[1]]
-
-        # For each isolated element fix the issue:
-        for(j in grep("\\", effected.row, fixed=T)) effected.row[j] <- gsub("-", " ", gsub("\\3", "", effected.row[j], fixed=T))
-
-        # Update ordering numbers:
-        ordering.numbers[effected.rows[i]] <- paste(effected.row, collapse=" ")
-
-      }
-
-    }
-
-    # Modify further ready for parsing and evaluating:
-    ordering.numbers <- paste("c(", gsub(" ", ",", trim(gsub("-", ":", ordering.numbers[nchar(ordering.numbers) > 0]))), ")", sep="")
-  
-    # For each character type:
-    for(i in 1:length(types)) {
-  
-      # Update ordering vector with character type:
-      ordering[eval(parse(text=ordering.numbers[i]))] <- types[i]
-
-    }
-
-  }
-
-  # Set default weight set of all equal (and 1):
-  weights <- rep(1, sum(nchar))
-    
-  # Deal with differential weighting, if present:
-  if(length(grep("WTSET", X, ignore.case = TRUE)) > 0) {
-
-    # Grab weighting line:
-    weighting.line <- gsub(",|;", "", strsplit(X[grep("WTSET", X, ignore.case = TRUE)], "=")[[1]][2])
-    
-    # Isolate weight values:
-    weight.values <- gsub(":", "", strsplit(weighting.line, " ")[[1]][grep(":", strsplit(weighting.line, " ")[[1]])])
-    
-    # Make weight markers vector:
-    weight.markers <- rev(paste(sort(as.numeric(weight.values)), ":", sep = ""))
-    
-    # Replace each weight with a percentage symbol (to later be used as the split character):
-    for(i in 1:length(weight.markers)) weighting.line <- gsub(weight.markers[i], "%", weighting.line)
-  
-    # Get initial list of numbers of characters of each type:
-    weighting.numbers <- trim(strsplit(weighting.line, "%")[[1]])[2:length(strsplit(weighting.line, "%")[[1]])]
-  
-    # Modify further ready for parsing and evaluating:
-    weighting.numbers <- paste("c(", gsub(" ", ",", trim(gsub("-", ":", weighting.numbers[nchar(weighting.numbers) > 0]))), ")", sep="")
-  
-    # For each weight value:
-    for(i in 1:length(weight.values)) {
-  
-      # Store updated weights:
-      weights[eval(parse(text = weighting.numbers[i]))] <- as.numeric(weight.values[i])
-  
-    }
-  
-  }
-
-  # Vectors to store minimum and maximum values:
-  min.vals <- max.vals <- vector(length = nchar)
-    
-  # For each character find the minimum and maximum value:
-  for(i in 1:nchar) {
+        # Build current label text (to look for in
+        CurrentLabelText <- paste("(CHARACTERS=", BlockNames[i], ")=", sep = "")
         
-    # List non-missing values for character:
-    non.nas <- sort(MATRIX[, i])
-    
-    # As long as there are non-NAs (i.e., there is not missing data for all taxa):
-    if(length(non.nas) > 0) {
-  
-      # Case if polymorphisms are available:
-      if(length(grep("&", non.nas)) > 0) {
-            
-        # Get polymorphisms:
-        polymorphisms <- grep("&", non.nas)
-            
-        # For each polymorphism:
-        for(j in polymorphisms) {
-                
-          # Add split values to end of non.nas vector:
-          non.nas <- c(non.nas, strsplit(non.nas[j], "&")[[1]])
-
+        # Find line that contains label (if used):
+        LabelMatch <- grep(CurrentLabelText, TypesetLines, fixed = TRUE)
+        
+        # If such a line was found:
+        if(length(LabelMatch) > 0) {
+          
+          # Isolate ordering information:
+          OrderingInformation <- strsplit(TypesetLines[LabelMatch], split = CurrentLabelText, fixed = TRUE)[[1]][2]
+          
+          # Extract ordering information:
+          OrderingExtracted <- AssumptionExtractor(OrderingInformation)
+          
+          # Store ordering information for block in ordering of block (i.e., numbered from 1 in block not 1 in whole NEXUS file):
+          Ordering[[i]] <- OrderingExtracted
+        
         }
-            
-        # Remove non-split values from non.nas vector:
-        non.nas <- non.nas[-polymorphisms]
-
-      }
         
-      # Find maxima:
-      max.vals[i] <- max(as.numeric(non.nas))
-
-      # Find minima:
-      min.vals[i] <- min(as.numeric(non.nas))
-
-    # Case if no data for any taxon:
+      }
+      
+    # If there are not any block names (or if some blocks lack names):
     } else {
-
-      # Set both minimum and maximum values as zero:
-      max.vals[i] <- min.vals[i] <- 0
-
+      
+      # Isolate ordering information:
+      OrderingInformation <- strsplit(TypesetLines, split = "UNTITLED=", fixed = TRUE)[[1]][2]
+      
+      # Extract ordering information:
+      OrderingExtracted <- AssumptionExtractor(OrderingInformation)
+      
+      # Get lengths of ordering for each block:
+      OrderingLengths <- unlist(lapply(Ordering, length))
+      
+      # For each block of the matrix list:
+      for(i in 1:length(OrderingLengths)) {
+        
+        # Store part of extracted ordering corresponding to ith block:
+        Ordering[[i]][1:OrderingLengths[i]] <-  OrderingExtracted[1:OrderingLengths[i]]
+        
+        # Remove already transferred ordering from extracted ready for next block:
+        OrderingExtracted <- OrderingExtracted[-(1:OrderingLengths[i])]
+        
+      }
+      
     }
-
+  
   }
-
-  # If wanting to equalise weights (NB: all continuous characters will continue to be weighted one):
-  if(equalise.weights) {
-
-    # Get starting weights:
-    weights <- apply(rbind(c(max.vals - min.vals), rep(1, nchar)), 2, max)
   
-    # Updaye weights for unordered characters:
-    weights[ordering == "unord"] <- 1
+  # Convert any "Squared" ordering to "cont" for continuous:
+  Ordering <- lapply(Ordering, gsub, pattern = "Squared", replacement = "cont", ignore.case = TRUE)
   
-    # Update weights for ordered characters:
-    weights[ordering == "ord"] <- 1 / weights[ordering == "ord"]
+  # Look for any non-standard ordering (i.e., not cont, ord, unord, or Step_X):
+  NonstandardOrdering <- setdiff(unique(unlist(Ordering)), c("cont", "ord", "unord", names(StepMatrices)))
   
-    # If there are step matrices:
-    if(!is.null(step.matrices)) {
+  # If any non-standard ordering is found stop and warn user:
+  if(length(NonstandardOrdering) > 0) stop(paste("The following non-standard character ordering(s) were found: ", paste(NonstandardOrdering, collapse = ", "), ". These should be one of type \"cont\", \"ord\", \"unord\", or step matrix.", sep = ""))
   
-      # Get maximum distances for each step matrix:
-      step.maxes <- unlist(lapply(lapply(step.matrices, as.numeric), max))
+  # Find any WTSET lines:
+  WeightsetLines <- X[lapply(lapply(strsplit(X, split = ""), '[', 1:5), paste, collapse = "") == "WTSET"]
   
-      # Update weights for step matrices:
-      for(i in 1:length(step.maxes)) weights[ordering == names(step.matrices)[i]] <- 1 / step.maxes[i]
-  
-    }
-  
-    # Ensure all weights are integers by multiplying by product of all reciprocals:
-    weights <- prod(unique(round(1 / weights))) * weights
-  
-    # Sub function to get all factors of an integer (stolen from: "http://stackoverflow.com/questions/6424856/r-function-for-returning-all-factors"):
-    get.all.factors <- function(x) {
-  
-      # Ensure input is an integer:
-      x <- as.integer(x)
-  
-      # Ensure x is positive and get sequence of 1 to x:
-      div <- seq_len(abs(x))
-  
-      # Get factors of x (i.e. numbers whose remainders are zero):
-      factors <- div[x %% div == 0L]
-
-      # Output answer:
-      return(factors)
-  
-    }
-  
-    # Get factors of every weight currently applied:
-    out <- sort(unlist(apply(matrix(unique(weights)), 1, get.all.factors)))
-  
-    # As long as the maximum possible factor is greater than 1:
-    while(max(rle(out)$values[rle(out)$lengths == length(unique(weights))]) > 1) {
-  
-      # Divide through weights by largest common factor:
-      weights <- weights / max(rle(out)$values[rle(out)$lengths == length(unique(weights))])
-
-      # Update factors for new weights:
-      out <- sort(unlist(apply(matrix(unique(weights)), 1, get.all.factors)))
-  
-    }
-
-  }
-
-  # Remove characters not favoured by phylogenetic software (periods, spaces, slashes, dashes and plusses):
-  rownames(MATRIX) <- gsub("\\.", "_dot_", gsub("-", "_dash_", gsub("/", "_slash_", gsub("\\+", "_plus_", gsub(" ", "_", rownames(MATRIX))))))
+  # If there are weightset line(s):
+  if(length(WeightsetLines) > 0) {
     
-  # Create output formatted data:
-  result <- list(textlines, MATRIX, ordering, weights, max.vals, min.vals, step.matrices, symbols)
+    # Remove any double spaces found (fot easier strsplit later):
+    while(length(grep("  ", WeightsetLines))) WeightsetLines <- gsub("  ", " ", WeightsetLines)
+    
+    # If there are any block names (i.e., names that may be used to differentiate assumptions by character block):
+    if(any(!is.na(BlockNames))) {
+      
+      # Get numbers of blocks with labels:
+      LabelledBlockNumbers <- which(!is.na(BlockNames))
+      
+      # For each labelled block:
+      for(i in LabelledBlockNumbers) {
+        
+        # Build current label text (to look for in
+        CurrentLabelText <- paste("(CHARACTERS=", BlockNames[i], ")=", sep = "")
+        
+        # Find line that contains label (if used):
+        LabelMatch <- grep(CurrentLabelText, WeightsetLines, fixed = TRUE)
+        
+        # If such a line was found:
+        if(length(LabelMatch) > 0) {
+          
+          # Isolate weights information:
+          WeightsInformation <- strsplit(WeightsetLines[LabelMatch], split = CurrentLabelText, fixed = TRUE)[[1]][2]
+          
+          # Extract weights information:
+          WeightsExtracted <- AssumptionExtractor(WeightsInformation)
+          
+          # Store weights information for block in weights of block (i.e., numbered from 1 in block not 1 in whole NEXUS file):
+          Weights[[i]] <- WeightsExtracted
+          
+        }
+        
+      }
+      
+    # If there are not any block names (or if some blocks lack names):
+    } else {
+      
+      # Isolate weights information:
+      WeightsInformation <- strsplit(WeightsetLines, split = "UNTITLED=", fixed = TRUE)[[1]][2]
+      
+      # Extract weights information:
+      WeightsExtracted <- AssumptionExtractor(WeightsInformation)
+      
+      # Get lengths of weights for each block:
+      WeightsLengths <- unlist(lapply(Weights, length))
+      
+      # For each block of the matrix list:
+      for(i in 1:length(WeightsLengths)) {
+        
+        # Store part of extracted weights corresponding to ith block:
+        Weights[[i]][1:WeightsLengths[i]] <-  WeightsExtracted[1:WeightsLengths[i]]
+        
+        # Remove already transferred weights from extracted ready for next block:
+        WeightsExtracted <- WeightsExtracted[-(1:WeightsLengths[i])]
+        
+      }
+      
+    }
+    
+  }
+  
+  # Convert weights to numeric:
+  Weights <- lapply(Weights, as.numeric)
+  
+  # If equalising weights:
+  if(EqualiseWeights) {
+    
+    # Get starting weights by taking differences for each character (will take reciprocal later for true weight):
+    StartingWeights <- lapply(lapply(MinMaxMatrixList, apply, 1, diff), function(x) x)
+    
+    # If there are continuous characters:
+    if(any(names(StartingWeights) == "CONTINUOUS")) {
+      
+      # Get numbers of continuous blocks:
+      ContinuousBlocks <- which(names(StartingWeights) == "CONTINUOUS")
+      
+      # Set weights for continuous blocks to null:
+      for(i in ContinuousBlocks) StartingWeights[[i]] <- vector(mode = "numeric")
+      
+    }
+    
+    # If there are any unordered characters:
+    if(any(unlist(Ordering) == "unord")) {
+      
+      # Get numbers of blocks with unordered characters:
+      BlocksWithUnorderedCharacters <- which(unlist(lapply(lapply(Ordering, '==', "unord"), sum)) > 0)
+      
+      # Convert all unordered characters to weight one:
+      for(i in BlocksWithUnorderedCharacters) StartingWeights[[i]][which(Ordering[[i]] == "unord")] <- 1
+      
+    }
+    
+    # If there are any step matrices specified:
+    if(any(unlist(lapply(lapply(Ordering, grep, pattern = "step_"), length)) > 0)) {
+      
+      # Get numbers of blocks with step matrix characters:
+      BlocksWithStepMatrixCharacters <- which(unlist(lapply(lapply(Ordering, grep, pattern = "step_"), length)) > 0)
+      
+      # for each block with step matrix characters:
+      for(i in BlocksWithStepMatrixCharacters) {
+        
+        # Get step matrix characters:
+        StepCharacters <- grep("step_", Ordering[[i]])
+        
+        # Set step matrix character as maximum possible value in step matrix (again, should be reciprocal, but that will happen later:
+        for(j in StepCharacters) StartingWeights[[i]][j] <- max(as.numeric(StepMatrices[[Ordering[[i]][j]]]))
+        
+      }
+      
+    }
+    
+    # Take reciprocal of weights so they are actual weights:
+    StartingWeights <- lapply(StartingWeights, function(x) 1 / x)
+    
+    # Get product weight (to multiply all weights by):
+    ProductWeight <- prod(unique(unlist(lapply(StartingWeights, function(x) round(1 / x)))))
+    
+    # Multiply weighting product through all starting weights:
+    StartingWeights <- lapply(StartingWeights, function(x) x * ProductWeight)
+    
+    # Get factors of every weight currently applied:
+    AllFactorsCombined <- sort(unlist(lapply(as.list(unique(unlist(StartingWeights))), GetAllFactors)))
+    
+    # Get largest common factor of all weights:
+    LargestCommonFactor <- max(rle(AllFactorsCombined)$values[rle(AllFactorsCombined)$lengths == length(unique(unlist(StartingWeights)))])
+    
+    # As long as the largest common factor is greater than 1:
+    while(LargestCommonFactor > 1) {
+      
+      # UPdate starting weights by dividing through by current largest facto:
+      StartingWeights <- lapply(StartingWeights, function(x) x / LargestCommonFactor)
+      
+      # Get factors of every weight currently applied:
+      AllFactorsCombined <- sort(unlist(lapply(as.list(unique(unlist(StartingWeights))), GetAllFactors)))
+      
+      # Get largest common factor of all weights:
+      LargestCommonFactor <- max(rle(AllFactorsCombined)$values[rle(AllFactorsCombined)$lengths == length(unique(unlist(StartingWeights)))])
+      
+    }
+    
+    # If there are any constant characters:
+    if(any(unlist(lapply(lapply(lapply(lapply(MinMaxMatrixList, apply, 1, diff), '==', 0), which), length)) > 0)) {
+      
+      # Get numbers of blocks with constant characters:
+      BlocksWithConstantCharacters <- which(unlist(lapply(lapply(lapply(lapply(MinMaxMatrixList, apply, 1, diff), '==', 0), which), length)) > 0)
+      
+      # For each block with constant characters set weight to zero:
+      for(i in BlocksWithConstantCharacters) StartingWeights[[i]][which(apply(MinMaxMatrixList[[i]], 1, diff) == 0)] <- 0
+      
+    }
+    
+    # If there are continuous characters:
+    if(any(names(StartingWeights) == "CONTINUOUS")) {
+      
+      # Get numbers of continuous blocks:
+      ContinuousBlocks <- which(names(StartingWeights) == "CONTINUOUS")
+      
+      # Set weights for continuous blocks as original weights:
+      for(i in ContinuousBlocks) StartingWeights[[i]] <- Weights[[i]]
+      
+    }
+    
+    # Update weights:
+    Weights <- StartingWeights
+    
+  }
+  
+  # Create top list:
+  TopList <- list(textlines, StepMatrices)
+  
+  # Add names to top list:
+  names(TopList) <- c("Header", "StepMatrices")
+  
+  # Start to compile output starting with top list:
+  Output <- list(TopList)
+  
+  # Add name to top list:
+  names(Output) <- "Topper"
+  
+  # For each matrix block:
+  for(i in 1:length(MatrixBlockList)) {
+    
+    # Create sublist for character information:
+    Characters <- list(Symbols[[i]], Missing[[i]], Gap[[i]])
+    
+    # Add names to characters sublist:
+    names(Characters) <- c("Symbols", "Missing", "Gap")
+    
+    # Build list for current block:
+    Block <- list(BlockNames[[i]], names(MatrixBlockList)[i], MatrixBlockList[[i]], Ordering[[i]], Weights[[i]], MinMaxMatrixList[[i]][, "Min"], MinMaxMatrixList[[i]][, "Max"], Characters)
+    
+    # Add anems to list:
+    names(Block) <- c("BlockName", "Datatype", "Matrix", "Ordering", "Weights", "MinVals", "MaxVals", "Characters")
+    
+    # Store current block in output:
+    Output[[(i + 1)]] <- Block
+    
+    # Add name to current matrix (using a number to differentiate them):
+    names(Output)[(i + 1)] <- paste("Matrix_", i, sep = "")
+    
+  }
 
-  # Add names to result:
-  names(result) <- c("header", "matrix", "ordering", "weights", "max.vals", "min.vals", "step.matrices", "symbols")
-
-  # Return result:
-  return(result)
+  # Return output:
+  return(invisible(Output))
 
 }
+
+# Test matrices:
+#a <- ReadMorphNexus(File = "~/Documents/Packages/Claddis/Continuous and step matrix examples/Marx_et_Fordyce_2016asuppc.nex", EqualiseWeights = TRUE)
+#b <- ReadMorphNexus(File = "~/Documents/Packages/Claddis/Continuous and step matrix examples/Kammerer_etal_2011asuppb.nex", EqualiseWeights = TRUE)
+#c <- ReadMorphNexus(File = "~/Documents/Homepage/www.graemetlloyd.com/nexus/Adams_2013a.nex", EqualiseWeights = TRUE)
+#d <- ReadMorphNexus(File = "~/Documents/Homepage/www.graemetlloyd.com/nexus/Maidment_2010a.nex", EqualiseWeights = TRUE)
+#e <- ReadMorphNexus(File = "~/Documents/Homepage/www.graemetlloyd.com/Added/Smith_et_Dyke_2008a/Smith_et_Dyke_2008a.nex", EqualiseWeights = TRUE)
