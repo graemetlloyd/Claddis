@@ -927,7 +927,7 @@ ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
   }
   
   # Check assumptions block is supplied (to catch issue of character information appearing in a different block type (e.g., MRBAYES):
-  if(length(grep("begin assumptions", X, ignore.case = TRUE)) == 0) stop("No assumptions block specified. NB: Claddis can not read ordering information is stored in another type of block (e.g., MRBAYES).")
+  if(length(grep("begin assumptions", X, ignore.case = TRUE)) == 0) stop("No assumptions block specified. NB: Claddis can not read ordering information stored in another type of block (e.g., MRBAYES).")
   
   # Find any TYPESET lines:
   TypesetLines <- X[lapply(lapply(strsplit(X, split = ""), '[', 1:7), paste, collapse = "") == "TYPESET"]
