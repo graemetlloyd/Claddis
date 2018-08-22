@@ -16,7 +16,7 @@
 #' @examples
 #'
 #' # Create a simple four-taxon tree:
-#' tree <- read.tree(text="(A,(B,(C,D)));")
+#' tree <- read.tree(text = "(A,(B,(C,D)));")
 #' 
 #' # Plot the tree:
 #' plot(tree)
