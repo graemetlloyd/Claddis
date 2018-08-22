@@ -12,7 +12,7 @@
 #' @examples
 #' 
 #' # Create simple four-taxon tree:
-#' tree <- read.tree(text="(A,(B,(C,D)));")
+#' tree <- read.tree(text = "(A,(B,(C,D)));")
 #' 
 #' # Plot tree:
 #' plot(tree)
@@ -32,7 +32,7 @@
 GetDescendantEdges <- function(n, tree) {
   
   # Find number of terminals (i.e. stopping point):
-  n.terminals <- length(FindDescendants(n, tree))
+  n.terminals <- length(strap::FindDescendants(n, tree))
   
   # Create vector to store internal nodes:
   nodes <- n
