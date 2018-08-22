@@ -35,13 +35,13 @@ MinSpanTreeEdges <- function(dist.matrix) {
 	dist.matrix <- as.matrix(dist.matrix)
 
 	# Get links matrix for minimum spanning tree:
-	links.matrix <- mst(dist.matrix)
+  links.matrix <- ape::mst(dist.matrix)
 	
 	# Update matrix class to NULL:
 	class(links.matrix) <- NULL
 	
 	# Create empty matrix to store edges for minimum spanning tree:
-	min.span.tree.edges <- matrix(nrow=0, ncol=2, dimnames=list(c(), c("From", "To")))
+	min.span.tree.edges <- matrix(nrow = 0, ncol = 2, dimnames = list(c(), c("From", "To")))
 	
 	# For each row:
 	for(i in 1:(nrow(links.matrix) - 1)) {
@@ -60,7 +60,7 @@ MinSpanTreeEdges <- function(dist.matrix) {
 	distances <- diag(dist.matrix[min.span.tree.edges[, "From"], min.span.tree.edges[, "To"]])
 	
 	# Add names to distances:
-	names(distances) <- apply(min.span.tree.edges, 1, paste, collapse="->")
+	names(distances) <- apply(min.span.tree.edges, 1, paste, collapse = "->")
 	
 	# Output distances for minimum soanning tree:
 	return(distances)
