@@ -10,7 +10,7 @@ MultiMorphospacePlot(pcoa_input, N_axes = 4, plot_taxon_names = FALSE,
 \arguments{
 \item{pcoa_input}{The main input in the format output from \link{MorphMatrix2PCoA}.}
 
-\item{N_axes}{An integer indicatingthe  total number of axes to plot (should minimally be three).}
+\item{N_axes}{An integer indicating the total number of axes to plot (should minimally be three).}
 
 \item{plot_taxon_names}{Optional to plot the names of the taxa (defaults to FALSE).}
 

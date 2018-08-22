@@ -35,7 +35,7 @@ tree <- rtree(10)
 tree$root.time <- 100
 
 # Create time bins:
-time.bins <- seq(100, 0, length.out=11)
+time.bins <- seq(100, 0, length.out = 11)
 
 # Get edge lengths for each bin:
 EdgeLengthsInBins(tree, time.bins)

@@ -30,6 +30,8 @@ The function operates as follows:
 5) Outputs both the stochastic character map (time spent in each state on each branch) and a matrix of state changes.
 
 (NB: As the map is stochastic the answer will be different each time the function is run and multiple replicates are strongly advised in order to ascertain uncertainty.)
+
+This was the method used in Tarver et al. (in press).
 }
 \examples{
 
@@ -54,6 +56,9 @@ out$Changes
 # View stochastic character map (time spent in each state on each branch):
 out$SCM
 
+}
+\references{
+Tarver, J. E., Taylor, R. S., Puttick, M. N., Lloyd, G. T., Pett, W., Fromm, B., Schirrmeister, B. E., Pisani, D., Peterson, K. J. and Donoghue, P. C. J., in press. Well-annotated microRNAomes do not evidence pervasive miRNA loss. Genome Biology and Evolution, , .
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

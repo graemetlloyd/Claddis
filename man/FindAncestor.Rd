@@ -23,7 +23,7 @@ Intended for use as an internal function for \link{TrimMorphDistMatrix}, but pot
 \examples{
 
 # Create a simple four-taxon tree:
-tree <- read.tree(text="(A,(B,(C,D)));")
+tree <- read.tree(text = "(A,(B,(C,D)));")
 
 # Plot the tree:
 plot(tree)

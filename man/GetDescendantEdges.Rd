@@ -20,7 +20,7 @@ Returns a vector of integers corresponding to row numbers in \code{$edge} or cel
 \examples{
 
 # Create simple four-taxon tree:
-tree <- read.tree(text="(A,(B,(C,D)));")
+tree <- read.tree(text = "(A,(B,(C,D)));")
 
 # Plot tree:
 plot(tree)
