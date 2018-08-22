@@ -24,7 +24,7 @@
 FindLinkedEdges <- function(tree) {
 	
 	# Create matrix of linked edges (all starting as unlinked, 0):
-	edge.link.matrix <- matrix(0, nrow=nrow(tree$edge), ncol=nrow(tree$edge), dimnames=list(1:nrow(tree$edge), 1:nrow(tree$edge)))
+	edge.link.matrix <- matrix(0, nrow = nrow(tree$edge), ncol = nrow(tree$edge), dimnames = list(1:nrow(tree$edge), 1:nrow(tree$edge)))
 	
 	# For each edge:
 	for(i in 1:nrow(tree$edge)) {
