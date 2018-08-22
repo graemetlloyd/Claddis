@@ -13,6 +13,8 @@
 #' 5) Outputs both the stochastic character map (time spent in each state on each branch) and a matrix of state changes.
 #'
 #' (NB: As the map is stochastic the answer will be different each time the function is run and multiple replicates are strongly advised in order to ascertain uncertainty.)
+#'
+#' This was the method used in Tarver et al. (in press).
 #' 
 #' @param tree A tree in phylo format with barnch lengths and a value for \code{$root.time}.
 #' @param tip.states A vector of tip states (must be 0 or 1) with names matching \code{tree$tip.label}.
@@ -23,6 +25,10 @@
 #' \item{SCM}{The stochastic character map.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
+#'
+#' @references
+#'
+#' Tarver, J. E., Taylor, R. S., Puttick, M. N., Lloyd, G. T., Pett, W., Fromm, B., Schirrmeister, B. E., Pisani, D., Peterson, K. J. and Donoghue, P. C. J., in press. Well-annotated microRNAomes do not evidence pervasive miRNA loss. Genome Biology and Evolution, , .
 #'
 #' @examples
 #' 
@@ -60,7 +66,7 @@ DolloSCM <- function(tree, tip.states) {
     non.matches <- c(setdiff(names(tip.states), tree$tip.label), setdiff(tree$tip.label, names(tip.states)))
     
     # If there are any non-matching names stop and notify user:
-    if(length(non.matches) > 0) stop(paste("Non-matching names between tree and tips states found:", paste(non.matches, collapse=", ")))
+    if(length(non.matches) > 0) stop(paste("Non-matching names between tree and tips states found:", paste(non.matches, collapse = ", ")))
     
     # Check for states other than zero or one:
     non.binary.states <- setdiff(unique(tip.states), c(0, 1))
