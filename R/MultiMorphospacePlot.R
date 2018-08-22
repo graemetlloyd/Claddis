@@ -7,7 +7,7 @@
 #' Plots multiple bivariate plots of ordination axes starting with 1 and up to N, such that every possible bivariate plot is produced.
 #'
 #' @param pcoa_input The main input in the format output from \link{MorphMatrix2PCoA}.
-#' @param N_axes An integer indicatingthe  total number of axes to plot (should minimally be three).
+#' @param N_axes An integer indicating the total number of axes to plot (should minimally be three).
 #' @param plot_taxon_names Optional to plot the names of the taxa (defaults to FALSE).
 #' @param plot_internal_nodes Optional to plot the internal nodes of the tree (if included in \code{pcoa_input}) (defaults to FALSE).
 #' @param plot_root Optional to plot the root separately (defaults to FALSE).
