@@ -27,7 +27,7 @@
 #' tree$root.time <- 100
 #' 
 #' # Create time bins:
-#' time.bins <- seq(100, 0, length.out=11)
+#' time.bins <- seq(100, 0, length.out = 11)
 #' 
 #' # Get edge lengths for each bin:
 #' EdgeLengthsInBins(tree, time.bins)
@@ -54,7 +54,7 @@ EdgeLengthsInBins <- function(tree, time.bins, pruned.tree=NULL) {
 		if(sum(pruned.tree$edge.length) < sum(tree$edge.length)) {
 			
 			# Find descendant tips of each node:
-			descendant.tips <- lapply(as.list((Ntip(tree) + 1):(Ntip(tree) + Nnode(tree))), FindDescendants, tree=tree)
+			descendant.tips <- lapply(as.list((Ntip(tree) + 1):(Ntip(tree) + Nnode(tree))), FindDescendants, tree = tree)
 			
 			# Add node numbers as names:
 			names(descendant.tips) <- (Ntip(tree) + 1):(Ntip(tree) + Nnode(tree))
@@ -76,7 +76,7 @@ EdgeLengthsInBins <- function(tree, time.bins, pruned.tree=NULL) {
 	internal.edges <- setdiff(1:nrow(tree$edge), terminal.edges)
 	
 	# Enforce old-to-young order of time bins:
-	time.bins <- sort(time.bins, decreasing=TRUE)
+	time.bins <- sort(time.bins, decreasing = TRUE)
 	
 	# Create all-zero vector to store ouput in:
 	internal.edge.length.in.bin <- terminal.edge.length.in.bin <- edge.length.in.bin <- rep(0, length(time.bins) - 1)
@@ -125,7 +125,7 @@ EdgeLengthsInBins <- function(tree, time.bins, pruned.tree=NULL) {
 	}
 	
 	# Add time bin max-mins as names:
-	names(terminal.edge.length.in.bin) <- names(internal.edge.length.in.bin) <- names(edge.length.in.bin) <- apply(cbind(time.bins[1:(length(time.bins) - 1)], time.bins[2:length(time.bins)]), 1, paste, collapse="-")
+	names(terminal.edge.length.in.bin) <- names(internal.edge.length.in.bin) <- names(edge.length.in.bin) <- apply(cbind(time.bins[1:(length(time.bins) - 1)], time.bins[2:length(time.bins)]), 1, paste, collapse = "-")
 	
 	# Compile output:
 	output <- list(edge.length.in.bin, terminal.edge.length.in.bin, internal.edge.length.in.bin)
