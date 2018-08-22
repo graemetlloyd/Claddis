@@ -51,6 +51,7 @@
 ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
   
   # ADD ABILITY TO READ CHARSET LINES
+  # COULD BE MULTIPLE TYPESET OR WTSET LINES, NEED TO CHECK FOR THIS!
   
   # Line formatting function to be used in lapply below to deal with polymorphic characters:
   LineFormatter <- function(x, direction = "in") {
