@@ -66,7 +66,7 @@ EdgeMatch <- function(original.tree, pruned.tree) {
 		for(i in (Ntip(pruned.tree) + 1):(Ntip(pruned.tree) + Nnode(pruned.tree))) {
 			
 			# Get descendants of node (members of clade):
-			clades <- c(clades, paste(pruned.tree$tip.label[FindDescendants(i, pruned.tree)], collapse="%%SpLiTtEr%%"))
+			clades <- c(clades, paste(pruned.tree$tip.label[FindDescendants(i, pruned.tree)], collapse = "%%SpLiTtEr%%"))
 			
 			# Update with node number:
 			names(clades)[length(clades)] <- i
@@ -74,7 +74,7 @@ EdgeMatch <- function(original.tree, pruned.tree) {
 		}
 		
 		# Create vector to store corresponding node numbers in original tree:
-		corresponding.nodes <- vector(mode="numeric")
+		corresponding.nodes <- vector(mode = "numeric")
 		
 		# For each clade in pruned tree find and store node number in original tree:
 		for(i in clades) corresponding.nodes <- c(corresponding.nodes, FindAncestor(strsplit(i, "%%SpLiTtEr%%")[[1]], original.tree))
@@ -89,7 +89,7 @@ EdgeMatch <- function(original.tree, pruned.tree) {
 		pruned.edges <- cbind(corresponding.nodes[match(pruned.tree$edge[, 1], clades)], corresponding.nodes[match(pruned.tree$edge[, 2], clades)])
 		
 		# Find edges that match EXACTLY with the original tree:
-		matching.edges <- match(apply(pruned.edges, 1, paste, collapse="%%"), apply(original.tree$edge, 1, paste, collapse="%%"))
+		matching.edges <- match(apply(pruned.edges, 1, paste, collapse = "%%"), apply(original.tree$edge, 1, paste, collapse = "%%"))
 		
 		# List non-matching edges for further searching:
 		nonmatching.edges <- pruned.edges[is.na(matching.edges), ]
@@ -98,7 +98,7 @@ EdgeMatch <- function(original.tree, pruned.tree) {
 		if(length(nonmatching.edges) > 0) {
 		
 			# Correct stupid matrix to vector problem:
-			if(!is.matrix(nonmatching.edges)) nonmatching.edges <- matrix(nonmatching.edges, ncol=2)
+			if(!is.matrix(nonmatching.edges)) nonmatching.edges <- matrix(nonmatching.edges, ncol = 2)
 			
 			# For each non-matching edge:
 			for(i in 1:nrow(nonmatching.edges)) {
@@ -124,7 +124,7 @@ EdgeMatch <- function(original.tree, pruned.tree) {
 				}
 				
 				# Update matching edges with multiple edges separated by a double-percent:
-				matching.edges[which(is.na(matching.edges))[1]] <- paste(rev(edges), collapse="%%")
+				matching.edges[which(is.na(matching.edges))[1]] <- paste(rev(edges), collapse = "%%")
 				
 			}
 
