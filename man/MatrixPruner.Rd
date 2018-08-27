@@ -4,26 +4,34 @@
 \alias{MatrixPruner}
 \title{Prunes a character matrix of characters or taxa}
 \usage{
-MatrixPruner(clad.matrix, taxa2prune = c(), characters2prune = c())
+MatrixPruner(clad.matrix, blocks2prune = c(), characters2prune = c(),
+  taxa2prune = c(), removeinvariant = FALSE)
 }
 \arguments{
 \item{clad.matrix}{The cladistic matrix in the format imported by \link{ReadMorphNexus}.}
 
-\item{taxa2prune}{A vector of taxon names to prune (these must be present in \code{rownames(clad.matrix$matrix}).}
+\item{blocks2prune}{A vector of number(s) of any blocks to prune.}
 
 \item{characters2prune}{A vector of character numbers to prune.}
+
+\item{taxa2prune}{A vector of taxon names to prune (these must be present in \code{rownames(clad.matrix$matrix}).}
+
+\item{removeinvariant}{A logical for whether invariant characters should (TRUE) or should not (FALSE, default) be pruned.}
 }
 \description{
 Prunes a character matrix of characters, taxa, or both.
 }
 \details{
-Removing characters or taxa from a matrix imported using \link{ReadMorphNexus} is not simple due to associated vectors for ordering, character weights etc. To save repetitively pruning each part this function takes the matrix as input and vectors of either taxon names, character numbers, or both and removes those from the matrix. Minimum and maximum values (used by \link{MorphDistMatrix}) are also updated.
+Removing characters or taxa from a matrix imported using \link{ReadMorphNexus} is not simple due to associated vectors for ordering, character weights etc. To save repetitively pruning each part this function takes the matrix as input and vector(s) of either block numbers, character numbers, taxon names, or any combination thereof and returns a matrix with these items removed. Minimum and maximum values (used by \link{MorphDistMatrix}) are also updated and the user has the option to remove constant characters this way as well (e.g, to reduce the memory required for a DNA matrix).
 }
 \examples{
 
 # Remove the outgroup taxon and characters 11 and 53 from Gauthier1986:
-prunedmatrix <- MatrixPruner(clad.matrix = Gauthier1986, taxa2prune = c("Outgroup"),
-  characters2prune = c(11, 53))
+prunedmatrix <- MatrixPruner(clad.matrix = Gauthier1986, characters2prune = c(11, 53),
+  taxa2prune = c("Outgroup"))
+
+# Show priuned matrix:
+prunedmatrix$Matrix_1$Matrix
 
 }
 \seealso{
