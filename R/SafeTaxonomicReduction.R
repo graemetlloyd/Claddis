@@ -1,9 +1,9 @@
 #' Safe Taxonomic Reduction
-#' 
+#'
 #' Performs Safe Taxonomic Reduction (STR) on a character-taxon matrix.
-#' 
+#'
 #' Performs Safe Taxonomic Reduction (Wilkinson 1995).
-#' 
+#'
 #' If no taxa can be safely removed will print the text "No taxa can be safely removed", and the \code{str.list} and \code{removed.matrix} will have no rows.
 #'
 #' NB: If your data contains inapplicable characters these will be treated as missing data, but this is inappropriate. Thus the user is advised to double check that any removed taxa make sense in the light of inapplicable states. (As far as I am aware this same behaviour occurs in the TAXEQ3 software.)
@@ -23,39 +23,71 @@
 #' @keywords Safe Taxonomic Reduction
 #'
 #' @examples
-#' 
+#'
 #' # Performs STR on the Gauthier 1986 dataset used in Wilkinson (1995):
 #' str.out <- SafeTaxonomicReduction(Gauthier1986)
-#' 
+#'
 #' # View deleted taxa:
 #' str.out$str.list
-#' 
+#'
 #' # View reduced matrix:
 #' str.out$reduced.matrix
-#' 
+#'
 #' # View removed matrix:
 #' str.out$removed.matrix
-#' 
+#'
 #' @export SafeTaxonomicReduction
 SafeTaxonomicReduction <- function(morph.matrix) {
+  
+  #morph.matrix <- ReadMorphNexus("~/Documents/Packages/Claddis/Continuous and step matrix examples/Kammerer_etal_2011asuppb.nex")
+  morph.matrix <- Gauthier1986
   
   # Store unaltered version of matrix to return to later:
   Unaltered <- morph.matrix
   
+  # If there is more than one matrix block (will need to temporarily combine into single matrix):
+  if(length(morph.matrix) > 2) {
+    
+    # Get list of just the matrix blocks:
+    MatrixBlocks <- lapply(morph.matrix[2:length(morph.matrix)], '[[', "Matrix")
+    
+    # For each additional block add at end of first block:
+    for(i in 2:length(MatrixBlocks)) MatrixBlocks[[1]] <- cbind(MatrixBlocks[[1]], MatrixBlocks[[i]][rownames(MatrixBlocks[[1]]), ])
+    
+    # Store single matrix block as first block of morph.matrix:
+    morph.matrix[[2]]$Matrix <- MatrixBlocks[[1]]
+    
+    # Store ordering for all blocks in first block of morph.matrix:
+    morph.matrix[[2]]$Ordering <- as.vector(unlist(lapply(morph.matrix[2:length(morph.matrix)], '[[', "Ordering")))
+    
+    # Store weights for all blocks in first block of morph.matrix:
+    morph.matrix[[2]]$Weights <- as.vector(unlist(lapply(morph.matrix[2:length(morph.matrix)], '[[', "Weights")))
+    
+    # Store minimum values for all blocks in first block of morph.matrix:
+    morph.matrix[[2]]$MinVals <- as.vector(unlist(lapply(morph.matrix[2:length(morph.matrix)], '[[', "MinVals")))
+    
+    # Store maximum values for all blocks in first block of morph.matrix:
+    morph.matrix[[2]]$MaxVals <- as.vector(unlist(lapply(morph.matrix[2:length(morph.matrix)], '[[', "MaxVals")))
+    
+    # Isolate to just first matrix block:
+    morph.matrix <- morph.matrix[1:2]
+
+  }
+  
   # Prune out any zero weight characters, if they exist:
-  if(any(morph.matrix$weights == 0)) morph.matrix <- MatrixPruner(clad.matrix = morph.matrix, characters2prune = which(morph.matrix$weights == 0))
+  if(any(morph.matrix[[2]]$Weights == 0)) morph.matrix <- MatrixPruner(clad.matrix = morph.matrix, characters2prune = which(morph.matrix[[2]]$Weights == 0))
   
   # Order matrix from least to most complete taxon (as least is most likely to be removed):
-  morph.matrix$matrix <- morph.matrix$matrix[order(apply(apply(morph.matrix$matrix, 1, is.na), 2, sum), decreasing = TRUE), ]
+  morph.matrix[[2]]$Matrix <- morph.matrix[[2]]$Matrix[order(apply(apply(morph.matrix[[2]]$Matrix, 1, is.na), 2, sum), decreasing = TRUE), ]
   
   # Subfunction to be used by lapply to check downwards (look at more complete taxa only) for safely removable taxa:
   CheckDownwardForMatches <- function(rownumber, morph.matrix) {
     
     # First find which characters are not scored as missing in current taxon:
-    NonMissingCharacters <- !is.na(morph.matrix$matrix[rownumber, ])
+    NonMissingCharacters <- !is.na(morph.matrix[[2]]$Matrix[rownumber, ])
     
     # Build isolated matrix block from current taxon to end of matrix only for characters coded for current taxon:
-    MatrixBlockToCheck <- morph.matrix$matrix[rownumber:nrow(morph.matrix$matrix), NonMissingCharacters, drop = FALSE]
+    MatrixBlockToCheck <- morph.matrix[[2]]$Matrix[rownumber:nrow(morph.matrix[[2]]$Matrix), NonMissingCharacters, drop = FALSE]
     
     # Find any taxa that have missing characters inside the block (can not be true parents):
     TaxaWithMissingCharacters <- names(which(apply(apply(MatrixBlockToCheck, 1, is.na), 2, any)))
@@ -92,7 +124,7 @@ SafeTaxonomicReduction <- function(morph.matrix) {
   }
   
   # Get any safely removable taxa and their senior parents:
-  SafeToRemove <- lapply(as.list(1:(nrow(morph.matrix$matrix) - 1)), CheckDownwardForMatches, morph.matrix = morph.matrix)
+  SafeToRemove <- lapply(as.list(1:(nrow(morph.matrix[[2]]$Matrix) - 1)), CheckDownwardForMatches, morph.matrix = morph.matrix)
   
   # If no taxa can be safely deleted:
   if(all(unlist(lapply(SafeToRemove, is.null)))) {
@@ -103,11 +135,11 @@ SafeTaxonomicReduction <- function(morph.matrix) {
     # Create empty safe to remove matrix:
     SafeToRemove <- matrix(nrow = 0, ncol = 3, dimnames = list(c(), c("Junior", "Senior", "Rule")))
     
-    # Set reduced matrix as complete matrix:
-    ReducedMatrix <- Unaltered$matrix
+    # Set reduced matrix as unaltered matrix:
+    RemovedMatrix <- ReducedMatrix <- Unaltered
     
     # Set removed matrix as empty matrix:
-    RemovedMatrix <- Unaltered$matrix[-(1:nrow(Unaltered$matrix)), , drop = FALSE]
+    RemovedMatrix <- MatrixPruner(Unaltered, taxa2prune = rownames(Unaltered$Matrix_1$Matrix))
     
   # If there are taxa that can be deleted:
   } else {
@@ -128,10 +160,10 @@ SafeTaxonomicReduction <- function(morph.matrix) {
     for(i in 1:nrow(SafeToRemove)) {
       
       # Check for rule 1 (symmetrical coding):
-      if(paste(morph.matrix$matrix[SafeToRemove[i, 1], ], collapse = "") == paste(morph.matrix$matrix[SafeToRemove[i, 2], ], collapse = "")) {
+      if(paste(morph.matrix$Matrix_1$Matrix[SafeToRemove[i, 1], ], collapse = "") == paste(morph.matrix$Matrix_1$Matrix[SafeToRemove[i, 2], ], collapse = "")) {
         
         # Check for any missing data:
-        if(any(is.na(morph.matrix$matrix[SafeToRemove[i, 1], ]))) {
+        if(any(is.na(morph.matrix$Matrix_1$Matrix[SafeToRemove[i, 1], ]))) {
           
           # Is rule 1b:
           STRRule <- c(STRRule, "Rule 1B")
@@ -148,7 +180,7 @@ SafeTaxonomicReduction <- function(morph.matrix) {
       } else {
         
         # Check for any missing data:
-        if(any(is.na(morph.matrix$matrix[SafeToRemove[i, 1], ]))) {
+        if(any(is.na(morph.matrix$Matrix_1$Matrix[SafeToRemove[i, 1], ]))) {
           
           # Is rule 2B:
           STRRule <- c(STRRule, "Rule 2B")
@@ -172,10 +204,10 @@ SafeTaxonomicReduction <- function(morph.matrix) {
     colnames(SafeToRemove)[3] <- "Rule"
     
     # Set reduced matrix as complete matrix:
-    ReducedMatrix <- Unaltered$matrix[setdiff(rownames(Unaltered$matrix), unique(SafeToRemove[, "Junior"])), ]
+    ReducedMatrix <- MatrixPruner(Unaltered, taxa2prune = unique(SafeToRemove[, "Junior"]))
     
     # Set removed matrix as empty matrix:
-    RemovedMatrix <- Unaltered$matrix[sort(unique(SafeToRemove[, "Junior"])), ]
+    RemovedMatrix <- MatrixPruner(Unaltered, taxa2prune = setdiff(rownames(Unaltered$Matrix_1$Matrix), unique(SafeToRemove[, "Junior"])))
     
   }
   
@@ -187,5 +219,5 @@ SafeTaxonomicReduction <- function(morph.matrix) {
   
   # Return output inviisibly:
   return(invisible(output))
-
+  
 }
