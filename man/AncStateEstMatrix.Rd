@@ -31,10 +31,10 @@ Uses the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{p
 set.seed(17)
 
 # Generate a random tree for the Michaux data set:
-tree <- rtree(nrow(Michaux1989$matrix))
+tree <- rtree(nrow(Michaux1989$Matrix_1$Matrix))
 
 # Update taxon names to match those in the data matrix:
-tree$tip.label <- rownames(Michaux1989$matrix)
+tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
 
 # Set root time by making youngest taxon extant:
 tree$root.time <- max(diag(vcv(tree)))

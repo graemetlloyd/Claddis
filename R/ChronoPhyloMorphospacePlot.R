@@ -25,13 +25,13 @@
 #' set.seed(4)
 #'
 #' # Generate a random tree for the Michaux 1989 data set:
-#' tree <- rtree(length(rownames(Michaux1989$matrix)))
+#' tree <- rtree(length(rownames(Michaux1989$Matrix_1$Matrix)))
 #'
 #' # Set root time so latest tip terminates at the present:
 #' tree$root.time <- max(diag(vcv(tree)))
 #'
 #' # Add taxon names to the tree:
-#' tree$tip.label <- rownames(Michaux1989$matrix)
+#' tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
 #'
 #' # Perform a phylogenetic Principal Coordinates Analysis:
 #' pcoa_data <- MorphMatrix2PCoA(Michaux1989, tree = tree)
