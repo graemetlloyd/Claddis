@@ -867,8 +867,8 @@ ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
       # Find step matrix name:
       StepMatrixName <- strsplit(strsplit(X[i], "USERTYPE ")[[1]][2], " ")[[1]][1]
       
-      # Replace stpe matrix name with step_N:
-      X <- gsub(StepMatrixName, paste("step_", LETTERS[length(StepMatrices)], sep=""), X)
+      # Replace step matrix name with step_N:
+      X <- gsub(StepMatrixName, paste("step_", LETTERS[length(StepMatrices)], sep = ""), X)
       
       # Use step matrix name (step_N) in list for later calling:
       names(StepMatrices)[length(StepMatrices)] <- paste("step_", LETTERS[length(StepMatrices)], sep="")
