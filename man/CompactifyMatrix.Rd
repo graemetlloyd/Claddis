@@ -33,7 +33,7 @@ Michaux1989compact <- CompactifyMatrix(Michaux1989)
 # Examine the matrix post-compactification:
 Michaux1989compact$matrix
 
-# Examine the wieights post-compactification:
+# Examine the weights post-compactification:
 Michaux1989compact$weights
 
 }
