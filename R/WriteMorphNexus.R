@@ -131,20 +131,6 @@ WriteMorphNexus <- function(clad.matrix, filename) {
     
   }
   
-  # If header text is present:
-  if(nchar(paste(clad.matrix$Topper$Header, collapse = "")) > 0) {
-    
-    # Create header line:
-    headlines <- paste("#NEXUS\n", paste(paste("[", clad.matrix$Topper$Header, "]", sep = ""), collapse= "\n"), "\n", sep = "\n")
-    
-  # If no text
-  } else {
-    
-    # Create header line:
-    headlines <- "#NEXUS\n\n"
-    
-  }
-  
   # Isolate just data blocks (i.e., clad.matrix without Topper):
   DataBlocks <- clad.matrix[2:length(clad.matrix)]
   
