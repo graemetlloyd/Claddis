@@ -213,6 +213,9 @@ ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
   # Check that this is a #NEXUS file:
   if(length(grep("#NEXUS", X, ignore.case = TRUE)) == 0) stop("This is not a #NEXUS file.")
 
+  # Replace any lower case matrix with upper case:
+  if(length(grep("MATRIX", X, ignore.case = FALSE)) == 0) X <- gsub("matrix", "MATRIX", X, ignore.case = FALSE)
+
   # Check that the #NEXUS file includes a matrix:
   if(length(grep("MATRIX", X, ignore.case = TRUE)) == 0) stop("There is no matrix present.")
 
@@ -580,7 +583,7 @@ ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
     # Get title line (if found) - should work even if there is a taxon whose name begins "TITLE":
     TitleLine <- intersect(which(unlist(lapply(lapply(strsplit(CurrentBlock, split = ""), '[', 1:5), paste, collapse = "")) == "TITLE"), 1:which(unlist(lapply(lapply(strsplit(CurrentBlock, split = ""), '[', 1:5), paste, collapse = "")) == "MATRI")[1])
     
-    # Store bock name:
+    # Store block name:
     if(length(TitleLine) > 0) BlockNames[i] <- gsub(";", "", rev(strsplit(CurrentBlock[TitleLine], split = " ")[[1]])[1])
     
   }
@@ -1219,10 +1222,3 @@ ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
   return(invisible(Output))
 
 }
-
-# Test matrices:
-#a <- ReadMorphNexus(File = "~/Documents/Packages/Claddis/Continuous and step matrix examples/Marx_et_Fordyce_2016asuppc.nex", EqualiseWeights = TRUE)
-#b <- ReadMorphNexus(File = "~/Documents/Packages/Claddis/Continuous and step matrix examples/Kammerer_etal_2011asuppb.nex", EqualiseWeights = TRUE)
-#c <- ReadMorphNexus(File = "~/Documents/Homepage/www.graemetlloyd.com/nexus/Adams_2013a.nex", EqualiseWeights = TRUE)
-#d <- ReadMorphNexus(File = "~/Documents/Homepage/www.graemetlloyd.com/nexus/Maidment_2010a.nex", EqualiseWeights = TRUE)
-#e <- ReadMorphNexus(File = "~/Documents/Homepage/www.graemetlloyd.com/Added/Smith_et_Dyke_2008a/Smith_et_Dyke_2008a.nex", EqualiseWeights = TRUE)
