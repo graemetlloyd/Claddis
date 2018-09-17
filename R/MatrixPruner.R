@@ -57,14 +57,14 @@ MatrixPruner <- function(clad.matrix, blocks2prune = c(), characters2prune = c()
   # If there are characters to prune:
   if(!is.null(characters2prune)) {
     
-    # Get character blocks for each character in descendng rder (as want to work backwards so things match up properly):
+    # Get character blocks for each character in descendng order (as want to work backwards so things match up properly):
     CharacterBlocks <- unlist(lapply(lapply(lapply(as.list(sort(characters2prune, decreasing = TRUE)), '>', unlist(lapply(lapply(clad.matrix[2:length(clad.matrix)], '[[', "Matrix"), ncol))), which), length)) + 1
     
     # Initial build of characters in list form:
     CharactersAsList <- lapply(lapply(clad.matrix[2:length(clad.matrix)], '[[', "Matrix"), function(x) 1:ncol(x))
     
-    # Actually form list of character numbers:
-    for(i in 2:length(CharactersAsList)) CharactersAsList[[i]] <- CharactersAsList[[i]] + max(CharactersAsList[[(i - 1)]])
+    # Actually form list of character numbers (i.e., renumber characters in second or higher blocks):
+    if(length(CharactersAsList) > 1) for(i in 2:length(CharactersAsList)) CharactersAsList[[i]] <- CharactersAsList[[i]] + max(CharactersAsList[[(i - 1)]])
     
     # For each unique character vlock:
     for(i in unique(CharacterBlocks)) {
