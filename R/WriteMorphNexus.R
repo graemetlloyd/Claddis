@@ -159,7 +159,7 @@ WriteMorphNexus <- function(clad.matrix, filename) {
   DataBlocksAsTextStrings <- lapply(DataBlocks, MatrixConversion)
   
   # Set up header block (returns empty string if nothing there):
-  HeaderBlock <- ifelse(length(clad.matrix$Topper$Header) > 0, paste("[", clad.matrix$Topper$Header, "]\n\n", sep = ""), "")
+  HeaderBlock <- ifelse(nchar(clad.matrix$Topper$Header) > 0, paste("[", clad.matrix$Topper$Header, "]\n\n", sep = ""), "")
 
   # Set up taxa block (only required if multiple matrix blocks as sets number of taxa, will be empty string otherwise):
   TaxaBlock <- ifelse(length(DataBlocks) > 1, paste("BEGIN TAXA;\n\tDIMENSIONS NTAX=", NTaxa, ";\n\tTAXLABELS\n\t\t", paste(rownames(clad.matrix$Matrix_1$Matrix), collapse = " "), "\n;\nEND;\n\n", sep = ""), "")
