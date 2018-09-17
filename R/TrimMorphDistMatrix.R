@@ -1,13 +1,13 @@
 #' Trims a morphological distance matrix
-#' 
+#'
 #' Trims a morphological distance matrix by removing objects that cause empty cells.
-#' 
+#'
 #' Trims a morphological distance matrix by removing nodes (terminal or internal) that cause empty cells allowing it to be passed to an ordination function such as \link{cmdscale}.
-#' 
+#'
 #' Some distances are not calculable from cladistic matrices if there are taxa that have no coded characters in common. This algorithm iteratively removes the taxa responsible for the most empty cells until the matrix is complete (no empty cells).
-#' 
+#'
 #' If the matrix includes reconstructed ancestors the user should also provide the tree used (as the \code{tree} argument). The function will then also remove the tips from the tree and where reconstructed ancestors also cause empty cells will prune the minimum number of descendants of that node. The function will then renumber the nodes in the distance matrix so they match the pruned tree.
-#' 
+#'
 #' @param dist.matrix A distance matrix in the format created by \link{MorphDistMatrix}.
 #' @param tree If the distance matrix includes ancestors this should be the tree (phylo object) used to reconstruct them.
 #'
@@ -20,31 +20,31 @@
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
 #' @examples
-#' 
+#'
 #' # Get morphological distances for Michaux (1989) data set:
 #' distances <- MorphDistMatrix(Michaux1989)
-#' 
+#'
 #' # Attempt to trim max.dist.matrix:
 #' TrimMorphDistMatrix(distances$max.dist.matrix)
-#' 
+#'
 #' @export TrimMorphDistMatrix
 TrimMorphDistMatrix <- function(dist.matrix, tree = NULL) {
-
-  # If input is iof class "dist" first convert to a regular matrix:
+  
+  # If input is of class "dist" first convert to a regular matrix:
   if(class(dist.matrix) == "dist") dist.matrix <- as.matrix(dist.matrix)
-
+  
   # Check the input is a distance matrix:
   if(!is.matrix(dist.matrix)) stop("ERROR: Input must be a distance matrix (i.e., either an object of class \"dist\" or a square matrix).")
-
+  
   # Case if there is no tree:
   if(is.null(tree)) {
     
     # Case if distance matrix is already complete:
     if(length(which(is.na(dist.matrix))) == 0) {
-
+      
       # Warn user:
       print("There are no gaps in the distance matrix")
-    
+      
       # There are no taxa to be removed:
       removed.taxa <- NULL
       
@@ -61,7 +61,7 @@ TrimMorphDistMatrix <- function(dist.matrix, tree = NULL) {
     } else {
       
       # Vector to store taxa that need removing:
-      removes <- vector(mode="character")
+      removes <- vector(mode = "character")
       
       # Whilst there are still gaps in the matrix:
       while(length(which(is.na(dist.matrix))) > 0) {
@@ -83,9 +83,9 @@ TrimMorphDistMatrix <- function(dist.matrix, tree = NULL) {
         
         # Add taxon to removes list:
         removes <- c(removes, taxon.to.delete)
-
+        
       }
-
+      
       # Compile data in single variable:
       out <- list(dist.matrix, tree, removes)
       
@@ -94,7 +94,7 @@ TrimMorphDistMatrix <- function(dist.matrix, tree = NULL) {
       
       # Output:
       return(out)
-
+      
     }
     
   # Case if there is a tree:
@@ -153,7 +153,7 @@ TrimMorphDistMatrix <- function(dist.matrix, tree = NULL) {
         
         # Add taxon to removes list:
         removes <- c(removes, taxon.to.delete)
-
+        
       }
       
       # Restore complete distance matrix:
@@ -179,7 +179,7 @@ TrimMorphDistMatrix <- function(dist.matrix, tree = NULL) {
         
         # Add to nodes to delete vector:
         tip.name.nodes.to.remove <- unique(c(tip.name.nodes.to.remove, originating.node.name))
-
+        
       }
       
       # Check if nodes need to be deleted that are not related to tips to be deleted:
@@ -217,9 +217,9 @@ TrimMorphDistMatrix <- function(dist.matrix, tree = NULL) {
               
               # Get taxon to exclude:
               taxon.to.exclude <- tree$tip.label[FindDescendants(descendant.nodes[1], tree)]
-
+              
             }
-
+            
           }
           
           # Add to removes list:
@@ -227,9 +227,9 @@ TrimMorphDistMatrix <- function(dist.matrix, tree = NULL) {
           
           # Add to tips to remove list:
           tips.to.remove <- c(tips.to.remove, taxon.to.exclude)
-
+          
         }
-
+        
       }
       
       # Prune matrix until complete:
@@ -245,8 +245,8 @@ TrimMorphDistMatrix <- function(dist.matrix, tree = NULL) {
         rownames(dist.matrix)[i] <- colnames(dist.matrix)[i] <- paste(sort(nms[which(is.na(match(nms, tips.to.remove)))]), collapse="%%")
         
       }
-
-      # Estbalish if there are redundant rows (nodes defined by a single tip or by no tips at all):
+      
+      # Establish if there are redundant rows (nodes defined by a single tip or by no tips at all):
       redundant.rows <- c(which(duplicated(rownames(dist.matrix))), which(rownames(dist.matrix) == ""))
       
       # If there are any redundant rows:
@@ -254,7 +254,7 @@ TrimMorphDistMatrix <- function(dist.matrix, tree = NULL) {
         
         # Remove them from the distance matrix:
         dist.matrix <- dist.matrix[-redundant.rows, -redundant.rows]
-
+        
       }
       
       # Remove pruned taxa from tree:
@@ -277,9 +277,9 @@ TrimMorphDistMatrix <- function(dist.matrix, tree = NULL) {
       
       # Return answer:
       return(out)
-
+      
     }
-
+    
   }
-
+  
 }
