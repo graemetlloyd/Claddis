@@ -689,7 +689,7 @@ ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
   GetGap <- function(X) {
     
     # If the gap character is specified:
-    if(length(grep("gap", X, ignore.case = TRUE)) > 0) {
+    if(length(grep("gap", X[1:grep("matrix", X)[1]], ignore.case = TRUE)) > 0) {
       
       # Get gap character:
       gap <- strsplit(strsplit(X[grep("gap", X, ignore.case = TRUE)][1], "GAP=|Gap=|gap=")[[1]][2], "")[[1]][1]
