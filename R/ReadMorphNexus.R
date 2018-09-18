@@ -689,7 +689,7 @@ ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
   GetGap <- function(X) {
     
     # If the gap character is specified:
-    if(length(grep("gap", X[1:grep("matrix", X)[1]], ignore.case = TRUE)) > 0) {
+    if(length(grep("gap", X[1:grep("MATRIX", X)[1]], ignore.case = TRUE)) > 0) {
       
       # Get gap character:
       gap <- strsplit(strsplit(X[grep("gap", X, ignore.case = TRUE)][1], "GAP=|Gap=|gap=")[[1]][2], "")[[1]][1]
@@ -1145,7 +1145,7 @@ ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
     # As long as the largest common factor is greater than 1:
     while(LargestCommonFactor > 1) {
       
-      # UPdate starting weights by dividing through by current largest facto:
+      # Update starting weights by dividing through by current largest facto:
       StartingWeights <- lapply(StartingWeights, function(x) x / LargestCommonFactor)
       
       # Get factors of every weight currently applied:
@@ -1207,7 +1207,7 @@ ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
     # Build list for current block:
     Block <- list(BlockNames[[i]], names(MatrixBlockList)[i], MatrixBlockList[[i]], Ordering[[i]], Weights[[i]], MinMaxMatrixList[[i]][, "Min"], MinMaxMatrixList[[i]][, "Max"], Characters)
     
-    # Add anems to list:
+    # Add names to list:
     names(Block) <- c("BlockName", "Datatype", "Matrix", "Ordering", "Weights", "MinVals", "MaxVals", "Characters")
     
     # Store current block in output:
