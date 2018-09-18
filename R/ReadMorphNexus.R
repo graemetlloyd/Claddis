@@ -114,7 +114,7 @@ ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
     # Reformat as a list:
     x <- lapply(lapply(as.list(gsub(";", "", strsplit(assumptionline, split = ", ")[[1]])), strsplit, split = ": "), unlist)
     
-    # Extarct just the numbers:
+    # Extract just the numbers:
     Numbers <- lapply(lapply(lapply(x, '[', 2), strsplit, split = " "), unlist)
     
     # If there are hyphens (ranges) in the data:
