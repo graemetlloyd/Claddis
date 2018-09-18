@@ -53,19 +53,26 @@ CompactifyMatrix <- function(clad.matrix) {
     # Case if matrix can be compactified:
     if(length(unique(char.distrib.strings)) < length(char.distrib.strings)) {
       
-      # For each character distribution string:
-      for(j in 1:length(unique(char.distrib.strings))) {
-        
-        # Find matches for current unique character:
-        matches <- which(char.distrib.strings == unique(char.distrib.strings)[j])
-        
-        # Sum weights of characters and store for first character:
-        clad.matrix[[i]]$Weights[matches[1]] <- sum(clad.matrix[[i]]$Weights[matches])
-        
-        # Set additional matches to zero:
-        if(length(matches) > 1) clad.matrix[[i]]$Weights[matches[-1]] <- 0
-        
-      }
+      # Get rle of character distribution strings:
+      rle.char.distrib.strings <- rle(sort(char.distrib.strings, decreasing = TRUE))
+      
+      # Set ordering of newly collapsed characters:
+      clad.matrix[[i]]$Ordering <- unlist(lapply(strsplit(rle.char.distrib.strings$values, " "), '[', 2))
+      
+      # Set weights of newly collapsed characters by aggregating weights of source characters:
+      clad.matrix[[i]]$Weights <- unlist(lapply(lapply(lapply(lapply(as.list(rle.char.distrib.strings$values), '==', char.distrib.strings), which), function(x) clad.matrix[[i]]$Weights[x]), sum))
+      
+      # Build new collapsed matrix:
+      clad.matrix[[i]]$Matrix <- matrix(unlist(lapply(lapply(strsplit(rle.char.distrib.strings$values, " "), '[', 1), strsplit, split = "")), nrow = nrow(clad.matrix[[i]]$Matrix), dimnames = list(rownames(clad.matrix[[i]]$Matrix), c()))
+      
+      # Get ranges of values for characters in new collapsed matrix:
+      MinMax <- lapply(lapply(lapply(lapply(lapply(lapply(apply(clad.matrix[[i]]$Matrix, 2, strsplit, split = "/"), unlist), strsplit, split = "&"), unlist), unique), as.numeric), range)
+      
+      # Set new minimum values for collapsed matrix:
+      clad.matrix[[i]]$MinVals <- unlist(lapply(MinMax, '[', 1))
+      
+      # Set new maximum values for collapsed matrix:
+      clad.matrix[[i]]$MaxVals <- unlist(lapply(MinMax, '[', 2))
       
     # Case if matrix cannot be compactified:
     } else {
@@ -76,12 +83,6 @@ CompactifyMatrix <- function(clad.matrix) {
     }
     
   }
-  
-  # List any zero weight characters:
-  ZeroWeightCharacters <- which(unlist(lapply(clad.matrix[2:length(clad.matrix)], '[[', "Weights")) == 0)
-  
-  # If there are zero weight characters then prune them:
-  if(length(ZeroWeightCharacters) > 0) clad.matrix <- MatrixPruner(clad.matrix, characters2prune = ZeroWeightCharacters)
 
   # Output unaltered matrix:
   return(clad.matrix)
