@@ -31,7 +31,7 @@ This function returns the proportional phylogenetic character completeness for a
 }
 \examples{
 
-# Create a random tree for the Gauthier 1986 data set:
+# Create a random tree for the Day et al. 2016 data set:
 Day2016tree <- rtree(nrow(Day2016$Matrix_1$Matrix))
 Day2016tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
 Day2016tree$root.time <- max(diag(vcv(Day2016tree)))

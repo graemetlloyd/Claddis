@@ -9,8 +9,8 @@
 #' @param CladMatrix  A cladistic matrix in the form imported by \link{ReadMorphNexus}.
 #' @param TimeTree  A time-scaled phylogenetic tree containing all the taxa in \code{CladMatrix}.
 #' @param TimeBins  A set of time bin boundaries (oldest to youngest) in millions of years.
-#' @param plot An optional choice to plot the results (default is \code{FALSE}).
-#' @param CI The confidence interval to be used as a proportion (0 to 1). Default is 0.95 (i.e., 95%).
+#' @param plot  An optional choice to plot the results (default is \code{FALSE}).
+#' @param CI  The confidence interval to be used as a proportion (0 to 1). Default is 0.95 (i.e., 95%).
 #'
 #' @return
 #'
@@ -20,7 +20,7 @@
 #'
 #' @examples
 #'
-#' # Create a random tree for the Gauthier 1986 data set:
+#' # Create a random tree for the Day et al. 2016 data set:
 #' Day2016tree <- rtree(nrow(Day2016$Matrix_1$Matrix))
 #' Day2016tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
 #' Day2016tree$root.time <- max(diag(vcv(Day2016tree)))
