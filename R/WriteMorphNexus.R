@@ -168,7 +168,7 @@ WriteMorphNexus <- function(clad.matrix, filename) {
   DataBlock <- ifelse(length(DataBlocks) == 1, paste("BEGIN DATA;\n\tDIMENSIONS  NTAX=", NTaxa, " NCHAR=", NCharacters, " ;\n\tFORMAT DATATYPE=", Datatypes, " SYMBOLS=\" ", Symbols, "\" MISSING=", Missing, " GAP=", Gap, " ;\n", sep = ""), "")
   
   # Set up character block (including MATRIX that will begin data):
-  CharacterBlock <- ifelse(rep(length(DataBlocks), length(DataBlocks)) > 1, paste("BEGIN CHARACTERS;\n\t", ifelse(nchar(BlockNames) > 0, paste("TITLE  ", BlockNames, ";\n", sep = ""), ""), "\tDIMENSIONS  NCHAR=", NCharacters, ";\n\tFORMAT  DATATYPE=", ifelse(Datatypes == "CONTINUOUS", "CONTINUOUS ", paste(Datatypes, " SYMBOLS=\"", Symbols, "\" ", sep = "")), "MISSING=", Missing, " GAP=", Gap, " ;\nMATRIX\n\n", sep = ""), "MATRIX\n\n")
+  CharacterBlock <- ifelse(rep(length(DataBlocks), length(DataBlocks)) > 1, paste("BEGIN CHARACTERS;\n\t", ifelse(nchar(BlockNames) > 0, paste("TITLE  ", BlockNames, ";\n", sep = ""), ""), "\tDIMENSIONS  NCHAR=", NCharacters, ";\n\tFORMAT  DATATYPE=", ifelse(Datatypes == "CONTINUOUS", "CONTINUOUS ", paste(Datatypes, " SYMBOLS=\" ", Symbols, "\" ", sep = "")), "MISSING=", Missing, " GAP=", Gap, " ;\nMATRIX\n\n", sep = ""), "MATRIX\n\n")
   
   # Take character block and meld with matri(ces) into matrix block(s):
   MatrixBlock <- paste(paste(CharacterBlock, unlist(lapply(DataBlocksAsTextStrings, paste, collapse = "\n")), "\n;\nEND;\n\n", sep = ""), collapse = "")
