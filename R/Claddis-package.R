@@ -84,11 +84,30 @@ NULL
 #' @importFrom utils combn
 NULL
 
+#' Character-taxon matrix from Day et al. 2016
+#'
+#' The character-taxon matrix from Day et al. (2016).
+#'
+#'
+#' @name Day2016
+#' @docType data
+#' @format A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#' @references Day, M. O., Rubidge, B. S. and Abdala, F., 2016. A new mid-Permian
+#' burnetiamorph therapsid from the Main Karoo Basin of South Africa and a
+#' phylogenetic review of Burnetiamorpha. Acta Palaeontologica Polonica, 61, 701-719.
+#' @keywords datasets
+NULL
+
+
+
+
+
+
 #' Character-taxon matrix from Gauthier 1986
-#' 
+#'
 #' The character-taxon matrix from Gauthier (1986).
-#' 
-#' 
+#'
+#'
 #' @name Gauthier1986
 #' @docType data
 #' @format A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
