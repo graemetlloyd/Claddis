@@ -4,7 +4,8 @@
 \alias{PhyloCharCompletenessInBins}
 \title{Phylogenetic character completeness in time-bins}
 \usage{
-PhyloCharCompletenessInBins(CladMatrix, TimeTree, TimeBins, plot = FALSE)
+PhyloCharCompletenessInBins(CladMatrix, TimeTree, TimeBins, plot = FALSE,
+  CI = 0.95)
 }
 \arguments{
 \item{CladMatrix}{A cladistic matrix in the form imported by \link{ReadMorphNexus}.}
@@ -14,6 +15,8 @@ PhyloCharCompletenessInBins(CladMatrix, TimeTree, TimeBins, plot = FALSE)
 \item{TimeBins}{A set of time bin boundaries (oldest to youngest) in millions of years.}
 
 \item{plot}{An optional choice to plot the results (default is \code{FALSE}).}
+
+\item{CI}{The confidence interval to be used as a proportion (0 to 1). Default is 0.95 (i.e., 95%).}
 }
 \value{
 A list summarising the mean, upper and lower 95% conifidence interval, and per character proportional character completeness in each time bin.
@@ -29,16 +32,16 @@ This function returns the proportional phylogenetic character completeness for a
 \examples{
 
 # Create a random tree for the Gauthier 1986 data set:
-Gauthier1986tree <- rtree(nrow(Gauthier1986$matrix))
-Gauthier1986tree$tip.label <- rownames(Gauthier1986$matrix)
-Gauthier1986tree$root.time <- max(diag(vcv(Gauthier1986tree)))
+Day2016tree <- rtree(nrow(Day2016$Matrix_1$Matrix))
+Day2016tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
+Day2016tree$root.time <- max(diag(vcv(Day2016tree)))
 
 # Get proportional phylogenetic character completeness in ten equal-length
 # time bins:
-PhyloCharCompletenessInBins(CladMatrix = Gauthier1986,
-  TimeTree = Gauthier1986tree, TimeBins = seq(from =
-  Gauthier1986tree$root.time, to = Gauthier1986tree$root.time -
-  max(diag(vcv(Gauthier1986tree))), length.out = 11))
+PhyloCharCompletenessInBins(CladMatrix = Day2016,
+  TimeTree = Day2016tree, TimeBins = seq(from =
+  Day2016tree$root.time, to = Day2016tree$root.time -
+  max(diag(vcv(Day2016tree))), length.out = 11))
 
 }
 \author{
