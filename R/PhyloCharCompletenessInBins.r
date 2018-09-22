@@ -140,7 +140,7 @@ PhyloCharCompletenessInBins <- function(CladMatrix, TimeTree, TimeBins, plot = F
     points(x = TimeBinMidpoints, y = MeanProportionalCompletenessInBins, type = "l", ylim = c(0, 1), xlim = c(max(TimeBinMidpoints), min(TimeBinMidpoints)), xlab = "Time (Ma)", ylab = "Proportional Character Completeness", lwd = 2)
     
     # Add legend:
-    legend(x = max(TimeBinMidpoints), y = 0.4, c(paste(CI, "% CI", sep = ""), "Mean"), col = c("grey", "black"), lwd = c(8, 2), merge = TRUE, bg = "white")
+    graphics::legend(x = max(TimeBinMidpoints), y = 0.4, c(paste(CI, "% CI", sep = ""), "Mean"), col = c("grey", "black"), lwd = c(8, 2), merge = TRUE, bg = "white")
     
     # Create empty plot first (y-axis limits set from 0 to 1):
     plot(x = TimeBinMidpoints, y = apply(ProportionalCompletenessInBinsByCharacter, 2, mean), type = "n", ylim = c(0, 1), xlim = c(max(TimeBinMidpoints), min(TimeBinMidpoints)), xlab = "Time (Ma)", ylab = "Proportional Character Completeness")
@@ -152,7 +152,7 @@ PhyloCharCompletenessInBins <- function(CladMatrix, TimeTree, TimeBins, plot = F
     points(x = TimeBinMidpoints, y = MeanProportionalCompletenessInBins, type = "l", ylim = c(0, 1), xlim = c(max(TimeBinMidpoints), min(TimeBinMidpoints)), xlab = "Time (Ma)", ylab = "Proportional Character Completeness", lwd = 2)
     
     # Add legend:
-    legend(x = max(TimeBinMidpoints), y = 0.4, c("Individual characters", "Mean"), col = c("grey", "black"), lwd = c(1, 2), merge = TRUE, bg = "white")
+    graphics::legend(x = max(TimeBinMidpoints), y = 0.4, c("Individual characters", "Mean"), col = c("grey", "black"), lwd = c(1, 2), merge = TRUE, bg = "white")
     
     # Reset plotting environment:
     par(mfrow = c(1, 1))
