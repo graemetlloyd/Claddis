@@ -6,11 +6,11 @@
 #'
 #' This function returns the proportional phylogenetic character completeness for a set of time bins.
 #'
-#' @param CladMatrix  A cladistic matrix in the form imported by \link{ReadMorphNexus}.
-#' @param TimeTree  A time-scaled phylogenetic tree containing all the taxa in \code{CladMatrix}.
-#' @param TimeBins  A set of time bin boundaries (oldest to youngest) in millions of years.
-#' @param plot  An optional choice to plot the results (default is \code{FALSE}).
-#' @param CI  The confidence interval to be used as a proportion (0 to 1). Default is 0.95 (i.e., 95%).
+#' @param CladMatrix A cladistic matrix in the form imported by \link{ReadMorphNexus}.
+#' @param TimeTree A time-scaled phylogenetic tree containing all the taxa in \code{CladMatrix}.
+#' @param TimeBins A set of time bin boundaries (oldest to youngest) in millions of years.
+#' @param plot An optional choice to plot the results (default is \code{FALSE}).
+#' @param CI The confidence interval to be used as a proportion (0 to 1). Default is 0.95 (i.e., 95%).
 #'
 #' @return
 #'
