@@ -16,7 +16,7 @@ PhyloCharCompletenessInBins(CladMatrix, TimeTree, TimeBins, plot = FALSE,
 
 \item{plot}{An optional choice to plot the results (default is \code{FALSE}).}
 
-\item{CI}{The confidence interval to be used as a proportion (0 to 1). Default is 0.95 (i.e., 95%).}
+\item{CI}{The confidence interval to be used as a proportion (0 to 1). Default is 0.95 (i.e., 95\%).}
 }
 \value{
 A list summarising the mean, upper and lower 95% conifidence interval, and per character proportional character completeness in each time bin.
