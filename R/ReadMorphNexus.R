@@ -8,7 +8,7 @@
 #' 
 #' Previously all empty values (missing or inapplicable) were treated as NAs. But now anything coded as a "gap" now appears as an empty text string ("") in the matrix. Additionally, previously polymorphisms and uncertianties were both considered as polymorphisms with multiple states separated by an ampersand ("&"), but now polymorphisms use the ampersand ("&") and uncertainties use a slash ("/"), allowing for different treatment later and correct outputting when writing to #NEXUS format. (NB: TNT does not allow this distinction and so both polymorphisms and uncertainties will be output as polymorphisms.)
 #' 
-#' @param file A file name specified by either a variable of mode character, or a double-quoted string.
+#' @param File A file name specified by either a variable of mode character, or a double-quoted string.
 #' @param EqualiseWeights Optional that overrides the weights specified in the file to make all characters truly equally weighted.
 #'
 #' @return

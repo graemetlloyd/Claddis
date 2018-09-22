@@ -7,9 +7,9 @@
 ReadMorphNexus(File, EqualiseWeights = FALSE)
 }
 \arguments{
-\item{EqualiseWeights}{Optional that overrides the weights specified in the file to make all characters truly equally weighted.}
+\item{File}{A file name specified by either a variable of mode character, or a double-quoted string.}
 
-\item{file}{A file name specified by either a variable of mode character, or a double-quoted string.}
+\item{EqualiseWeights}{Optional that overrides the weights specified in the file to make all characters truly equally weighted.}
 }
 \value{
 \item{Topper}{Contains any header text or step matrices and pertains to the entire file.}
