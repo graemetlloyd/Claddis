@@ -22,7 +22,7 @@
 #'
 #' # Get morphological distances for Day et
 #' # al. (2016) data set:
-#' distances <- MorphDistMatrixFast(Day2016)
+#' distances <- MorphDistMatrix(Day2016)
 #'
 #' # Show distance metric:
 #' distances$DistanceMetric

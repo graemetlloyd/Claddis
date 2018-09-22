@@ -32,7 +32,7 @@ Takes a cladistic morphological dataset and converts it into a set of pairwise d
 
 # Get morphological distances for Day et
 # al. (2016) data set:
-distances <- MorphDistMatrixFast(Day2016)
+distances <- MorphDistMatrix(Day2016)
 
 # Show distance metric:
 distances$DistanceMetric
