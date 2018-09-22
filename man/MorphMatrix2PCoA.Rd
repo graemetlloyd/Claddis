@@ -6,8 +6,9 @@
 \usage{
 MorphMatrix2PCoA(morph.matrix, distance.method = "MORD",
   transform.proportional.distances = "arcsine_sqrt",
-  correction = "cailliez", tree = NULL, estimate.allchars = FALSE,
-  estimate.tips = FALSE)
+  polymorphism.behaviour = "min.difference",
+  uncertainty.behaviour = "min.difference", correction = "cailliez",
+  tree = NULL, estimate.allchars = FALSE, estimate.tips = FALSE)
 }
 \arguments{
 \item{morph.matrix}{A vector of mode character representing the tip names for which an ancestor is sought.}
@@ -15,6 +16,10 @@ MorphMatrix2PCoA(morph.matrix, distance.method = "MORD",
 \item{distance.method}{The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{MorphDistMatrix} for more details.}
 
 \item{transform.proportional.distances}{The transformation to apply to propotional (0 to 1) distances (one of "none", "sqrt", or "arcsine_sqrt" - the default). See \link{MorphDistMatrix} for more details.}
+
+\item{polymorphism.behaviour}{The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.}
+
+\item{uncertainty.behaviour}{The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.}
 
 \item{correction}{The negative eigenvalue correction to use (one of "lingoes", "none", or "cailliez" - the default). See \link{pcoa} for more details.}
 

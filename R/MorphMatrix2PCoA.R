@@ -15,6 +15,8 @@
 #' @param morph.matrix A vector of mode character representing the tip names for which an ancestor is sought.
 #' @param distance.method The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{MorphDistMatrix} for more details.
 #' @param transform.proportional.distances The transformation to apply to propotional (0 to 1) distances (one of "none", "sqrt", or "arcsine_sqrt" - the default). See \link{MorphDistMatrix} for more details.
+#' @param polymorphism.behaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
+#' @param uncertainty.behaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
 #' @param correction The negative eigenvalue correction to use (one of "lingoes", "none", or "cailliez" - the default). See \link{pcoa} for more details.
 #' @param tree If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.
 #' @param estimate.allchars If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{AncStateEstMatrix} for more details.
@@ -61,7 +63,7 @@
 #' y
 #'
 #' @export MorphMatrix2PCoA
-MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", transform.proportional.distances = "arcsine_sqrt", correction = "cailliez", tree = NULL, estimate.allchars = FALSE, estimate.tips = FALSE) {
+MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", transform.proportional.distances = "arcsine_sqrt", polymorphism.behaviour = "min.difference", uncertainty.behaviour = "min.difference", correction = "cailliez", tree = NULL, estimate.allchars = FALSE, estimate.tips = FALSE) {
     
 # Add some top level conditionsl here to check input is valid.
   
@@ -69,20 +71,11 @@ MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", transform.p
   if(is.null(tree)) {
     
     # Get morphological distances from the cladistic matrix:
-    morph_distances <- MorphDistMatrix(morph.matrix, transform.proportional.distances = transform.proportional.distances)
+    morph_distances <- MorphDistMatrix(morph.matrix, distance = distance.method, transform.proportional.distances = transform.proportional.distances, polymorphism.behaviour = polymorphism.behaviour, uncertainty.behaviour = uncertainty.behaviour)
     
-    # If using Raw Euclidean Distances:
-    if(distance.method == "RED") trimmed_distances <- TrimMorphDistMatrix(morph_distances$raw.dist.matrix)
+    # Get trimmed distances:
+    trimmed_distances <- TrimMorphDistMatrix(morph_distances$DistanceMatrix)
 
-    # If using Generalised Euclidean Distances:
-    if(distance.method == "GED") trimmed_distances <- TrimMorphDistMatrix(morph_distances$GED.dist.matrix)
-
-    # If using Gower Coefficients:
-    if(distance.method == "GC") trimmed_distances <- TrimMorphDistMatrix(morph_distances$gower.dist.matrix)
-
-    # If using Maximum Observable Rescaled Distances:
-    if(distance.method == "MORD") trimmed_distances <- TrimMorphDistMatrix(morph_distances$max.dist.matrix)
-    
     # If trimming of matrix lead to taxa being removed warn user:
     if(!is.null(trimmed_distances$removed.taxa)) message(paste("The following taxa had to be removed to produce a complete distance matrix:", paste(trimmed_distances$removed.taxa, collapse = ", ")))
     
@@ -110,19 +103,10 @@ MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", transform.p
     }
 
     # Get morphological distances from the cladistic matrix:
-    morph_distances <- MorphDistMatrix(morph.matrix, transform.proportional.distances = transform.proportional.distances)
-
-    # If using Raw Euclidean Distances:
-    if(distance.method == "RED") trimmed_distances <- TrimMorphDistMatrix(morph_distances$raw.dist.matrix, tree = tree)
+    morph_distances <- MorphDistMatrix(morph.matrix, distance = distance.method, transform.proportional.distances = transform.proportional.distances, polymorphism.behaviour = polymorphism.behaviour, uncertainty.behaviour = uncertainty.behaviour)
     
-    # If using Generalised Euclidean Distances:
-    if(distance.method == "GED") trimmed_distances <- TrimMorphDistMatrix(morph_distances$GED.dist.matrix, tree = tree)
-    
-    # If using Gower Coefficients:
-    if(distance.method == "GC") trimmed_distances <- TrimMorphDistMatrix(morph_distances$gower.dist.matrix, tree = tree)
-    
-    # If using Maximum Observable Rescaled Distances:
-    if(distance.method == "MORD") trimmed_distances <- TrimMorphDistMatrix(morph_distances$max.dist.matrix, tree = tree)
+    # Get trimmed distances:
+    trimmed_distances <- TrimMorphDistMatrix(morph_distances$DistanceMatrix, tree = tree)
 
     # If trimming of matrix lead to taxa or nodes being removed warn user:
     if(!is.null(trimmed_distances$removed.taxa)) message(paste("The following taxa or nodes had to be removed to produce a complete distance matrix:", paste(trimmed_distances$removed.taxa, collapse = ", ")))
@@ -151,13 +135,3 @@ MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", transform.p
   invisible(output)
   
 }
-
-
-#tree <- rtree(length(rownames(Gauthier1986$matrix)))
-#tree$tip.label <- rownames(Gauthier1986$matrix)
-
-#x <- MorphMatrix2PCoA(Gauthier1986)
-#y <- MorphMatrix2PCoA(Gauthier1986, tree = tree)
-
-#x
-#y
