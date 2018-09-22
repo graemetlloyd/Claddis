@@ -149,7 +149,7 @@ ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
     } else {
       
       # Simply convert to numbers and ensure they are sorted in increasing order:
-      Numbers <- sort(as.numeric(Numbers))
+      Numbers <- lapply(lapply(Numbers, as.numeric), sort)
       
     }
     
