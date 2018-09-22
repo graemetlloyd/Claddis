@@ -2,11 +2,11 @@
 #' 
 #' Creates a morphological data file from a character-taxon matrix.
 #' 
-#' Claddis generally assumes that matrices will be imported into R from the #NEXUS format, but in some cases (e.g., when using simulated data) it might be desirable to build a matrix within R. This function allows the user to convert such a matrix into the format required by other Claddis functions.
+#' Claddis generally assumes that matrices will be imported into R from the #NEXUS format, but in some cases (e.g., when using simulated data) it might be desirable to build a matrix within R. This function allows the user to convert such a matrix into the format required by other Claddis functions as long as it only contains a single block.
 #'
-#' NB: Currently the function cannot deal with step matrices or continuous characters.
+#' NB: Currently the function cannot deal directly with step matrices or continuous characters.
 #' 
-#' @param CTmatrix A Character-Taxon (columns-rows) matrix, with taxa names as rownames.
+#' @param CTmatrix A Character-Taxon (columns-rows) matrix, with taxon names as rownames.
 #' @param header A scalar indicating any header text (defaults to an empty string: "").
 #' @param weights A vector specifying the weights used (if not specified defaults to 1).
 #' @param ordering A vector indicating whether characters are ordered ("ord") or unordered ("unord") (if no specified defaults to ordered).
@@ -15,14 +15,8 @@
 #'
 #' @return
 #'
-#' \item{header}{Any header text included in the file given between square brackets as character.}
-#' \item{matrix}{A matrix of taxa (rows) and characters (columns). The matrix is in character format in order to deal with polymorphisms, which are separated by ampersands.}
-#' \item{ordering}{A character vector of the same length as the number of morphological characters indicating whether they are ordered (\code{ord}) or unordered (\code{unord}).}
-#' \item{weights}{A numeric vector of the same length as the number of morphological characters indicating their weights.}
-#' \item{max.vals}{A numeric vector of the same length as the number of morphological characters indicating the maximum state values.}
-#' \item{min.vals}{A numeric vector of the same length as the number of morphological characters indicating the minimum state values.}
-#' \item{step.matrices}{A list of any step matrices supplied in the input file. Is \code{NULL} if none are specified.}
-#' \item{symbols}{The original symbols used in the input data (these are replaced in the matrix by integers starting at zero.}
+#' \item{Topper}{Contains any header text or step matrices and pertains to the entire file.}
+#' \item{Matrix_N}{One or more matrix blocks (numbered 1 to N) with associated information pertaining only to that matrix block. This includes the block name (if specificed, NA if not), the block datatype (one of "CONTINUOUS", "DNA", "NUCLEOTIDE", "PROTEIN", "RESTRICTION", "RNA", or "STANDARD"), the actual matrix (taxa as rows, names stored as rownames and characters as columns), the ordering type of each character ("ord" = ordered, "unord" = unordered), the character weights, the minimum and maximum values (used by Claddis' distance functions), and the original characters (symbols, missing, and gap values) used for writing out the data.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -31,8 +25,8 @@
 #' @examples
 #'
 #' # Create random 10-by-50 matrix:
-#' CTmatrix <- matrix(sample(c("0", "1", "0&1", NA), 500,
-#'   replace = TRUE), nrow = 10, dimnames =
+#' CTmatrix <- matrix(sample(c("0", "1", "0&1", NA, ""),
+#'   500, replace = TRUE), nrow = 10, dimnames =
 #'   list(apply(matrix(sample(LETTERS, 40,
 #'   replace = TRUE), nrow = 10), 1, paste,
 #'   collapse = ""), c()))
