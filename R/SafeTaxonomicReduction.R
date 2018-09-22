@@ -39,9 +39,6 @@
 #' @export SafeTaxonomicReduction
 SafeTaxonomicReduction <- function(morph.matrix) {
   
-  #morph.matrix <- ReadMorphNexus("~/Documents/Packages/Claddis/Continuous and step matrix examples/Kammerer_etal_2011asuppb.nex")
-  morph.matrix <- Gauthier1986
-  
   # Store unaltered version of matrix to return to later:
   Unaltered <- morph.matrix
   
