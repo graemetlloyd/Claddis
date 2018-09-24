@@ -36,7 +36,7 @@
 #'
 #' @export MakeMorphMatrix
 MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NULL, symbols = NULL, equalise.weights = FALSE) {
-    
+  
   # Check input is a matrix:
   if(!is.matrix(CTmatrix)) stop("CTmatrix must be a matrix.")
   
@@ -53,7 +53,7 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
   mystery.characters <- setdiff(unique(unlist(strsplit(as.character(unique(as.vector(CTmatrix))), "&"))), c(as.character(0:31), NA))
   
   # If mystery character types are present warn user:
-  if(length(mystery.characters) > 0) stop("Characters must either be the integers 0 to 31, NA for missing, or & for polymorphisms.")
+  if(length(mystery.characters) > 0) stop("Characters must either be the integers 0 to 31, NA for missing, & for polymorphisms, or / for uncertainties.")
 
   # Check supplied weights are correct length:
   if(!is.null(weights) && length(weights) != ncol(CTmatrix)) stop("Weights must have same length as number of characters in CTmatrix.")
@@ -86,10 +86,10 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
   if(is.null(weights)) weights <- rep(1, ncol(CTmatrix))
 
   # Calculate minimum values:
-  min.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CTmatrix, 2, as.character), 2, strsplit, split = "&"), unlist), as.numeric), sort), min))
+  min.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CTmatrix, 2, as.character), 2, strsplit, split = "&|/"), unlist), as.numeric), sort), min))
 
   # Calculate maximum values:
-  max.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CTmatrix, 2, as.character), 2, strsplit, split = "&"), unlist), as.numeric), sort), max))
+  max.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CTmatrix, 2, as.character), 2, strsplit, split = "&|/"), unlist), as.numeric), sort), max))
 
   # Default step matrices to NULL for now (may add this option in future):
   step.matrices <- NULL
@@ -109,7 +109,7 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
     # Update weights for ordered characters:
     weights[ordering == "ord"] <- 1 / weights[ordering == "ord"]
     
-    # If there are step matrices:
+    # If there are step matrices (not technically using these yet, but I guess this will have to exist eventually):
     if(!is.null(step.matrices)) {
         
       # Get maximum distances for each step matrix:
@@ -155,14 +155,32 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
     }
     
   }
+  
+  # Build matrix topper:
+  Topper <- list(header, step.matrices)
+  
+  # Add names to topper:
+  names(Topper) <- c("Header", "StepMatrices")
+  
+  # Build characters list:
+  Characters <- list(symbols, "?", "-")
+  
+  # Add names to characters list:
+  names(Characters) <- c("Symbols", "Missing", "Gap")
+  
+  # Build Matrix_1 list:
+  Matrix_1 <- list(NA, "STANDARD", CTmatrix, ordering, weights, min.vals, max.vals, Characters)
+  
+  # Add anmes to Matrix_1:
+  names(Matrix_1) <- c("BlockName", "Datatype", "Matrix", "Ordering", "Weights", "MinVals", "MaxVals", "Characters")
 
-  # Create output formatted data:
-  result <- list(header, CTmatrix, ordering, weights, max.vals, min.vals, step.matrices, symbols)
+  # Assimilate into output:
+  result <- list(Topper, Matrix_1)
 
-  # Add names to result:
-  names(result) <- c("header", "matrix", "ordering", "weights", "max.vals", "min.vals", "step.matrices", "symbols")
+  # Add names to output:
+  names(result) <- c("Topper", "Matrix_1")
 
-  # Return result:
+  # Return output:
   return(result)
 
 }
