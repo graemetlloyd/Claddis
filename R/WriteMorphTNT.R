@@ -43,8 +43,11 @@ WriteMorphTNT <- function(clad.matrix, filename, add.analysis.block = FALSE) {
     # If there are symbols (i.e., non-continuous data):
     if(length(DataMatrix$Characters$Symbols) > 0) {
       
-      # Set up TNT symbols:
-      TNTSymbols <- c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V")
+      # If datatype is STANDARD set TNT symbols:
+      if(DataMatrix$Datatype == "STANDARD") TNTSymbols <- c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V")
+      
+      # If datatype is non-STANDARD (but still discrete):
+      if(DataMatrix$Datatype != "STANDARD") TNTSymbols <- DataMatrix$Characters$Symbols
       
       # In reverse order go through numbers:
       for(i in rev(TNTSymbols)) {
@@ -73,7 +76,7 @@ WriteMorphTNT <- function(clad.matrix, filename, add.analysis.block = FALSE) {
       # Find cells with polymorphsims:
       Polymorphisms <- grep("&", DataMatrix$Matrix)
       
-      # Repale with values inside parentheses:
+      # Respale with values inside parentheses:
       DataMatrix$Matrix[Polymorphisms] <- paste("[", unlist(lapply(strsplit(DataMatrix$Matrix[Polymorphisms], split = "&"), paste, collapse = "")), "]", sep = "")
       
     }
