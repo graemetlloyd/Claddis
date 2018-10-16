@@ -2,19 +2,29 @@
 % Please edit documentation in R/AncStateEstMatrix.R
 \name{AncStateEstMatrix}
 \alias{AncStateEstMatrix}
-\title{Ancestral State Estimation}
+\title{Ancestral Character State Estimation}
 \usage{
-AncStateEstMatrix(morph.matrix, tree, estimate.allchars = FALSE,
-  estimate.tips = FALSE)
+AncStateEstMatrix(InputMatrix, Tree, EstimateAllNodes = FALSE,
+  EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE,
+  PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp",
+  Threshold = 0.01)
 }
 \arguments{
-\item{morph.matrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
+\item{InputMatrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
 
-\item{tree}{A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{morph.matrix}.}
+\item{Tree}{A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{InputMatrix}.}
 
-\item{estimate.allchars}{An optional that allows the user to make estimates for all ancestral values. The default will only make estimates for nodes that link coded terminals.}
+\item{EstimateAllNodes}{Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).}
 
-\item{estimate.tips}{An optional that allows the user to make estimates for tip values. The default only makes estimates for internal nodes.}
+\item{EstimateTipValues}{Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).}
+
+\item{InapplicablesAsMissing}{Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).}
+
+\item{PolymorphismBehaviour}{One of either "equalp" or "treatasmissing".}
+
+\item{UncertaintyBehaviour}{One of either "equalp" or "treatasmissing".}
+
+\item{Threshold}{The threshold value to use when collapsing marginal likelihoods to discrete state(s).}
 }
 \value{
 \item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral states.}
@@ -23,7 +33,7 @@ AncStateEstMatrix(morph.matrix, tree, estimate.allchars = FALSE,
 Given a tree and a cladistic matrix uses likelihood to estimate the ancestral states for every character.
 }
 \details{
-Uses the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package to make ancestral state estimates. Here these are collapsed to the most likely state, or if two or more states are most likely, a polymorphism of the most likely states. This is the method used by Brusatte et al. (2014).
+Uses either the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package (discrete characters) or the \link{ace} function in the \link{ape} package (continuous characters) to make ancestral state estimates. For discrete characters these are collapsed to the most likely state (or states, given equal likelihoods or likelihood within a defined threshold value). In the latter case the resulting states are represented as an uncertainty (i.e., states separated by a lash, e.g., 0/1. This is the method used by Brusatte et al. (2014).
 }
 \examples{
 

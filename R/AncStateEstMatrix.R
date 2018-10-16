@@ -1,13 +1,17 @@
-#' Ancestral State Estimation
+#' Ancestral Character State Estimation
 #' 
 #' Given a tree and a cladistic matrix uses likelihood to estimate the ancestral states for every character.
 #' 
-#' Uses the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package to make ancestral state estimates. Here these are collapsed to the most likely state, or if two or more states are most likely, a polymorphism of the most likely states. This is the method used by Brusatte et al. (2014).
+#' Uses either the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package (discrete characters) or the \link{ace} function in the \link{ape} package (continuous characters) to make ancestral state estimates. For discrete characters these are collapsed to the most likely state (or states, given equal likelihoods or likelihood within a defined threshold value). In the latter case the resulting states are represented as an uncertainty (i.e., states separated by a lash, e.g., 0/1. This is the method used by Brusatte et al. (2014).
 #' 
-#' @param morph.matrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
-#' @param tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{morph.matrix}.
-#' @param estimate.allchars An optional that allows the user to make estimates for all ancestral values. The default will only make estimates for nodes that link coded terminals.
-#' @param estimate.tips An optional that allows the user to make estimates for tip values. The default only makes estimates for internal nodes.
+#' @param InputMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#' @param Tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{InputMatrix}.
+#' @param EstimateAllNodes Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).
+#' @param EstimateTipValues Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).
+#' @param InapplicablesAsMissing Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).
+#' @param PolymorphismBehaviour One of either "equalp" or "treatasmissing".
+#' @param UncertaintyBehaviour One of either "equalp" or "treatasmissing".
+#' @param Threshold The threshold value to use when collapsing marginal likelihoods to discrete state(s).
 #'
 #' @return \item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral states.}
 #'
@@ -37,216 +41,355 @@
 #' AncStateEstMatrix(Michaux1989, tree)
 #' 
 #' @export AncStateEstMatrix
-AncStateEstMatrix <- function(morph.matrix, tree, estimate.allchars = FALSE, estimate.tips = FALSE) {
-
+AncStateEstMatrix <- function(InputMatrix, Tree, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
+  
+  # How to get tip states for a continuous character?
+  # How to deal with step matrices?
+  # Change help file to explain interactions between all options, e.g., iff doing all chars then polymorphsims used for discrete, midpoint for continuous etc.
+  
   # Catch problem with trees with no branch lengths:
-  if(is.null(tree$edge.length)) stop("ERROR:\n Tree must have branch lengths.")
-
+  if(is.null(Tree$edge.length)) stop("Tree must have branch lengths.")
+  
   # Catch problem with polytomies:
-  if(tree$Nnode < (Ntip(tree) - 1)) stop("ERROR:\n Tree must be fully bifurcating.")
-
+  if(Tree$Nnode < (Ntip(Tree) - 1)) stop("Tree must be fully bifurcating.")
+  
   # Catch problem with zero-length branches:
-  if(any(tree$edge.length == 0)) stop("ERROR:\n Tree must not have zero-length branches.")
-
+  if(any(Tree$edge.length == 0)) stop("Tree must not have zero-length branches.")
+  
+  # Check for step matrices and stop and warn if found:
+  if(length(InputMatrix$Topper$StepMatrices) > 0) stop("Function can not currently deal with step matrices.")
+  
+  # Check EstimateAllNodes is a logical:
+  if(!is.logical(EstimateAllNodes)) stop("EstimateAllNodes must be a logical (TRUE or FALSE).")
+  
+  # Check EstimateTipValues is a logical:
+  if(!is.logical(EstimateTipValues)) stop("EstimateTipValues must be a logical (TRUE or FALSE).")
+  
+  # Check InapplicablesAsMissing is a logical:
+  if(!is.logical(InapplicablesAsMissing)) stop("InapplicablesAsMissing must be a logical (TRUE or FALSE).")
+  
   # Collapse matrix to vectors for each character (state and ordering combination):
-  collapse.matrix <- apply(rbind(morph.matrix$matrix, morph.matrix$ordering), 2, paste, collapse = "")
-
-  # Find just unique characters (no point repeating ancestral state reconstruction if codings and ordering are identical):
-  unique.characters <- match(unique(collapse.matrix), collapse.matrix)
-
-  # Case if only estimating states for ancestral nodes:
-  if(estimate.tips == FALSE) {
+  collapse.matrix <- unname(unlist(lapply(InputMatrix[2:length(InputMatrix)], function(x) apply(rbind(x$Matrix, x$Ordering), 2, paste, collapse = ""))))
+  
+  # Isolate ordering elements:
+  ordering <- unlist(lapply(InputMatrix[2:length(InputMatrix)], '[[', "Ordering"))
+  
+  # Isolate minimum values:
+  min.vals <- unlist(lapply(InputMatrix[2:length(InputMatrix)], '[[', "MinVals"))
+  
+  # Isolate maximum values:
+  max.vals <- unlist(lapply(InputMatrix[2:length(InputMatrix)], '[[', "MaxVals"))
+  
+  # Combine matrix blocks into a single matrix:
+  InputMatrix <- OriginalMatrix <- do.call(cbind, lapply(InputMatrix[2:length(InputMatrix)], '[[', "Matrix"))
+  
+  # Find any failed name matches:
+  FailedNameMatches <- c(setdiff(rownames(InputMatrix), Tree$tip.label), setdiff(Tree$tip.label, rownames(InputMatrix)))
+  
+  # Check there are no failed name matches and stop and report if found:
+  if(length(FailedNameMatches) > 0) stop(paste("The following names do not match between the tree and matrix: ", paste(sort(FailedNameMatches), collapse = ", "), ". Check spelling and try again.", sep = ""))
+  
+  # Check PolymorphismBehaviour is a valid option and stop and report if not:
+  if(length(setdiff(PolymorphismBehaviour, c("equalp", "treatasmissing"))) > 0) stop("PolymorphismBehaviour must be one of \"equalp\" or \"treatasmissing\".")
+  
+  # Check UncertaintyBehaviour is a valid option and stop and report if not:
+  if(length(setdiff(UncertaintyBehaviour, c("equalp", "treatasmissing"))) > 0) stop("UncertaintyBehaviour must be one of \"equalp\" or \"treatasmissing\".")
+  
+  # Check threshold is in correct window of possible values:
+  if(Threshold < 0 || Threshold > 0.5) stop("Threshold must be between 0 and 0.5.")
+  
+  # If treating inapplicables as missing (and there is at least one inapplicable) replace with NA:
+  if(InapplicablesAsMissing && length(which(InputMatrix == "")) > 0) InputMatrix[which(InputMatrix == "")] <- NA
+  
+  # If treating polymorphisms as missing:
+  if(PolymorphismBehaviour == "treatasmissing" && length(grep("&", InputMatrix)) > 0) InputMatrix[grep("&", InputMatrix)] <- NA
+  
+  # If treating uncertainties as missing:
+  if(UncertaintyBehaviour == "treatasmissing" && length(grep("/", InputMatrix)) > 0) InputMatrix[grep("/", InputMatrix)] <- NA
+  
+  # Convert tip states into a list:
+  DataAsList <- apply(InputMatrix, 2, list)
+  
+  # Add Tipsattes name to list:
+  DataAsList <- lapply(DataAsList, function(x) {names(x) <- "TipStates"; return(x)})
+  
+  # For each character:
+  for(i in 1:length(DataAsList)) {
     
-    # Create ancestral storage matrix:
-    anc.lik.matrix <- matrix(nrow = Nnode(tree), ncol = length(morph.matrix$matrix[1, ]))
+    # Add minimum value to list:
+    DataAsList[[i]]$MinVal <- unname(min.vals[i])
     
-    # Label matrix to record ancestral state estimates:
-    rownames(anc.lik.matrix) <- c((Ntip(tree) + 1):(Ntip(tree) + Nnode(tree)))
+    # Add maximum value to list:
+    DataAsList[[i]]$MaxVal <- unname(max.vals[i])
     
-  # Case if also estimating states for tip nodes:
-  } else {
-
-    # Create ancestral storage matrix (including tips):
-    anc.lik.matrix <- matrix(nrow = Ntip(tree) + Nnode(tree), ncol = length(morph.matrix$matrix[1, ]))
-
-    # Label matrix to record ancestral state estimates:
-    rownames(anc.lik.matrix) <- c(tree$tip.label, (Ntip(tree) + 1):(Ntip(tree) + Nnode(tree)))
+    # Add ordering to list:
+    DataAsList[[i]]$Ordering <- unname(ordering[i])
+    
+    # Add tree to list:
+    DataAsList[[i]]$Tree <- Tree
     
   }
   
-  # For each unique character:
-  for(i in unique.characters) {
-        
-    # Get minimum value for character:
-    minval <- morph.matrix$min.vals[i]
-
-    # Get maximum value for character:
-    maxval <- morph.matrix$max.vals[i]
-
-    # Case that not all characters are NA:
-    if(!is.na(minval) && !is.na(maxval)) {
+  # If estimating values for all characters (need to set dummy tip states for missing values):
+  if(EstimateAllNodes) {
     
-      # Only proceed if character is variable (non-constant):
-      if(maxval != minval) {
-            
-        # If estimating states for all taxa then treat missing values as all possible states:
-        if(estimate.allchars) morph.matrix$matrix[which(is.na(morph.matrix$matrix[, i])), i] <- paste(minval:maxval, collapse = "&")
-            
-        # Find tips which cannot be used due to missing data:
-        tipstogo <- rownames(morph.matrix$matrix)[which(is.na(morph.matrix$matrix[, i]))]
-            
-        # Only continue if at least three tips in pruned tree:
-        if(length(tipstogo) < (Ntip(tree) - 2)) {
+    # Subfunction to fill missing values (and inapplicables if desired):
+    FillMissing <- function(TipStates) {
       
-          # If there are tips to remove create a pruned tree:
-          if(length(tipstogo) > 0) chartree <- drop.tip(tree, tipstogo)
+      # Find which rows correspond to missing states:
+      MissingRows <- which(is.na(TipStates$TipStates))
+      
+      # If missing states found:
+      if(length(MissingRows) > 0) {
         
-          # If there are no tips to remove just use full tree:
-          if(length(tipstogo) == 0) chartree <- tree
-            
-          # Get tip values for the pruned tree:
-          tipvals <- morph.matrix$matrix[chartree$tip.label, i]
-                
-          # Continue if not gap-coded (or apparently gap-coded) or is unordered:
-          if(!any(diff(sort(as.numeric(unlist(strsplit(tipvals, "&"))))) > 1) || morph.matrix$ordering[i] == "unord") {
-                    
-            # Set discrete character estimation model if unordered and or binary character:
-            if(maxval - minval == 1 || maxval - minval > 1 && morph.matrix$ordering[i] == "unord") mymodel <- "ER"
-                    
-            # Set discrete character estimation model if ordered multistate character:
-            if(maxval - minval > 1 && morph.matrix$ordering[i] == "ord") {
-                        
-              # Create all zero matrix:
-              mymodel <- matrix(0, nrow = (maxval - minval) + 1, ncol = (maxval - minval) + 1)
-                        
-              # Name rows and columns as states:
-              rownames(mymodel) <- colnames(mymodel) <- minval:maxval
-                        
-              # Enter one for all the off-diagonal diagonals (an ordered change model):
-              for(j in 1:(length(mymodel[1, ]) - 1)) mymodel[j + 1, j] <- mymodel[j, j + 1] <- 1
-
-            }
-                    
-            # Create matrix to store probabilities of tip values:
-            tipvals.mat <- matrix(0, nrow = length(tipvals), ncol = maxval - minval + 1)
-      
-            # Add rownames (tip labels):
-            rownames(tipvals.mat) <- names(tipvals)
-
-            # Add colunames (state values):
-            colnames(tipvals.mat) <- minval:maxval
-                    
-            # Fill all probabilities equal to one (non-polymorphisms):
-            for(j in colnames(tipvals.mat)) tipvals.mat[which(tipvals == j), j] <- 1
-                    
-            # If there are polymorphisms make all observed states equally probable:
-            if(any(apply(tipvals.mat, 1, sum) == 0)) {
-                        
-              # Get list of tip values with polymorphisms:
-              polymorphism.values <- which(apply(tipvals.mat, 1, sum) == 0)
-                        
-              # Go through each polymorphism:
-              for(j in polymorphism.values) {
-                            
-                # Get list of each state:
-                states <- strsplit(tipvals[j], "&")[[1]]
-                            
-                # Make each state equally probable in tip values matrix:
-                tipvals.mat[j, states] <- 1 / length(states)
-
-              }
-
-            }
-
-            # Remove any potential node labels on the character tree to avoid an error from rerootingMethod():
-            chartree$node.label <- NULL
-
-            # Get likelihoods for each state in taxa and ancestors:
-            state.likelihoods <- rerootingMethod(chartree, tipvals.mat, model = mymodel)$marginal.anc
-                    
-            # Get maximum likelihood:
-            max.lik <- apply(state.likelihoods, 1, max)
-                    
-            # Create vector to store maximum likelihood states:
-            max.lik.state <- vector(mode = "character", length = length(rownames(state.likelihoods)))
-      
-            # Add names:
-            names(max.lik.state) <- rownames(state.likelihoods)
-                    
-            # For each tip and node find most likely state(s):
-            for(j in 1:length(max.lik)) max.lik.state[j] <- paste(colnames(state.likelihoods)[which(state.likelihoods[j, ] == max.lik[j])], collapse="&")
-
-          # Case if gap-coded or apparently gap-coded:
-          } else {
-                    
-            # If there are polymorphisms present:
-            if(length(grep("&", tipvals)) > 0) {
-                        
-              # List rows with polymorphisms:
-              rows <- grep("&", tipvals)
-                        
-              # For each polymorphism:
-              for(j in 1:length(rows)) {
-                            
-                # Replace polymorphisms with mean values:
-                tipvals[rows[j]] <- mean(as.numeric(strsplit(tipvals[rows[j]], "&")[[1]]))
-      
-              }
-
-            }
-                    
-            # Treat character as continuous to get ancestral state estimates:
-            max.lik.state <- round(ace(as.numeric(tipvals), chartree)$ace)
-
-          }
-                
-          # Get node numbers for pruned tree:
-          chartreenodes <- (Ntip(chartree) + 1):(Ntip(chartree) + Nnode(chartree))
-                
-          # For each node on pruned tree:
-          for(j in chartreenodes) {
-                    
-            # Find descendants in pruned tree:
-            descs <- sort(chartree$tip.label[FindDescendants(j, chartree)])
-                    
-            # Store ancestral values in state estimation matrix:
-            anc.lik.matrix[as.character(FindAncestor(descs, tree)), i] <- max.lik.state[as.character(j)]
- 
-          }
-
-          # If also estimating tip states:
-          if(estimate.tips == TRUE) {
-          
-            # Store tip states for taxa:
-            anc.lik.matrix[chartree$tip.label, i] <- max.lik.state[match(chartree$tip.label, names(max.lik.state))]
-
-          }
-
-        # Case if pruned tree too small to inform (leaves matrix as NAs)
-        }
-            
-      # Case if constant character:
-      } else {
-            
-        # Enter constant value for all nodes:
-        anc.lik.matrix[, i] <- minval
-
+        # Build missing state by either forming a polymorphism of all possible tip states, or if continuous the midpoint value:
+        FillStates <- ifelse(TipStates$Ordering == "cont", (TipStates$MinVal + TipStates$MaxVal) / 2, paste(TipStates$MinVal:TipStates$MaxVal, collapse = "/"))
+        
+        # Insert missing values:
+        TipStates$TipStates[MissingRows] <- FillStates
+        
       }
-
-    # Case if all characters are NA:
-    } else {
-
-      # Enter NA for all nodes:
-      anc.lik.matrix[, i] <- NA
-
+      
+      # Return tip states with missing values replaced:
+      return(TipStates)
+      
     }
-
-  }
-
-  # Fill in repeating characters to give full matrix:
-  anc.lik.matrix <- anc.lik.matrix[, unique.characters[match(collapse.matrix, unique(collapse.matrix))]]
     
-  # Return completed discrete ancestral character estimation matrix:
-  return(anc.lik.matrix)
+    # Apply fill missing fucntion across all characters:
+    DataAsList <- lapply(DataAsList, FillMissing)
+    
+  }
+  
+  # Subfunction to prune tips with missing or inapplicable values:
+  PruneTips <- function(x) {
+    
+    # Find all missing or inapplicable value tip names:
+    Missing <- names(sort(c(which(x$TipStates == ""), which(is.na(x$TipStates)))))
+    
+    # If there is at least one:
+    if(length(Missing) > 0) {
+      
+      # Remove tips from tree:
+      x$Tree <- drop.tip(phy = x$Tree, tip = Missing)
+      
+      # Remove tips from tip states:
+      x$TipStates <- x$TipStates[setdiff(names(x$TipStates), Missing)]
+      
+    }
+    
+    # Return pruend output:
+    return(x)
+    
+  }
+  
+  # Prune out missing and inapplicable tips:
+  DataAsList <- lapply(DataAsList, PruneTips)
+  
+  # Subfunction to build tip state matrices:
+  TipStateVectorToMatrix <- function(x) {
+    
+    # If the character is not continuous (i.e., it is some form of discrete character):
+    if(x$Ordering != "cont") {
+      
+      # Temporarily store tip states so matrix format can overwrite the stored version below:
+      TipStates <- x$TipStates
+      
+      # Create marix of tip state probabilities:
+      x$TipStates <- matrix(0, nrow = length(x$TipStates), ncol = x$MaxVal - x$MinVal + 1, dimnames = list(names(x$TipStates), x$MinVal:x$MaxVal))
+      
+      # For each character state if a single state is coded store probability as 1:
+      for(i in colnames(x$TipStates)) x$TipStates[TipStates == i, i] <- 1
+      
+      # If there are polymorphisms and/or uncertainties:
+      if(length(grep("&|/", TipStates)) > 0) {
+        
+        # Get polymorphism locations:
+        Polymorphisms <- grep("&", TipStates)
+        
+        # Get uncertainty locations:
+        Uncertainties <- grep("/", TipStates)
+        
+        # If there are polymorphisms and using the "equalp" (equal probability of each state) option:
+        if(length(Polymorphisms) > 0 && PolymorphismBehaviour == "equalp") {
+          
+          # For each polymorphisms set each state as equally probable:
+          for(i in Polymorphisms) x$TipStates[i, strsplit(TipStates[i], split = "&")[[1]]] <- 1 / length(strsplit(TipStates[i], split = "&")[[1]])
+          
+        }
+        
+        # If there are uncertainties and using the "equalp" (equal probability of each state) option:
+        if(length(Uncertainties) > 0 && UncertaintyBehaviour == "equalp") {
+          
+          # For each uncertainty set each state as equally probable:
+          for(i in Uncertainties) x$TipStates[i, strsplit(TipStates[i], split = "/")[[1]]] <- 1 / length(strsplit(TipStates[i], split = "/")[[1]])
+          
+        }
+        
+      }
+      
+    # If a continuous character:
+    } else {
+      
+      # Simply make tip states the numeric values (should never be a polymorphism) as a vector:
+      x$TipStates <- as.numeric(x$TipStates)
+      
+    }
+    
+    # Return the revised input in the same list format:
+    return(x)
+    
+  }
+  
+  # Reformat tip states ready for ancestral estimation:
+  DataAsList <- lapply(DataAsList, TipStateVectorToMatrix)
+  
+  # Subfunction to build tip state matrices:
+  ModelBuilder <- function(x) {
+    
+    # Set default model to equal rates (works for all binary or unordered characters):
+    x$Model <- "ER"
+    
+    # If a character is both ordered and has at least three states:
+    if((x$MaxVal - x$MinVal) > 1 && x$Ordering == "ord") {
+      
+      # Get number of states:
+      NStates <- (x$MaxVal - x$MinVal) + 1
+      
+      # Build all zero matrix to begin with:
+      x$Model <- matrix(0, nrow = NStates, ncol = NStates, dimnames = list(x$MinVal:x$MaxVal, x$MinVal:x$MaxVal))
+      
+      # for each (just) off-diagonal value store 1 (i.e., N steps to move between adjacent states):
+      for(i in 2:NStates) x$Model[(i - 1), i] <- x$Model[i, (i - 1)] <- 1
+      
+    }
+    
+    # Return full output:
+    return(x)
+  
+  }
+  
+  # Add ancestral state model for each character:
+  DataAsList <- lapply(DataAsList, ModelBuilder)
+
+  # Sunfunctio to get ancestral states:
+  GetAncStates <- function(x, EstimateTipValues, Threshold) {
+    
+    # If character is continuous:
+    if(x$Ordering == "cont") {
+      
+      # Get ancestral states using ace:
+      x$AncestralStates <- ace(x = x$TipStates, phy = x$Tree)$ace
+      
+    # If character is discrete:
+    } else {
+      
+      # Get ancestral states using rerooting method:
+      x$AncestralStates <- rerootingMethod(tree = x$Tree, x = x$TipStates, model = x$Model)$marginal.anc
+      
+      # Reformat to msot likely state
+      x$AncestralStates <- unlist(lapply(lapply(apply(x$AncestralStates, 1, list), unlist), function(x) {paste(names(x[x > (max(x) - Threshold)]), collapse = "/")}))
+      
+      # If not estimating tip values then prune these:
+      if(!EstimateTipValues) x$AncestralStates <- x$AncestralStates[-match(x$Tree$tip.label, names(x$AncestralStates))]
+      
+    }
+    
+    # Return full output of x:
+    return(x)
+    
+  }
+  
+  # Get ancestral states for each character:
+  DataAsList <- lapply(DataAsList, GetAncStates, EstimateTipValues, Threshold)
+  
+  # Get Newick strings of all sampled subtrees (to use to avoid reudunancy in tree node mapping):
+  NewickStrings <- unlist(lapply(lapply(DataAsList, '[[', "Tree"), ape::write.tree))
+  
+  # Get just unique strings (i.e., just those trees that need toa ctyal map to full tree):
+  UniqueNewickStrings <- unique(NewickStrings)
+  
+  # Convert unique Newcik strings to unique trees:
+  UniqueTrees <- read.tree(text = UniqueNewickStrings)
+  
+  # If only a single tree reformat as a list:
+  if(class(UniqueTrees) == "phylo") UniqueTrees <- list(UniqueTrees)
+  
+  # Subfunction map nodes from pruned tree to full tree:
+  MapPrunedTreeNodesToFullTreeNodes <- function(tree, fulltree) {
+    
+    # Get number of tips of pruned tree:
+    NTips <- ape::Ntip(tree)
+    
+    # Get number of nodes of pruend tree:
+    NNodes <- ape::Nnode(tree)
+    
+    # Get all internal node numbers for peruend tree:
+    NodeNumbers <- (NTips + 1):(NTips + NNodes)
+    
+    # If the pruned tree is different to the full tree:
+    if(write.tree(tree) != write.tree(fulltree)) {
+      
+      # Get descendants of each node in pruned tree:
+      Descendants <- lapply(as.list(NodeNumbers), function(x) tree$tip.label[strap::FindDescendants(x, tree = tree)])
+      
+      # Get corresponding ancestral node in full tree:
+      Ancestors <- unlist(lapply(Descendants, function(x) Claddis::FindAncestor(descs = x, tree = fulltree)))
+      
+    # If pruned tree is identical to full tree (not pruned at all):
+    } else {
+      
+      # Set ancestors as node numbers:
+      Ancestors <- NodeNumbers
+      
+    }
+    
+    # Output matrix matching node numbers of pruned tree to full tree:
+    return(matrix(c(NodeNumbers, Ancestors), ncol = 2, dimnames = list(c(), c("PrunedNode", "FullNode"))))
+    
+  }
+  
+  # Get pruned node to full node for each unique tree:
+  NodeMapsList <- lapply(UniqueTrees, MapPrunedTreeNodesToFullTreeNodes, fulltree = Tree)
+  
+  # Build out for all trees (adds in any duplicated trees):
+  NodeMapsList <- NodeMapsList[match(NewickStrings, UniqueNewickStrings)]
+  
+  # Add node maps to data list:
+  for(i in 1:length(DataAsList)) DataAsList[[i]]$NodeMaps <- NodeMapsList[[i]]
+  
+  # Get number of tips in tree:
+  NTips <- ape::Ntip(Tree)
+  
+  # Get number of ndoes in tree:
+  NNodes <- ape::Nnode(Tree)
+  
+  # Get all node names and numbers:
+  Nodes <- c(rownames(OriginalMatrix), (NTips + 1):(NTips + NNodes))
+  
+  # Renumber nodes of ancestral states:
+  DataAsList <- lapply(DataAsList, function(x) { names(x$AncestralStates)[match(as.character(x$NodeMaps[, "PrunedNode"]), names(x$AncestralStates))] <- as.character(x$NodeMaps[, "FullNode"]); return(x) })
+  
+  # Collapse down to an ancestral state matrix ready for output:
+  AncestralStateMatrix <- do.call(cbind, lapply(DataAsList, function(x) {x$AncestralStates <- x$AncestralStates[Nodes]; names(x$AncestralStates) <- Nodes; return(x$AncestralStates)}))
+  
+  # Isolate estimated tip values:
+  TipMatrix <- AncestralStateMatrix[rownames(OriginalMatrix), ]
+  
+  # If there are any missing values:
+  if(any(is.na(TipMatrix))) {
+    
+    # Isolate misisng values:
+    MissingTipStates <- which(is.na(TipMatrix))
+    
+    # Repalce missing values with original (unmodified) input values:
+    TipMatrix[MissingTipStates] <- OriginalMatrix[MissingTipStates]
+    
+    # Add tip values back into full output:
+    AncestralStateMatrix[rownames(OriginalMatrix), ] <- TipMatrix
+    
+  }
+  
+  # Return ancestral satte matrix:
+  return(AncestralStateMatrix)
 
 }
