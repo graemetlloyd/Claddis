@@ -18,7 +18,7 @@
 #' @examples
 #' 
 #' # Create a simple four-taxon tree with branch lengths:
-#' tree <- read.tree(text="(A:1,(B:1,(C:1,D:1):1):1);")
+#' tree <- read.tree(text = "(A:1,(B:1,(C:1,D:1):1):1);")
 #' 
 #' # Set root age as 20 Ma:
 #' tree$root.time <- 20
@@ -39,7 +39,7 @@
 CorrectRootTime <- function(original.tree, pruned.tree) {
 	
 	# Conditional if pruned tree too small:
-	if(Ntip(pruned.tree) < 3) stop("ERROR: pruned.tree includes too few (<3) taxa to be used.")
+	if(ape::Ntip(pruned.tree) < 3) stop("ERROR: pruned.tree includes too few (<3) taxa to be used.")
 	
 	# Conditional in case where pruned tree taxa are not a subset of the original tree taxa:
 	if(length(setdiff(pruned.tree$tip.label, original.tree$tip.label)) > 0) stop("ERROR: pruned.tree cannot include taxa not present in original.tree.")
