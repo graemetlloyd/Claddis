@@ -49,8 +49,21 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
   # Delete any column names (could cause downstream issues otherwise):
   if(!is.null(colnames(CTmatrix))) colnames(CTmatrix) <- NULL
   
+  
+  
+  
+  # WILL ONLY WORK FOR DISCRETE CHARACTERS!
+  
+  
+  
+  
   # List any mystery character types:
-  mystery.characters <- setdiff(unique(unlist(strsplit(as.character(unique(as.vector(CTmatrix))), "&"))), c(as.character(0:31), NA))
+  mystery.characters <- setdiff(unique(unlist(strsplit(as.character(unique(as.vector(CTmatrix))), split = "&|/"))), c(as.character(0:31), NA))
+  
+  
+  
+  
+  
   
   # If mystery character types are present warn user:
   if(length(mystery.characters) > 0) stop("Characters must either be the integers 0 to 31, NA for missing, & for polymorphisms, or / for uncertainties.")
@@ -171,7 +184,7 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
   # Build Matrix_1 list:
   Matrix_1 <- list(NA, "STANDARD", CTmatrix, ordering, weights, min.vals, max.vals, Characters)
   
-  # Add anmes to Matrix_1:
+  # Add names to Matrix_1:
   names(Matrix_1) <- c("BlockName", "Datatype", "Matrix", "Ordering", "Weights", "MinVals", "MaxVals", "Characters")
 
   # Assimilate into output:
