@@ -4,17 +4,17 @@
 \alias{TrimMorphDistMatrix}
 \title{Trims a morphological distance matrix}
 \usage{
-TrimMorphDistMatrix(dist.matrix, tree = NULL)
+TrimMorphDistMatrix(dist.matrix, Tree = NULL)
 }
 \arguments{
 \item{dist.matrix}{A distance matrix in the format created by \link{MorphDistMatrix}.}
 
-\item{tree}{If the distance matrix includes ancestors this should be the tree (phylo object) used to reconstruct them.}
+\item{Tree}{If the distance matrix includes ancestors this should be the tree (phylo object) used to reconstruct them.}
 }
 \value{
-\item{dist.matrix}{A complete distance matrix with all cells filled. If there were no empty cells will return original.}
-\item{tree}{A tree (if supplied) with the removed taxa (see below) pruned. If no taxa are dropped will return the same tree as inputted. If no tree is supplied this is set to NULL.}
-\item{removed.taxa}{A character vector listing the taxa removed. If none are removed this will be set to NULL.}
+\item{DistMatrix}{A complete distance matrix with all cells filled. If there were no empty cells will return original.}
+\item{Tree}{A tree (if supplied) with the removed taxa (see below) pruned. If no taxa are dropped will return the same tree as inputted. If no tree is supplied this is set to NULL.}
+\item{RemovedTaxa}{A character vector listing the taxa removed. If none are removed this will be set to NULL.}
 }
 \description{
 Trims a morphological distance matrix by removing objects that cause empty cells.
@@ -32,7 +32,7 @@ If the matrix includes reconstructed ancestors the user should also provide the 
 distances <- MorphDistMatrix(Michaux1989)
 
 # Attempt to trim max.dist.matrix:
-TrimMorphDistMatrix(distances$max.dist.matrix)
+TrimMorphDistMatrix(distances$DistanceMatrix)
 
 }
 \author{

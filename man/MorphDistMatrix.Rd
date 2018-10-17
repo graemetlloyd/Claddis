@@ -4,21 +4,21 @@
 \alias{MorphDistMatrix}
 \title{Get distance matrices from a cladistic matrix}
 \usage{
-MorphDistMatrix(morph.matrix, distance = "MORD",
-  transform.proportional.distances = "arcsine_sqrt",
-  polymorphism.behaviour = "min.difference",
-  uncertainty.behaviour = "min.difference")
+MorphDistMatrix(morph.matrix, Distance = "MORD",
+  TransformProportionalDistances = "arcsine_sqrt",
+  PolymorphismBehaviour = "min.difference",
+  UncertaintyBehaviour = "min.difference")
 }
 \arguments{
 \item{morph.matrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
 
-\item{distance}{The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).}
+\item{Distance}{The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).}
 
-\item{transform.proportional.distances}{Whether to transform the proportional distances (Gower and max). Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default).}
+\item{TransformProportionalDistances}{Whether to transform the proportional distances (Gower and max). Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default).}
 
-\item{polymorphism.behaviour}{The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.}
+\item{PolymorphismBehaviour}{The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.}
 
-\item{uncertainty.behaviour}{The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.}
+\item{UncertaintyBehaviour}{The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.}
 }
 \value{
 \item{DistanceMetric}{The distance metric used.}

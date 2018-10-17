@@ -3,10 +3,10 @@
 #' Takes a cladistic morphological dataset and converts it into a set of pairwise distances.
 #'
 #' @param morph.matrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
-#' @param distance The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).
-#' @param transform.proportional.distances Whether to transform the proportional distances (Gower and max). Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default).
-#' @param polymorphism.behaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
-#' @param uncertainty.behaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
+#' @param Distance The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).
+#' @param TransformProportionalDistances Whether to transform the proportional distances (Gower and max). Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default).
+#' @param PolymorphismBehaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
+#' @param UncertaintyBehaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
 #'
 #' @return
 #'
@@ -35,7 +35,7 @@
 #' distances$ComparableCharacterMatrix
 #'
 #' @export MorphDistMatrix
-MorphDistMatrix <- function(morph.matrix, distance = "MORD", transform.proportional.distances = "arcsine_sqrt", polymorphism.behaviour = "min.difference", uncertainty.behaviour = "min.difference") {
+MorphDistMatrix <- function(morph.matrix, Distance = "MORD", TransformProportionalDistances = "arcsine_sqrt", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference") {
   
   # Subfunction to find comparable characters for a pairwise taxon comparison:
   GetComparableCharacters <- function(interest.col, morph.matrix) {
@@ -77,7 +77,7 @@ MorphDistMatrix <- function(morph.matrix, distance = "MORD", transform.proportio
   }
   
   # Subfunction to edit polymorphic characters down to a single value:
-  EditPolymorphisms <- function(comparisons, comparable.characters, ordering, polymorphism.behaviour, uncertainty.behaviour) {
+  EditPolymorphisms <- function(comparisons, comparable.characters, ordering, PolymorphismBehaviour, UncertaintyBehaviour) {
     
     # Set first taxon values:
     firstrow <- comparisons[[1]]
@@ -104,7 +104,7 @@ MorphDistMatrix <- function(morph.matrix, distance = "MORD", transform.proportio
       characters.to.check <- sort(unique(c(ampersand.elements, slash.elements)))
       
       # Set behaviours as either the shared version or minimum difference if they contradict (may need to modify this later for mroe complex options):
-      behaviour <- unlist(lapply(lapply(lapply(lapply(lapply(lapply(apply(apply(rbind(firstrow[characters.to.check], secondrow[characters.to.check]), 2, gsub, pattern = "[:0-9:]", replacement = ""), 2, list), unlist), function(x) x[nchar(x) > 0]), function(x) gsub(x, pattern = "&", replacement = polymorphism.behaviour)), function(x) gsub(x, pattern = "/", replacement = uncertainty.behaviour)), unique), function(x) ifelse(length(x) > 1, "min.difference", x)))
+      behaviour <- unlist(lapply(lapply(lapply(lapply(lapply(lapply(apply(apply(rbind(firstrow[characters.to.check], secondrow[characters.to.check]), 2, gsub, pattern = "[:0-9:]", replacement = ""), 2, list), unlist), function(x) x[nchar(x) > 0]), function(x) gsub(x, pattern = "&", replacement = PolymorphismBehaviour)), function(x) gsub(x, pattern = "/", replacement = UncertaintyBehaviour)), unique), function(x) ifelse(length(x) > 1, "min.difference", x)))
       
       # If behaviour is to find minimum differences:
       if(any(behaviour == "min.difference")) {
@@ -267,17 +267,17 @@ MorphDistMatrix <- function(morph.matrix, distance = "MORD", transform.proportio
   # Check for step matrices and stop and warn user if found:
   if(is.list(morph.matrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
   
-  # Check input of transform.proportional.distances is valid and stop and warn if not:
-  if(length(setdiff(transform.proportional.distances, c("arcsine_sqrt", "none", "sqrt"))) > 0) stop("transform.proportional.distances must be one of \"none\", \"sqrt\", or \"arcsine_sqrt\".")
+  # Check input of TransformProportionalDistances is valid and stop and warn if not:
+  if(length(setdiff(TransformProportionalDistances, c("arcsine_sqrt", "none", "sqrt"))) > 0) stop("TransformProportionalDistances must be one of \"none\", \"sqrt\", or \"arcsine_sqrt\".")
   
   # Check input of distance is valid and stop and warn if not:
-  if(length(setdiff(distance, c("RED", "GED", "GC", "MORD"))) > 0) stop("distance must be one or more of \"RED\", \"GED\", \"GC\", or \"MORD\".")
+  if(length(setdiff(Distance, c("RED", "GED", "GC", "MORD"))) > 0) stop("Distance must be one or more of \"RED\", \"GED\", \"GC\", or \"MORD\".")
   
-  # Check input for polymorphism.behaviour is valid and stop and warn if not:
-  if(length(setdiff(polymorphism.behaviour, c("mean.difference", "min.difference"))) > 0) stop("polymorphism.behaviour must be one or more of \"mean.difference\", or \"min.difference\".")
+  # Check input for PolymorphismBehaviour is valid and stop and warn if not:
+  if(length(setdiff(PolymorphismBehaviour, c("mean.difference", "min.difference"))) > 0) stop("PolymorphismBehaviour must be one or more of \"mean.difference\", or \"min.difference\".")
   
-  # Check input for uncertainty.behaviour is valid and stop and warn if not:
-  if(length(setdiff(uncertainty.behaviour, c("mean.difference", "min.difference"))) > 0) stop("uncertainty.behaviour must be one or more of \"mean.difference\", or \"min.difference\".")
+  # Check input for UncertaintyBehaviour is valid and stop and warn if not:
+  if(length(setdiff(UncertaintyBehaviour, c("mean.difference", "min.difference"))) > 0) stop("UncertaintyBehaviour must be one or more of \"mean.difference\", or \"min.difference\".")
   
   # Isolate ordering element:
   ordering <- unlist(lapply(morph.matrix[2:length(morph.matrix)], '[[', "Ordering"))
@@ -310,7 +310,7 @@ MorphDistMatrix <- function(morph.matrix, distance = "MORD", transform.proportio
   matrix.of.char.comp <- mapply(SubsetPairwiseByComparable, rows.pairs, list.of.compchar)
   
   # Deal with any polymorphisms found and collapse appropriately:
-  matrix.of.char.comp <- mapply(EditPolymorphisms, unlist(apply(matrix.of.char.comp, 2, list), recursive = FALSE), list.of.compchar, MoreArgs = list(ordering, polymorphism.behaviour, uncertainty.behaviour))
+  matrix.of.char.comp <- mapply(EditPolymorphisms, unlist(apply(matrix.of.char.comp, 2, list), recursive = FALSE), list.of.compchar, MoreArgs = list(ordering, PolymorphismBehaviour, UncertaintyBehaviour))
   
   # Get the absolute differences between each comparable character for each pairwise comparison:
   raw.diffs <- diffs <- unlist(apply(matrix.of.char.comp, 2, GetAbsoluteCharacterDifferences), recursive = FALSE)
@@ -325,7 +325,7 @@ MorphDistMatrix <- function(morph.matrix, distance = "MORD", transform.proportio
   raw.dist <- lapply(diffs, RawEuclideanDistance)
   
   # Only calculate the max differences for "GED" or "MORD" matrices:
-  if(distance == "GED" || distance == "MORD") {
+  if(Distance == "GED" || Distance == "MORD") {
     
     # Find maximum possible differences for the comparable characters:
     maxdiffs <- lapply(list.of.compchar, MaximumDIfferences, max.vals, min.vals)
@@ -336,16 +336,16 @@ MorphDistMatrix <- function(morph.matrix, distance = "MORD", transform.proportio
   }
   
   # If calculating Raw Eucldiean Distances build the distance matrix:
-  if(distance == "RED") dist.matrix <- ConvertListToMatrix(raw.dist, morph.matrix)
+  if(Distance == "RED") dist.matrix <- ConvertListToMatrix(raw.dist, morph.matrix)
 
   # If calculating the Gower Coefficient build the distance matrix:
-  if(distance == "GC") dist.matrix <- ConvertListToMatrix(as.list(mapply(CalculateGowerCoefficient, diffs, list.of.compchar, MoreArgs = list(weights))), morph.matrix)
+  if(Distance == "GC") dist.matrix <- ConvertListToMatrix(as.list(mapply(CalculateGowerCoefficient, diffs, list.of.compchar, MoreArgs = list(weights))), morph.matrix)
   
   # If calculating the MORD build the distance matrix:
-  if(distance == "MORD") dist.matrix <- ConvertListToMatrix(mapply(CalculateMORD, diffs, maxdiffs), morph.matrix)
+  if(Distance == "MORD") dist.matrix <- ConvertListToMatrix(mapply(CalculateMORD, diffs, maxdiffs), morph.matrix)
   
   # If calculating the GED:
-  if(distance == "GED") {
+  if(Distance == "GED") {
     
     # Build starting GED data:
     GED.data <- mapply(BuildStartingGEDData, diffs, list.of.compchar, MoreArgs = list(morph.matrix, weights), SIMPLIFY = FALSE)
@@ -392,10 +392,10 @@ MorphDistMatrix <- function(morph.matrix, distance = "MORD", transform.proportio
   if(any(is.nan(dist.matrix))) dist.matrix[is.nan(dist.matrix)] <- NA
   
   # If transforming distance matrix by taking the square root - take the square root:
-  if(transform.proportional.distances == "sqrt") dist.matrix <- sqrt(dist.matrix)
+  if(TransformProportionalDistances == "sqrt") dist.matrix <- sqrt(dist.matrix)
   
   # If transforming distance matrix by taking the arcsine square root:
-  if(transform.proportional.distances == "arcsine_sqrt") {
+  if(TransformProportionalDistances == "arcsine_sqrt") {
     
     # Check for squared distances greater than 1:
     if(any(sort(sqrt(dist.matrix)) > 1)) {
@@ -417,7 +417,7 @@ MorphDistMatrix <- function(morph.matrix, distance = "MORD", transform.proportio
   }
   
   # Compile results as a list:
-  result <- list(distance, dist.matrix, comp.char.matrix)
+  result <- list(Distance, dist.matrix, comp.char.matrix)
   
   # Add names to list:
   names(result) <- c("DistanceMetric", "DistanceMatrix", "ComparableCharacterMatrix")
