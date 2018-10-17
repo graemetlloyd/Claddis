@@ -295,7 +295,7 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", TransformProportion
   morph.matrix <- do.call(cbind, lapply(morph.matrix[2:length(morph.matrix)], '[[', "Matrix"))
   
   # If there are inapplicables then convert these to NAs:
-  if(any(morph.matrix == "")) morph.matrix[morph.matrix == ""] <- NA
+  if(any(sort(morph.matrix == ""))) morph.matrix[morph.matrix == ""] <- NA
   
   # Find all possible (symmetric) pariwise comparisons for the N taxa in the matrix (excluding self-comparisons):
   comparisons <- combn(1:nrow(morph.matrix), 2)
