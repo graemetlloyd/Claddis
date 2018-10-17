@@ -30,16 +30,16 @@ Intended to mimic the data visualisation of Sakamoto adn Ruta (2012; their Video
 set.seed(4)
 
 # Generate a random tree for the Michaux 1989 data set:
-tree <- rtree(length(rownames(Michaux1989$Matrix_1$Matrix)))
+Tree <- rtree(nrow(Michaux1989$Matrix_1$Matrix))
 
 # Set root time so latest tip terminates at the present:
-tree$root.time <- max(diag(vcv(tree)))
+Tree$root.time <- max(diag(vcv(Tree)))
 
 # Add taxon names to the tree:
-tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
+Tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
 
 # Perform a phylogenetic Principal Coordinates Analysis:
-pcoa_data <- MorphMatrix2PCoA(Michaux1989, tree = tree)
+pcoa_data <- MorphMatrix2PCoA(Michaux1989, Tree = Tree)
 
 # Plot a chronophylomorphospace:
 ChronoPhyloMorphospacePlot(pcoa_data)

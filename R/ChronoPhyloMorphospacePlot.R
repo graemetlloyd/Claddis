@@ -25,16 +25,16 @@
 #' set.seed(4)
 #'
 #' # Generate a random tree for the Michaux 1989 data set:
-#' tree <- rtree(length(rownames(Michaux1989$Matrix_1$Matrix)))
+#' Tree <- rtree(nrow(Michaux1989$Matrix_1$Matrix))
 #'
 #' # Set root time so latest tip terminates at the present:
-#' tree$root.time <- max(diag(vcv(tree)))
+#' Tree$root.time <- max(diag(vcv(Tree)))
 #'
 #' # Add taxon names to the tree:
-#' tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
+#' Tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
 #'
 #' # Perform a phylogenetic Principal Coordinates Analysis:
-#' pcoa_data <- MorphMatrix2PCoA(Michaux1989, tree = tree)
+#' pcoa_data <- MorphMatrix2PCoA(Michaux1989, Tree = Tree)
 #'
 #' # Plot a chronophylomorphospace:
 #' ChronoPhyloMorphospacePlot(pcoa_data)
@@ -58,11 +58,11 @@ ChronoPhyloMorphospacePlot <- function(pcoa_data, x_axis = 1, y_axis = 2, shadow
   if(is.null(p.p$txt.col)) p.p$txt.col <- "black"
   if(is.null(p.p$txt.cex)) p.p$txt.cex <- 1
 
-  # Isolate tree:
-  tree <- pcoa_data$tree
+  # Isolate Tree:
+  Tree <- pcoa_data$Tree
   
-  # Record umber of tips:
-  N <- Ntip(tree)
+  # Record number of tips:
+  N <- ape::Ntip(Tree)
   
   # Isolate pcoa axes:
   pcoa_data <- pcoa_data$vectors
@@ -85,7 +85,7 @@ ChronoPhyloMorphospacePlot <- function(pcoa_data, x_axis = 1, y_axis = 2, shadow
   }
 
   # Get node ages for z-axis in plotting:
-  z_axis <- GetNodeAges(tree)
+  z_axis <- GetNodeAges(Tree)
 
   # Make x label for plot:
   xlab <- paste("PC", x_axis, sep = "")
@@ -103,7 +103,7 @@ ChronoPhyloMorphospacePlot <- function(pcoa_data, x_axis = 1, y_axis = 2, shadow
   points3d(pcoa_data[(N + 1):nrow(pcoa_data), 1], pcoa_data[(N + 1):nrow(pcoa_data), 2], z_axis[(N + 1):nrow(pcoa_data)], col = p.p$n.bg, size = p.p$n.cex * 4)
 
   # plots branches
-  for (i in 1:nrow(tree$edge)) lines3d(pcoa_data[(tree$edge[i, ]), 1], pcoa_data[(tree$edge[i, ]), 2], z_axis[(tree$edge[i, ])], lwd = 2)
+  for (i in 1:nrow(Tree$edge)) lines3d(pcoa_data[(Tree$edge[i, ]), 1], pcoa_data[(Tree$edge[i, ]), 2], z_axis[(Tree$edge[i, ])], lwd = 2)
 
   # plot taxa labels
   text3d(pcoa_data[, x_axis], pcoa_data[, y_axis], z_axis, rownames(pcoa_data), col = p.p$txt.col, cex = p.p$txt.cex, adj = p.p$txt.adj)
@@ -112,13 +112,13 @@ ChronoPhyloMorphospacePlot <- function(pcoa_data, x_axis = 1, y_axis = 2, shadow
   if(shadow == TRUE){
       
     # Plot branches:
-    for (i in 1:nrow(tree$edge)) lines3d(pcoa_data[(tree$edge[i, ]), 1], pcoa_data[(tree$edge[i, ]), 2], tree$root.time, lwd = 2, alpha = 0.5)
+    for (i in 1:nrow(Tree$edge)) lines3d(pcoa_data[(Tree$edge[i, ]), 1], pcoa_data[(Tree$edge[i, ]), 2], Tree$root.time, lwd = 2, alpha = 0.5)
 
     # Plot internal nodes:
-    points3d(pcoa_data[(N + 1):nrow(pcoa_data), 1], pcoa_data[(N + 1):nrow(pcoa_data), 2], tree$root.time, col = p.p$n.bg, size = p.p$n.cex * 4, alpha = 0.5)
+    points3d(pcoa_data[(N + 1):nrow(pcoa_data), 1], pcoa_data[(N + 1):nrow(pcoa_data), 2], Tree$root.time, col = p.p$n.bg, size = p.p$n.cex * 4, alpha = 0.5)
       
     # Plot tips:
-    points3d(pcoa_data[1:N, 1], pcoa_data[1:N, 2], tree$root.time, col = p.p$t.bg, size = p.p$t.cex * 4, alpha = 0.5)
+    points3d(pcoa_data[1:N, 1], pcoa_data[1:N, 2], Tree$root.time, col = p.p$t.bg, size = p.p$t.cex * 4, alpha = 0.5)
       
   }
 
