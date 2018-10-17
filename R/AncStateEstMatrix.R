@@ -26,32 +26,32 @@
 #' @examples
 #' 
 #' # Set random seed:
-#' set.seed(17)
+#' set.seed(4)
 #' 
 #' # Generate a random tree for the Michaux data set:
-#' tree <- rtree(nrow(Michaux1989$Matrix_1$Matrix))
+#' tree <- rtree(n = nrow(Day2016$Matrix_1$Matrix))
 #' 
 #' # Update taxon names to match those in the data matrix:
-#' tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
+#' tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
 #' 
 #' # Set root time by making youngest taxon extant:
 #' tree$root.time <- max(diag(vcv(tree)))
 #' 
 #' # Estimate ancestral states:
-#' AncStateEstMatrix(Michaux1989, tree)
+#' AncStateEstMatrix(InputMatrix = Day2016, Tree = tree)
 #' 
 #' @export AncStateEstMatrix
 AncStateEstMatrix <- function(InputMatrix, Tree, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
   
   # How to get tip states for a continuous character?
   # How to deal with step matrices?
-  # Change help file to explain interactions between all options, e.g., iff doing all chars then polymorphsims used for discrete, midpoint for continuous etc.
+  # Change help file to explain interactions between all options, e.g., if doing all chars then polymorphsims used for discrete, midpoint for continuous etc.
   
   # Catch problem with trees with no branch lengths:
   if(is.null(Tree$edge.length)) stop("Tree must have branch lengths.")
   
   # Catch problem with polytomies:
-  if(Tree$Nnode < (Ntip(Tree) - 1)) stop("Tree must be fully bifurcating.")
+  if(Tree$Nnode < (ape::Ntip(Tree) - 1)) stop("Tree must be fully bifurcating.")
   
   # Catch problem with zero-length branches:
   if(any(Tree$edge.length == 0)) stop("Tree must not have zero-length branches.")
@@ -79,6 +79,9 @@ AncStateEstMatrix <- function(InputMatrix, Tree, EstimateAllNodes = FALSE, Estim
   
   # Isolate maximum values:
   max.vals <- unlist(lapply(InputMatrix[2:length(InputMatrix)], '[[', "MaxVals"))
+  
+  # Store raw original matrix:
+  RawInputMatrix <- InputMatrix
   
   # Combine matrix blocks into a single matrix:
   InputMatrix <- OriginalMatrix <- do.call(cbind, lapply(InputMatrix[2:length(InputMatrix)], '[[', "Matrix"))
@@ -286,7 +289,7 @@ AncStateEstMatrix <- function(InputMatrix, Tree, EstimateAllNodes = FALSE, Estim
       # Get ancestral states using rerooting method:
       x$AncestralStates <- rerootingMethod(tree = x$Tree, x = x$TipStates, model = x$Model)$marginal.anc
       
-      # Reformat to msot likely state
+      # Reformat to most likely state
       x$AncestralStates <- unlist(lapply(lapply(apply(x$AncestralStates, 1, list), unlist), function(x) {paste(names(x[x > (max(x) - Threshold)]), collapse = "/")}))
       
       # If not estimating tip values then prune these:
@@ -381,7 +384,7 @@ AncStateEstMatrix <- function(InputMatrix, Tree, EstimateAllNodes = FALSE, Estim
     # Isolate misisng values:
     MissingTipStates <- which(is.na(TipMatrix))
     
-    # Repalce missing values with original (unmodified) input values:
+    # Replace missing values with original (unmodified) input values:
     TipMatrix[MissingTipStates] <- OriginalMatrix[MissingTipStates]
     
     # Add tip values back into full output:
@@ -389,7 +392,27 @@ AncStateEstMatrix <- function(InputMatrix, Tree, EstimateAllNodes = FALSE, Estim
     
   }
   
-  # Return ancestral satte matrix:
+  # Get column (character) count for each matrix block:
+  MatrixColumns <- unlist(lapply(lapply(RawInputMatrix[2:length(RawInputMatrix)], '[[', "Matrix"), ncol))
+  
+  # For each matrix block:
+  for(i in 1:length(MatrixColumns)) {
+    
+    # Insert portion of ancestral state estimate into block:
+    RawInputMatrix[[(i + 1)]]$Matrix <- AncestralStateMatrix[, 1:MatrixColumns[i], drop = FALSE]
+    
+    # Remove that portion from the block:
+    AncestralStateMatrix <- AncestralStateMatrix[, -(1:MatrixColumns[i]), drop = FALSE]
+    
+  }
+  
+  # Overwrite ancestral state output with updated raw input:
+  AncestralStateMatrix <- RawInputMatrix
+  
+  # Add tree to output:
+  AncestralStateMatrix$Topper$Tree <- Tree
+  
+  # Return ancestral state matrix:
   return(AncestralStateMatrix)
 
 }

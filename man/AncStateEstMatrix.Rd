@@ -38,19 +38,19 @@ Uses either the \link{rerootingMethod} (Yang et al. 1995) as implemented in the 
 \examples{
 
 # Set random seed:
-set.seed(17)
+set.seed(4)
 
 # Generate a random tree for the Michaux data set:
-tree <- rtree(nrow(Michaux1989$Matrix_1$Matrix))
+tree <- rtree(n = nrow(Day2016$Matrix_1$Matrix))
 
 # Update taxon names to match those in the data matrix:
-tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
+tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
 
 # Set root time by making youngest taxon extant:
 tree$root.time <- max(diag(vcv(tree)))
 
 # Estimate ancestral states:
-AncStateEstMatrix(Michaux1989, tree)
+AncStateEstMatrix(InputMatrix = Day2016, Tree = tree)
 
 }
 \references{
