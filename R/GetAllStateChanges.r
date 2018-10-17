@@ -342,10 +342,10 @@ GetAllStateChanges <- function(clad.matrix, tree, time.bins, Nsim = 10) {
                     # ALSO WHAT IF NEITHER ORDERED NOR UNORDERED?
                     
                     # Create tip states matrix that will serve as priors for make.simmap (if character is ordered):
-                    if(clad.matrix$ordering[j] == "ord") tip.states <- matrix(0, nrow = Ntip(pruned.tree), ncol=length(sort(unique(unlist(strsplit(tip.values, "&"))))), dimnames=list(pruned.tree$tip.label, range(as.numeric(sort(unique(unlist(strsplit(tip.values, "&"))))))[1]:range(as.numeric(sort(unique(unlist(strsplit(tip.values, "&"))))))[2]))
+                    if(clad.matrix$ordering[j] == "ord") tip.states <- matrix(0, nrow = ape::Ntip(pruned.tree), ncol = length(sort(unique(unlist(strsplit(tip.values, "&"))))), dimnames = list(pruned.tree$tip.label, range(as.numeric(sort(unique(unlist(strsplit(tip.values, "&"))))))[1]:range(as.numeric(sort(unique(unlist(strsplit(tip.values, "&"))))))[2]))
                     
                     # Create tip states matrix that will serve as priors for make.simmap (if character is unordered):
-                    if(clad.matrix$ordering[j] == "unord") tip.states <- matrix(0, nrow = Ntip(pruned.tree), ncol=length(sort(unique(unlist(strsplit(tip.values, "&"))))), dimnames=list(pruned.tree$tip.label, sort(unique(unlist(strsplit(tip.values, "&"))))))
+                    if(clad.matrix$ordering[j] == "unord") tip.states <- matrix(0, nrow = ape::Ntip(pruned.tree), ncol = length(sort(unique(unlist(strsplit(tip.values, "&"))))), dimnames = list(pruned.tree$tip.label, sort(unique(unlist(strsplit(tip.values, "&"))))))
                     
                     # Case if polymorphisms amongst tip states:
                     if(length(grep("&", tip.values))) {
@@ -390,7 +390,7 @@ GetAllStateChanges <- function(clad.matrix, tree, time.bins, Nsim = 10) {
                     for(k in 1:Nsim) {
                         
                         # Get root state(s) for pruned.tree:
-                        root.states[k, match(j, MissingStringCharacters[[i]])] <- root.state <- as.numeric(names(charmaps[[k]][[match(Ntip(pruned.tree) + 1, pruned.tree$edge[, 1])]][1]))
+                        root.states[k, match(j, MissingStringCharacters[[i]])] <- root.state <- as.numeric(names(charmaps[[k]][[match(ape::Ntip(pruned.tree) + 1, pruned.tree$edge[, 1])]][1]))
                         
                         # Find all edges with changes (no point looking at others):
                         edgeswithchanges <- which(unlist(lapply(charmaps[[k]], length)) > 1)

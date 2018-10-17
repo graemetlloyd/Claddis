@@ -24,22 +24,22 @@
 GetNodeAges <- function(tree) {
   
   # Store root node number:
-  rootnode <- Ntip(tree) + 1
+  rootnode <- ape::Ntip(tree) + 1
   
   # If tree is a complete polytomy:
   if(tree$Nnode == 1) {
       
     # Create paths for just tips:
-    paths <- as.list(1:Ntip(tree))
+    paths <- as.list(1:ape::Ntip(tree))
     
     # Add root to each path:
-    for(i in 1:length(paths)) paths[[i]] <- c(paths[[i]], Ntip(tree) + 1)
+    for(i in 1:length(paths)) paths[[i]] <- c(paths[[i]], ape::Ntip(tree) + 1)
     
   # If tree is not a complete polytomy:
   } else {
       
     # Create initial paths list with end nodes (terminal and internal, excluding the root):
-    paths <- split(c(1:Ntip(tree), (Ntip(tree) + 2):(Ntip(tree) + Nnode(tree))), f = 1:(Ntip(tree) + Nnode(tree) - 1))
+    paths <- split(c(1:ape::Ntip(tree), (ape::Ntip(tree) + 2):(ape::Ntip(tree) + ape::Nnode(tree))), f = 1:(ape::Ntip(tree) + ape::Nnode(tree) - 1))
       
     # Strip names:
     names(paths) <- NULL
@@ -69,7 +69,7 @@ GetNodeAges <- function(tree) {
   }
 
   # Create vector to store node ages:
-  nodeages <- vector(mode = "numeric", length = Ntip(tree) + Nnode(tree))
+  nodeages <- vector(mode = "numeric", length = ape::Ntip(tree) + ape::Nnode(tree))
   
   # For each path:
   for(i in 1:length(paths)) {
@@ -83,7 +83,7 @@ GetNodeAges <- function(tree) {
   nodeages <- tree$root.time - nodeages
   
   # Add node numbers:
-  names(nodeages) <- 1:(Ntip(tree) + Nnode(tree))
+  names(nodeages) <- 1:(ape::Ntip(tree) + ape::Nnode(tree))
   
   # Return node ages:
   return(nodeages)

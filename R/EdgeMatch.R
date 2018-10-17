@@ -36,7 +36,7 @@
 EdgeMatch <- function(original.tree, pruned.tree) {
 	
 	# Conditional if pruned tree too small:
-	if(Ntip(pruned.tree) < 3) stop("ERROR: pruned.tree includes too few (<3) taxa to be used.")
+	if(ape::Ntip(pruned.tree) < 3) stop("ERROR: pruned.tree includes too few (<3) taxa to be used.")
 	
 	# Conditional in case where pruned tree taxa are not a subset of the original tree taxa:
 	if(length(setdiff(pruned.tree$tip.label, original.tree$tip.label)) > 0) stop("ERROR: pruned.tree cannot include taxa not present in original.tree.")
@@ -54,7 +54,7 @@ EdgeMatch <- function(original.tree, pruned.tree) {
 		matching.edges <- as.list(1:nrow(original.tree$edge))
 		
 		# Create lists of nodes (which will be identical):
-		clades <- corresponding.nodes <- c((Ntip(pruned.tree) + 1):(Ntip(pruned.tree) + Nnode(pruned.tree)), 1:Ntip(pruned.tree))
+		clades <- corresponding.nodes <- c((ape::Ntip(pruned.tree) + 1):(ape::Ntip(pruned.tree) + ape::Nnode(pruned.tree)), 1:ape::Ntip(pruned.tree))
 		
 	# If taxa are removed:
 	} else {
@@ -63,7 +63,7 @@ EdgeMatch <- function(original.tree, pruned.tree) {
 		clades <- vector(mode="character")
 		
 		# For each internal node of pruned tree:
-		for(i in (Ntip(pruned.tree) + 1):(Ntip(pruned.tree) + Nnode(pruned.tree))) {
+		for(i in (ape::Ntip(pruned.tree) + 1):(ape::Ntip(pruned.tree) + ape::Nnode(pruned.tree))) {
 			
 			# Get descendants of node (members of clade):
 			clades <- c(clades, paste(pruned.tree$tip.label[FindDescendants(i, pruned.tree)], collapse = "%%SpLiTtEr%%"))
@@ -83,7 +83,7 @@ EdgeMatch <- function(original.tree, pruned.tree) {
 		corresponding.nodes <- c(corresponding.nodes, match(pruned.tree$tip.label, original.tree$tip.label))
 		
 		# Add tips to node numbers for pruned.tree:
-		clades <- c(as.numeric(names(clades)), 1:Ntip(pruned.tree))
+		clades <- c(as.numeric(names(clades)), 1:ape::Ntip(pruned.tree))
 		
 		# Make edge matrix for pruned tree using corresponding nodes in original tree:
 		pruned.edges <- cbind(corresponding.nodes[match(pruned.tree$edge[, 1], clades)], corresponding.nodes[match(pruned.tree$edge[, 2], clades)])

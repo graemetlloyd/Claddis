@@ -41,10 +41,10 @@ GetDescendantEdges <- function(n, tree) {
     edges <- grep(n, tree$edge[, 1])
     
   # Keep going until all descendant edges are found:
-  while(length(which(tree$edge[edges, 2] <= Ntip(tree))) < n.terminals) {
+  while(length(which(tree$edge[edges, 2] <= ape::Ntip(tree))) < n.terminals) {
     
     # Get internal nodes found so far:
-    nodes <- tree$edge[edges, 2][which(tree$edge[edges, 2] > Ntip(tree))]
+    nodes <- tree$edge[edges, 2][which(tree$edge[edges, 2] > ape::Ntip(tree))]
         
     # For each node add any new descendant edges:
     for(i in nodes) edges <- sort(unique(c(edges, which(tree$edge[, 1] == i))))

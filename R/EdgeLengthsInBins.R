@@ -54,10 +54,10 @@ EdgeLengthsInBins <- function(tree, time.bins, pruned.tree=NULL) {
 		if(sum(pruned.tree$edge.length) < sum(tree$edge.length)) {
 			
 			# Find descendant tips of each node:
-			descendant.tips <- lapply(as.list((Ntip(tree) + 1):(Ntip(tree) + Nnode(tree))), FindDescendants, tree = tree)
+			descendant.tips <- lapply(as.list((ape::Ntip(tree) + 1):(ape::Ntip(tree) + ape::Nnode(tree))), FindDescendants, tree = tree)
 			
 			# Add node numbers as names:
-			names(descendant.tips) <- (Ntip(tree) + 1):(Ntip(tree) + Nnode(tree))
+			names(descendant.tips) <- (ape::Ntip(tree) + 1):(ape::Ntip(tree) + ape::Nnode(tree))
 			
 			# Find edges to collapse (those with dropped descendants only):
 			edges.to.collapse <- match(as.numeric(names(which(unlist(lapply(lapply(lapply(descendant.tips, match, table=match(dropped.tips, tree$tip.label)), is.na), sum)) == 0))), tree$edge[, 2])
@@ -70,7 +70,7 @@ EdgeLengthsInBins <- function(tree, time.bins, pruned.tree=NULL) {
 	}
 	
 	# Get terminal edge numbers:
-	terminal.edges <- match(1:Ntip(tree), tree$edge[, 2])
+	terminal.edges <- match(1:ape::Ntip(tree), tree$edge[, 2])
 	
 	# Get internal edge numbers:
 	internal.edges <- setdiff(1:nrow(tree$edge), terminal.edges)

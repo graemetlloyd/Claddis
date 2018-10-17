@@ -81,7 +81,7 @@ DolloSCM <- function(tree, tip.states) {
     new.root <- FindAncestor(names(which(tip.states == 1)), tree)
     
     # If new root is really the old root:
-    if((Ntip(tree) + 1) == new.root && sum(tip.states == 1) > 1) {
+    if((ape::Ntip(tree) + 1) == new.root && sum(tip.states == 1) > 1) {
         
         # Set acqusition branch to zero as precedes root:
         acquisition.branch <- 0
@@ -271,16 +271,16 @@ DolloSCM <- function(tree, tip.states) {
                 new.edges <- new.tree$edge
         
                 # Update tip names for original tree edge matrix:
-                for(i in 1:Ntip(tree)) orig.edges[which(orig.edges[, 2] == i), 2] <- tree$tip.label[i]
+                for(i in 1:ape::Ntip(tree)) orig.edges[which(orig.edges[, 2] == i), 2] <- tree$tip.label[i]
         
                 # Update tip names for pruned tree edge matrix:
-                for(i in 1:Ntip(new.tree)) new.edges[which(new.edges[, 2] == i), 2] <- new.tree$tip.label[i]
+                for(i in 1:ape::Ntip(new.tree)) new.edges[which(new.edges[, 2] == i), 2] <- new.tree$tip.label[i]
         
                 # Update node names for original tree edge matrix:
-                for(i in (Ntip(tree) + 1):(Ntip(tree) + Nnode(tree))) orig.edges[which(orig.edges == i)] <- paste(sort(tree$tip.label[FindDescendants(i, tree)]), collapse="")
+                for(i in (ape::Ntip(tree) + 1):(ape::Ntip(tree) + ape::Nnode(tree))) orig.edges[which(orig.edges == i)] <- paste(sort(tree$tip.label[FindDescendants(i, tree)]), collapse="")
         
                 # Update node names for pruned tree edge matrix:
-                for(i in (Ntip(new.tree) + 1):(Ntip(new.tree) + Nnode(new.tree))) new.edges[which(new.edges == i)] <- paste(sort(new.tree$tip.label[FindDescendants(i, new.tree)]), collapse="")
+                for(i in (ape::Ntip(new.tree) + 1):(ape::Ntip(new.tree) + ape::Nnode(new.tree))) new.edges[which(new.edges == i)] <- paste(sort(new.tree$tip.label[FindDescendants(i, new.tree)]), collapse="")
         
                 # Collapse original edge matrix to from-to straings for matching:
                 orig.edges <- apply(orig.edges, 1, paste, collapse="%%TO%%")
