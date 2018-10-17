@@ -14,17 +14,21 @@
 #'
 #' @param morph.matrix A vector of mode character representing the tip names for which an ancestor is sought.
 #' @param distance.method The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{MorphDistMatrix} for more details.
-#' @param transform.proportional.distances The transformation to apply to propotional (0 to 1) distances (one of "none", "sqrt", or "arcsine_sqrt" - the default). See \link{MorphDistMatrix} for more details.
-#' @param polymorphism.behaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
-#' @param uncertainty.behaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
+#' @param TransformProportionalDistances The transformation to apply to propotional (0 to 1) distances (one of "none", "sqrt", or "arcsine_sqrt" - the default). See \link{MorphDistMatrix} for more details.
+#' @param DistPolymorphismBehaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
+#' @param DistUncertaintyBehaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
 #' @param correction The negative eigenvalue correction to use (one of "lingoes", "none", or "cailliez" - the default). See \link{pcoa} for more details.
-#' @param tree If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.
-#' @param estimate.allchars If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{AncStateEstMatrix} for more details.
-#' @param estimate.tips If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link{AncStateEstMatrix} for more details.
+#' @param Tree If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.
+#' @param EstimateAllNodes If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{AncStateEstMatrix} for more details.
+#' @param EstimateTipValues If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link{AncStateEstMatrix} for more details.
+#' @param InapplicablesAsMissing See \link{AncStateEstMatrix}.
+#' @param AncestralPolymorphismBehaviour Behaviour for dealing with polymorphisms when producing ancestral state estimates - see \link{AncStateEstMatrix}.
+#' @param AncestralUncertaintyBehaviour Behaviour for dealing with uncertainties when producing ancestral state estimates - see \link{AncStateEstMatrix}.
+#' @param Threshold Threshold for ancestral state estimation of discrete characters - see \link{AncStateEstMatrix} for details.
 #'
-#' @return \item{tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{TrimMorphDistMatrix}.}
-#' @return \item{dist.matrix}{The distance matrix. Note this may be pruned by \link{TrimMorphDistMatrix} and thus not include all taxa.}
-#' @return \item{removed.taxa}{A vector of taxa (or nodes) removed by \link{TrimMorphDistMatrix}. Returns NULL if none are removed.}
+#' @return \item{Tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{TrimMorphDistMatrix}.}
+#' @return \item{DistMatrix}{The distance matrix. Note this may be pruned by \link{TrimMorphDistMatrix} and thus not include all taxa.}
+#' @return \item{RemovedTaxa}{A vector of taxa (or nodes) removed by \link{TrimMorphDistMatrix}. Returns NULL if none are removed.}
 #' @return \item{note}{See \link{pcoa}.}
 #' @return \item{values}{See \link{pcoa}.}
 #' @return \item{vectors}{See \link{pcoa}.}
@@ -50,28 +54,31 @@
 #' # Show output:
 #' x
 #'
-#' # Generate a (mde up) tree:
-#' tree <- rtree(length(rownames(Michaux1989$matrix)))
+#' # Generate a (made up) tree:
+#' tree <- rtree(length(rownames(Michaux1989$Matrix_1$Matrix)))
 #'
 #' # Add taxon names to it:
-#' tree$tip.label <- rownames(Michaux1989$matrix)
+#' tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
+#'
+#' # Set root time by making youngest taxon extant:
+#' tree$root.time <- max(diag(vcv(tree)))
 #'
 #' # Run with tree:
-#' y <- MorphMatrix2PCoA(Michaux1989, tree = tree)
+#' y <- MorphMatrix2PCoA(Michaux1989, Tree = tree)
 #'
 #' # Show new output:
 #' y
 #'
 #' @export MorphMatrix2PCoA
-MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", transform.proportional.distances = "arcsine_sqrt", polymorphism.behaviour = "min.difference", uncertainty.behaviour = "min.difference", correction = "cailliez", tree = NULL, estimate.allchars = FALSE, estimate.tips = FALSE) {
+MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", TransformProportionalDistances = "arcsine_sqrt", DistPolymorphismBehaviour = "min.difference", DistUncertaintyBehaviour = "min.difference", correction = "cailliez", Tree = NULL, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, AncestralPolymorphismBehaviour = "equalp", AncestralUncertaintyBehaviour = "equalp", Threshold = 0.01) {
     
 # Add some top level conditionsl here to check input is valid.
   
   # If no tree is supplied:
-  if(is.null(tree)) {
+  if(is.null(Tree)) {
     
     # Get morphological distances from the cladistic matrix:
-    morph_distances <- MorphDistMatrix(morph.matrix, distance = distance.method, transform.proportional.distances = transform.proportional.distances, polymorphism.behaviour = polymorphism.behaviour, uncertainty.behaviour = uncertainty.behaviour)
+    morph_distances <- MorphDistMatrix(morph.matrix, Distance = distance.method, TransformProportionalDistances = TransformProportionalDistances, PolymorphismBehaviour = DistPolymorphismBehaviour, UncertaintyBehaviour = DistUncertaintyBehaviour)
     
     # Get trimmed distances:
     trimmed_distances <- TrimMorphDistMatrix(morph_distances$DistanceMatrix)
@@ -80,56 +87,42 @@ MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", transform.p
     if(!is.null(trimmed_distances$removed.taxa)) message(paste("The following taxa had to be removed to produce a complete distance matrix:", paste(trimmed_distances$removed.taxa, collapse = ", ")))
     
     # Perform Principal Coordinates Analysis on the data:
-    pcoa_results <- pcoa(trimmed_distances$dist.matrix, correction = correction, rn = rownames(trimmed_distances$dist.matrix))
+    pcoa_results <- pcoa(trimmed_distances$DistMatrix, correction = correction, rn = rownames(trimmed_distances$DistMatrix))
     
   # Case if a tree is included (and a phylomorphospace is requested):
   } else {
       
     # Get ancestral character states:
-    ancestral_values <- AncStateEstMatrix(morph.matrix, tree, estimate.allchars = FALSE, estimate.tips = FALSE)
-
-    # Case if estimating tip values:
-    if(estimate.tips) {
-    
-      # Overwrite entire matrix with ancestral values as they include tips too.
-      morph.matrix$matrix <- ancestral_values
-    
-    # Case if not estimating tip values:
-    } else {
-    
-      # Add ancestral values into matrix with existing tip values:
-      morph.matrix$matrix <- rbind(morph.matrix$matrix, ancestral_values)
-    
-    }
+    ancestral_values <- AncStateEstMatrix(InputMatrix = morph.matrix, Tree = Tree, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = InapplicablesAsMissing, PolymorphismBehaviour = AncestralPolymorphismBehaviour, UncertaintyBehaviour = AncestralUncertaintyBehaviour, Threshold = Threshold)
 
     # Get morphological distances from the cladistic matrix:
-    morph_distances <- MorphDistMatrix(morph.matrix, distance = distance.method, transform.proportional.distances = transform.proportional.distances, polymorphism.behaviour = polymorphism.behaviour, uncertainty.behaviour = uncertainty.behaviour)
+    morph_distances <- MorphDistMatrix(ancestral_values, Distance = distance.method, TransformProportionalDistances = TransformProportionalDistances, PolymorphismBehaviour = DistPolymorphismBehaviour, UncertaintyBehaviour = DistUncertaintyBehaviour)
     
     # Get trimmed distances:
-    trimmed_distances <- TrimMorphDistMatrix(morph_distances$DistanceMatrix, tree = tree)
+    trimmed_distances <- TrimMorphDistMatrix(morph_distances$DistanceMatrix, Tree = Tree)
 
     # If trimming of matrix lead to taxa or nodes being removed warn user:
     if(!is.null(trimmed_distances$removed.taxa)) message(paste("The following taxa or nodes had to be removed to produce a complete distance matrix:", paste(trimmed_distances$removed.taxa, collapse = ", ")))
 
     # Store (possibly trimmed) tree ready to be output:
-    tree <- trimmed_distances$tree
+    Tree <- trimmed_distances$Tree
 
     # Perform Principal Coordinates Analysis on the data:
-    pcoa_results <- pcoa(trimmed_distances$dist.matrix, correction = correction, rn = rownames(trimmed_distances$dist.matrix))
+    pcoa_results <- pcoa(trimmed_distances$DistMatrix, correction = correction, rn = rownames(trimmed_distances$DistMatrix))
 
   }
   
   # Compile output:
-  output <- c(list(tree), list(trimmed_distances$dist.matrix), list(trimmed_distances$removed.taxa), pcoa_results)
+  output <- c(list(Tree), list(trimmed_distances$DistMatrix), list(trimmed_distances$RemovedTaxa), pcoa_results)
 
   # Add variable name for tree:
-  names(output)[[1]] <- "tree"
+  names(output)[[1]] <- "Tree"
 
   # Add variable name for distaance matrix:
-  names(output)[[2]] <- "dist.matrix"
+  names(output)[[2]] <- "DistMatrix"
   
   # Add variable name for removed taxa and nodes:
-  names(output)[[3]] <- "removed.taxa"
+  names(output)[[3]] <- "RemovedTaxa"
 
   # Return output invisibly:
   invisible(output)

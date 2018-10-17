@@ -5,36 +5,46 @@
 \title{Principal Coordinates on a Cladistic Matrix}
 \usage{
 MorphMatrix2PCoA(morph.matrix, distance.method = "MORD",
-  transform.proportional.distances = "arcsine_sqrt",
-  polymorphism.behaviour = "min.difference",
-  uncertainty.behaviour = "min.difference", correction = "cailliez",
-  tree = NULL, estimate.allchars = FALSE, estimate.tips = FALSE)
+  TransformProportionalDistances = "arcsine_sqrt",
+  DistPolymorphismBehaviour = "min.difference",
+  DistUncertaintyBehaviour = "min.difference", correction = "cailliez",
+  Tree = NULL, EstimateAllNodes = FALSE, EstimateTipValues = FALSE,
+  InapplicablesAsMissing = FALSE, AncestralPolymorphismBehaviour = "equalp",
+  AncestralUncertaintyBehaviour = "equalp", Threshold = 0.01)
 }
 \arguments{
 \item{morph.matrix}{A vector of mode character representing the tip names for which an ancestor is sought.}
 
 \item{distance.method}{The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{MorphDistMatrix} for more details.}
 
-\item{transform.proportional.distances}{The transformation to apply to propotional (0 to 1) distances (one of "none", "sqrt", or "arcsine_sqrt" - the default). See \link{MorphDistMatrix} for more details.}
+\item{TransformProportionalDistances}{The transformation to apply to propotional (0 to 1) distances (one of "none", "sqrt", or "arcsine_sqrt" - the default). See \link{MorphDistMatrix} for more details.}
 
-\item{polymorphism.behaviour}{The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.}
+\item{DistPolymorphismBehaviour}{The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.}
 
-\item{uncertainty.behaviour}{The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.}
+\item{DistUncertaintyBehaviour}{The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.}
 
 \item{correction}{The negative eigenvalue correction to use (one of "lingoes", "none", or "cailliez" - the default). See \link{pcoa} for more details.}
 
-\item{tree}{If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.}
+\item{Tree}{If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.}
 
-\item{estimate.allchars}{If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{AncStateEstMatrix} for more details.}
+\item{EstimateAllNodes}{If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{AncStateEstMatrix} for more details.}
 
-\item{estimate.tips}{If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link{AncStateEstMatrix} for more details.}
+\item{EstimateTipValues}{If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link{AncStateEstMatrix} for more details.}
+
+\item{InapplicablesAsMissing}{See \link{AncStateEstMatrix}.}
+
+\item{AncestralPolymorphismBehaviour}{Behaviour for dealing with polymorphisms when producing ancestral state estimates - see \link{AncStateEstMatrix}.}
+
+\item{AncestralUncertaintyBehaviour}{Behaviour for dealing with uncertainties when producing ancestral state estimates - see \link{AncStateEstMatrix}.}
+
+\item{Threshold}{Threshold for ancestral state estimation of discrete characters - see \link{AncStateEstMatrix} for details.}
 }
 \value{
-\item{tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{TrimMorphDistMatrix}.}
+\item{Tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{TrimMorphDistMatrix}.}
 
-\item{dist.matrix}{The distance matrix. Note this may be pruned by \link{TrimMorphDistMatrix} and thus not include all taxa.}
+\item{DistMatrix}{The distance matrix. Note this may be pruned by \link{TrimMorphDistMatrix} and thus not include all taxa.}
 
-\item{removed.taxa}{A vector of taxa (or nodes) removed by \link{TrimMorphDistMatrix}. Returns NULL if none are removed.}
+\item{RemovedTaxa}{A vector of taxa (or nodes) removed by \link{TrimMorphDistMatrix}. Returns NULL if none are removed.}
 
 \item{note}{See \link{pcoa}.}
 
@@ -70,14 +80,17 @@ x <- MorphMatrix2PCoA(Michaux1989)
 # Show output:
 x
 
-# Generate a (mde up) tree:
-tree <- rtree(length(rownames(Michaux1989$matrix)))
+# Generate a (made up) tree:
+tree <- rtree(length(rownames(Michaux1989$Matrix_1$Matrix)))
 
 # Add taxon names to it:
-tree$tip.label <- rownames(Michaux1989$matrix)
+tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
+
+# Set root time by making youngest taxon extant:
+tree$root.time <- max(diag(vcv(tree)))
 
 # Run with tree:
-y <- MorphMatrix2PCoA(Michaux1989, tree = tree)
+y <- MorphMatrix2PCoA(Michaux1989, Tree = tree)
 
 # Show new output:
 y
