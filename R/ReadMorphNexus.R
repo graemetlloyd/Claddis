@@ -1001,6 +1001,9 @@ ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
   
   }
   
+  # Check for characters without an ordering status and stop and warn user if found:
+  if(any(is.na(unlist(Ordering)))) stop(paste("The following characters have undefined ordering: ", paste(which(is.na(unlist(Ordering))), collapse = ", "), ". Add their ordering to the assumptions block and try again.", sep =""))
+  
   # Convert any "Squared" ordering to "cont" for continuous:
   Ordering <- lapply(Ordering, gsub, pattern = "Squared", replacement = "cont", ignore.case = TRUE)
   
