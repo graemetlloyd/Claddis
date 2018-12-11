@@ -1,1 +1,3 @@
 # Git ignore the following
+.DS_Store
+.Rapp.history
