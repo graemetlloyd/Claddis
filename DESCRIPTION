@@ -18,7 +18,8 @@ Imports:
     utils
 Description: Measures morphological diversity from discrete character data and
     estimates evolutionary tempo on phylogenetic trees.
+Encoding: UTF-8
 License: GPL (>=2)
 LazyData: yes
 ByteCompile: yes
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
