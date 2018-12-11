@@ -27,7 +27,7 @@ Note that \code{fixRootTime} in the \code{paleotree} package performs the same f
 \examples{
 
 # Create a simple four-taxon tree with branch lengths:
-tree <- read.tree(text="(A:1,(B:1,(C:1,D:1):1):1);")
+tree <- read.tree(text = "(A:1,(B:1,(C:1,D:1):1):1);")
 
 # Set root age as 20 Ma:
 tree$root.time <- 20

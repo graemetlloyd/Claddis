@@ -9,7 +9,8 @@ MorphMatrix2PCoA(morph.matrix, distance.method = "MORD",
   DistPolymorphismBehaviour = "min.difference",
   DistUncertaintyBehaviour = "min.difference", correction = "cailliez",
   Tree = NULL, EstimateAllNodes = FALSE, EstimateTipValues = FALSE,
-  InapplicablesAsMissing = FALSE, AncestralPolymorphismBehaviour = "equalp",
+  InapplicablesAsMissing = FALSE,
+  AncestralPolymorphismBehaviour = "equalp",
   AncestralUncertaintyBehaviour = "equalp", Threshold = 0.01)
 }
 \arguments{

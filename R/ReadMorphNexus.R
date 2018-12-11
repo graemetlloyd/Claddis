@@ -53,6 +53,7 @@ ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
   # ADD ABILITY TO READ CHARSET LINES
   # COULD BE MULTIPLE TYPESET OR WTSET LINES, NEED TO CHECK FOR THIS!
   # ADD ABILITY TO READ AND STORE CHARACTER STATES LABELS ETC.
+  # ADD ABILITY TO DEAL WITH RANGES FOR CONTINUOUS DATA
   
   # Line formatting function to be used in lapply below to deal with polymorphic characters:
   LineFormatter <- function(x, direction = "in") {
@@ -162,7 +163,7 @@ ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
     # Store character type in output:
     for(i in 1:length(Numbers)) output[Numbers[[i]]] <- names(Numbers)[i]
     
-    # Check all characters have some kind of ordering decsribed:
+    # Check all characters have some kind of ordering described:
     if(length(which(output == "")) > 0) stop(paste("The following characters have no specified ordering: ", paste(which(output == ""), collapse = ", "), ". Check ASSUMPTIONS block and edit appropriately.", sep = ""))
     
     # Return output:

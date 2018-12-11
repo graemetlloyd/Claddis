@@ -49,11 +49,32 @@ GetAllStateChanges <- function(clad.matrix, tree, time.bins, Nsim = 10) {
     # NEED TO TIME BIN INTERNAL VERSUS TERMINAL BRANCHES; ALSO MAYBE BY CHARACTER?
     # MAKE LESS VERBOSE OUTPUT?
     # IDENTIFY DUPLICATE CHARACTER STATE DISTRIBUTIONS INCLUDING EQUIVALENT (0011 and 1100 being effectively equal, unless step matrix!)
-    #    AND ONLY PERFORM SCM ON UNIQUE STATE DISTRIBUTON-CHARACTER TYPE COMBOS
-    # MAJOR ISSUE IS NO EASY WAY TO MAKE MODEL FOR ORDERED MULTISTATE CHARACTER WHEN NOT ALL STATES ARE FOUND AT TIPS
+    # AND ONLY PERFORM SCM ON UNIQUE STATE DISTRIBUTON-CHARACTER TYPE COMBOS
+    # MAJOR ISSUE IS NO EASY WAY TO MAKE MODEL FOR ORDERED MULTISTATE CHARACTER WHEN NOT ALL STATES ARE FOUND AT TIPS (E.G., 0 and 2 sampled, but not 1)
     
+    
+    # Build all data into single matrix:
+    MatrixBlock <- do.call(cbind, lapply(clad.matrix[2:length(clad.matrix)], '[[', "Matrix"))
+    
+    # Assemble all ordering values into a single vector:
+    Ordering <- unname(do.call(c, lapply(clad.matrix[2:length(clad.matrix)], '[[', "Ordering")))
+    
+    # Assemble all minimum values into a single vector:
+    MinVals <- unname(do.call(c, lapply(clad.matrix[2:length(clad.matrix)], '[[', "MinVals")))
+    
+    # Assemble all maximum values into a single vector:
+    MaxVals <- unname(do.call(c, lapply(clad.matrix[2:length(clad.matrix)], '[[', "MaxVals")))
+    
+    # Assemble all datatypes into a single vector:
+    DataTypes <- unname(do.call(c, lapply(clad.matrix[2:length(clad.matrix)], function(x) rep(x[["Datatype"]], ncol(x[["Matrix"]])))))
+    
+    
+    # Need to use datatype and symbols for output, e.g., if actually DNA
+
+
+
     # Create strings that define character models (non-missing states plus ordering):
-    char.model.sets <- paste(unlist(lapply(lapply(lapply(lapply(apply(clad.matrix$matrix, 2, strsplit, split = "&"), unlist), sort), unique), paste, collapse = "")), clad.matrix$ordering, sep = "")
+    char.model.sets <- paste(unlist(lapply(lapply(lapply(lapply(apply(clad.matrix$Matrix_1$Matrix, 2, strsplit, split = "&"), unlist), sort), unique), paste, collapse = "")), clad.matrix$Matrix_1$Ordering, sep = "")
     
     # Create empty list to store character models:
     char.models <- list()

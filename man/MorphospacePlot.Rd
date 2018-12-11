@@ -5,8 +5,8 @@
 \title{Plot Morphopace}
 \usage{
 MorphospacePlot(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL,
-  plot_taxon_names = FALSE, plot_internal_nodes = FALSE, plot_root = TRUE,
-  root_colour = "grey")
+  plot_taxon_names = FALSE, plot_internal_nodes = FALSE,
+  plot_root = TRUE, root_colour = "grey")
 }
 \arguments{
 \item{pcoa_input}{The main input in the format output from \link{MorphMatrix2PCoA}.}

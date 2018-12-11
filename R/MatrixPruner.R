@@ -66,7 +66,7 @@ MatrixPruner <- function(clad.matrix, blocks2prune = c(), characters2prune = c()
     # Actually form list of character numbers (i.e., renumber characters in second or higher blocks):
     if(length(CharactersAsList) > 1) for(i in 2:length(CharactersAsList)) CharactersAsList[[i]] <- CharactersAsList[[i]] + max(CharactersAsList[[(i - 1)]])
     
-    # For each unique character vlock:
+    # For each unique character block:
     for(i in unique(CharacterBlocks)) {
       
       # Find columns to delete in ith matrix:

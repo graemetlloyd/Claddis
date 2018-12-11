@@ -51,6 +51,8 @@
 #' @export DiscreteCharacterRate
 
 # NEED TO GENERALISE LRT INTO SINGLE SUBFUNCTION
+# NEED TO WARN USER OF TRYING TO DO DISCRETE RATES WITH CONTINUOUS CHARACTERS
+
 
 DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   
@@ -99,13 +101,21 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
     # Ensure difference in ages between branches not present in bin are zero:
     LADs[FADs < LADs] <- FADs[FADs < LADs]
     
-    # Calculate and store the proportion of each branch ipresent in the time bin:
+    # Calculate and store the proportion of each branch present in the time bin:
     prop.branch.in.bin[, (i - 1)] <- (FADs - LADs) / branch.durations
     
   }
+  
+  
+  
+  
+  
+  
+  
+  
 
   # Get ancestral character states:
-  anc.states <- AncStateEstMatrix(clad.matrix, tree, estimate.allchars = FALSE, estimate.tips = FALSE)
+  anc.states <- AncStateEstMatrix(InputMatrix = clad.matrix, Tree = tree, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01)
   
   # Isolate tip states in tip label order:
   tip.states <- clad.matrix$matrix[tree$tip.label, , drop = FALSE]
@@ -114,7 +124,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   all.states <- rbind(tip.states, anc.states)
   
   # Re-label row names by node number:
-  rownames(all.states) <- c(1:(Ntip(tree) + Nnode(tree)))
+  rownames(all.states) <- c(1:(ape::Ntip(tree) + ape::Nnode(tree)))
   
   # Create trees to store branch lengths with respect to completeness and observed and observable character changes:
   completeness.tree <- observed.tree <- observable.tree <- tree
@@ -241,7 +251,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   Nchar <- sum(clad.matrix$weights)
 
   # Get row numbers of terminal branches:
-  terminal.branches <- match(1:Ntip(tree), tree$edge[, 2])
+  terminal.branches <- match(1:ape::Ntip(tree), tree$edge[, 2])
   
   # Get row numbers of internal branches:
   internal.branches <- setdiff(1:nrow(tree$edge), terminal.branches)
@@ -561,7 +571,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   n <- length(tree$edge[, 1])
   
   # Get number of tips (and terminal branches):
-  ntips <- n.tb <- Ntip(tree)
+  ntips <- n.tb <- ape::Ntip(tree)
   
   # Get number of internal branches:
   n.ib <- n - n.tb
@@ -576,7 +586,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, time.bins, alpha = 0.01) {
   changes.ib <- observed.tree$edge.length[internal.branches]
   
   # Get list of nonterminal and nonroot nodes:
-  nodes <- (Ntip(tree) + 2):(Ntip(tree) + Nnode(tree))
+  nodes <- (ape::Ntip(tree) + 2):(ape::Ntip(tree) + ape::Nnode(tree))
   
   # Percentage of characters that are observable:
   pctcomp <- completeness.tree$edge.length / Nchar

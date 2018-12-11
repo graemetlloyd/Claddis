@@ -4,8 +4,8 @@
 \alias{StackPlot}
 \title{Plot Stacked Ordination Spaces}
 \usage{
-StackPlot(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2,
-  x_axis = 1, y_axis = 2, axis_label = "PC")
+StackPlot(ordination_axes, ages, groups = NULL, time_slices,
+  shear = 0.2, x_axis = 1, y_axis = 2, axis_label = "PC")
 }
 \arguments{
 \item{ordination_axes}{A matrix of the ordination axes supplied (rownames should be object names). First column should be values for first axis, second for second axis and so on.}

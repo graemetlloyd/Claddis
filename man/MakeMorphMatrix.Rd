@@ -4,8 +4,8 @@
 \alias{MakeMorphMatrix}
 \title{Creates a morphological data file from a matrix}
 \usage{
-MakeMorphMatrix(CTmatrix, header = "", weights = NULL, ordering = NULL,
-  symbols = NULL, equalise.weights = FALSE)
+MakeMorphMatrix(CTmatrix, header = "", weights = NULL,
+  ordering = NULL, symbols = NULL, equalise.weights = FALSE)
 }
 \arguments{
 \item{CTmatrix}{A Character-Taxon (columns-rows) matrix, with taxon names as rownames.}

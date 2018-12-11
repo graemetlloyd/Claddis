@@ -91,7 +91,7 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", TransformProportion
     # Set ordering for comparable characters:
     charordering <- ordering[compchar]
     
-    # Only if there are polymorphisms or uncertianties:
+    # Only if there are polymorphisms or uncertainties:
     if(length(c(grep("&", unique(c(firstrow, secondrow))), grep("/", unique(c(firstrow, secondrow))))) > 0) {
       
       # Find ampersands (polymorphisms):
@@ -103,7 +103,7 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", TransformProportion
       # Combine to find all characters to check:
       characters.to.check <- sort(unique(c(ampersand.elements, slash.elements)))
       
-      # Set behaviours as either the shared version or minimum difference if they contradict (may need to modify this later for mroe complex options):
+      # Set behaviours as either the shared version or minimum difference if they contradict (may need to modify this later for more complex options):
       behaviour <- unlist(lapply(lapply(lapply(lapply(lapply(lapply(apply(apply(rbind(firstrow[characters.to.check], secondrow[characters.to.check]), 2, gsub, pattern = "[:0-9:]", replacement = ""), 2, list), unlist), function(x) x[nchar(x) > 0]), function(x) gsub(x, pattern = "&", replacement = PolymorphismBehaviour)), function(x) gsub(x, pattern = "/", replacement = UncertaintyBehaviour)), unique), function(x) ifelse(length(x) > 1, "min.difference", x)))
       
       # If behaviour is to find minimum differences:
@@ -176,12 +176,12 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", TransformProportion
       
     }
     
-    # Return the first and sceond rows either without polymorphisms or with them removed:
+    # Return the first and second rows either without polymorphisms or with them removed:
     return(list(firstrow, secondrow))
     
   }
   
-  # Subfunctionet the absolute difference between the two rows:
+  # Subfunction to get the absolute difference between the two rows:
   GetAbsoluteCharacterDifferences <- function(column) {
     
     # Isolate first row values:
