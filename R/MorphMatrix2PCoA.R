@@ -14,6 +14,7 @@
 #'
 #' @param morph.matrix A vector of mode character representing the tip names for which an ancestor is sought.
 #' @param distance.method The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{MorphDistMatrix} for more details.
+#' @param GEDType The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.
 #' @param TransformProportionalDistances The transformation to apply to propotional (0 to 1) distances (one of "none", "sqrt", or "arcsine_sqrt" - the default). See \link{MorphDistMatrix} for more details.
 #' @param DistPolymorphismBehaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
 #' @param DistUncertaintyBehaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
@@ -70,7 +71,7 @@
 #' y
 #'
 #' @export MorphMatrix2PCoA
-MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", TransformProportionalDistances = "arcsine_sqrt", DistPolymorphismBehaviour = "min.difference", DistUncertaintyBehaviour = "min.difference", correction = "cailliez", Tree = NULL, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, AncestralPolymorphismBehaviour = "equalp", AncestralUncertaintyBehaviour = "equalp", Threshold = 0.01) {
+MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", GEDType = "Wills", TransformProportionalDistances = "arcsine_sqrt", DistPolymorphismBehaviour = "min.difference", DistUncertaintyBehaviour = "min.difference", correction = "cailliez", Tree = NULL, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, AncestralPolymorphismBehaviour = "equalp", AncestralUncertaintyBehaviour = "equalp", Threshold = 0.01) {
     
 # Add some top level conditionsl here to check input is valid.
   
@@ -96,7 +97,7 @@ MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", TransformPr
     ancestral_values <- AncStateEstMatrix(InputMatrix = morph.matrix, Tree = Tree, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = InapplicablesAsMissing, PolymorphismBehaviour = AncestralPolymorphismBehaviour, UncertaintyBehaviour = AncestralUncertaintyBehaviour, Threshold = Threshold)
 
     # Get morphological distances from the cladistic matrix:
-    morph_distances <- MorphDistMatrix(ancestral_values, Distance = distance.method, TransformProportionalDistances = TransformProportionalDistances, PolymorphismBehaviour = DistPolymorphismBehaviour, UncertaintyBehaviour = DistUncertaintyBehaviour)
+    morph_distances <- MorphDistMatrix(ancestral_values, Distance = distance.method, GEDType = GEDType, TransformProportionalDistances = TransformProportionalDistances, PolymorphismBehaviour = DistPolymorphismBehaviour, UncertaintyBehaviour = DistUncertaintyBehaviour)
     
     # Get trimmed distances:
     trimmed_distances <- TrimMorphDistMatrix(morph_distances$DistanceMatrix, Tree = Tree)
