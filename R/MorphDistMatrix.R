@@ -4,6 +4,7 @@
 #'
 #' @param morph.matrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
 #' @param Distance The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).
+#' @param GEDType The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.
 #' @param TransformProportionalDistances Whether to transform the proportional distances (Gower and max). Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default).
 #' @param PolymorphismBehaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
 #' @param UncertaintyBehaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
@@ -35,7 +36,7 @@
 #' distances$ComparableCharacterMatrix
 #'
 #' @export MorphDistMatrix
-MorphDistMatrix <- function(morph.matrix, Distance = "MORD", TransformProportionalDistances = "arcsine_sqrt", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference") {
+MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", TransformProportionalDistances = "arcsine_sqrt", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference") {
   
   # Subfunction to find comparable characters for a pairwise taxon comparison:
   GetComparableCharacters <- function(interest.col, morph.matrix) {
@@ -273,6 +274,9 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", TransformProportion
   # Check input of distance is valid and stop and warn if not:
   if(length(setdiff(Distance, c("RED", "GED", "GC", "MORD"))) > 0) stop("Distance must be one or more of \"RED\", \"GED\", \"GC\", or \"MORD\".")
   
+  # Check input of GED type is valid and stop and warn if not:
+  if(length(setdiff(GEDType, c("Legacy", "Hybrid", "Wills"))) > 0) stop("GEDType must be one or more of \"Legacy\", \"Hybrid\", or \"Wills\".")
+  
   # Check input for PolymorphismBehaviour is valid and stop and warn if not:
   if(length(setdiff(PolymorphismBehaviour, c("mean.difference", "min.difference"))) > 0) stop("PolymorphismBehaviour must be one or more of \"mean.difference\", or \"min.difference\".")
   
@@ -353,13 +357,13 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", TransformProportion
     # Transpose matrices:
     GED.data <- lapply(GED.data, t)
     
-    #TG: second, create the matrix
+    # Now build into proper matrix:
     GED.data <- matrix(data = (unlist(GED.data)), ncol = ncol(morph.matrix), byrow = TRUE)
     
-    # Add to maximum differences (S_ijk * W_ijk in equation 1 of Wills 2001):
+    # Get differences as a singel vector:
     differences <- unlist(diffs)
     
-    # Add to maximum differences (S_ijk_max * W_ijk in equation 1 of Wills 2001):
+    # Get maximum differences as a single vector (S_ijk_max * W_ijk in equation 1 of Wills 2001):
     maximum.differences <- unlist(maxdiffs)
     
     # Calculated weighted mean univariate distance for calculating GED (equation 2 in Wills 2001):
