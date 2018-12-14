@@ -252,8 +252,8 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", TransformProportion
     
   }
   
-  # Subfunction to get count of complete characters for each taxon (diagonal in compraabale characters matrix:
-  CountCompleteCharacters <- function(colum) return(length(colum) - length(grep(TRUE, is.na(colum))))
+  # Subfunction to get count of complete characters for each taxon (diagonal in comparable characters matrix:
+  CountCompleteCharacters <- function(column) return(length(column) - length(grep(TRUE, is.na(column))))
   
   # Subfunction to calculate the Gower Coefficient:
   CalculateGowerCoefficient <- function(differences, comparable.characters, weights) return(sum(differences) / sum(weights[comparable.characters]))
