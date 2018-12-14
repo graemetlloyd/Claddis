@@ -4,7 +4,7 @@
 \alias{MorphDistMatrix}
 \title{Get distance matrices from a cladistic matrix}
 \usage{
-MorphDistMatrix(morph.matrix, Distance = "MORD",
+MorphDistMatrix(morph.matrix, Distance = "MORD", GEDType = "Wills",
   TransformProportionalDistances = "arcsine_sqrt",
   PolymorphismBehaviour = "min.difference",
   UncertaintyBehaviour = "min.difference")
@@ -13,6 +13,8 @@ MorphDistMatrix(morph.matrix, Distance = "MORD",
 \item{morph.matrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
 
 \item{Distance}{The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).}
+
+\item{GEDType}{The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.}
 
 \item{TransformProportionalDistances}{Whether to transform the proportional distances (Gower and max). Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default).}
 

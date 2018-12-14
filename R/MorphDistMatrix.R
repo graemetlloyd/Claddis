@@ -357,21 +357,46 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", 
     # Transpose matrices:
     GED.data <- lapply(GED.data, t)
     
-    # Now build into proper matrix:
+    # Now build into matrix of pairwise comparisons (odds to be compared with adjacent evens):
     GED.data <- matrix(data = (unlist(GED.data)), ncol = ncol(morph.matrix), byrow = TRUE)
     
-    # Get differences as a singel vector:
-    differences <- unlist(diffs)
+    # Calculate single weighted mean univariate distance for calculating GED Legacy or Hybrid (after equation 2 in Wills 2001):
+    if(GEDType != "Wills") NonWills_S_ijk_bar <- rep(sum(unlist(diffs)) / sum(unlist(maxdiffs)), length.out = length(diffs))
     
-    # Get maximum differences as a single vector (S_ijk_max * W_ijk in equation 1 of Wills 2001):
-    maximum.differences <- unlist(maxdiffs)
+    # Calculate individual pairwise weighted mean univariate distance for calculating GED Hybrid or Wills (after equation 2 in Wills 2001):
+    if(GEDType != "Legacy") {
+      
+      # Generate individual mean pairwise distance for each comparison:
+      NonLegacy_S_ijk_bar <- unlist(lapply(diffs, sum)) / unlist(lapply(maxdiffs, sum))
+      
+      # Find NaNs (divide by zero errors for when there are no characters in common in a pairwsie comparison):
+      NaNs <- which(is.nan(NonLegacy_S_ijk_bar))
+      
+      # If usings WIlls version replace NaNs with NA:
+      if(GEDType == "Wills" && length(NaNs) > 0) NonLegacy_S_ijk_bar[NaNs] <- NA
+      
+      # If using Hybrid replace NaNs with single global mean distance value:
+      if(GEDType == "Hybrid" && length(NaNs) > 0) NonLegacy_S_ijk_bar[NaNs] <- NonWills_S_ijk_bar[NaNs]
+      
+      # Set modified non-Legacy S_ijk_bar as main S_ijk_bar:
+      S_ijk_bar <- NonLegacy_S_ijk_bar
     
-    # Calculated weighted mean univariate distance for calculating GED (equation 2 in Wills 2001):
-    S_ijk_bar <- sum(differences) / sum(maximum.differences)
+    }
     
-    # Replace missing distances with S_ijk_bar (i.e., results of equation 2 in Wills 2001 into equation 1 of Wills 2001):
-    GED.data[is.na(GED.data)] <- S_ijk_bar
+    # If using Legacy set NonWills_S_ijk_bar as main S_ijk_bar:
+    if(GEDType == "Legacy") S_ijk_bar <- NonWills_S_ijk_bar
     
+    # For each set of differences:
+    for(i in seq(from = 1, to = nrow(GED.data) - 1, length.out = length(diffs))) {
+      
+      # Find missing distances (if any):
+      MissingDistances <- which(is.na(GED.data[i, ]))
+      
+      # Replace missing distances with S_ijk_bar (i.e., results of equation 2 in Wills 2001 into equation 1 of Wills 2001):
+      if(length(MissingDistances) > 0) GED.data[i, MissingDistances] <- S_ijk_bar[ceiling(i / 2)]
+      
+    }
+
     # Isolate the distances:
     S_ijk <- GED.data[which((1:nrow(GED.data) %% 2) == 1), ]
     
