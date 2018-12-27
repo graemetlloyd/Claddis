@@ -2,7 +2,7 @@
 #'
 #' \bold{Introduction}
 #'
-#' Morphological change can be captured by discrete characters and their evolution modelled as occurring along the branches of a phylogenetic tree. This function takes as primary input a character-taxon matrix of discrete characters (in the format imported by \link{ReadMorphNexus}) and a time-scaled phylogenetic tree (in the format of \pkg{paleotree} or \pkg{strap}) and begins by inferring ancestral states at the tree's internal nodes using the \link{AncStateEstMatrix} function. From here changes along individual branches can be estimated (only the minimum number of changes are inferred; see \link{GetAllStateChanges} for an alternative but unfininshed approach) and hence rates can be calculated.
+#' Morphological change can be captured by discrete characters and their evolution modelled as occurring along the branches of a phylogenetic tree. This function takes as primary input a character-taxon matrix of discrete characters (in the format imported by \link{ReadMorphNexus}) and a time-scaled phylogenetic tree (in the format of \pkg{paleotree} or \pkg{strap}) and begins by inferring ancestral states at the tree's internal nodes using the \link{AncStateEstMatrix} function. From here changes along individual branches can be estimated (only the minimum number of changes are inferred; see \link{GetAllStateChanges} for an alternative but unfinished approach) and hence rates can be calculated.
 #'
 #' A discrete character rate can be expressed as the mean number of changes per character per million years and can be calculated for a branch (edge) of the tree, a clade (a mean rate for the edges descended from a single node), a character partition (the mean rate for a subset of the characters across all edges), or, most complex, the mean rate across the edges (or parts of edges) present in a time bin (defined by two values denoting the beginning and end of the time bin). In an ideal scenario these rates could be compared at face value, but that would require a large number of characters and very minimal (or zero) missing data. I.e., at an extreme of missing data if only one character can be observed along a branch it will either change (the maximum possible rate of evolution) or it will not (the minimum possible rate of evolution). In such cases it would be unwise to consider either outcome as being a significant departure from the mean rate.
 #'
@@ -10,7 +10,7 @@
 #'
 #' \deqn{LR = value of likehood function under the null (one-rate) hypothesis / maximum possible value of likehood function under the alternative (two-rate) hypotheses}
 #'
-#' Typically we might expect the two hypotheses to be well defined a priori. E.g., an expectation that a specific branch of the tree might have a higher or lower rate than background due to some evolutionary shift. However, Lloyd et al. (2012) instead provided an exploratory approach whereby every possible one edge value was compared with the rate for the rest of the tree (and the equivalent with clades adn time bins). This was the default in Claddis up to version 0.2, but this has now been replaced (since version 0.3) with a more customisable set of options that allows different types of hypotheses (e.g., partitioning the data by character), as well as more complex hypotheses (e.g., a 3-rate model), to be tested.
+#' Typically we might expect the two hypotheses to be well defined a priori. E.g., an expectation that a specific branch of the tree might have a higher or lower rate than background due to some evolutionary shift. However, Lloyd et al. (2012) instead provided an exploratory approach whereby every possible one edge value was compared with the rate for the rest of the tree (and the equivalent with clades and time bins). This was the default in Claddis up to version 0.2, but this has now been replaced (since version 0.3) with a more customisable set of options that allows different types of hypotheses (e.g., partitioning the data by character), as well as more complex hypotheses (e.g., a three-rate model), to be tested.
 #'
 #' \bold{The four types of rate hypothesis}
 #'
@@ -23,25 +23,25 @@
 #'   \item A character partition rate (available here with the \code{CharacterPartitionsToTest} option).
 #' }
 #'
-#' In Claddis (>=0.3) these partitions are defined as a list of lists where only the first N - 1 partitions need be defined. E.g., if comparing the first edge value to the rest of the tree then the user only needs to define the value "1" and the function will automatically add a second partition containing all other edges. This can be set with the option \code{BranchPartitionsToTest = lapply(as.list(1), as.list)}. Similarly, to do what Lloyd et al. (2012) did and repeat the test for every edge in the tree (and assuming this variable is already named "tree") you could use, \code{BranchPartitionsToTest = lapply(as.list(1:nrow(tree$edge)), as.list)}.
+#' In Claddis (>=0.3) these partitions are defined as a list of lists where only the first N - 1 partitions need be defined. E.g., if comparing the first edge value to the rest of the tree then the user only needs to define the value "1" and the function will automatically add a second partition containing all other edges. This can be set with the option \code{BranchPartitionsToTest = list(list(1))}. Similarly, to do what Lloyd et al. (2012) did and repeat the test for every edge in the tree (and assuming this variable is already named "tree") you could use, \code{BranchPartitionsToTest = lapply(as.list(1:nrow(tree$edge)), as.list)}.
 #'
-#' Because of the flexibility of this function the user can define any set of edges as well. For example, they could test whether terminal branches have a different rate from internal branches with \code{BranchPartitionsToTest = list(list(match(1:Ntip(tree), tree$edge[, 2])))}. The \code{CladePartitionsToTest} is really just a special subset of this type of hypothesis, but with edges being defined as descending from a specific internal node in the tree. Once again, an explorartory approach like that of Lloyd et al. (2012) can be used with: \code{CladePartitionsToTest = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)}. Note that this excludes the root node as this would define a single partition and hence would represent the null hypothesis (a single rate model for the whole tree). More generally clades must be defined by the node numbers they correspond to. In R an easy way to identify these is with: \code{plot(tree); nodelabels()}.
+#' Because of the flexibility of this function the user can define any set of edges. For example, they could test whether terminal branches have a different rate from internal branches with \code{BranchPartitionsToTest = list(list(match(1:Ntip(tree), tree$edge[, 2])))}. The \code{CladePartitionsToTest} is really just a special subset of this type of hypothesis, but with edges being defined as descending from a specific internal node in the tree. Once again, an exploratory approach like that of Lloyd et al. (2012) can be used with: \code{CladePartitionsToTest = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)}. Note that this excludes the root node as this would define a single partition and hence would represent the null hypothesis (a single rate model for the whole tree). More generally clades must be defined by the node numbers they correspond to. In R an easy way to identify these is with: \code{plot(tree); nodelabels()}.
 #'
-#' Time bin paritions are defined in a similar way, but are numbered 1:N beginning with the oldest time bin. So if wanting to do an exploratory test of single bin partitions (and only four time bins were specified) you could use: \code{TimeBinPartitionsToTest = lapply(as.list(1:4), as.list)}. Bins can be combined too, just as edges are above. For example, time bins 1 and 2 could form a single partition with: \code{TimeBinPartitionsToTest = list(list(1:2))}. Or if looking to test a model where each bin has its' own rate value you could use: \code{TimeBinPartitionsToTest = list(as.list(1:3))}. Note, as before we do not need to specify the fourth bin as this will be automatically done by the function, however, \code{TimeBinPartitionsToTest = list(as.list(1:4))} will also work. Some caution needs to be applied with N-rate models (where N is three or larger) as a result favouring such models does not necessarily endorse N-separate rates. I.e., it could simply be that one bin has such a larger excursion that overall the N-rate model fits better than the 1-rate model, but some bins could be combined. It is up to the user to check this themselves by exploring smaller combinations of bins. For example, if the four rate model was considered significant the user could explore all three- and two-rate models as well to check that four-rates are really the optimal explanantion.
+#' Time bin partitions are defined in a similar way, but are numbered 1:N starting from the oldest time bin. So if wanting to do an exploratory test of single bin partitions (and only four time bins were specified) you could use: \code{TimeBinPartitionsToTest = lapply(as.list(1:4), as.list)}. Bins can be combined too, just as edges are above. For example, time bins 1 and 2 could form a single partition with: \code{TimeBinPartitionsToTest = list(list(1:2))}. Or if looking to test a model where each bin has its' own rate value you could use: \code{TimeBinPartitionsToTest = list(as.list(1:3))}. Note, as before we do not need to specify the fourth bin as this will be automatically done by the function, however, \code{TimeBinPartitionsToTest = list(as.list(1:4))} will also work. Some caution needs to be applied with N-rate models (where N is three or larger) as a result favouring such models does not necessarily endorse N-separate rates. I.e., it could simply be that one bin has such a large excursion that overall the N-rate model fits better than the 1-rate model, but some 2-rate models might be better still. It is up to the user to check this themselves by exploring smaller combinations of bins.
 #'
-#' Finally, character partitions allow the user to explore whether rates vary across different character types, e.g., skeletal characters versus soft tissue characters, or cranial characters versus postcranial characters. Here characters are simply numbered 1:N, but here single character partitions are less likely to be of interest. As an example of use lets say the first ten characters are what we are interested in as a partition (the second partition being the remaining characters), we could use: \code{CharacterPartitionsToTest = list(list(1:10))}.
+#' Finally, character partitions allow the user to explore whether rates vary across different character types, e.g., skeletal characters versus soft tissue characters, or cranial characters versus postcranial characters. Here characters are simply numbered 1:N, but here single character partitions are less likely to be of interest. As an example of use lets say the first ten characters are what we are interested in as a partition (the second partition being the remaining characters), we could use: \code{CharacterPartitionsToTest = list(list(1:10))} to test for a two-rate model.
 #'
-#' Note that the list structure is critical to defining partitions as it allows partitions to be of different sizes and numbers. For example, one partition of three and another of six, or one set of two partitions and another set of four partitions. However, it may not be intuitive to some users so the examples it is recommended that the user refers to the examples above as a guide.
+#' Note that the list of lists structure is critical to defining partitions as it allows them to be of different sizes and numbers. For example, one partition of three and another of six, or one set of two partitions and another set of four partitions - structures not possible using vectors or matrices. However, it may not be intuitive to some users so it is recommended that the user refers to the examples above as a guide.
 #'
-#' Additionally it should be noted that the user can test multiple types of hypotheses simultaneously with the function. For example, performing several branch tests whilst performing clade tests. However, they needn't perform all types simultaneously (and unused partition types can be set to NULL, the default in each case).
+#' Additionally, it should be noted that the user can test multiple types of hypotheses simultaneously with the function. For example, performing several branch tests whilst also performing clade tests. However, it is not necessary to perform all types simultaneously (as was the case in version 0.2) and unused partition types can be set to NULL, the default in each case.
 #'
 #' \bold{Other options}
 #'
-#' Since Claddis version 0.3 this function ahs allowed the user to set many more options than were offered previously and these should be considered carefully before running any tests.
+#' Since Claddis version 0.3 this function has allowed the user greater control with many more options than were offered previously and these should be considered carefully before running any tests.
 #'
 #' Firstly, the user can pick an option for \code{ChangeTimes} which sets the times character changes are inferred to occur. This is only relevant when the user is performing time bin partition test(s) as this requires some inference to be made about when changes occur on branches that may span multiple time bins. The current options are: \code{"midpoint"} (all changes are inferred to occur midway along the branch, effectively mimicking the approach of Ruta et al. 2006), \code{"spaced"} (all changes are inferred to occur equally spaced a long the branch, with changes occurring in character number order), or \code{"random"} (changes are assigned a random time by drawing from a uniform distribution between the beginning and end of each branch). The first of these is likely to lead to unrealistically "clumped" changes and by extension implies completely correlated character change that would violate the assumptions of the Poisson distribution that underlies the significance tests here (Lloyd et al. 2012). At the other extreme, the equally spaced option will likely unrealistically smooth out time series and potnentially make it harder to reject the single-rate null. For these reasons, the random option is recommended and is set as the default. However, because it is random this makes the function stochastic (the answer can vary each time it is run) and so the user should therefore run the function multiple times if using this option (i.e., by using a for loop) and aggregating the results at the end (e.g., as was done by previous authors; Lloyd et al. 2012; Close et al. 2015).
 #'
-#' Secondly, the \code{Alpha} value sets the significance threshold by which the likelihood ratio test's resulting p-value is compared. Following lloyd et al. (2012) this is set lower (0.01) than the standard 0.05 value by default as those authors found rates to be highly heterogenous in their data set (fossil lungfish). However, this should not be adopted as a "standard" value without question. Note that the function also corrects for multiple comparisons to avoid Type I errors (false positives). It does so (following Lloyd et al. 2012) using the Benjamini-Hochberg (Benjamini and Hochberg 1995) False Discovery Rate approach (see Lloyd et al. 2012 for a discussion of why).
+#' Secondly, the \code{Alpha} value sets the significance threshold by which the likelihood ratio test's resulting p-value is compared. Following lloyd et al. (2012) this is set lower (0.01) than the standard 0.05 value by default as those authors found rates to be highly heterogenous in their data set (fossil lungfish). However, this should not be adopted as a "standard" value without question. Note that the function also corrects for multiple comparisons (using the \code{MultipleComparisonCorrection} option) to avoid Type I errors (false positives). It does so (following Lloyd et al. 2012) using the Benjamini-Hochberg (Benjamini and Hochberg 1995) False Discovery Rate approach (see Lloyd et al. 2012 for a discussion of why).
 #'
 #' Thirdly, polymorphisms and uncertainities create complications for assessing character changes along branches. These can occur at the tips (true polymorphisms or uncertainties in sampled taxa) and internal nodes (uncertainty over the estimated ancestral state). There are two options presented here, and applicable to both \code{PolymorphismState} and \code{UncertaintyState} (allowing these to be set separately). These are to convert such values to missing (NA) or to pick one of the possible states at random. Using missing values will increase overall uncertainty and potentially lead to Type II errors (false negatives), but represents a conservative solution. The random option is an attempt to avoid Type II errors, but can be considered unrealistic, especially if there are true polymorphisms. Additionally, the random option will again make the function stochastic meaning the user should run it multiple times amd aggregate the results. Note that if there are no polymorphisms or uncertianties in the character-taxon matrix the latter can still occur with ancestral state estimates, espcially if the threshold value is set at a high value (see \link{AncStateEstMatrix} for details).
 #'
@@ -70,6 +70,7 @@
 #' @param TimeBinPartitionsToTest A list of time bin partition(s) (numbered 1 to N) to test for a 2-rate parameter model (i.e., one rate for the time bin(s) and another for the remaining time bins). If NULL (the default) then no partition test(s) will be made.
 #' @param ChangeTimes The time at which to record the character changes. One of \code{"midpoint"} (changes occur at the midpoint of the branch), \code{"spaced"} (changes equally spaced along branch), or \code{"random"} (change times drawn at random from a uniform distribution; the default and recommended option). Note: this is only meaningful if testing for time bin partitions.
 #' @param Alpha The alpha value to be used for the significance tests. The default is 0.01.
+#' @param MultipleComparisonCorrection Currently the only option (\code{"BenjaminiHochberg"}) is the Benjamini and Hochberg (1995) false discovery rate approach.
 #' @param PolymorphismState One of \code{"missing"} (converts polymorphic values to NA; the default) or \code{"random"} (picks one of the possible polymorphic states at random).
 #' @param UncertaintyState One of \code{"missing"} (converts uncertain values to NA; the default) or \code{"random"} (picks one of the possible uncertain states at random).
 #' @param InapplicableState The only current option is \code{"missing"} (converts value to NA).
@@ -148,10 +149,8 @@
 #'
 #' @export DiscreteCharacterRate
 
-# OPTION FOR MULTIPLE COMPARISON CORRECTION APPROACH TO APPLY (ALTHOUGH PROLLY ONLY USE BH)
-# LIST OF LISTS FOR N-RATE PARAMETER TESTS? YEP. AND THEN CHECK THESE SO CAN SET "OTHER" RATE SECTIONS. NEEDS CHECK THAT DEFINED PARTITIONS DO NOT CONTAIN
 # WRITE SEARCH VERSION FOR FINDING RATE SHIFTS? SHOULD THIS EVEN BE AN OPTION?
-# MAYBE MAKE ANCESTRAL STATE UNCERTIANTY DIFFERENT FOR TIPS THAN NODES?
+# MAYBE MAKE ANCESTRAL STATE UNCERTAINTY DIFFERENT FOR TIPS THAN NODES?
 # CHANGE TIMES CANNOT BE COMPLETELY RANDOM AS MULTISTEP (I.E. ORDERED MULTISTEP) CHANHES MUST BE IN A SEQUENCE. ALTHOUGH CAN BE MODELLED AS SUCH?
 # TEST FOR OVERLAP BETWEEN CLADES IS MORE COMPLEX, MAYBE CONVERT THESE TO BRANCH PARTITIONS IN FUNCTION INSTEAD AS THIS CAN THEN USE EXISTING CODE.
 # ADD TERMINAL VERSUS INTERNAL OPTION SOMEHOW/SOMEWHERE.
@@ -160,11 +159,15 @@
 # ADD MEAN RATE TO OUTPUT?
 # NEED EXTRA FUNCTION(S) TO VISUALISE RESULTS MOST LIKELY
 # ALLOW REWEIGHTING OF INAPPLICABLES ZERO AS AN OPTION FOR THEM?
+# OUTPUT MEAN RATE AND CHANGE TIMES - e.G., TO ALLOW A PHYLOMORPHOSPACE TO BE CONSTRUCTED.
+# HOW TO FORMAT OUTPUT?
+# WHAT TO DO WITH ZERO VALUES IN TIME SERIES? EXCLUDE?
+# TIME IS KEY THING TO CHECK (IF ZERO THEN NO CHANCE TO OBSERVE ANYTHING)
 
-DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", Alpha = 0.01, PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
+DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
   
   # Check for step matrices and stop and warn user if found:
-  if(is.list(morph.matrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
+  if(is.list(clad.matrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
 
   # Check tree has branch lengths:
   if(is.null(tree$edge.length)) stop("Tree does not have branch lengths (durations). Try timescaling the tree, e.g., with DatePhylo.")
@@ -663,6 +666,16 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   # Add time bin opposition to edge list:
   EdgeList <- lapply(EdgeList, function(x) {x$TimeBinOpposition <- setdiff(1:(length(TimeBins) - 1), x$TimeBinMembership); return(x)})
   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   # If performing branch partition tests:
   if(!is.null(BranchPartitionsToTest)) {
     
@@ -735,9 +748,49 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   } else {
     
     # Make empty time bin partition result output:
-    TimeBinTestResultsPartitionTestResults <- NULL
+    TimeBinTestResults <- NULL
     
   }
+  
+  # Subfunction to calculate adjusted alphas for multiple comparison corrections:
+  AddMultipleComparisonCorrectionCutoffs <- function(TestResults, Alpha, MultipleComparisonCorrection = "BenjaminiHochberg") {
+    
+    # Get number of comparisons performed:
+    NComparisons <- length(TestResults)
+    
+    # If using the Benjamini-Hochberg false discovery rate approach:
+    if(MultipleComparisonCorrection == "BenjaminiHochberg") {
+      
+      # Set cutoff values:
+      CutoffValues <- ((1:NComparisons) / NComparisons) * Alpha
+      
+      # Get actual p-values found:
+      PValues <- unlist(lapply(TestResults, '[[', "PValue"))
+      
+      # Order cutoffs by p-value rank:
+      CutoffValues <- CutoffValues[rank(PValues)]
+      
+    }
+    
+    # Add cutoffs to output:
+    for(i in 1:length(TestResults)) TestResults[[i]]$CorrectedAlpha <- CutoffValues[i]
+    
+    # Return modified test results:
+    return(TestResults)
+    
+  }
+  
+  # If doing branch partition tests then add multiple comparison alpha cutoffs:
+  if(!is.null(BranchPartitionsToTest)) BranchPartitionTestResults <- AddMultipleComparisonCorrectionCutoffs(TestResults = BranchPartitionTestResults, Alpha = Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection)
+  
+  # If doing character partition tests then add multiple comparison alpha cutoffs:
+  if(!is.null(CharacterPartitionsToTest)) CharacterPartitionTestResults <- AddMultipleComparisonCorrectionCutoffs(TestResults = CharacterPartitionTestResults, Alpha = Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection)
+  
+  # If doing clade partition tests then add multiple comparison alpha cutoffs:
+  if(!is.null(CladePartitionsToTest)) CladePartitionTestResults <- AddMultipleComparisonCorrectionCutoffs(TestResults = CladePartitionTestResults, Alpha = Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection)
+  
+  # If doing time bin partition tests then add multiple comparison alpha cutoffs:
+  if(!is.null(TimeBinPartitionsToTest)) TimeBinTestResults <- AddMultipleComparisonCorrectionCutoffs(TestResults = TimeBinTestResults, Alpha = Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection)
   
   # Compile output:
   Output <- list(BranchPartitionTestResults, CharacterPartitionTestResults, CladePartitionTestResults, TimeBinTestResults)
@@ -763,651 +816,3 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
 #x
 
 
-
-# CHECK BELOW IS TRUE
-
-    # Number of zero-duration branches:
-#nzero.tb <- nzero.ib <- nzero <- 0
-
-    # Do not count zero-duration branches in sample:
-#m <- nrow(bin.results) - nzero
-
-    # Do not count zero-duration branches in sample:
-#m.tb <- nrow(bin.results.tb) - nzero.tb
-
-    # Do not count zero-duration branches in sample:
-#m.ib <- nrow(bin.results.ib) - nzero.ib
-
-    # Calculate cutoffs (significance thresholds) based on Benjamini and Hochberg 1995 JRSSB False Discovery Rate (FDR):
-#cutoffs <- c((1:m) / m * Alpha, rep(0, nzero))
-
-    # Calculate cutoffs (significance thresholds) based on Benjamini and Hochberg 1995 JRSSB False Discovery Rate (FDR):
-#cutoffs.tb <- c((1:m.tb) / m.tb * Alpha, rep(0, nzero.tb))
-
-    # Calculate cutoffs (significance thresholds) based on Benjamini and Hochberg 1995 JRSSB False Discovery Rate (FDR):
-#cutoffs.ib <- c((1:m.ib) / m.ib * Alpha, rep(0, nzero.ib))
-
-    # Get indices ready for identifying significant p values:
-#ifelse(length(which(sort(bin.pvals) <= cutoffs)) > 0, indices <- 1:max((1:m)[sort(bin.pvals) <= cutoffs]), indices <- c(1)[-1])
-
-    # Get indices ready for identifying significant p values:
-#ifelse(length(which(sort(bin.pvals.tb) <= cutoffs.tb)) > 0, indices.tb <- 1:max((1:m.tb)[sort(bin.pvals.tb) <= cutoffs.tb]), indices.tb <- c(1)[-1])
-
-    # Get indices ready for identifying significant p values:
-#ifelse(length(which(sort(bin.pvals.ib) <= cutoffs.ib)) > 0, indices.ib <- 1:max((1:m.ib)[sort(bin.pvals.ib) <= cutoffs.ib]), indices.ib <- c(1)[-1])
-
-    # Isolate significant p values:
-#signif <- order(bin.pvals)[indices]
-
-    # Isolate significant p values:
-#signif.tb <- order(bin.pvals.tb)[indices.tb]
-
-    # Isolate significant p values:
-#signif.ib <- order(bin.pvals.ib)[indices.ib]
-
-    # Add 1 in significance column for significant p-values after FDR correction:
-#bin.results[signif, "ml.signif"] <- 1
-
-    # Add 1 in significance column for significant p-values after FDR correction:
-#bin.results.tb[signif.tb, "ml.signif"] <- 1
-
-    # Add 1 in significance column for significant p-values after FDR correction:
-#bin.results.ib[signif.ib, "ml.signif"] <- 1
-
-    # Indicate significantly high rate bins:
-#bin.results[(bin.results[, "ml.signif"] & bin.results[, "in.rate"] > bin.results[, "out.rate"]), "ml.signif.hi"] <- 1
-
-    # Indicate significantly high rate bins:
-#bin.results.tb[(bin.results.tb[, "ml.signif"] & bin.results.tb[, "in.rate"] > bin.results.tb[, "out.rate"]), "ml.signif.hi"] <- 1
-
-    # Indicate significantly high rate bins:
-#bin.results.ib[(bin.results.ib[, "ml.signif"] & bin.results.ib[, "in.rate"] > bin.results.ib[, "out.rate"]), "ml.signif.hi"] <- 1
-  
-    # Indicate significantly low rate bins:
-#bin.results[(bin.results[, "ml.signif"] & bin.results[, "in.rate"] < bin.results[, "out.rate"]), "ml.signif.lo"] <- 1
-
-    # Indicate significantly low rate bins:
-#bin.results.tb[(bin.results.tb[, "ml.signif"] & bin.results.tb[, "in.rate"] < bin.results.tb[, "out.rate"]), "ml.signif.lo"] <- 1
-
-    # Indicate significantly low rate bins:
-#bin.results.ib[(bin.results.ib[, "ml.signif"] & bin.results.ib[, "in.rate"] < bin.results.ib[, "out.rate"]), "ml.signif.lo"] <- 1
-
-    # Round chi-square values in output:
-#bin.results[, "ml.chisq"] <- round(bin.results[, "ml.chisq"], 2)
-
-    # Round chi-square values in output:
-#bin.results.tb[, "ml.chisq"] <- round(bin.results.tb[, "ml.chisq"], 2)
-
-    # Round chi-square values in output:
-#bin.results.ib[, "ml.chisq"] <- round(bin.results.ib[, "ml.chisq"], 2)
-  
-    # Round p-values in output:
-#bin.results[, "ml.pval"] <- round(bin.results[, "ml.pval"], 3)
-
-    # Round p-values in output:
-#bin.results.tb[, "ml.pval"] <- round(bin.results.tb[, "ml.pval"], 3)
-
-    # Round p-values in output:
-#bin.results.ib[, "ml.pval"] <- round(bin.results.ib[, "ml.pval"], 3)
-  
-# WHAT TO DO WITH ZERO VALUES IN TIME SERIES? EXCLUDE?
-# TIME IS KEY THING TO CHECK (IF ZERO THEN NO CHANCE TO OBSERVE ANYTHING)
-
-  # Case if equal rates cannot be rejected:
-#} else {
-
-    # If not then print notification and stop:
-#cat(paste("H_0 - all rates equal across time bins - cannot be rejected at an Alpha of ", Alpha, " (Actual p = ", chisq.p, ").\nCalculations of per-bin rates aborted.", sep=""))
-    
-# NEED TO MODIFY THE BELOW AS MAY BE SIG DIFFS FOR INTERNAL OR TERMINAL BRANCHES NOT SEEN IN POOLED
-
-    # Create NULL outputs:
-#bin.results.tb <- bin.results.ib <- bin.results <- message(paste("H_0 - all rates equal across time bins - cannot be rejected at an Alpha of ", Alpha, " (Actual p = ", chisq.p, ").\nA single rate of ", mlenumer, "is preferred.", sep = ""))
-    
-#}
-
-  # Get number of branches:
-#n <- length(tree$edge[, 1])
-  
-  # Get number of tips (and terminal branches):
-#ntips <- n.tb <- ape::Ntip(tree)
-  
-  # Get number of internal branches:
-#n.ib <- n - n.tb
-  
-  # Get total number of character changes on tree:
-#changes <- observed.tree$edge.length
-  
-  # Get number of character changes on terminal branches:
-#changes.tb <- observed.tree$edge.length[terminal.branches]
-  
-  # Get number of character changes on internal branches:
-#changes.ib <- observed.tree$edge.length[internal.branches]
-  
-  # Get list of nonterminal and nonroot nodes:
-#nodes <- (ape::Ntip(tree) + 2):(ape::Ntip(tree) + ape::Nnode(tree))
-  
-  # Percentage of characters that are observable:
-#pctcomp <- completeness.tree$edge.length / Nchar
-  
-  # Percentage of characters that are observable on terminal branches:
-#pctcomp.tb <- completeness.tree$edge.length[terminal.branches] / Nchar
-  
-  # Percentage of characters that are observable on internal branches:
-#pctcomp.ib <- completeness.tree$edge.length[internal.branches] / Nchar
-  
-  # Get branch durations:
-#Time <- tree$edge.length
-  
-  # Get terminal branch durations:
-#Time.tb <- tree$edge.length[terminal.branches]
-  
-  # Get internal branch durations:
-#Time.ib <- tree$edge.length[internal.branches]
-  
-  # Get number of zero length branches:
-#nzero <- length(which(Time == 0))
-  
-  # Get number of zero length terminal branches:
-#nzero.tb <- length(which(Time.tb == 0))
-  
-  # Get number of zero length internal branches:
-#nzero.ib <- length(which(Time.ib == 0))
-  
-  # Get maximum likelihood numerator:
-#mlenumer <- sum(changes) / sum(Time * pctcomp)
-  
-  # Get maximum likelihood numerator for terminal branches:
-#mlenumer.tb <- sum(changes.tb) / sum(Time.tb * pctcomp.tb)
-  
-  # Get maximum likelihood numerator for internal branches:
-#mlenumer.ib <- sum(changes.ib) / sum(Time.ib * pctcomp.ib)
-  
-  # Get maximum likelihood denominator:
-#mledenom <- changes / (Time * pctcomp)
-  
-  # Get maximum likelihood denominator for terminal branches:
-#mledenom.tb <- changes.tb / (Time.tb * pctcomp.tb)
-  
-  # Get maximum likelihood denominator for internal branches:
-#mledenom.ib <- changes.ib / (Time.ib * pctcomp.ib)
-  
-  # Get log numerator:
-#lognumer <- sum(log(dpois(changes, mlenumer * Time * pctcomp)))
-  
-  # Get log numerator for terminal branches:
-#lognumer.tb <- sum(log(dpois(changes.tb, mlenumer.tb * Time.tb * pctcomp.tb)))
-  
-  # Get log numerator for internal branches:
-#lognumer.ib <- sum(log(dpois(changes.ib, mlenumer.ib * Time.ib * pctcomp.ib)))
-  
-  # Get log denominator with zero-length branches removed:
-#logdenom <- sum(log(dpois(changes, mledenom * Time * pctcomp)), na.rm = TRUE)
-  
-  # Get log denominator for terminal branches with zero-length branches removed:
-#logdenom.tb <- sum(log(dpois(changes.tb, mledenom.tb * Time.tb * pctcomp.tb)), na.rm = TRUE)
-  
-  # Get log denominator for internal branches with zero-length branches removed:
-#logdenom.ib <- sum(log(dpois(changes.ib, mledenom.ib * Time.ib * pctcomp.ib)), na.rm = TRUE)
-  
-  # Get test statistic:
-#teststat <- -2 * (lognumer - logdenom)
-  
-  # Get test statistic for terminal branches:
-#teststat.tb <- -2 * (lognumer.tb - logdenom.tb)
-  
-  # Get test statistic for internal branches:
-#teststat.ib <- -2 * (lognumer.ib - logdenom.ib)
-  
-  # Calculate position of test statistic in chi-square distribution to get probability (zero-length branches not calculated in df):
-#chisq.p <- pchisq(teststat, n - 1 - nzero, lower.tail = FALSE)
-  
-  # Calculate position of test statistic in chi-square distribution for terminal branches to get probability (zero-length branches not calculated in df):
-#chisq.p.tb <- pchisq(teststat.tb, n.tb - 1 - nzero.tb, lower.tail = FALSE)
-  
-  # Calculate position of test statistic in chi-square distribution for internal branches to get probability (zero-length branches not calculated in df):
-#chisq.p.ib <- pchisq(teststat.ib, n.ib - 1 - nzero.ib, lower.tail = FALSE)
-  
-  # Check to see if null hypothesis of equal rates across the tree can be rejected:
-#if(chisq.p < Alpha) {
-    
-    # If so then print notification and carry on:
-    #cat(paste("H_0 - all rates equal across the tree - is rejected at an Alpha of ", Alpha, " (actual p = ", chisq.p, ").\nContinuing to per-branch and per-clade rate calculations.", sep = ""))
-    
-    # Create matrix to store branch results:
-    #branch.results <- matrix(0, nrow = n, ncol = 20)
-    
-    # Create matrix to store terminal branch results:
-    #branch.results.tb <- matrix(0, nrow = n.tb, ncol = 20)
-    
-    # Create matrix to store internal branch results:
-    #branch.results.ib <- matrix(0, nrow = n.ib, ncol = 20)
-    
-    # Create matrix to store node results:
-    #node.results <- matrix(0, nrow = length(nodes), ncol = 29)
-    
-    # Add column names for branches:
-    #colnames(branch.results) <- colnames(branch.results.tb) <- colnames(branch.results.ib) <- c("branch", "from", "to", "in.rate", "out.rate", "ml.chisq", "ml.pval", "ml.signif.hi", "ml.signif.hi.ti", "ml.signif.lo", "ml.signif.lo.ti", "ml.signif", "ml.signif.ti", "rand.val", "rand.mean", "rand.sd", "rand.pval", "rand.signif.hi", "rand.signif.lo", "rand.signif")
-    
-    # Add column names for nodes:
-    #colnames(node.results) <- c("node", "in.rate", "in.rate.tb", "in.rate.ib", "out.rate", "out.rate.tb", "out.rate.ib", "ml.chisq", "ml.chisq.tb", "ml.chisq.ib", "ml.pval", "ml.pval.tb", "ml.pval.ib", "ml.signif.hi", "ml.signif.hi.tb", "ml.signif.hi.ib", "ml.signif.lo", "ml.signif.lo.tb", "ml.signif.lo.ib", "ml.signif", "ml.signif.tb", "ml.signif.ib", "rand.val", "rand.mean", "rand.sd", "rand.pval", "rand.signif.hi", "rand.signif.lo", "rand.signif")
-    
-    # Number branches 1 to N:
-    #branch.results[, "branch"] <- 1:n
-    
-    # Number terminal branches:
-    #branch.results.tb[, "branch"] <- terminal.branches
-    
-    # Number internal branches:
-    #branch.results.ib[, "branch"] <- internal.branches
-    
-    # Add from and to node numbers:
-    #branch.results[, c("from", "to")] <- tree$edge[, 1:2]
-    
-    # Add from and to node numbers for terminal branches:
-    #branch.results.tb[, c("from", "to")] <- tree$edge[terminal.branches, 1:2]
-    
-    # Add from and to node numbers for internal branches:
-    #branch.results.ib[, c("from", "to")] <- tree$edge[internal.branches, 1:2]
-    
-    # Number nodes:
-    #node.results[, "node"] <- nodes
-    
-    # For each branch:
-    #for (i in 1:n) {
-      
-      # Check if branch is terminal:
-      #if(length(sort(match(i, terminal.branches)))) {
-        
-        # If yes set as TRUE:
-        #branch.is.terminal <- TRUE
-        
-      # Branch is terminal:
-      #} else {
-        
-        # If no set as FALSE:
-        #branch.is.terminal <- FALSE
-        
-        #}
-      
-      # Get numbers of other (not ith) branches:
-      #other <- (1:n)[-i]
-      
-      # Get numbers of other (not ith) terminal or internal branches:
-      #ifelse(branch.is.terminal, other.tb <- terminal.branches[-match(i, terminal.branches)], other.ib <- internal.branches[-match(i, internal.branches)])
-      
-      # Create maximum likelihood denominator variable:
-      #mledenom <- rep(NA, n)
-      
-      # Create maximum likelihood denominator variable for terminal or internal branches:
-      #ifelse(branch.is.terminal, mledenom.tb <- rep(NA, n.tb), mledenom.ib <- rep(NA, n.ib))
-      
-      # Calculate maximum likelihood denominator for branch:
-      #mledenom[i] <- mlebranch <- changes[i] / (Time[i] * pctcomp[i])
-      
-      # Calculate maximum likelihood denominator for terminal or internal branch:
-      #ifelse(branch.is.terminal, mledenom.tb[match(i, terminal.branches)] <- mlebranch.tb <- changes.tb[match(i, terminal.branches)] / (Time.tb[match(i, terminal.branches)] * pctcomp.tb[match(i, terminal.branches)]), mledenom.ib[match(i, internal.branches)] <- mlebranch.ib <- changes.ib[match(i, internal.branches)] / (Time.ib[match(i, internal.branches)] * pctcomp.ib[match(i, internal.branches)]))
-      
-      # Calculate maximum likelihood denominator for other branches:
-      #mledenom[other] <- mleother <- sum(changes[other]) / sum(Time[other] * pctcomp[other])
-      
-      # Calculate maximum likelihood denominator for other terminal or internal branches:
-      #ifelse(branch.is.terminal, mledenom.tb[-match(i, terminal.branches)] <- mleother.tb <- sum(changes[other.tb]) / sum(Time[other.tb] * pctcomp[other.tb]), mledenom.ib[-match(i, internal.branches)] <- mleother.ib <- sum(changes[other.ib]) / sum(Time[other.ib] * pctcomp[other.ib]))
-      
-      # Calculate log numerator:
-      #lognumer <- sum(log(dpois(changes, mlenumer * Time * pctcomp)), na.rm = TRUE)
-      
-      # Calculate log numerator for terminal or internal branches:
-      #ifelse(branch.is.terminal, lognumer.tb <- sum(log(dpois(changes.tb, mlenumer.tb * Time.tb * pctcomp.tb)), na.rm = TRUE), lognumer.ib <- sum(log(dpois(changes.ib, mlenumer.ib * Time.ib * pctcomp.ib)), na.rm = TRUE))
-      
-      # Calculate log denominator:
-      #logdenom <- sum(log(dpois(changes, mledenom * Time * pctcomp)), na.rm = TRUE)
-      
-      # Calculate log denominator for terminal or internal branches:
-      #ifelse(branch.is.terminal, logdenom.tb <- sum(log(dpois(changes.tb, mledenom.tb * Time.tb * pctcomp.tb)), na.rm = TRUE), logdenom.ib <- sum(log(dpois(changes.ib, mledenom.ib * Time.ib * pctcomp.ib)), na.rm = TRUE))
-      
-      # Store rate for branch:
-      #branch.results[i, "in.rate"] <- round(mlebranch, 2)
-      
-      # Store rate for terminal or internal branch:
-      #ifelse(branch.is.terminal, branch.results.tb[match(i, branch.results.tb[, "branch"]), "in.rate"] <- round(mlebranch.tb, 2), branch.results.ib[match(i, branch.results.ib[, "branch"]), "in.rate"] <- round(mlebranch.ib, 2))
-      
-      # Store rate for outside branches:
-      #branch.results[i, "out.rate"] <- round(mleother, 2)
-      
-      # Store rate for outside terminal or internal branches:
-      #ifelse(branch.is.terminal, branch.results.tb[match(i, branch.results.tb[, "branch"]), "out.rate"] <- round(mleother.tb, 2), branch.results.ib[match(i, branch.results.ib[, "branch"]), "out.rate"] <- round(mleother.ib, 2))
-      
-      # Store chi-squared value (will be zero for zero-duration branch):
-      #branch.results[i, "ml.chisq"] <- teststat <- -2 * (lognumer - logdenom)
-      
-      # Store chi-squared value (will be zero for zero-duration branch) for internal or terminal branches:
-      #ifelse(branch.is.terminal, branch.results.tb[match(i, branch.results.tb[, "branch"]), "ml.chisq"] <- teststat.tb <- -2 * (lognumer.tb - logdenom.tb), branch.results.ib[match(i, branch.results.ib[, "branch"]), "ml.chisq"] <- teststat.ib <- -2 * (lognumer.ib - logdenom.ib))
-      
-      # Store probability for branch (will be 1 for zero-duration branch):
-      #branch.results[i, "ml.pval"] <- pchisq(teststat, 2 - 1, lower.tail = FALSE)
-      
-      # Store probability for branch (will be 1 for zero-duration branch) for terminal or internal branches:
-      #ifelse(branch.is.terminal, branch.results.tb[match(i, branch.results.tb[, "branch"]), "ml.pval"] <- pchisq(teststat.tb, 2 - 1, lower.tail = FALSE), branch.results.ib[match(i, branch.results.ib[, "branch"]), "ml.pval"] <- pchisq(teststat.ib, 2 - 1, lower.tail = FALSE))
-      
-      #}
-    
-    # Set initial row number for storing data:
-    #j <- 1
-    
-    # For each node (excluding the root):
-    #for (i in nodes) {
-      
-      # Identify branches within clade:
-      #clade <- GetDescendantEdges(i, tree)
-      
-      # Identify terminal branches within clade:
-      #clade.tb <- clade[sort(match(terminal.branches, clade))]
-      
-      # Identify internal branches within clade:
-      #clade.ib <- clade[sort(match(internal.branches, clade))]
-      
-      # Identify branches outside clade:
-      #nonclade <- (1:n)[-clade]
-      
-      # Identify terminal branches outside clade:
-      #nonclade.tb <- setdiff(terminal.branches, clade.tb)
-      
-      # Identify internal branches outside clade:
-      #nonclade.ib <- setdiff(internal.branches, clade.ib)
-      
-      # Set empty maximum likelihood denominator vector:
-      #mledenom <- rep(NA, n)
-      
-      # Set empty maximum likelihood denominator vector for terminal branches:
-      #mledenom.tb <- rep(NA, n.tb)
-      
-      # Set empty maximum likelihood denominator vector for internal branches:
-      #mledenom.ib <- rep(NA, n.ib)
-      
-      # Fill within clade values for maximum likelihood denominator:
-      #mledenom[clade] <- claderate <- sum(changes[clade]) / sum(Time[clade] * pctcomp[clade])
-      
-      # Fill within clade values for maximum likelihood denominator for terminal branches:
-      #mledenom.tb[match(clade.tb, terminal.branches)] <- claderate.tb <- sum(changes[clade.tb]) / sum(Time[clade.tb] * pctcomp[clade.tb])
-      
-      # Fill within clade values for maximum likelihood denominator for internal branches (if present):
-      #if(length(clade.ib) > 0) mledenom.ib[match(clade.ib, internal.branches)] <- claderate.ib <- sum(changes[clade.ib]) / sum(Time[clade.ib] * pctcomp[clade.ib])
-      
-      # Fill outside clade values for maximum likelihood denominator:
-      #mledenom[nonclade] <- noncladerate <- sum(changes[nonclade]) / sum(Time[nonclade] * pctcomp[nonclade])
-      
-      # Fill outside clade values for maximum likelihood denominator for terminal branches:
-      #mledenom.tb[match(nonclade.tb, terminal.branches)] <- noncladerate.tb <- sum(changes[nonclade.tb]) / sum(Time[nonclade.tb] * pctcomp[nonclade.tb])
-      
-      # Fill outside clade values for maximum likelihood denominator for internal branches (if present):
-      #if(length(clade.ib) > 0) mledenom.ib[match(nonclade.ib, internal.branches)] <- noncladerate.ib <- sum(changes[nonclade.ib]) / sum(Time[nonclade.ib] * pctcomp[nonclade.ib])
-      
-      # Set log-likelihood numerator:
-      #lognumer <- sum(log(dpois(changes, mlenumer * Time * pctcomp)), na.rm = TRUE)
-      
-      # Set log-likelihood numerator for terminal branches:
-      #lognumer.tb <- sum(log(dpois(changes.tb, mlenumer.tb * Time.tb * pctcomp.tb)), na.rm = TRUE)
-      
-      # Set log-likelihood numerator for internal branches (if present):
-      #if(length(clade.ib) > 0) lognumer.ib <- sum(log(dpois(changes.ib, mlenumer.ib * Time.ib * pctcomp.ib)), na.rm = TRUE)
-      
-      # Set log-likelihood denominator:
-      #logdenom <- sum(log(dpois(changes, mledenom * Time * pctcomp)), na.rm = TRUE)
-      
-      # Set log-likelihood denominator for terminal branches:
-      #logdenom.tb <- sum(log(dpois(changes.tb, mledenom.tb * Time.tb * pctcomp.tb)), na.rm = TRUE)
-      
-      # Set log-likelihood denominator for internal branches (if present):
-      #if(length(clade.ib) > 0) logdenom.ib <- sum(log(dpois(changes.ib, mledenom.ib * Time.ib * pctcomp.ib)), na.rm = TRUE)
-      
-      # Record within clade rate:
-      #node.results[j, "in.rate"] <- round(claderate, 2)
-      
-      # Record within clade rate for terminal branches:
-      #node.results[j, "in.rate.tb"] <- round(claderate.tb, 2)
-      
-      # Record within clade rate for internal branches (if present):
-      #ifelse(length(clade.ib) > 0, node.results[j, "in.rate.ib"] <- round(claderate.ib, 2), node.results[j, "in.rate.ib"] <- NA)
-      
-      # Record outside clade rate:
-      #node.results[j, "out.rate"] <- round(noncladerate, 2)
-      
-      # Record outside clade rate for terminal branches:
-      #node.results[j, "out.rate.tb"] <- round(noncladerate.tb, 2)
-      
-      # Record outside clade rate for internal branches (if present):
-      #ifelse(length(clade.ib) > 0, node.results[j, "out.rate.ib"] <- round(noncladerate.ib, 2), node.results[j, "out.rate.ib"] <- NA)
-      
-      # Record chi-square test statistic:
-      #node.results[j, "ml.chisq"] <- teststat <- -2 * (lognumer - logdenom)
-      
-      # Record chi-square test statistic for terminal branches:
-      #node.results[j, "ml.chisq.tb"] <- teststat.tb <- -2 * (lognumer.tb - logdenom.tb)
-      
-      # Record chi-square test statistic for internal branches (if present):
-      #ifelse(length(clade.ib) > 0, node.results[j, "ml.chisq.ib"] <- teststat.ib <- -2 * (lognumer.ib - logdenom.ib), node.results[j, "ml.chisq.ib"] <- NA)
-      
-      # Record p-value for chi-squared test:
-      #node.results[j, "ml.pval"] <- testresult <- pchisq(teststat, 2 - 1, lower.tail = FALSE)
-      
-      # Record p-value for chi-squared test for terminal branches:
-      #node.results[j, "ml.pval.tb"] <- testresult.tb <- pchisq(teststat.tb, 2 - 1, lower.tail = FALSE)
-      
-      # Record p-value for chi-squared test for terminal branches:
-      #ifelse(length(clade.ib) > 0, node.results[j, "ml.pval.ib"] <- testresult.ib <- pchisq(teststat.ib, 2 - 1, lower.tail=F), node.results[j, "ml.pval.ib"] <- NA)
-      
-      # Update row number:
-      #j <- j + 1
-      
-      #}
-    
-    # Combine terminal and internal branch rate results and order as branch.results:
-    #termandintern.results <- rbind(branch.results.tb, branch.results.ib)[order(rbind(branch.results.tb, branch.results.ib)[, "branch"]), ]
-    
-    # Create vector to store true (1; terminal) / false (0; internal) branch type:
-    #branchisterminal <- rep(0, nrow(tree$edge))
-    
-    # Store 1 for terminals:
-    #branchisterminal[terminal.branches] <- 1
-    
-    # Combine and reduce branch type and terminal and internal branch rate results (ignores randomisations):
-    #termandintern.results <- cbind(branchisterminal, termandintern.results[, c("in.rate", "out.rate", "ml.chisq", "ml.pval")])
-    
-    # Update column names (to avoid clashes with branch.results):
-    #colnames(termandintern.results) <- c("is.term", "in.rate.ti", "out.rate.ti", "ml.chisq.ti", "ml.pval.ti")
-    
-    # Combine all branch rates versus split terminal-internal branches:
-    #branch.results <- cbind(branch.results, termandintern.results)
-    
-    # Reorder and cut down (ignores randomisation results):
-    #branch.results <- branch.results[, c("branch", "from", "to", "is.term", "in.rate", "in.rate.ti", "out.rate", "out.rate.ti", "ml.chisq", "ml.chisq.ti", "ml.pval", "ml.pval.ti", "ml.signif.hi", "ml.signif.hi.ti", "ml.signif.lo", "ml.signif.lo.ti", "ml.signif", "ml.signif.ti")]
-    
-    # Get just the branch p-values:
-    #branch.pvals <- branch.results[, "ml.pval"]
-    
-    # Get just the terminal branch p-values:
-    #branch.pvals.tb <- branch.results[terminal.branches, "ml.pval.ti"]
-    
-    # Get just the internal branch p-values:
-    #branch.pvals.ib <- branch.results[internal.branches, "ml.pval.ti"]
-    
-    # Do not count zero-duration branches in sample:
-    #m <- n - nzero
-    
-    # Do not count zero-duration terminal branches in sample:
-    #m.tb <- n.tb - nzero.tb
-    
-    # Do not count zero-duration internal branches in sample:
-    #m.ib <- n.ib - nzero.ib
-    
-    # Calculate cutoffs (significance thresholds) based on Benjamini and Hochberg 1995 JRSSB False Discovery Rate (FDR):
-    #cutoffs <- c((1:m) / m * Alpha, rep(0, nzero))
-    
-    # Calculate cutoffs (significance thresholds) for terminal branches:
-    #cutoffs.tb <- c((1:m.tb) / m.tb * Alpha, rep(0, nzero.tb))
-    
-    # Calculate cutoffs (significance thresholds) for internal branches:
-    #cutoffs.ib <- c((1:m.ib) / m.ib * Alpha, rep(0, nzero.ib))
-    
-    # Get indices ready for identifying significant p values:
-    #ifelse(length(which(sort(branch.pvals) <= cutoffs)) > 0, indices <- 1:max((1:m)[sort(branch.pvals) <= cutoffs]), indices <- c(1)[-1])
-    
-    # Get indices ready for identifying significant terminal p values:
-    #ifelse(length(which(sort(branch.pvals.tb) <= cutoffs.tb)) > 0, indices.tb <- 1:max((1:m.tb)[sort(branch.pvals.tb) <= cutoffs.tb]), indices.tb <- c(1)[-1])
-    
-    # Get indices ready for identifying significant internal p values:
-    #ifelse(length(which(sort(branch.pvals.ib) <= cutoffs.ib)) > 0, indices.ib <- 1:max((1:m.ib)[sort(branch.pvals.ib) <= cutoffs.ib]), indices.ib <- c(1)[-1])
-    
-    # Isolate significant p values:
-    #signif <- order(branch.pvals)[indices]
-    
-    # Isolate significant terminal p values:
-    #signif.tb <- terminal.branches[order(branch.pvals.tb)[indices.tb]]
-    
-    # Isolate significant internal p values:
-    #signif.ib <- internal.branches[order(branch.pvals.ib)[indices.ib]]
-    
-    # Add 1 in significance column for significant p-values after FDR correction:
-    #branch.results[signif, "ml.signif"] <- 1
-    
-    # Add 1 in significance column for significant terminal p-values after FDR correction:
-    #branch.results[signif.tb, "ml.signif.ti"] <- 1
-    
-    # Add 1 in significance column for significant internal p-values after FDR correction:
-    #branch.results[signif.ib, "ml.signif.ti"] <- 1
-    
-    # Indicate significantly high rate branches:
-    #branch.results[(branch.results[, "ml.signif"] & branch.results[, "in.rate"] > branch.results[, "out.rate"]), "ml.signif.hi"] <- 1
-    
-    # Indicate significantly high rate terminal and internal branches:
-    #branch.results[(branch.results[, "ml.signif.ti"] & branch.results[, "in.rate.ti"] > branch.results[, "out.rate.ti"]), "ml.signif.hi.ti"] <- 1
-    
-    # Indicate significantly low rate branches:
-    #branch.results[(branch.results[, "ml.signif"] & branch.results[, "in.rate"] < branch.results[, "out.rate"]), "ml.signif.lo"] <- 1
-    
-    # Indicate significantly low rate terminal and internal branches:
-    #branch.results[(branch.results[, "ml.signif.ti"] & branch.results[, "in.rate.ti"] < branch.results[, "out.rate.ti"]), "ml.signif.lo.ti"] <- 1
-    
-    # Round chi-square values in output:
-    #branch.results[, "ml.chisq"] <- round(branch.results[, "ml.chisq"], 2)
-    
-    # Round chi-square values in output:
-    #branch.results[, "ml.chisq.ti"] <- round(branch.results[, "ml.chisq.ti"], 2)
-    
-    # Round p-values in output:
-    #branch.results[, "ml.pval"] <- round(branch.results[, "ml.pval"], 3)
-
-    # Round p-values in output:
-    #branch.results[, "ml.pval.ti"] <- round(branch.results[, "ml.pval.ti"], 3)
-    
-    # Isolate the node p-values:
-    #node.pvals <- node.results[, "ml.pval"]
-    
-    # Isolate the node p-values for terminal branches:
-    #node.pvals.tb <- node.results[, "ml.pval.tb"]
-    
-    # Isolate the node p-values for internal branches:
-    #node.pvals.ib <- node.results[, "ml.pval.ib"]
-    
-    # Set m as number of nodes (excluding root), serves for terminal branches alone too:
-    #m <- length(nodes)
-    
-    # Set m as number of non-cherry nodes (excluding root and NAs):
-    #m.ib <- length(sort(node.pvals.ib))
-    
-    # Calculate cutoffs (significance thresholds) based on Benjamini and Hochberg 1995 JRSSB False Discovery Rate (FDR):
-    #cutoffs <- (1:m) / m * Alpha
-    
-    # Calculate cutoffs for internal branches:
-    #cutoffs.ib <- (1:m.ib) / m.ib * Alpha
-    
-    # Get indices ready for identifying significant p values:
-    #ifelse(length(which(sort(node.pvals) <= cutoffs)) > 0, indices <- 1:max((1:m)[sort(node.pvals) <= cutoffs]), indices <- c(1)[-1])
-    
-    # Get indices ready for identifying significant p values for terminal branches:
-    #ifelse(length(which(sort(node.pvals.tb) <= cutoffs)) > 0, indices.tb <- 1:max((1:m)[sort(node.pvals.tb) <= cutoffs]), indices.tb <- c(1)[-1])
-    
-    # Get indices ready for identifying significant p values for internal branches:
-    #ifelse(length(which(sort(node.pvals.ib) <= cutoffs.ib)) > 0, indices.ib <- 1:max((1:m.ib)[sort(node.pvals.ib) <= cutoffs.ib]), indices.ib <- c(1)[-1])
-    
-    # Isolate significant p-values:
-    #signif <- order(node.pvals)[indices]
-    
-    # Isolate significant p-values for terminal branches:
-    #signif.tb <- order(node.pvals.tb)[indices.tb]
-    
-    # Isolate significant p-values for internal branches:
-    #signif.ib <- order(node.pvals.ib)[indices.ib]
-    
-    # Add NAs for terminal branch only clades (cherries):
-    #node.results[is.na(node.results[, "ml.chisq.ib"]), c("ml.signif.hi.ib", "ml.signif.lo.ib", "ml.signif.ib")] <- NA
-    
-    # Record significant clades:
-    #node.results[signif, "ml.signif"] <- 1
-    
-    # Record significant terminal branches clades:
-    #node.results[signif.tb, "ml.signif.tb"] <- 1
-    
-    # Record significant internal branches clades:
-    #node.results[signif.ib, "ml.signif.ib"] <- 1
-    
-    # Round chi-squared test statistic to 1dp:
-    #node.results[, "ml.chisq"] <- round(node.results[, "ml.chisq"], 1)
-    
-    # Round chi-squared test statistic to 1dp:
-    #node.results[, "ml.chisq.tb"] <- round(node.results[, "ml.chisq.tb"], 1)
-    
-    # Round chi-squared test statistic to 1dp:
-    #node.results[, "ml.chisq.ib"] <- round(node.results[, "ml.chisq.ib"], 1)
-    
-    # Round chi-squared p-value to 3dp:
-    #node.results[, "ml.pval"] <- round(node.results[, "ml.pval"], 3)
-    
-    # Round chi-squared p-value to 3dp:
-    #node.results[, "ml.pval.tb"] <- round(node.results[, "ml.pval.tb"], 3)
-    
-    # Round chi-squared p-value to 3dp:
-    #node.results[, "ml.pval.ib"] <- round(node.results[, "ml.pval.ib"], 3)
-    
-    # Record significantly high clade rates:
-    #node.results[(node.results[, "ml.signif"] & node.results[, "in.rate"] > node.results[, "out.rate"]), "ml.signif.hi"] <- 1
-    
-    # Record significantly high clade rates:
-    #node.results[(node.results[, "ml.signif.tb"] & node.results[, "in.rate.tb"] > node.results[, "out.rate.tb"]), "ml.signif.hi.tb"] <- 1
-    
-    # Record significantly high clade rates:
-    #node.results[intersect(which(node.results[, "ml.signif.ib"] == 1), which(node.results[, "in.rate.ib"] > node.results[, "out.rate.ib"])), "ml.signif.hi.ib"] <- 1
-    
-    # Record signficiantly low rates:
-    #node.results[(node.results[, "ml.signif"] & node.results[, "in.rate"] < node.results[, "out.rate"]), "ml.signif.lo"] <- 1
-    
-    # Record signficiantly low rates:
-    #node.results[(node.results[, "ml.signif.tb"] & node.results[, "in.rate.tb"] < node.results[, "out.rate.tb"]), "ml.signif.lo.tb"] <- 1
-    
-    # Record significantly low rates:
-    #node.results[intersect(which(node.results[, "ml.signif.ib"] == 1), which(node.results[, "in.rate.ib"] < node.results[, "out.rate.ib"])), "ml.signif.lo.ib"] <- 1
-
-  # Case if equal rates cannot be rejected:
-  #} else {
-    
-    # If not then print notification and stop:
-    #cat(paste("H_0 - all rates equal across the tree - cannot be rejected at an Alpha of ", Alpha, " (Actual p = ", chisq.p, ").\nCalculations of per-branch and per-clade rates aborted.", sep = ""))
-    
-    # Create NULL outputs:
-    #branch.results <- node.results <- NULL
-    
-    #}
-  
-# COMBINE TIME BIN RESULTS INTO SINGLE VARIABLE?
-
-  # List output matrices:
-#out <- list(character.changes, node.results, branch.results, bin.results, bin.results.tb, bin.results.ib)
-  
-  # Add names to them:
-#names(out) <- c("character.changes", "node.results", "branch.results", "per.bin.rates", "per.bin.rates.tb", "per.bin.rates.ib")
-  
-  # Return results:
-#return(out)
-  
-#}
