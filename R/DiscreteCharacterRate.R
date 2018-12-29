@@ -150,17 +150,14 @@
 #' @export DiscreteCharacterRate
 
 # WRITE SEARCH VERSION FOR FINDING RATE SHIFTS? SHOULD THIS EVEN BE AN OPTION?
-# MAYBE MAKE ANCESTRAL STATE UNCERTAINTY DIFFERENT FOR TIPS THAN NODES?
-# CHANGE TIMES CANNOT BE COMPLETELY RANDOM AS MULTISTEP (I.E. ORDERED MULTISTEP) CHANHES MUST BE IN A SEQUENCE. ALTHOUGH CAN BE MODELLED AS SUCH?
-# TEST FOR OVERLAP BETWEEN CLADES IS MORE COMPLEX, MAYBE CONVERT THESE TO BRANCH PARTITIONS IN FUNCTION INSTEAD AS THIS CAN THEN USE EXISTING CODE.
+# MAYBE MAKE ANCESTRAL STATE UNCERTAINTY DIFFERENT FOR TIPS THAN NODES? I.e., HO IT EGTS RESOLVED CAN BE DIFFERENT (MORE OPTIONS TO FUNCTION)
 # ADD TERMINAL VERSUS INTERNAL OPTION SOMEHOW/SOMEWHERE.
-# ALLOW OPTION TO IGNORE SOME PARTS OF THE TREE FOR PARTITON TESTS? MAKES CALCULATING THE MAN RATE TRICKIER BUT MIGHT MKAE SENSE E.G. FOR INGROUP ONLY TESTS.
+# ALLOW OPTION TO IGNORE SOME PARTS OF THE TREE FOR PARTITON TESTS? MAKES CALCULATING THE MEAN RATE TRICKIER BUT MIGHT MAKE SENSE E.G. FOR INGROUP ONLY TESTS. EXCLUDE EDGES AFTER DOING ANCESTRAL STATES? OR SET THESE TO ALL NAS TO ENSURE OTHER THINGS WORK FINE?
 # THE MEAN RATE SHOULD BE THE MEAN RATE FOR ANY PARTITION TYPE? THEN THE EXPECTED NUMBER OF CHANGES IS SIMPLY A PRODUCT OF TIME AND COMPLETENESS?
-# ADD MEAN RATE TO OUTPUT?
 # NEED EXTRA FUNCTION(S) TO VISUALISE RESULTS MOST LIKELY
 # ALLOW REWEIGHTING OF INAPPLICABLES ZERO AS AN OPTION FOR THEM?
-# OUTPUT MEAN RATE AND CHANGE TIMES - e.G., TO ALLOW A PHYLOMORPHOSPACE TO BE CONSTRUCTED.
-# HOW TO FORMAT OUTPUT?
+# HOW TO FORMAT OUTPUT? ADD MEAN RATE TO OUTPUT? CONTINUOUS CHARACTER CONVERSION NEEDS TO BE RECORdED IN OUTPUT SO DOES NOT CAUSE ISSUES IN DOWNSTREAM PHYLOMORPHOSPACE ANALYSES; OUTPUT MEAN RATE AND CHANGE TIMES - E.G., TO ALLOW A PHYLOMORPHOSPACE TO BE CONSTRUCTED.
+
 # WHAT TO DO WITH ZERO VALUES IN TIME SERIES? EXCLUDE?
 # TIME IS KEY THING TO CHECK (IF ZERO THEN NO CHANCE TO OBSERVE ANYTHING)
 
@@ -177,6 +174,9 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   
   # Check ChangeTimes is correctly formatted or stop and warn user:
   if(length(setdiff(ChangeTimes, c("midpoint", "spaced", "random"))) > 0) stop("ChangeTimes must be one of \"midpoint\", \"spaced\", or \"random\".")
+  
+  # Check MultipleComparisonCorrection is correctly formatted or stop and warn user:
+  if(length(setdiff(MultipleComparisonCorrection, c("BenjaminiHochberg"))) > 0) stop("MultipleComparisonCorrection must be one of \"BenjaminiHochberg\".")
   
   # Check PolymorphismState is correctly formatted or stop and warn user:
   if(length(setdiff(PolymorphismState, c("missing", "random"))) > 0) stop("PolymorphismState must be one of \"missing\" or \"random\".")
@@ -595,7 +595,21 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
       # Add column name to change time column:
       colnames(CharacterChanges)[ncol(CharacterChanges)] <- "Time"
       
-      # Add bin for character change as las column:
+      # Subfunction to re-sort character change times so they occur in correct order:
+      SortChangeTimes <- function(CharacterChanges) {
+        
+        # Sort change time for each character from oldest (first) to youngest (last) and store it:
+        CharacterChanges[, "Time"] <- unname(unlist(lapply(as.list(unique(CharacterChanges[, "Character"])), function(x) sort(CharacterChanges[which(CharacterChanges[, "Character"] == x), "Time"], decreasing = TRUE))))
+        
+        # Return sorted character changes:
+        return(CharacterChanges)
+        
+      }
+      
+      # Re-sort character change times so they occur in correct order:
+      CharacterChanges <- SortChangeTimes(CharacterChanges)
+      
+      # Add bin for character change as last column:
       CharacterChanges <- cbind(CharacterChanges, unlist(lapply(as.list(CharacterChanges[, "Time"]), function(x) max(which(x <= TimeBins)))))
       
       # Add column name to change time column:
@@ -666,16 +680,6 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   # Add time bin opposition to edge list:
   EdgeList <- lapply(EdgeList, function(x) {x$TimeBinOpposition <- setdiff(1:(length(TimeBins) - 1), x$TimeBinMembership); return(x)})
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   # If performing branch partition tests:
   if(!is.null(BranchPartitionsToTest)) {
     
@@ -695,7 +699,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   
   
   
-  CharacterPartitionTestResults <- NULL #CHARACTER HERE EVENTUALLY!
+  CharacterPartitionTestResults <- NULL # CHARACTER HERE EVENTUALLY!
   
   
   
@@ -768,7 +772,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
       PValues <- unlist(lapply(TestResults, '[[', "PValue"))
       
       # Order cutoffs by p-value rank:
-      CutoffValues <- CutoffValues[rank(PValues)]
+      CutoffValues <- CutoffValues[rank(PValues, ties.method = "random")]
       
     }
     
@@ -814,5 +818,3 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
 #x <- DiscreteCharacterRate(tree = tree, clad.matrix = Day2016, TimeBins = TimeBins, BranchPartitionsToTest = list(list(match(1:Ntip(tree), tree$edge[, 2]))), CharacterPartitionsToTest = lapply(as.list(1:3), as.list), CladePartitionsToTest = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list), TimeBinPartitionsToTest = lapply(as.list(1:(length(TimeBins) - 1)), as.list), ChangeTimes = "random", Alpha = 0.01, PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01)
 
 #x
-
-
