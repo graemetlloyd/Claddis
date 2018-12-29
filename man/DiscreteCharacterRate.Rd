@@ -155,11 +155,7 @@ x <- DiscreteCharacterRate(tree = tree, clad.matrix =
   "random", Alpha = 0.01, PolymorphismState =
   "missing", UncertaintyState = "missing",
   InapplicableState = "missing", TimeBinApproach =
-  "Lloyd", EnsureAllWeightsAreIntegers = FALSE,
-  EstimateAllNodes = FALSE, EstimateTipValues =
-  FALSE, InapplicablesAsMissing = FALSE,
-  PolymorphismBehaviour = "equalp",
-  UncertaintyBehaviour = "equalp", Threshold = 0.01)
+  "Lloyd")
 
 }
 \references{

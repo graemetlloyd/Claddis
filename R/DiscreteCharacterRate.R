@@ -141,22 +141,17 @@
 #'   "random", Alpha = 0.01, PolymorphismState =
 #'   "missing", UncertaintyState = "missing",
 #'   InapplicableState = "missing", TimeBinApproach =
-#'   "Lloyd", EnsureAllWeightsAreIntegers = FALSE,
-#'   EstimateAllNodes = FALSE, EstimateTipValues =
-#'   FALSE, InapplicablesAsMissing = FALSE,
-#'   PolymorphismBehaviour = "equalp",
-#'   UncertaintyBehaviour = "equalp", Threshold = 0.01)
+#'   "Lloyd")
 #'
 #' @export DiscreteCharacterRate
 
 # WRITE SEARCH VERSION FOR FINDING RATE SHIFTS? SHOULD THIS EVEN BE AN OPTION?
-# MAYBE MAKE ANCESTRAL STATE UNCERTAINTY DIFFERENT FOR TIPS THAN NODES? I.e., HO IT EGTS RESOLVED CAN BE DIFFERENT (MORE OPTIONS TO FUNCTION)
-# ADD TERMINAL VERSUS INTERNAL OPTION SOMEHOW/SOMEWHERE.
-# ALLOW OPTION TO IGNORE SOME PARTS OF THE TREE FOR PARTITON TESTS? MAKES CALCULATING THE MEAN RATE TRICKIER BUT MIGHT MAKE SENSE E.G. FOR INGROUP ONLY TESTS. EXCLUDE EDGES AFTER DOING ANCESTRAL STATES? OR SET THESE TO ALL NAS TO ENSURE OTHER THINGS WORK FINE?
+# MAYBE MAKE ANCESTRAL STATE UNCERTAINTY DIFFERENT FOR TIPS THAN NODES? I.E., HOW IT GETS RESOLVED CAN BE DIFFERENT (MORE OPTIONS TO FUNCTION)
+# THESE TWO ARE RELATED: 1. ADD TERMINAL VERSUS INTERNAL OPTION SOMEHOW/SOMEWHERE, 2. ALLOW OPTION TO IGNORE SOME PARTS OF THE TREE FOR PARTITON TESTS? MAKES CALCULATING THE MEAN RATE TRICKIER BUT MIGHT MAKE SENSE E.G. FOR INGROUP ONLY TESTS. EXCLUDE EDGES AFTER DOING ANCESTRAL STATES? OR SET THESE TO ALL NAS TO ENSURE OTHER THINGS WORK FINE?
 # THE MEAN RATE SHOULD BE THE MEAN RATE FOR ANY PARTITION TYPE? THEN THE EXPECTED NUMBER OF CHANGES IS SIMPLY A PRODUCT OF TIME AND COMPLETENESS?
 # NEED EXTRA FUNCTION(S) TO VISUALISE RESULTS MOST LIKELY
 # ALLOW REWEIGHTING OF INAPPLICABLES ZERO AS AN OPTION FOR THEM?
-# HOW TO FORMAT OUTPUT? ADD MEAN RATE TO OUTPUT? CONTINUOUS CHARACTER CONVERSION NEEDS TO BE RECORdED IN OUTPUT SO DOES NOT CAUSE ISSUES IN DOWNSTREAM PHYLOMORPHOSPACE ANALYSES; OUTPUT MEAN RATE AND CHANGE TIMES - E.G., TO ALLOW A PHYLOMORPHOSPACE TO BE CONSTRUCTED.
+# HOW TO FORMAT OUTPUT? ADD MEAN RATE TO OUTPUT? CONTINUOUS CHARACTER CONVERSION NEEDS TO BE RECORdED IN OUTPUT SO DOES NOT CAUSE ISSUES IN DOWNSTREAM PHYLOMORPHOSPACE ANALYSES; OUTPUT MEAN RATE AND CHANGE TIMES - E.G., TO ALLOW A PHYLOMORPHOSPACE TO BE CONSTRUCTED. GET CIS FOR EACH PARTITION FOR VISUALISATION (E.G., BARPLOT OF PARTITION VALUES WITH DASHED LINE FOR MEAN AND ERROR BARS FOR CIS)?
 
 # WHAT TO DO WITH ZERO VALUES IN TIME SERIES? EXCLUDE?
 # TIME IS KEY THING TO CHECK (IF ZERO THEN NO CHANCE TO OBSERVE ANYTHING)
@@ -697,12 +692,71 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
     
   }
   
+  # Subfunction to perform character partition tests:
+  PerformCharacterPartitionTests <- function(x) {
+    
+    # Subfunction to get character partition values for likelihood test(s):
+    GetCharacterValuesForLikelihood <- function(x) {
+      
+      # Get character changes matrix from edge list:
+      CharacterChanges <- do.call(rbind, lapply(EdgeList, function(y) y$CharacterChanges))
+      
+      # Isolate weighted character changes in partition:
+      WeightedNCharacterChanges <- sum(unlist(lapply(as.list(x), function(x) CharacterChanges[CharacterChanges[, "Character"] == x, "Weight"])))
+      
+      # Isolate weighted completeness (includes time component):
+      WeightedPartitionCompleteness <- sum((unlist(lapply(lapply(EdgeList, function(y) y$ComparableCharacters), function(z) sum(Weights[intersect(z, x)]))) / sum(Weights[x])) * unlist(lapply(EdgeList, function(x) x$BranchDuration)))
+      
+      # Set partition duration as one as already included in completeness term:
+      PartitionDuration <- 1
+      
+      # Get partition rate:
+      PartitionRate <- WeightedNCharacterChanges / (WeightedPartitionCompleteness * PartitionDuration)
+      
+      # Combine values into vector for output:
+      output <- c(WeightedNCharacterChanges, WeightedPartitionCompleteness, PartitionDuration, PartitionRate)
+      
+      # Add naems to vector:
+      names(output) <- c("WeightedNCharacterChanges", "WeightedPartitionCompleteness", "PartitionDuration", "PartitionRate")
+      
+      # Return values as output:
+      return(output)
+      
+    }
+    
+    # Get character values for each partition:
+    CharacterTestValues <- do.call(rbind, lapply(x, GetCharacterValuesForLikelihood))
+    
+    # Get p value for likelihood ratio test:
+    TestPValue <- GetMaximumLikelihoodPValue(MeanRate = MeanCharacterRate, SampledRates = CharacterTestValues[, "PartitionRate"], SampledChanges = CharacterTestValues[, "WeightedNCharacterChanges"], SampledCompleteness = CharacterTestValues[, "WeightedPartitionCompleteness"], SampledTime = CharacterTestValues[, "PartitionDuration"])
+    
+    # Combine output into a list:
+    Output <- list(CharacterTestValues[, "PartitionRate"], TestPValue)
+    
+    # Add names to output:
+    names(Output) <- c("PartitionRates", "PValue")
+    
+    # Return output:
+    return(Output)
+    
+  }
   
-  
-  CharacterPartitionTestResults <- NULL # CHARACTER HERE EVENTUALLY!
-  
-  
-  
+  # If performing branch partition tests:
+  if(!is.null(CharacterPartitionsToTest)) {
+    
+    # Set mean edge rate:
+    MeanCharacterRate <- sum(unlist(lapply(EdgeList, function(x) x$CharacterChanges[, "Weight"]))) / sum(unlist(lapply(EdgeList, function(x) x$BranchDuration)) * (unlist(lapply(EdgeList, function(x) sum(Weights[x$ComparableCharacters]))) / sum(Weights)))
+    
+    # Perform character partition tests:
+    CharacterPartitionTestResults <- lapply(CharacterPartitionsToTest, PerformCharacterPartitionTests)
+
+  # If performing branch partition tests:
+  } else {
+    
+    # Make empty character partition result output:
+    CharacterPartitionTestResults <- NULL
+    
+  }
   
   # If performing clade partition tests:
   if(!is.null(CladePartitionsToTest)) {
