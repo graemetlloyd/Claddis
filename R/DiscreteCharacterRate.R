@@ -47,7 +47,7 @@
 #'
 #' Fourthly, inapplicable characters can additionally complicate matters as they are not quite the same as missing data. I.e., they can mean that change in a particular character is not even possible along a branch. However, there is no easy way to deal with such characters at present so the user is not presented with a true option here - currently all inapplicable states are simply converted to missing values by the function. In future, though, other options may be available here. For now it is simply noted that users should be careful in making inferences if there are inapplcaible characters in their data and should perhaps consider removing them with \link{MatrixPruner} to gauge their effect.
 #'
-#' Fifthly, there are currenty two further options for assessing rates across time bins. As noted above a complication here is that character changes (the rate numerator) and character completeness (part of the rate denominator) are typically assessed on branches. However, branches will typically span time bin boundaries and hence many bins will contain only some portion of particular branches. The exact portion can be easily calculated for branch durations (the other part of the rate denominator) and the \code{ChangeTimes} option above is used to set the rate numerator, however, the completeness remains complex to deal with. The first attempt to deal with this was made by Close et al. (2015) who simply did w eighted mean completeness by using the proportion of a branch in each bin as the weight and multiplying this by each branches completeness (the \code{"Close"} option here). However, this may lead to unrealistic "smoothing" of the data and perhaps more importantly makes no account of which characters are known in a bin. Lloyd (2016) proposed an alternative "subtree" approach which assesses completeness by considering each character to be represented by a subtree where only branches that are complete are retained then branch durations in each bin are summed across subtrees such that the duration term automatically includes completenes (the \code{"Lloyd"} option here). Here the latter is recommended, but note that no true comparison has yet been made in the literature.
+#' Fifthly, there are currenty two further options for assessing rates across time bins. As noted above a complication here is that character changes (the rate numerator) and character completeness (part of the rate denominator) are typically assessed on branches. However, branches will typically span time bin boundaries and hence many bins will contain only some portion of particular branches. The exact portion can be easily calculated for branch durations (the other part of the rate denominator) and the \code{ChangeTimes} option above is used to set the rate numerator, however, the completeness remains complex to deal with. The first attempt to deal with this was made by Close et al. (2015) who simply did w eighted mean completeness by using the proportion of a branch in each bin as the weight and multiplying this by each branches completeness (the \code{"Close"} option here). However, this may lead to unrealistic "smoothing" of the data and perhaps more importantly makes no account of which characters are known in a bin. Lloyd (2016) proposed an alternative "subtree" approach which assesses completeness by considering each character to be represented by a subtree where only branches that are complete are retained then branch durations in each bin are summed across subtrees such that the duration term automatically includes completenes (the \code{"Lloyd"} option here). Here the latter is strongly recommended, for example, because this will lead to the same global rate across the whole tree as the branch, clade or character partitions, whereas the Close approach will not.
 #'
 #' Sixthly, all character changes are weighted according to the weights provided in the input character-taxon matrix. In many cases these will simply all be one, although see the equalise weights option in \link{ReadMorphNexus}. However, when weights vary they can create some issues for the function. Specifcally, changes are expected to be in the same (integer) units, but if weights vary then they have to be modelled accordingly. I.e., a character twice the weight of another may lead to a single change being counted as two changes. This is most problematic when the user has continuous characters which are automatically converted to gap-weighted (Thiele 1993) characters. However, this conversion creates drastically down-weighted characters nd hence the user may wish to set the \code{EnsureAllWeightsAreIntegers} option to TRUE. Note that reweighting will affect the results and hence shifting the weights of characters up or down will necessarily lead to shifts in the relative Type I and II errors. This is an unexplored aspect of such approaches, but is something the user should be aware of. More broadly it is recommended that continuous (or gap-weighted) characters be avoided when using these approaches.
 #'
@@ -164,19 +164,18 @@
 # WRITE SEARCH VERSION FOR FINDING RATE SHIFTS? SHOULD THIS EVEN BE AN OPTION?
 # MAYBE MAKE ANCESTRAL STATE UNCERTAINTY DIFFERENT FOR TIPS THAN NODES? I.E., HOW IT GETS RESOLVED CAN BE DIFFERENT (MORE OPTIONS TO FUNCTION)
 # THESE TWO ARE RELATED: 1. ADD TERMINAL VERSUS INTERNAL OPTION SOMEHOW/SOMEWHERE, 2. ALLOW OPTION TO IGNORE SOME PARTS OF THE TREE FOR PARTITION TESTS? MAKES CALCULATING THE MEAN RATE TRICKIER BUT MIGHT MAKE SENSE E.G. FOR INGROUP ONLY TESTS. EXCLUDE EDGES AFTER DOING ANCESTRAL STATES? OR SET THESE TO ALL NAS TO ENSURE OTHER THINGS WORK FINE?
-# THE MEAN RATE SHOULD BE THE MEAN RATE FOR ANY PARTITION TYPE? THEN THE EXPECTED NUMBER OF CHANGES IS SIMPLY A PRODUCT OF TIME AND COMPLETENESS? NEED TO NAiL DOWN JUST WAHT THE MEAN IS AND HOW TO
 # NEED EXTRA FUNCTION(S) TO VISUALISE RESULTS MOST LIKELY
 # ALLOW REWEIGHTING OF INAPPLICABLES ZERO AS AN OPTION FOR THEM?
 # HOW TO FORMAT OUTPUT? ADD MEAN RATE TO OUTPUT? CONTINUOUS CHARACTER CONVERSION NEEDS TO BE RECORdED IN OUTPUT SO DOES NOT CAUSE ISSUES IN DOWNSTREAM PHYLOMORPHOSPACE ANALYSES; OUTPUT MEAN RATE AND CHANGE TIMES - E.G., TO ALLOW A PHYLOMORPHOSPACE TO BE CONSTRUCTED. GET CIS FOR EACH PARTITION FOR VISUALISATION (E.G., BARPLOT OF PARTITION VALUES WITH DASHED LINE FOR MEAN AND ERROR BARS FOR CIS)?
-# CHECK FOR AUTAMPOMORPHIES AND INFORM USE IF FOUND?
+# CHECK FOR AUTAPOMORPHIES AND INFORM USER IF FOUND?
 # ADD CONTRIVED EXAMPLES TO SHOW HOW FUNCTION WORKS, E.G. RATE OF ONE CHANGES PER MILLION YEARS THEN DUPLICATED BLOCK WITH CHARCTER PARTITION TEST.
-# TIME BINS WITH NOTHING IN WILL CAUSE ISSUES AS DIVIDE BY ZEROES WILL OCCUR.
+# TIME BINS WITH NOTHING IN WILL CAUSE ISSUES AS DIVIDE BY ZEROES WILL OCCUR - ADD CHECK FOR THIS.
 # OPTIMAL TIMEBIN APPROACH WOULD BE ONE WHERE SUMMED VALUES SAME AS TOTAL VALUE - YEP, SO LLOYD DOES THIS AND CLOSE DOES NOT
-# DO I EVEN NEED CLADE MEMBERSHIP/OPPOSITION IF EVENTUALLY CALL BY EDGE NUMBER ANYWAY?
-# GET CLADE NUMBERS BACK FOR OUTPUTTING
-
-# WHAT TO DO WITH ZERO VALUES IN TIME SERIES? EXCLUDE?
-# TIME IS KEY THING TO CHECK (IF ZERO THEN NO CHANCE TO OBSERVE ANYTHING)
+# DO I EVEN NEED CLADE MEMBERSHIP/OPPOSITION IF EVENTUALLY CALL BY EDGE NUMBER ANYWAY? CHECK OTHER ASPECTS OF EDGE LIST TOO!
+# GET CLADE NUMBERS BACK FOR OUTPUTTING?
+# WHAT IS SIGNIFICNALTY HIGH OR LOW IF THERE ARE THREE OR MORE PARTITIONS?
+# GET GLOBAL RATE INTO OUTPUT WHILST AVOIDING ISSUE WITH CLOSE APPROACH HAVING GOBAL RATE THAT WILL NOT MATCH EDGE OR CHAACTER PARTITIONS
+# PROBABLY NEED MORE CAREFUL CHECKS FOR ZERO VALUES GENERALLY, E.G., CHARACTER WITH ALL MISSING DATA
 
 DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
   
@@ -340,151 +339,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
     return(PValue)
     
   }
-  
-  # Subfunction to perform branch partition tests:
-  PerformBranchPartitionTests <- function(x) {
-    
-    # Subfunction to get edge values for likelihood test(s):
-    GetEdgeValuesForLikelihood <- function(x) {
-      
-      # Isolate edge changes:
-      EdgeChanges <- sum(unlist(lapply(EdgeList[x], function(x) sum(x$CharacterChanges[, "Weight"]))))
-      
-      # Isolate edge completeness (includes time term):
-      EdgeCompleteness <- sum(unlist(lapply(EdgeList[x], function(x) sum(Weights[x$ComparableCharacters] / sum(Weights)))) * unlist(lapply(EdgeList[x], function(x) x$BranchDuration)))
-      
-      # Set edge duration as one as already included in completeness term:
-      EdgeDuration <- 1
-      
-      # Set edge rate:
-      EdgeRate <- EdgeChanges / (EdgeCompleteness * EdgeDuration)
-      
-      # COmbine values into vector for output:
-      output <- c(EdgeChanges, EdgeCompleteness, EdgeDuration, EdgeRate)
-      
-      # Add naems to vector:
-      names(output) <- c("EdgeChanges", "EdgeCompleteness", "EdgeDuration", "EdgeRate")
-      
-      # Return values as output:
-      return(output)
-      
-    }
-    
-    # Get edge values for each partition:
-    EdgeTestValues <- do.call(rbind, lapply(x, GetEdgeValuesForLikelihood))
-    
-    # Get p value for likelihood ratio test:
-    TestPValue <- GetMaximumLikelihoodPValue(MeanRate = MeanEdgeRate, SampledRates = EdgeTestValues[, "EdgeRate"], SampledChanges = EdgeTestValues[, "EdgeChanges"], SampledCompleteness = EdgeTestValues[, "EdgeCompleteness"], SampledTime = EdgeTestValues[, "EdgeDuration"])
-    
-    # Combine output into a list:
-    Output <- list(EdgeTestValues[, "EdgeRate"], TestPValue)
-    
-    # Add names to output:
-    names(Output) <- c("BranchRates", "PValue")
-    
-    # Return output:
-    return(Output)
-    
-  }
-  
-  # Subfunction to perform character partition tests:
-  PerformCharacterPartitionTests <- function(x) {
-    
-    # Subfunction to get character partition values for likelihood test(s):
-    GetCharacterValuesForLikelihood <- function(x) {
-      
-      # Get character changes matrix from edge list:
-      CharacterChanges <- do.call(rbind, lapply(EdgeList, function(y) y$CharacterChanges))
-      
-      # Isolate weighted character changes in partition:
-      WeightedNCharacterChanges <- sum(unlist(lapply(as.list(x), function(x) CharacterChanges[CharacterChanges[, "Character"] == x, "Weight"])))
-      
-      # Isolate weighted completeness (includes time component):
-      WeightedPartitionCompleteness <- sum((unlist(lapply(lapply(EdgeList, function(y) y$ComparableCharacters), function(z) sum(Weights[intersect(z, x)]))) / sum(Weights[x])) * unlist(lapply(EdgeList, function(x) x$BranchDuration)))
-      
-      # Set partition duration as one as already included in completeness term:
-      PartitionDuration <- 1
-      
-      # Get partition rate:
-      PartitionRate <- WeightedNCharacterChanges / (WeightedPartitionCompleteness * PartitionDuration)
-      
-      # Combine values into vector for output:
-      output <- c(WeightedNCharacterChanges, WeightedPartitionCompleteness, PartitionDuration, PartitionRate)
-      
-      # Add naems to vector:
-      names(output) <- c("WeightedNCharacterChanges", "WeightedPartitionCompleteness", "PartitionDuration", "PartitionRate")
-      
-      # Return values as output:
-      return(output)
-      
-    }
-    
-    # Get character values for each partition:
-    CharacterTestValues <- do.call(rbind, lapply(x, GetCharacterValuesForLikelihood))
-    
-    # Get p value for likelihood ratio test:
-    TestPValue <- GetMaximumLikelihoodPValue(MeanRate = MeanCharacterRate, SampledRates = CharacterTestValues[, "PartitionRate"], SampledChanges = CharacterTestValues[, "WeightedNCharacterChanges"], SampledCompleteness = CharacterTestValues[, "WeightedPartitionCompleteness"], SampledTime = CharacterTestValues[, "PartitionDuration"])
-    
-    # Combine output into a list:
-    Output <- list(CharacterTestValues[, "PartitionRate"], TestPValue)
-    
-    # Add names to output:
-    names(Output) <- c("PartitionRates", "PValue")
-    
-    # Return output:
-    return(Output)
-    
-  }
-
-  # Subfunction to perform time bin partition tests:
-  PerformTimeBinPartitionTests <- function(x) {
-    
-    # Subfunction to get time bin values for likelihood test(s):
-    GetTimeBinValuesForLikelihood <- function(x) {
-      
-      # Isolate time bin changes:
-      TimeBinChanges <- sum(unlist(lapply(WeightedChangesByBin[x], sum)))
-      
-      # If using Close approach isolate time bin completeness (includes time term):
-      if(TimeBinApproach == "Close") TimeBinCompleteness <- sum(unlist(lapply(ProportionalCompletenessByBin[x], sum)))
-      
-      # If using Lloyd approach isolate time bin completeness (includes time term):
-      if(TimeBinApproach == "Lloyd") TimeBinCompleteness <- sum(unlist(lapply(DurationCompletenessByBin[x], sum)))
-      
-      # Set time bin duration as one as already included in completeness term:
-      TimeBinDuration <- 1
-      
-      # Set time bin rate:
-      TimeBinRate <- TimeBinChanges / (TimeBinCompleteness * TimeBinDuration)
-      
-      # COmbine values into vector for output:
-      output <- c(TimeBinChanges, TimeBinCompleteness, TimeBinDuration, TimeBinRate)
-      
-      # Add names to vector:
-      names(output) <- c("TimeBinChanges", "TimeBinCompleteness", "TimeBinDuration", "TimeBinRate")
-      
-      # Return values as output:
-      return(output)
-      
-    }
-    
-    # Get edge values for each partition:
-    TimeBinTestValues <- do.call(rbind, lapply(x, GetTimeBinValuesForLikelihood))
-    
-    # Get p value for likelihood ratio test:
-    TestPValue <- GetMaximumLikelihoodPValue(MeanRate = MeanTimeBinRate, SampledRates = TimeBinTestValues[, "TimeBinRate"], SampledChanges = TimeBinTestValues[, "TimeBinChanges"], SampledCompleteness = TimeBinTestValues[, "TimeBinCompleteness"], SampledTime = TimeBinTestValues[, "TimeBinDuration"])
-    
-    # Combine output into a list:
-    Output <- list(TimeBinTestValues[, "TimeBinRate"], TestPValue)
-    
-    # Add names to output:
-    names(Output) <- c("TimeBinRates", "PValue")
-    
-    # Return output:
-    return(Output)
-    
-  }
-
+ 
   # Get ages for each (tip and internal) node:
   NodeAges <- GetNodeAges(tree)
 
@@ -773,31 +628,92 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   # Add time bin opposition to edge list:
   EdgeList <- lapply(EdgeList, function(x) {x$TimeBinOpposition <- setdiff(1:(length(TimeBins) - 1), x$TimeBinMembership); return(x)})
   
-  # If performing branch partition tests:
-  if(!is.null(BranchPartitionsToTest)) {
+  # Combine all changes into a single matrix:
+  AllChanges <- do.call(rbind, lapply(EdgeList, function(x) x$CharacterChanges))
+  
+  # Remove silly rownames from all changes:
+  rownames(AllChanges) <- NULL
+
+  # If doing some kind of edge test (branch or clade):
+  if(!is.null(BranchPartitionsToTest) || !is.null(CladePartitionsToTest)) {
     
-    # Set mean edge rate:
-    MeanEdgeRate <- sum(unlist(lapply(EdgeList, function(x) x$CharacterChanges[, "Weight"]))) / sum(unlist(lapply(EdgeList, function(x) x$BranchDuration)) * (unlist(lapply(EdgeList, function(x) sum(Weights[x$ComparableCharacters]))) / sum(Weights)))
+    # Get (weighted) number of changes on each edge:
+    EdgeChanges <- unlist(lapply(EdgeList, function(x) sum(x$CharacterChanges[, "Steps"] * x$CharacterChanges[, "Weight"])))
+
+    # Get completeness for each edge:
+    EdgeCompleteness <- unlist(lapply(EdgeList, function(x) sum(Weights[x$ComparableCharacters]) / sum(Weights)))
     
-    # Perform branch partition tests:
-    BranchPartitionTestResults <- lapply(BranchPartitionsToTest, PerformBranchPartitionTests)
+    # Get duration of each edge:
+    EdgeDurations <- unlist(lapply(EdgeList, function(x) x$BranchDuration))
     
-  # If not performing branch partition tests:
-  } else {
+    # Set global rate:
+    GlobalRate <- sum(EdgeChanges) / sum(EdgeCompleteness * EdgeDurations)
     
-    # Make empty branch partition result output:
-    BranchPartitionTestResults <- NULL
+    # If performing branch partition tests:
+    if(!is.null(BranchPartitionsToTest)) {
+      
+      # Build partitioned data matrices (NB: completeness and duration get combined here as they cannot be summed separately later):
+      PartitionedData <- lapply(BranchPartitionsToTest, function(x) matrix(unlist(lapply(x, function(y) c(sum(EdgeChanges[y]), sum(EdgeCompleteness[y] * EdgeDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))
+      
+      # Add sampled rate to paritioned data matrices:
+      PartitionedData <- lapply(PartitionedData, function(x) {x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x); colnames(x)[1] <- "Rate"; x})
+      
+      # Get P-Values and combine output as edge test results:
+      BranchPartitionTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], GetMaximumLikelihoodPValue(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "PValue"); x})
+    
+    # If not performing branch partition tests:
+    } else {
+      
+      # Make empty branch partition result output:
+      BranchPartitionTestResults <- NULL
+      
+    }
+    
+    # If performing clade partition tests:
+    if(!is.null(CladePartitionsToTest)) {
+      
+      # Build partitioned data matrices (NB: completeness and duration get combined here as they cannot be summed separately later):
+      PartitionedData <- lapply(CladePartitionsToTest, function(x) matrix(unlist(lapply(x, function(y) c(sum(EdgeChanges[y]), sum(EdgeCompleteness[y] * EdgeDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))
+      
+      # Add sampled rate to paritioned data matrices:
+      PartitionedData <- lapply(PartitionedData, function(x) {x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x); colnames(x)[1] <- "Rate"; x})
+      
+      # Get P-Values and combine output as edge test results:
+      CladePartitionTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], GetMaximumLikelihoodPValue(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "PValue"); x})
+      
+    # If not performing clade partition tests:
+    } else {
+      
+      # Make empty clade partition result output:
+      CladePartitionTestResults <- NULL
+      
+    }
     
   }
   
   # If performing branch partition tests:
   if(!is.null(CharacterPartitionsToTest)) {
     
-    # Set mean edge rate:
-    MeanCharacterRate <- sum(unlist(lapply(EdgeList, function(x) x$CharacterChanges[, "Weight"]))) / sum(unlist(lapply(EdgeList, function(x) x$BranchDuration)) * (unlist(lapply(EdgeList, function(x) sum(Weights[x$ComparableCharacters]))) / sum(Weights)))
+    # Get vector of (weighted) changes for each character:
+    CharacterChanges <- unlist(lapply(as.list(CharacterNumbers), function(x) {CharacterRows <- which(AllChanges[, "Character"] == x); sum(AllChanges[CharacterRows, "Steps"] * AllChanges[CharacterRows, "Weight"])}))
     
-    # Perform character partition tests:
-    CharacterPartitionTestResults <- lapply(CharacterPartitionsToTest, PerformCharacterPartitionTests)
+    # Get vector of weighted durations for each character:
+    CharacterDurations <- (Weights / sum(Weights)) * sum(tree$edge.length)
+    
+    # Get vector of completness (opportunity to observe changes) for each character:
+    CharacterCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) {CharacterPresence <- rep(0, times = length(CharacterNumbers)); CharacterPresence[x$ComparableCharacters] <- 1; CharacterPresence * x$BranchDuration})), 2, sum) / sum(tree$edge.length)
+    
+    # Set global rate:
+    GlobalRate <- sum(CharacterChanges) / sum(CharacterCompleteness * CharacterDurations)
+    
+    # Build partitioned data matrices (NB: completeness and duration get combined here as they cannot be summed separately later):
+    PartitionedData <- lapply(CharacterPartitionsToTest, function(x) matrix(unlist(lapply(x, function(y) c(sum(CharacterChanges[y]), sum(CharacterCompleteness[y] * CharacterDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))
+    
+    # Add sampled rate to paritioned data matrices:
+    PartitionedData <- lapply(PartitionedData, function(x) {x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x); colnames(x)[1] <- "Rate"; x})
+    
+    # Get P-Values and combine output as edge test results:
+    CharacterPartitionTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], GetMaximumLikelihoodPValue(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "PValue"); x})
 
   # If performing branch partition tests:
   } else {
@@ -807,49 +723,32 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
     
   }
   
-  # If performing clade partition tests:
-  if(!is.null(CladePartitionsToTest)) {
-    
-    # Set mean edge rate:
-    MeanEdgeRate <- sum(unlist(lapply(EdgeList, function(x) x$CharacterChanges[, "Weight"]))) / sum(unlist(lapply(EdgeList, function(x) x$BranchDuration)) * (unlist(lapply(EdgeList, function(x) sum(Weights[x$ComparableCharacters]))) / sum(Weights)))
-    
-    # Perform clade partition tests:
-    CladePartitionTestResults <- lapply(CladePartitionsToTest, PerformBranchPartitionTests)
-    
-    # Update branch rates to clade rates in output names:
-    CladePartitionTestResults <- lapply(CladePartitionTestResults, function(x) {names(x) <- gsub("BranchRates", "CladeRates", names(x)); return(x)})
-    
-  # If not performing clade partition tests:
-  } else {
-    
-    # Make empty clade partition result output:
-    CladePartitionTestResults <- NULL
-    
-  }
-  
   # If performing time bin partition tests:
   if(!is.null(TimeBinPartitionsToTest)) {
     
-    # Build all changes matrix:
-    AllCharacterChanges <- do.call(rbind, lapply(EdgeList, function(x) x$CharacterChanges))
+    # Get weighted number of changes from each time bin:
+    TimeBinChanges <- unlist(lapply(as.list(1:(length(TimeBins) - 1)), function(x) {ChangeRows <- AllChanges[, "Bin"] == x; sum(AllChanges[ChangeRows, "Steps"] * AllChanges[ChangeRows, "Weight"])}))
     
-    # Get weighted changes from each bin:
-    WeightedChangesByBin <- unlist(lapply(as.list(1:(length(TimeBins) - 1)), function(x) sum(AllCharacterChanges[which(AllCharacterChanges[, "Bin"] == x), "Weight"])))
+    # If using the Close time bin completeness approach get completeness value for each time bin:
+    if(TimeBinApproach == "Close") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations * (sum(Weights[x$ComparableCharacters]) / sum(Weights)))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations)), 2, sum)
     
-    # If using Close approach set completeness (including time component) for each time bin:
-    if(TimeBinApproach == "Close") ProportionalCompletenessByBin <- apply(apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations)), 2, '*', unlist(lapply(EdgeList, function(x) sum(Weights[x$ComparableCharacters])))), 2, sum)
+    # If using the Lloyd time bin completeness approach get completeness value for each time bin::
+    if(TimeBinApproach == "Lloyd") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(Weights[x$ComparableCharacters], ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(Weights, ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum)
     
-    # If using Lloyd approach set completeness (including time component) for each time bin:
-    if(TimeBinApproach == "Lloyd") DurationCompletenessByBin <- apply(apply(do.call(rbind, lapply(EdgeList, function(x) x$BinnedBranchDurations)), 2, '*', unlist(lapply(EdgeList, function(x) sum(Weights[x$ComparableCharacters])))), 2, sum)
+    # Get durations of edges in each time bin:
+    TimeBinDurations <- apply(do.call(rbind, lapply(EdgeList, function(x) x$BinnedBranchDurations)), 2, sum)
     
-    # If using Close approach set mean time bin rate:
-    if(TimeBinApproach == "Close") MeanTimeBinRate <- sum(WeightedChangesByBin) / sum(ProportionalCompletenessByBin)
+    # Set global rate (NB: will differ between Close and Lloyd approaches, but Lloyd approach will match edge or character global rate):
+    GlobalRate <- sum(TimeBinChanges) / sum(TimeBinCompleteness * TimeBinDurations)
     
-    # If using Lloyd approach set mean time bin rate:
-    if(TimeBinApproach == "Lloyd") MeanTimeBinRate <- sum(WeightedChangesByBin) / sum(DurationCompletenessByBin)
+    # Build partitioned data matrices (NB: completeness and duration get combined here as they cannot be summed separately later):
+    PartitionedData <- lapply(TimeBinPartitionsToTest, function(x) matrix(unlist(lapply(x, function(y) c(sum(TimeBinChanges[y]), sum(TimeBinCompleteness[y] * TimeBinDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))
     
-    # Perform time bin partition tests:
-    TimeBinTestResults <- lapply(TimeBinPartitionsToTest, PerformTimeBinPartitionTests)
+    # Add sampled rate to paritioned data matrices:
+    PartitionedData <- lapply(PartitionedData, function(x) {x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x); colnames(x)[1] <- "Rate"; x})
+    
+    # Get P-Values and combine output as edge test results:
+    TimeBinTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], GetMaximumLikelihoodPValue(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "PValue"); x})
     
   # If not performing time bin partition tests:
   } else {
@@ -858,7 +757,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
     TimeBinTestResults <- NULL
     
   }
-  
+
   # Subfunction to calculate adjusted alphas for multiple comparison corrections:
   AddMultipleComparisonCorrectionCutoffs <- function(TestResults, Alpha, MultipleComparisonCorrection = "BenjaminiHochberg") {
     
@@ -909,39 +808,6 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   return(Output)
 
 }
-
-
-# NEED SUBFUNCTION TO BUILD PARTITONED VALUES FROM "BRICKS" FO REACH COMPONENT (CHANGES, TIME, COMPLETENESS
-# PartitionMaker <- function(Partition, Changes, Completeness, Duration) {}
-
-#EdgeCompleteness <- unlist(lapply(EdgeList, function(x) sum(Weights[x$ComparableCharacters]) / sum(Weights)))
-#EdgeChanges <- unlist(lapply(EdgeList, function(x) sum(x$CharacterChanges[, "Steps"] * x$CharacterChanges[, "Weight"])))
-#EdgeDurations <- unlist(lapply(EdgeList, function(x) x$BranchDuration))
-
-#AllChanges <- do.call(rbind, lapply(EdgeList, function(x) x$CharacterChanges))
-#rownames(AllChanges) <- NULL
-#TimeBinChanges <- unlist(lapply(as.list(1:(length(TimeBins) - 1)), function(x) {ChangeRows <- AllChanges[, "Bin"] == x; sum(AllChanges[ChangeRows, "Steps"] * AllChanges[ChangeRows, "Weight"])}))
-#TimeBinCompletenessClose <- apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations * (sum(Weights[x$ComparableCharacters]) / sum(Weights)))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations)), 2, sum)
-#TimeBinCompletenessLloyd <- apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(Weights[x$ComparableCharacters], ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(Weights, ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum)
-#TimeBinDurations <- apply(do.call(rbind, lapply(EdgeList, function(x) x$BinnedBranchDurations)), 2, sum)
-
-#CharacterChanges <- unlist(lapply(as.list(CharacterNumbers), function(x) {CharacterRows <- which(AllChanges[, "Character"] == x); sum(AllChanges[CharacterRows, "Steps"] * AllChanges[CharacterRows, "Weight"])}))
-#CharacterDurations <- (Weights / sum(Weights)) * sum(tree$edge.length) # This at least gives same sum of durations as edges or time bins :/
-#CharacterCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) {CharacterPresence <- rep(0, times = length(CharacterNumbers)); CharacterPresence[x$ComparableCharacters] <- 1; CharacterPresence * x$BranchDuration})), 2, sum) / sum(tree$edge.length)
-
-#plot(TimeBinCompletenessLloyd, TimeBinCompletenessClose)
-
-#all.equal(sum(TimeBinChanges), sum(EdgeChanges))
-#all.equal(sum(TimeBinChanges), sum(CharacterChanges))
-#all.equal(sum(TimeBinDurations), sum(EdgeDurations))
-#all.equal(sum(TimeBinDurations), sum(CharacterDurations))
-#all.equal(sum(EdgeChanges) / sum(EdgeCompleteness * EdgeDurations), sum(TimeBinChanges) / sum(TimeBinCompletenessLloyd * TimeBinDurations))
-#all.equal(sum(EdgeChanges) / sum(EdgeCompleteness * EdgeDurations), sum(CharacterChanges) / sum(CharacterCompleteness * CharacterDurations))
-#all.equal(sum(EdgeCompleteness * EdgeDurations), sum(TimeBinCompletenessLloyd * TimeBinDurations))
-#all.equal(sum(CharacterCompleteness * CharacterDurations), sum(TimeBinCompletenessLloyd * TimeBinDurations))
-#all.equal(sum(EdgeCompleteness * EdgeDurations), sum(TimeBinCompletenessClose * TimeBinDurations))
-#all.equal(sum(CharacterCompleteness * CharacterDurations), sum(TimeBinCompletenessClose * TimeBinDurations))
-
 
 #set.seed(17)
 #tree <- rtree(nrow(Day2016$Matrix_1$Matrix))
