@@ -75,7 +75,7 @@ Given a tree and a cladistic-type matrix uses likelihood ratio tests to compare 
 
 Morphological change can be captured by discrete characters and their evolution modelled as occurring along the branches of a phylogenetic tree. This function takes as primary input a character-taxon matrix of discrete characters (in the format imported by \link{ReadMorphNexus}) and a time-scaled phylogenetic tree (in the format of \pkg{paleotree} or \pkg{strap}) and begins by inferring ancestral states at the tree's internal nodes using the \link{AncStateEstMatrix} function. From here changes along individual branches can be estimated (only the minimum number of changes are inferred; see \link{GetAllStateChanges} for an alternative but unfinished approach) and hence rates can be calculated.
 
-A discrete character rate can be expressed as the mean number of changes per character per million years and can be calculated for a branch (edge) of the tree, a clade (a mean rate for the edges descended from a single node), a character partition (the mean rate for a subset of the characters across all edges), or, most complex, the mean rate across the edges (or parts of edges) present in a time bin (defined by two values denoting the beginning and end of the time bin). In an ideal scenario these rates could be compared at face value, but that would require a large number of characters and very minimal (or zero) missing data. I.e., at an extreme of missing data if only one character can be observed along a branch it will either change (the maximum possible rate of evolution) or it will not (the minimum possible rate of evolution). In such cases it would be unwise to consider either outcome as being a significant departure from the mean rate.
+A discrete character rate can be expressed as the mean number of changes per million years (users may wish to normalise this by the number of characters for interpretation) and can be calculated for a branch (edge) of the tree, a clade (a mean rate for the edges descended from a single node), a character partition (the mean rate for a subset of the characters across all edges), or, most complex (see Lloyd 2016), the mean rate across the edges (or parts of edges) present in a time bin (defined by two values denoting the beginning and end of the time bin). In an ideal scenario these rates could be compared at face value, but that would require a large number of characters and very minimal (or zero) missing data. I.e., at an extreme of missing data if only one character can be observed along a branch it will either change (the maximum possible rate of evolution) or it will not (the minimum possible rate of evolution). In such cases it would be unwise to consider either outcome as being a significant departure from the mean rate.
 
 Because of these complications Lloyd et al. (2012) devised tests by which the significance of an edge (or other paritioning of the data, i.e., a clade, time bin etc.) could be considered to be significantly high or low in comparison to the mean rate for the whole tree (i.e., whether a two-rate model could be considered more likely than a one-rate model). This is achieved through a likelihood ratio test:
 
@@ -85,7 +85,7 @@ Typically we might expect the two hypotheses to be well defined a priori. E.g., 
 
 \bold{The four types of rate hypothesis}
 
-Following Cloutier (1991), Lloyd (2016) extended the four main types of rate hypotheses to:
+Following Cloutier (1991), Lloyd (2016) extended two main types of rate hypotheses to four:
 
 \enumerate{
   \item A branch rate (available here with the \code{BranchPartitionsToTest} option).
@@ -94,7 +94,7 @@ Following Cloutier (1991), Lloyd (2016) extended the four main types of rate hyp
   \item A character partition rate (available here with the \code{CharacterPartitionsToTest} option).
 }
 
-In Claddis (>=0.3) these partitions are defined as a list of lists where only the first N - 1 partitions need be defined. E.g., if comparing the first edge value to the rest of the tree then the user only needs to define the value "1" and the function will automatically add a second partition containing all other edges. This can be set with the option \code{BranchPartitionsToTest = list(list(1))}. Similarly, to do what Lloyd et al. (2012) did and repeat the test for every edge in the tree (and assuming this variable is already named "tree") you could use, \code{BranchPartitionsToTest = lapply(as.list(1:nrow(tree$edge)), as.list)}.
+In Claddis (>=0.3) these partitions are defined as a list of lists of vectors where only the first N - 1 partitions need be defined. E.g., if comparing the first edge value to the rest of the tree then the user only needs to define the value "1" and the function will automatically add a second partition containing all other edges. This can be set with the option \code{BranchPartitionsToTest = list(list(1))}. Similarly, to do what Lloyd et al. (2012) did and repeat the test for every edge in the tree (and assuming this variable is already named "tree") you could use, \code{BranchPartitionsToTest = lapply(as.list(1:nrow(tree$edge)), as.list)}.
 
 Because of the flexibility of this function the user can define any set of edges. For example, they could test whether terminal branches have a different rate from internal branches with \code{BranchPartitionsToTest = list(list(match(1:Ntip(tree), tree$edge[, 2])))}. The \code{CladePartitionsToTest} is really just a special subset of this type of hypothesis, but with edges being defined as descending from a specific internal node in the tree. Once again, an exploratory approach like that of Lloyd et al. (2012) can be used with: \code{CladePartitionsToTest = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)}. Note that this excludes the root node as this would define a single partition and hence would represent the null hypothesis (a single rate model for the whole tree). More generally clades must be defined by the node numbers they correspond to. In R an easy way to identify these is with: \code{plot(tree); nodelabels()}.
 
@@ -156,6 +156,9 @@ x <- DiscreteCharacterRate(tree = tree, clad.matrix =
   "missing", UncertaintyState = "missing",
   InapplicableState = "missing", TimeBinApproach =
   "Lloyd")
+
+
+
 
 }
 \references{
