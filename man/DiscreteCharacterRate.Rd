@@ -156,9 +156,6 @@ x <- DiscreteCharacterRate(tree = tree, clad.matrix =
   InapplicableState = "missing", TimeBinApproach =
   "Lloyd")
 
-
-
-
 }
 \references{
 Benjamini, Y. and Hochberg, Y., 1995. Controlling the false discovery rate: a practical and powerful approach to multiple testing. Journal of the Royal Statistical Society, Series B, 57, 289-300.

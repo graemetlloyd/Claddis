@@ -142,34 +142,8 @@
 #'   InapplicableState = "missing", TimeBinApproach =
 #'   "Lloyd")
 #'
-#'
-#'
-
-#Tree <- read.tree(text = "(A:1,(B:2,(C:2,D:2):2):2);")
-
-#Tree$root.time <- 3
-
-#SingleBlockMatrix <- matrix(c(0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1), nrow = 4, byrow = TRUE, dimnames = list(c("A", "B", "C", "D"), c()))
-
-#TestMatrixOne <- MakeMorphMatrix(CTmatrix = SingleBlockMatrix)
-
-#DoubleBlockMatrix <- cbind(SingleBlockMatrix, SingleBlockMatrix)
-
-#TestMatrixTwo <- MakeMorphMatrix(CTmatrix = DoubleBlockMatrix)
-
-#DiscreteCharacterRate(tree = Tree, clad.matrix = TestMatrixOne, TimeBins = c(3, 2, 1, 0), BranchPartitionsToTest = lapply(as.list(1:nrow(Tree$edge)), as.list), CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, Threshold = 0.0000000001)
-
-#'
 #' @export DiscreteCharacterRate
 
-# ALLOW REWEIGHTING OF INAPPLICABLES ZERO AS AN OPTION FOR THEM?
-# HOW TO FORMAT OUTPUT? GET CIS FOR EACH PARTITION FOR VISUALISATION (E.G., BARPLOT OF PARTITION VALUES WITH DASHED LINE FOR MEAN AND ERROR BARS FOR CIS)?
-# CHECK FOR AUTAPOMORPHIES AND INFORM USER IF FOUND?
-# ADD CONTRIVED EXAMPLES TO SHOW HOW FUNCTION WORKS, E.G. RATE OF ONE CHANGES PER MILLION YEARS THEN DUPLICATED BLOCK WITH CHARCTER PARTITION TEST.
-# TIME BINS WITH NOTHING IN WILL CAUSE ISSUES AS DIVIDE BY ZEROES WILL OCCUR - ADD CHECK FOR THIS.
-# GET CLADE NUMBERS BACK FOR OUTPUTTING?
-# WHAT IS SIGNIFICNALTY HIGH OR LOW IF THERE ARE THREE OR MORE PARTITIONS? THIS IS NOT EVEN IN OUTPUT YET.
-# PROBABLY NEED MORE CAREFUL CHECKS FOR ZERO VALUES GENERALLY, E.G., CHARACTER WITH ALL MISSING DATA
 
 DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
   
@@ -179,33 +153,14 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   # MAYBE MAKE ANCESTRAL STATE UNCERTAINTY DIFFERENT FOR TIPS THAN NODES? I.E., HOW IT GETS RESOLVED CAN BE DIFFERENT (MORE OPTIONS TO FUNCTION)
   # THESE TWO ARE RELATED: 1. ADD TERMINAL VERSUS INTERNAL OPTION SOMEHOW/SOMEWHERE, 2. ALLOW OPTION TO IGNORE SOME PARTS OF THE TREE FOR PARTITION TESTS? MAKES CALCULATING THE MEAN RATE TRICKIER BUT MIGHT MAKE SENSE E.G. FOR INGROUP ONLY TESTS. EXCLUDE EDGES AFTER DOING ANCESTRAL STATES? OR SET THESE TO ALL NAS TO ENSURE OTHER THINGS WORK FINE?
   # EXTRA FUNCTION(S) TO VISUALISE RESULTS MOST LIKELY
-  
-  #set.seed(17)
-  #tree <- rtree(nrow(Day2016$Matrix_1$Matrix))
-  #tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
-  #tree$root.time <- max(diag(vcv(tree)))
-  #TimeBins <- seq(from = tree$root.time, to = 0, length.out = 5)
-  #tree = tree
-  #clad.matrix = Day2016
-  #TimeBins = TimeBins
-  #BranchPartitionsToTest = lapply(as.list(1:nrow(tree$edge)), as.list)
-  #CharacterPartitionsToTest = lapply(as.list(1:sum(unlist(lapply(clad.matrix[2:length(clad.matrix)], function(x) ncol(x$Matrix))))), as.list)
-  #CladePartitionsToTest = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)
-  #TimeBinPartitionsToTest = lapply(as.list(1:(length(TimeBins) - 1)), as.list)
-  #ChangeTimes = "random"
-  #Alpha = 0.01
-  #MultipleComparisonCorrection = "BenjaminiHochberg"
-  #PolymorphismState = "missing"
-  #UncertaintyState = "missing"
-  #InapplicableState = "missing"
-  #TimeBinApproach = "Lloyd"
-  #EnsureAllWeightsAreIntegers = FALSE
-  #EstimateAllNodes = FALSE
-  #EstimateTipValues = FALSE
-  #InapplicablesAsMissing = FALSE
-  #PolymorphismBehaviour = "equalp"
-  #UncertaintyBehaviour = "equalp"
-  #Threshold = 0.01
+  # CHECK FOR AUTAPOMORPHIES AND INFORM USER IF FOUND?
+  # ADD CONTRIVED EXAMPLES TO SHOW HOW FUNCTION WORKS, E.G. RATE OF ONE CHANGES PER MILLION YEARS THEN DUPLICATED BLOCK WITH CHARCTER PARTITION TEST.
+  # PROBABLY NEED MORE CAREFUL CHECKS FOR ZERO VALUES GENERALLY, E.G., CHARACTER WITH ALL MISSING DATA
+  # ALLOW REWEIGHTING OF INAPPLICABLES ZERO AS AN OPTION FOR THEM?
+  # HOW TO FORMAT OUTPUT? GET CIS FOR EACH PARTITION FOR VISUALISATION (E.G., BARPLOT OF PARTITION VALUES WITH DASHED LINE FOR MEAN AND ERROR BARS FOR CIS)? STICK WITH LIST OR COLLAPSE TO A MATRIX SOMEHOW?
+  # TIME BINS WITH NOTHING IN WILL CAUSE ISSUES AS DIVIDE BY ZEROES WILL OCCUR - ADD CHECK FOR THIS.
+  # GET CLADE NUMBERS BACK FOR OUTPUTTING?
+  # WHAT IS SIGNIFICANTLY HIGH OR LOW IF THERE ARE THREE OR MORE PARTITIONS? THIS IS NOT EVEN IN OUTPUT YET.
 
   # Check for step matrices and stop and warn user if found:
   if(is.list(clad.matrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
@@ -815,15 +770,3 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   return(Output)
 
 }
-
-#set.seed(17)
-#tree <- rtree(nrow(Day2016$Matrix_1$Matrix))
-#tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
-#tree$root.time <- max(diag(vcv(tree)))
-#TimeBins <- seq(from = tree$root.time, to = 0, length.out = 5)
-
-#x <- DiscreteCharacterRate(tree = tree, clad.matrix = Day2016, TimeBins = TimeBins, BranchPartitionsToTest = lapply(as.list(1:nrow(tree$edge)), as.list), CharacterPartitionsToTest = lapply(as.list(1:3), as.list), CladePartitionsToTest = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list), TimeBinPartitionsToTest = lapply(as.list(1:(length(TimeBins) - 1)), as.list), ChangeTimes = "random", Alpha = 0.01, PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01)
-
-#x <- DiscreteCharacterRate(tree = tree, clad.matrix = Day2016, TimeBins = TimeBins, BranchPartitionsToTest = list(list(match(1:Ntip(tree), tree$edge[, 2]))), CharacterPartitionsToTest = lapply(as.list(1:3), as.list), CladePartitionsToTest = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list), TimeBinPartitionsToTest = lapply(as.list(1:(length(TimeBins) - 1)), as.list), ChangeTimes = "random", Alpha = 0.01, PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01)
-
-#x
