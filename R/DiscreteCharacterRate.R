@@ -161,48 +161,50 @@
 #'
 #' @export DiscreteCharacterRate
 
-# WRITE SEARCH VERSION FOR FINDING RATE SHIFTS? SHOULD THIS EVEN BE AN OPTION? DOES THIS REQUIRE MODIFYING LRT TO COMPARE E.G. 2-RATE DIRECTLY WITH 3-RATE MODEL? OR CAN USE OUTPUT P-VALUES AND CONVERT MODELS TO AICS? WOULD NEED TO PERMUTE ALL POSSIBLE COMBOS AN DNOT SURE HOW LARGE THESE MIGHT GET.
-# MAYBE MAKE ANCESTRAL STATE UNCERTAINTY DIFFERENT FOR TIPS THAN NODES? I.E., HOW IT GETS RESOLVED CAN BE DIFFERENT (MORE OPTIONS TO FUNCTION)
-# THESE TWO ARE RELATED: 1. ADD TERMINAL VERSUS INTERNAL OPTION SOMEHOW/SOMEWHERE, 2. ALLOW OPTION TO IGNORE SOME PARTS OF THE TREE FOR PARTITION TESTS? MAKES CALCULATING THE MEAN RATE TRICKIER BUT MIGHT MAKE SENSE E.G. FOR INGROUP ONLY TESTS. EXCLUDE EDGES AFTER DOING ANCESTRAL STATES? OR SET THESE TO ALL NAS TO ENSURE OTHER THINGS WORK FINE?
-# NEED EXTRA FUNCTION(S) TO VISUALISE RESULTS MOST LIKELY
 # ALLOW REWEIGHTING OF INAPPLICABLES ZERO AS AN OPTION FOR THEM?
 # HOW TO FORMAT OUTPUT? CONTINUOUS CHARACTER CONVERSION NEEDS TO BE RECORdED IN OUTPUT SO DOES NOT CAUSE ISSUES IN DOWNSTREAM PHYLOMORPHOSPACE ANALYSES; OUTPUT MEAN RATE AND CHANGE TIMES - E.G., TO ALLOW A PHYLOMORPHOSPACE TO BE CONSTRUCTED. GET CIS FOR EACH PARTITION FOR VISUALISATION (E.G., BARPLOT OF PARTITION VALUES WITH DASHED LINE FOR MEAN AND ERROR BARS FOR CIS)?
 # CHECK FOR AUTAPOMORPHIES AND INFORM USER IF FOUND?
 # ADD CONTRIVED EXAMPLES TO SHOW HOW FUNCTION WORKS, E.G. RATE OF ONE CHANGES PER MILLION YEARS THEN DUPLICATED BLOCK WITH CHARCTER PARTITION TEST.
 # TIME BINS WITH NOTHING IN WILL CAUSE ISSUES AS DIVIDE BY ZEROES WILL OCCUR - ADD CHECK FOR THIS.
-# DO I EVEN NEED CLADE MEMBERSHIP/OPPOSITION IF EVENTUALLY CALL BY EDGE NUMBER ANYWAY? CHECK OTHER ASPECTS OF EDGE LIST TOO!
 # GET CLADE NUMBERS BACK FOR OUTPUTTING?
 # WHAT IS SIGNIFICNALTY HIGH OR LOW IF THERE ARE THREE OR MORE PARTITIONS? THIS IS NOT EVEN IN OUTPUT YET.
 # PROBABLY NEED MORE CAREFUL CHECKS FOR ZERO VALUES GENERALLY, E.G., CHARACTER WITH ALL MISSING DATA
 
 DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
   
-  #set.seed(17)
-  #tree <- rtree(nrow(Day2016$Matrix_1$Matrix))
-  #tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
-  #tree$root.time <- max(diag(vcv(tree)))
-  #TimeBins <- seq(from = tree$root.time, to = 0, length.out = 5)
-  #tree = tree
-  #clad.matrix = Day2016
-  #TimeBins = TimeBins
-  #BranchPartitionsToTest = lapply(as.list(1:nrow(tree$edge)), as.list)
-  #CharacterPartitionsToTest = lapply(as.list(1:sum(unlist(lapply(clad.matrix[2:length(clad.matrix)], function(x) ncol(x$Matrix))))), as.list)
-  #CladePartitionsToTest = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)
-  #TimeBinPartitionsToTest = lapply(as.list(1:(length(TimeBins) - 1)), as.list)
-  #ChangeTimes = "random"
-  #Alpha = 0.01
-  #MultipleComparisonCorrection = "BenjaminiHochberg"
-  #PolymorphismState = "missing"
-  #UncertaintyState = "missing"
-  #InapplicableState = "missing"
-  #TimeBinApproach = "Lloyd"
-  #EnsureAllWeightsAreIntegers = FALSE
-  #EstimateAllNodes = FALSE
-  #EstimateTipValues = FALSE
-  #InapplicablesAsMissing = FALSE
-  #PolymorphismBehaviour = "equalp"
-  #UncertaintyBehaviour = "equalp"
-  #Threshold = 0.01
+  # DESIDERATA (STUFF IT'D BE NICE TO ADD IN FUTURE):
+  #
+  # WRITE SEARCH VERSION FOR FINDING RATE SHIFTS? SHOULD THIS EVEN BE AN OPTION? DOES THIS REQUIRE MODIFYING LRT TO COMPARE E.G. 2-RATE DIRECTLY WITH 3-RATE MODEL? OR CAN USE OUTPUT P-VALUES AND CONVERT MODELS TO AICS? WOULD NEED TO PERMUTE ALL POSSIBLE COMBOS AND NOT SURE HOW LARGE THESE MIGHT GET.
+  # MAYBE MAKE ANCESTRAL STATE UNCERTAINTY DIFFERENT FOR TIPS THAN NODES? I.E., HOW IT GETS RESOLVED CAN BE DIFFERENT (MORE OPTIONS TO FUNCTION)
+  # THESE TWO ARE RELATED: 1. ADD TERMINAL VERSUS INTERNAL OPTION SOMEHOW/SOMEWHERE, 2. ALLOW OPTION TO IGNORE SOME PARTS OF THE TREE FOR PARTITION TESTS? MAKES CALCULATING THE MEAN RATE TRICKIER BUT MIGHT MAKE SENSE E.G. FOR INGROUP ONLY TESTS. EXCLUDE EDGES AFTER DOING ANCESTRAL STATES? OR SET THESE TO ALL NAS TO ENSURE OTHER THINGS WORK FINE?
+  # NEED EXTRA FUNCTION(S) TO VISUALISE RESULTS MOST LIKELY
+  
+  set.seed(17)
+  tree <- rtree(nrow(Day2016$Matrix_1$Matrix))
+  tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
+  tree$root.time <- max(diag(vcv(tree)))
+  TimeBins <- seq(from = tree$root.time, to = 0, length.out = 5)
+  tree = tree
+  clad.matrix = Day2016
+  TimeBins = TimeBins
+  BranchPartitionsToTest = lapply(as.list(1:nrow(tree$edge)), as.list)
+  CharacterPartitionsToTest = lapply(as.list(1:sum(unlist(lapply(clad.matrix[2:length(clad.matrix)], function(x) ncol(x$Matrix))))), as.list)
+  CladePartitionsToTest = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)
+  TimeBinPartitionsToTest = lapply(as.list(1:(length(TimeBins) - 1)), as.list)
+  ChangeTimes = "random"
+  Alpha = 0.01
+  MultipleComparisonCorrection = "BenjaminiHochberg"
+  PolymorphismState = "missing"
+  UncertaintyState = "missing"
+  InapplicableState = "missing"
+  TimeBinApproach = "Lloyd"
+  EnsureAllWeightsAreIntegers = FALSE
+  EstimateAllNodes = FALSE
+  EstimateTipValues = FALSE
+  InapplicablesAsMissing = FALSE
+  PolymorphismBehaviour = "equalp"
+  UncertaintyBehaviour = "equalp"
+  Threshold = 0.01
 
   # Check for step matrices and stop and warn user if found:
   if(is.list(clad.matrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
@@ -361,12 +363,6 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   
   # Find descendant edges for each internal node:
   DescendantEdgesForEachInternalNode <- lapply(as.list(InternalNodeNumbers), GetDescendantEdges, tree = tree)
-  
-  # Use these to assign clade memberships for each branch:
-  for(i in 1:length(EdgeList)) EdgeList[[i]]$CladeMembership <- InternalNodeNumbers[unlist(lapply(lapply(DescendantEdgesForEachInternalNode, '==', i), sum)) == 1]
-  
-  # Add opposite (clade opposition) to each branch:
-  EdgeList <- lapply(EdgeList, function(x) {x$CladeOpposition <- setdiff(InternalNodeNumbers, x$CladeMembership); return(x)})
   
   # Get ancestral character states:
   AncestralStates <- AncStateEstMatrix(InputMatrix = clad.matrix, Tree = tree, EstimateAllNodes = EstimateAllNodes, EstimateTipValues = EstimateTipValues, InapplicablesAsMissing = InapplicablesAsMissing, PolymorphismBehaviour = PolymorphismBehaviour, UncertaintyBehaviour = UncertaintyBehaviour, Threshold = Threshold)
@@ -619,12 +615,6 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   
   # Add proportional binned branch lengths to edge list:
   EdgeList <- lapply(EdgeList, function(x) {x$ProportionalBinnedEdgeDurations <- x$BinnedBranchDurations / sum(x$BinnedBranchDurations); return(x)})
-  
-  # Add time bin membership to edge list:
-  EdgeList <- lapply(EdgeList, function(x) {x$TimeBinMembership <- which(x$ProportionalBinnedEdgeDurations > 0); return(x)})
-  
-  # Add time bin opposition to edge list:
-  EdgeList <- lapply(EdgeList, function(x) {x$TimeBinOpposition <- setdiff(1:(length(TimeBins) - 1), x$TimeBinMembership); return(x)})
   
   # Start to build matrix of all changes with list of character changes:
   AllChanges <- lapply(EdgeList, function(x) x$CharacterChanges)
