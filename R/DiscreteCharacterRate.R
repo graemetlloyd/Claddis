@@ -143,8 +143,6 @@
 #'   "Lloyd")
 #'
 #' @export DiscreteCharacterRate
-
-
 DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
   
   # DESIDERATA (STUFF IT WOULD BE NICE TO ADD IN FUTURE):
@@ -365,7 +363,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
     if(UncertaintyState == "missing") AllStates[UncertaintyPositions] <- NA
     
     # If replacing uncertainties with random values draw and replace:
-    if(UncertaintyState == "random") AllStates[UncertaintyPositions] <- unlist(lapply(strsplit(AllStates[UncertaintyPositions], "&"), sample, size = 1))
+    if(UncertaintyState == "random") AllStates[UncertaintyPositions] <- unlist(lapply(strsplit(AllStates[UncertaintyPositions], "/"), sample, size = 1))
     
   }
   
@@ -645,6 +643,15 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
       
     }
     
+  # If not doing clade OR branch tests:
+  } else {
+    
+    # Make empty branch partition result output:
+    BranchPartitionTestResults <- NULL
+
+    # Make empty clade partition result output:
+    CladePartitionTestResults <- NULL
+
   }
   
   # If performing branch partition tests:
