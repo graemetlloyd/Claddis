@@ -61,6 +61,7 @@ DiscreteCharacterRate(tree, clad.matrix, TimeBins,
 }
 \value{
 \item{InferredCharacterChanges}{Matrix of inferred character changes.}
+\item{IntrinsicCharacterRate}{The intrinsic (global) character rate in changes per million years.}
 \item{BranchPartitionResults}{List of branch partition results (corresponding to \code{BranchPartitionsToTest}. NULL if not requested.}
 \item{CharacterPartitionResults}{List of character partition results (corresponding to \code{CharacterPartitionsToTest}. NULL if not requested.}
 \item{CladePartitionResults}{List of clade partition results (corresponding to \code{CladePartitionsToTest}. NULL if not requested.}

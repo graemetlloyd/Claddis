@@ -84,6 +84,7 @@
 #' @return
 #'
 #' \item{InferredCharacterChanges}{Matrix of inferred character changes.}
+#' \item{IntrinsicCharacterRate}{The intrinsic (global) character rate in changes per million years.}
 #' \item{BranchPartitionResults}{List of branch partition results (corresponding to \code{BranchPartitionsToTest}. NULL if not requested.}
 #' \item{CharacterPartitionResults}{List of character partition results (corresponding to \code{CharacterPartitionsToTest}. NULL if not requested.}
 #' \item{CladePartitionResults}{List of clade partition results (corresponding to \code{CladePartitionsToTest}. NULL if not requested.}
@@ -165,14 +166,13 @@
 # THESE TWO ARE RELATED: 1. ADD TERMINAL VERSUS INTERNAL OPTION SOMEHOW/SOMEWHERE, 2. ALLOW OPTION TO IGNORE SOME PARTS OF THE TREE FOR PARTITION TESTS? MAKES CALCULATING THE MEAN RATE TRICKIER BUT MIGHT MAKE SENSE E.G. FOR INGROUP ONLY TESTS. EXCLUDE EDGES AFTER DOING ANCESTRAL STATES? OR SET THESE TO ALL NAS TO ENSURE OTHER THINGS WORK FINE?
 # NEED EXTRA FUNCTION(S) TO VISUALISE RESULTS MOST LIKELY
 # ALLOW REWEIGHTING OF INAPPLICABLES ZERO AS AN OPTION FOR THEM?
-# HOW TO FORMAT OUTPUT? ADD MEAN RATE TO OUTPUT? CONTINUOUS CHARACTER CONVERSION NEEDS TO BE RECORdED IN OUTPUT SO DOES NOT CAUSE ISSUES IN DOWNSTREAM PHYLOMORPHOSPACE ANALYSES; OUTPUT MEAN RATE AND CHANGE TIMES - E.G., TO ALLOW A PHYLOMORPHOSPACE TO BE CONSTRUCTED. GET CIS FOR EACH PARTITION FOR VISUALISATION (E.G., BARPLOT OF PARTITION VALUES WITH DASHED LINE FOR MEAN AND ERROR BARS FOR CIS)?
+# HOW TO FORMAT OUTPUT? CONTINUOUS CHARACTER CONVERSION NEEDS TO BE RECORdED IN OUTPUT SO DOES NOT CAUSE ISSUES IN DOWNSTREAM PHYLOMORPHOSPACE ANALYSES; OUTPUT MEAN RATE AND CHANGE TIMES - E.G., TO ALLOW A PHYLOMORPHOSPACE TO BE CONSTRUCTED. GET CIS FOR EACH PARTITION FOR VISUALISATION (E.G., BARPLOT OF PARTITION VALUES WITH DASHED LINE FOR MEAN AND ERROR BARS FOR CIS)?
 # CHECK FOR AUTAPOMORPHIES AND INFORM USER IF FOUND?
 # ADD CONTRIVED EXAMPLES TO SHOW HOW FUNCTION WORKS, E.G. RATE OF ONE CHANGES PER MILLION YEARS THEN DUPLICATED BLOCK WITH CHARCTER PARTITION TEST.
 # TIME BINS WITH NOTHING IN WILL CAUSE ISSUES AS DIVIDE BY ZEROES WILL OCCUR - ADD CHECK FOR THIS.
 # DO I EVEN NEED CLADE MEMBERSHIP/OPPOSITION IF EVENTUALLY CALL BY EDGE NUMBER ANYWAY? CHECK OTHER ASPECTS OF EDGE LIST TOO!
 # GET CLADE NUMBERS BACK FOR OUTPUTTING?
 # WHAT IS SIGNIFICNALTY HIGH OR LOW IF THERE ARE THREE OR MORE PARTITIONS? THIS IS NOT EVEN IN OUTPUT YET.
-# GET GLOBAL RATE INTO OUTPUT WHILST AVOIDING ISSUE WITH CLOSE APPROACH HAVING GOBAL RATE THAT WILL NOT MATCH EDGE OR CHAACTER PARTITIONS
 # PROBABLY NEED MORE CAREFUL CHECKS FOR ZERO VALUES GENERALLY, E.G., CHARACTER WITH ALL MISSING DATA
 
 DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
@@ -761,6 +761,9 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
     TimeBinTestResults <- NULL
     
   }
+  
+  # Set global rate for output:
+  GlobalRate <- sum(unlist(lapply(EdgeList, function(x) sum(x$CharacterChanges[, "Steps"] * x$CharacterChanges[, "Weight"])))) / sum(unlist(lapply(EdgeList, function(x) sum(Weights[x$ComparableCharacters]) / sum(Weights))) * unlist(lapply(EdgeList, function(x) x$BranchDuration)))
 
   # Subfunction to calculate adjusted alphas for multiple comparison corrections:
   AddMultipleComparisonCorrectionCutoffs <- function(TestResults, Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection) {
@@ -806,10 +809,10 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   if(!is.null(TimeBinPartitionsToTest)) TimeBinTestResults <- AddMultipleComparisonCorrectionCutoffs(TestResults = TimeBinTestResults, Alpha = Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection)
   
   # Compile output:
-  Output <- list(AllChanges, BranchPartitionTestResults, CharacterPartitionTestResults, CladePartitionTestResults, TimeBinTestResults)
+  Output <- list(AllChanges, GlobalRate, BranchPartitionTestResults, CharacterPartitionTestResults, CladePartitionTestResults, TimeBinTestResults)
   
   # Add naems to output:
-  names(Output) <- c("InferredCharacterChanges", "BranchPartitionResults", "CharacterPartitionResults", "CladePartitionResults", "TimeBinResults")
+  names(Output) <- c("InferredCharacterChanges", "IntrinsicCharacterRate", "BranchPartitionResults", "CharacterPartitionResults", "CladePartitionResults", "TimeBinResults")
   
   # Return output:
   return(Output)
