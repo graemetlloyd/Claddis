@@ -14,7 +14,7 @@
 #'
 #' \bold{The four types of rate hypothesis}
 #'
-#' Following Cloutier (1991), Lloyd (2016) extended two main types of rate hypotheses to four:
+#' Following Cloutier (1991), Lloyd (2016) extended the two main types of rate hypotheses to four:
 #'
 #' \enumerate{
 #'   \item A branch rate (available here with the \code{BranchPartitionsToTest} option).
@@ -53,9 +53,7 @@
 #'
 #' Finally, the ramaining options (\code{EstimateAllNodes}, \code{EstimateTipValues}, \code{InapplicablesAsMissing}, \code{PolymorphismBehaviour}, \code{UncertaintyBehaviour}, and \code{Threshold}) are all simply passed directly to \link{AncStateEstMatrix} for estimating the ancestral states and users should consult the help file for that function for further details.
 #'
-#' Note that currently the function cannot deal with step matrices.
-#'
-#' Note that the terminal versus internal option from Brusatte et al. (2014) is yet to be implemented by default.
+#' Note that currently the function cannot deal with step matrices and that the terminal versus internal option from Brusatte et al. (2014) is yet to be implemented.
 #'
 #' @description
 #'
@@ -85,12 +83,11 @@
 #'
 #' @return
 #'
-#' \item{character.changes}{A matrix containing information on all the character changes reconstructed and used to measure rates.}
-#' \item{node.results}{A table displaying the results of the per-clade rate tests.}
-#' \item{branch.results}{A table displaying the results of the per-branch rate tests.}
-#' \item{per.bin.rates}{Per time-bin rates (use with caution).}
-#' \item{per.bin.rates.tb}{Per time-bin rates for terminal branches (use with caution).}
-#' \item{per.bin.rates.ib}{Per time-bin rates for internal branches (use with caution).}
+#' \item{InferredCharacterChanges}{Matrix of inferred character changes.}
+#' \item{BranchPartitionResults}{List of branch partition results (corresponding to \code{BranchPartitionsToTest}. NULL if not requested.}
+#' \item{CharacterPartitionResults}{List of character partition results (corresponding to \code{CharacterPartitionsToTest}. NULL if not requested.}
+#' \item{CladePartitionResults}{List of clade partition results (corresponding to \code{CladePartitionsToTest}. NULL if not requested.}
+#' \item{TimeBinResults}{List of time bin partition results (corresponding to \code{TimeBinPartitionsToTest}. NULL if not requested.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Steve C. Wang \email{scwang@@swarthmore.edu}
 #'
@@ -163,7 +160,7 @@
 #'
 #' @export DiscreteCharacterRate
 
-# WRITE SEARCH VERSION FOR FINDING RATE SHIFTS? SHOULD THIS EVEN BE AN OPTION? DOES THIS REQUIRE MODIFYING LRT TO COMPARE E.G. 2-RATE DIRECTLY WITH 3-RATE MODEL? OR CAN USE OUTPUT P-VALUES AND CONVERT MODELS TO AICS?
+# WRITE SEARCH VERSION FOR FINDING RATE SHIFTS? SHOULD THIS EVEN BE AN OPTION? DOES THIS REQUIRE MODIFYING LRT TO COMPARE E.G. 2-RATE DIRECTLY WITH 3-RATE MODEL? OR CAN USE OUTPUT P-VALUES AND CONVERT MODELS TO AICS? WOULD NEED TO PERMUTE ALL POSSIBLE COMBOS AN DNOT SURE HOW LARGE THESE MIGHT GET.
 # MAYBE MAKE ANCESTRAL STATE UNCERTAINTY DIFFERENT FOR TIPS THAN NODES? I.E., HOW IT GETS RESOLVED CAN BE DIFFERENT (MORE OPTIONS TO FUNCTION)
 # THESE TWO ARE RELATED: 1. ADD TERMINAL VERSUS INTERNAL OPTION SOMEHOW/SOMEWHERE, 2. ALLOW OPTION TO IGNORE SOME PARTS OF THE TREE FOR PARTITION TESTS? MAKES CALCULATING THE MEAN RATE TRICKIER BUT MIGHT MAKE SENSE E.G. FOR INGROUP ONLY TESTS. EXCLUDE EDGES AFTER DOING ANCESTRAL STATES? OR SET THESE TO ALL NAS TO ENSURE OTHER THINGS WORK FINE?
 # NEED EXTRA FUNCTION(S) TO VISUALISE RESULTS MOST LIKELY

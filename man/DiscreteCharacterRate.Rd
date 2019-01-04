@@ -60,12 +60,11 @@ DiscreteCharacterRate(tree, clad.matrix, TimeBins,
 \item{Threshold}{Option passed to internal use of \link{AncStateEstMatrix}.}
 }
 \value{
-\item{character.changes}{A matrix containing information on all the character changes reconstructed and used to measure rates.}
-\item{node.results}{A table displaying the results of the per-clade rate tests.}
-\item{branch.results}{A table displaying the results of the per-branch rate tests.}
-\item{per.bin.rates}{Per time-bin rates (use with caution).}
-\item{per.bin.rates.tb}{Per time-bin rates for terminal branches (use with caution).}
-\item{per.bin.rates.ib}{Per time-bin rates for internal branches (use with caution).}
+\item{InferredCharacterChanges}{Matrix of inferred character changes.}
+\item{BranchPartitionResults}{List of branch partition results (corresponding to \code{BranchPartitionsToTest}. NULL if not requested.}
+\item{CharacterPartitionResults}{List of character partition results (corresponding to \code{CharacterPartitionsToTest}. NULL if not requested.}
+\item{CladePartitionResults}{List of clade partition results (corresponding to \code{CladePartitionsToTest}. NULL if not requested.}
+\item{TimeBinResults}{List of time bin partition results (corresponding to \code{TimeBinPartitionsToTest}. NULL if not requested.}
 }
 \description{
 Given a tree and a cladistic-type matrix uses likelihood ratio tests to compare N-rate and 1-rate models across branches, clades, time bins, or character partitions.
@@ -85,7 +84,7 @@ Typically we might expect the two hypotheses to be well defined a priori. E.g., 
 
 \bold{The four types of rate hypothesis}
 
-Following Cloutier (1991), Lloyd (2016) extended two main types of rate hypotheses to four:
+Following Cloutier (1991), Lloyd (2016) extended the two main types of rate hypotheses to four:
 
 \enumerate{
   \item A branch rate (available here with the \code{BranchPartitionsToTest} option).
@@ -124,9 +123,7 @@ Sixthly, all character changes are weighted according to the weights provided in
 
 Finally, the ramaining options (\code{EstimateAllNodes}, \code{EstimateTipValues}, \code{InapplicablesAsMissing}, \code{PolymorphismBehaviour}, \code{UncertaintyBehaviour}, and \code{Threshold}) are all simply passed directly to \link{AncStateEstMatrix} for estimating the ancestral states and users should consult the help file for that function for further details.
 
-Note that currently the function cannot deal with step matrices.
-
-Note that the terminal versus internal option from Brusatte et al. (2014) is yet to be implemented by default.
+Note that currently the function cannot deal with step matrices and that the terminal versus internal option from Brusatte et al. (2014) is yet to be implemented.
 }
 \examples{
 
