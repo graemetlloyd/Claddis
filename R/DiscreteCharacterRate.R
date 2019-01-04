@@ -85,6 +85,7 @@
 #'
 #' \item{InferredCharacterChanges}{Matrix of inferred character changes.}
 #' \item{IntrinsicCharacterRate}{The intrinsic (global) character rate in changes per million years.}
+#' \item{ContinuousCharactersConvertedToDiscrete}{Whether or not continuous characters were converted to discrete characters (important for handling the data in downstream analys(es)).}
 #' \item{BranchPartitionResults}{List of branch partition results (corresponding to \code{BranchPartitionsToTest}. NULL if not requested.}
 #' \item{CharacterPartitionResults}{List of character partition results (corresponding to \code{CharacterPartitionsToTest}. NULL if not requested.}
 #' \item{CladePartitionResults}{List of clade partition results (corresponding to \code{CladePartitionsToTest}. NULL if not requested.}
@@ -162,7 +163,7 @@
 #' @export DiscreteCharacterRate
 
 # ALLOW REWEIGHTING OF INAPPLICABLES ZERO AS AN OPTION FOR THEM?
-# HOW TO FORMAT OUTPUT? CONTINUOUS CHARACTER CONVERSION NEEDS TO BE RECORdED IN OUTPUT SO DOES NOT CAUSE ISSUES IN DOWNSTREAM PHYLOMORPHOSPACE ANALYSES; OUTPUT MEAN RATE AND CHANGE TIMES - E.G., TO ALLOW A PHYLOMORPHOSPACE TO BE CONSTRUCTED. GET CIS FOR EACH PARTITION FOR VISUALISATION (E.G., BARPLOT OF PARTITION VALUES WITH DASHED LINE FOR MEAN AND ERROR BARS FOR CIS)?
+# HOW TO FORMAT OUTPUT? GET CIS FOR EACH PARTITION FOR VISUALISATION (E.G., BARPLOT OF PARTITION VALUES WITH DASHED LINE FOR MEAN AND ERROR BARS FOR CIS)?
 # CHECK FOR AUTAPOMORPHIES AND INFORM USER IF FOUND?
 # ADD CONTRIVED EXAMPLES TO SHOW HOW FUNCTION WORKS, E.G. RATE OF ONE CHANGES PER MILLION YEARS THEN DUPLICATED BLOCK WITH CHARCTER PARTITION TEST.
 # TIME BINS WITH NOTHING IN WILL CAUSE ISSUES AS DIVIDE BY ZEROES WILL OCCUR - ADD CHECK FOR THIS.
@@ -172,39 +173,39 @@
 
 DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
   
-  # DESIDERATA (STUFF IT'D BE NICE TO ADD IN FUTURE):
+  # DESIDERATA (STUFF IT WOULD BE NICE TO ADD IN FUTURE):
   #
   # WRITE SEARCH VERSION FOR FINDING RATE SHIFTS? SHOULD THIS EVEN BE AN OPTION? DOES THIS REQUIRE MODIFYING LRT TO COMPARE E.G. 2-RATE DIRECTLY WITH 3-RATE MODEL? OR CAN USE OUTPUT P-VALUES AND CONVERT MODELS TO AICS? WOULD NEED TO PERMUTE ALL POSSIBLE COMBOS AND NOT SURE HOW LARGE THESE MIGHT GET.
   # MAYBE MAKE ANCESTRAL STATE UNCERTAINTY DIFFERENT FOR TIPS THAN NODES? I.E., HOW IT GETS RESOLVED CAN BE DIFFERENT (MORE OPTIONS TO FUNCTION)
   # THESE TWO ARE RELATED: 1. ADD TERMINAL VERSUS INTERNAL OPTION SOMEHOW/SOMEWHERE, 2. ALLOW OPTION TO IGNORE SOME PARTS OF THE TREE FOR PARTITION TESTS? MAKES CALCULATING THE MEAN RATE TRICKIER BUT MIGHT MAKE SENSE E.G. FOR INGROUP ONLY TESTS. EXCLUDE EDGES AFTER DOING ANCESTRAL STATES? OR SET THESE TO ALL NAS TO ENSURE OTHER THINGS WORK FINE?
-  # NEED EXTRA FUNCTION(S) TO VISUALISE RESULTS MOST LIKELY
+  # EXTRA FUNCTION(S) TO VISUALISE RESULTS MOST LIKELY
   
-  set.seed(17)
-  tree <- rtree(nrow(Day2016$Matrix_1$Matrix))
-  tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
-  tree$root.time <- max(diag(vcv(tree)))
-  TimeBins <- seq(from = tree$root.time, to = 0, length.out = 5)
-  tree = tree
-  clad.matrix = Day2016
-  TimeBins = TimeBins
-  BranchPartitionsToTest = lapply(as.list(1:nrow(tree$edge)), as.list)
-  CharacterPartitionsToTest = lapply(as.list(1:sum(unlist(lapply(clad.matrix[2:length(clad.matrix)], function(x) ncol(x$Matrix))))), as.list)
-  CladePartitionsToTest = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)
-  TimeBinPartitionsToTest = lapply(as.list(1:(length(TimeBins) - 1)), as.list)
-  ChangeTimes = "random"
-  Alpha = 0.01
-  MultipleComparisonCorrection = "BenjaminiHochberg"
-  PolymorphismState = "missing"
-  UncertaintyState = "missing"
-  InapplicableState = "missing"
-  TimeBinApproach = "Lloyd"
-  EnsureAllWeightsAreIntegers = FALSE
-  EstimateAllNodes = FALSE
-  EstimateTipValues = FALSE
-  InapplicablesAsMissing = FALSE
-  PolymorphismBehaviour = "equalp"
-  UncertaintyBehaviour = "equalp"
-  Threshold = 0.01
+  #set.seed(17)
+  #tree <- rtree(nrow(Day2016$Matrix_1$Matrix))
+  #tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
+  #tree$root.time <- max(diag(vcv(tree)))
+  #TimeBins <- seq(from = tree$root.time, to = 0, length.out = 5)
+  #tree = tree
+  #clad.matrix = Day2016
+  #TimeBins = TimeBins
+  #BranchPartitionsToTest = lapply(as.list(1:nrow(tree$edge)), as.list)
+  #CharacterPartitionsToTest = lapply(as.list(1:sum(unlist(lapply(clad.matrix[2:length(clad.matrix)], function(x) ncol(x$Matrix))))), as.list)
+  #CladePartitionsToTest = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)
+  #TimeBinPartitionsToTest = lapply(as.list(1:(length(TimeBins) - 1)), as.list)
+  #ChangeTimes = "random"
+  #Alpha = 0.01
+  #MultipleComparisonCorrection = "BenjaminiHochberg"
+  #PolymorphismState = "missing"
+  #UncertaintyState = "missing"
+  #InapplicableState = "missing"
+  #TimeBinApproach = "Lloyd"
+  #EnsureAllWeightsAreIntegers = FALSE
+  #EstimateAllNodes = FALSE
+  #EstimateTipValues = FALSE
+  #InapplicablesAsMissing = FALSE
+  #PolymorphismBehaviour = "equalp"
+  #UncertaintyBehaviour = "equalp"
+  #Threshold = 0.01
 
   # Check for step matrices and stop and warn user if found:
   if(is.list(clad.matrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
@@ -421,11 +422,17 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
     
   }
   
+  # Set default converted continuous characters to FALSE:
+  ContinuousCharactersConverted <- FALSE
+  
   # Check for continuous characters as these will need to be modified for modelling to discrete characters:
   if(any(Ordering == "cont")) {
     
     # Tell user this is happening:
     cat("Continuous characters found. Converting to gap-weighted discrete characters.\n")
+    
+    # Set default converted continuous characters to TRUE:
+    ContinuousCharactersConverted <- TRUE
     
     # Find out which characters are continuous:
     ContinuousCharactersFound <- which(Ordering == "cont")
@@ -799,10 +806,10 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   if(!is.null(TimeBinPartitionsToTest)) TimeBinTestResults <- AddMultipleComparisonCorrectionCutoffs(TestResults = TimeBinTestResults, Alpha = Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection)
   
   # Compile output:
-  Output <- list(AllChanges, GlobalRate, BranchPartitionTestResults, CharacterPartitionTestResults, CladePartitionTestResults, TimeBinTestResults)
+  Output <- list(AllChanges, GlobalRate, ContinuousCharactersConverted, BranchPartitionTestResults, CharacterPartitionTestResults, CladePartitionTestResults, TimeBinTestResults)
   
   # Add naems to output:
-  names(Output) <- c("InferredCharacterChanges", "IntrinsicCharacterRate", "BranchPartitionResults", "CharacterPartitionResults", "CladePartitionResults", "TimeBinResults")
+  names(Output) <- c("InferredCharacterChanges", "IntrinsicCharacterRate", "ContinuousCharactersConvertedToDiscrete", "BranchPartitionResults", "CharacterPartitionResults", "CladePartitionResults", "TimeBinResults")
   
   # Return output:
   return(Output)
