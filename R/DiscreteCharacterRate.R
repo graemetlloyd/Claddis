@@ -146,11 +146,11 @@
 #'
 #'
 
-#Tree <- read.tree(text = "(A:1,(B:1,(C:1,D:1):1):1);")
+#Tree <- read.tree(text = "(A:1,(B:2,(C:2,D:2):2):2);")
 
 #Tree$root.time <- 3
 
-#SingleBlockMatrix <- matrix(c(0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1), nrow = 4, byrow = TRUE, dimnames = list(c("A", "B", "C", "D"), c()))
+#SingleBlockMatrix <- matrix(c(0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1), nrow = 4, byrow = TRUE, dimnames = list(c("A", "B", "C", "D"), c()))
 
 #TestMatrixOne <- MakeMorphMatrix(CTmatrix = SingleBlockMatrix)
 
@@ -158,10 +158,12 @@
 
 #TestMatrixTwo <- MakeMorphMatrix(CTmatrix = DoubleBlockMatrix)
 
+#DiscreteCharacterRate(tree = Tree, clad.matrix = TestMatrixOne, TimeBins = c(3, 2, 1, 0), BranchPartitionsToTest = lapply(as.list(1:nrow(Tree$edge)), as.list), CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, Threshold = 0.0000000001)
+
 #'
 #' @export DiscreteCharacterRate
 
-# WRITE SEARCH VERSION FOR FINDING RATE SHIFTS? SHOULD THIS EVEN BE AN OPTION?
+# WRITE SEARCH VERSION FOR FINDING RATE SHIFTS? SHOULD THIS EVEN BE AN OPTION? DOES THIS REQUIRE MODIFYING LRT TO COMPARE E.G. 2-RATE DIRECTLY WITH 3-RATE MODEL? OR CAN USE OUTPUT P-VALUES AND CONVERT MODELS TO AICS?
 # MAYBE MAKE ANCESTRAL STATE UNCERTAINTY DIFFERENT FOR TIPS THAN NODES? I.E., HOW IT GETS RESOLVED CAN BE DIFFERENT (MORE OPTIONS TO FUNCTION)
 # THESE TWO ARE RELATED: 1. ADD TERMINAL VERSUS INTERNAL OPTION SOMEHOW/SOMEWHERE, 2. ALLOW OPTION TO IGNORE SOME PARTS OF THE TREE FOR PARTITION TESTS? MAKES CALCULATING THE MEAN RATE TRICKIER BUT MIGHT MAKE SENSE E.G. FOR INGROUP ONLY TESTS. EXCLUDE EDGES AFTER DOING ANCESTRAL STATES? OR SET THESE TO ALL NAS TO ENSURE OTHER THINGS WORK FINE?
 # NEED EXTRA FUNCTION(S) TO VISUALISE RESULTS MOST LIKELY
@@ -170,10 +172,9 @@
 # CHECK FOR AUTAPOMORPHIES AND INFORM USER IF FOUND?
 # ADD CONTRIVED EXAMPLES TO SHOW HOW FUNCTION WORKS, E.G. RATE OF ONE CHANGES PER MILLION YEARS THEN DUPLICATED BLOCK WITH CHARCTER PARTITION TEST.
 # TIME BINS WITH NOTHING IN WILL CAUSE ISSUES AS DIVIDE BY ZEROES WILL OCCUR - ADD CHECK FOR THIS.
-# OPTIMAL TIMEBIN APPROACH WOULD BE ONE WHERE SUMMED VALUES SAME AS TOTAL VALUE - YEP, SO LLOYD DOES THIS AND CLOSE DOES NOT
 # DO I EVEN NEED CLADE MEMBERSHIP/OPPOSITION IF EVENTUALLY CALL BY EDGE NUMBER ANYWAY? CHECK OTHER ASPECTS OF EDGE LIST TOO!
 # GET CLADE NUMBERS BACK FOR OUTPUTTING?
-# WHAT IS SIGNIFICNALTY HIGH OR LOW IF THERE ARE THREE OR MORE PARTITIONS?
+# WHAT IS SIGNIFICNALTY HIGH OR LOW IF THERE ARE THREE OR MORE PARTITIONS? THIS IS NOT EVEN IN OUTPUT YET.
 # GET GLOBAL RATE INTO OUTPUT WHILST AVOIDING ISSUE WITH CLOSE APPROACH HAVING GOBAL RATE THAT WILL NOT MATCH EDGE OR CHAACTER PARTITIONS
 # PROBABLY NEED MORE CAREFUL CHECKS FOR ZERO VALUES GENERALLY, E.G., CHARACTER WITH ALL MISSING DATA
 
@@ -628,8 +629,14 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   # Add time bin opposition to edge list:
   EdgeList <- lapply(EdgeList, function(x) {x$TimeBinOpposition <- setdiff(1:(length(TimeBins) - 1), x$TimeBinMembership); return(x)})
   
+  # Start to build matrix of all changes with list of character changes:
+  AllChanges <- lapply(EdgeList, function(x) x$CharacterChanges)
+  
+  # Add edge number to each matrix of character changes:
+  for(i in 1:length(AllChanges)) AllChanges[[i]] <- cbind(rep(i, times = nrow(AllChanges[[i]])), AllChanges[[i]])
+  
   # Combine all changes into a single matrix:
-  AllChanges <- do.call(rbind, lapply(EdgeList, function(x) x$CharacterChanges))
+  AllChanges <- do.call(rbind, lapply(AllChanges, function(x) {colnames(x)[1] <- "Edge"; x}))
   
   # Remove silly rownames from all changes:
   rownames(AllChanges) <- NULL
@@ -799,10 +806,10 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   if(!is.null(TimeBinPartitionsToTest)) TimeBinTestResults <- AddMultipleComparisonCorrectionCutoffs(TestResults = TimeBinTestResults, Alpha = Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection)
   
   # Compile output:
-  Output <- list(BranchPartitionTestResults, CharacterPartitionTestResults, CladePartitionTestResults, TimeBinTestResults)
+  Output <- list(AllChanges, BranchPartitionTestResults, CharacterPartitionTestResults, CladePartitionTestResults, TimeBinTestResults)
   
   # Add naems to output:
-  names(Output) <- c("BranchPartitionResults", "CharacterPartitionResults", "CladePartitionResults", "TimeBinResults")
+  names(Output) <- c("InferredCharacterChanges", "BranchPartitionResults", "CharacterPartitionResults", "CladePartitionResults", "TimeBinResults")
   
   # Return output:
   return(Output)
