@@ -5,7 +5,7 @@
 \title{Principal Coordinates on a Cladistic Matrix}
 \usage{
 MorphMatrix2PCoA(morph.matrix, distance.method = "MORD",
-  GEDType = "Wills", TransformProportionalDistances = "arcsine_sqrt",
+  GEDType = "Wills", TransformDistances = "arcsine_sqrt",
   DistPolymorphismBehaviour = "min.difference",
   DistUncertaintyBehaviour = "min.difference", correction = "cailliez",
   Tree = NULL, EstimateAllNodes = FALSE, EstimateTipValues = FALSE,
@@ -19,6 +19,8 @@ MorphMatrix2PCoA(morph.matrix, distance.method = "MORD",
 \item{distance.method}{The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{MorphDistMatrix} for more details.}
 
 \item{GEDType}{The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.}
+
+\item{TransformDistances}{The transformation to apply to distances. See \link{MorphDistMatrix} for details.}
 
 \item{DistPolymorphismBehaviour}{The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{MorphDistMatrix} for details.}
 
@@ -39,8 +41,6 @@ MorphMatrix2PCoA(morph.matrix, distance.method = "MORD",
 \item{AncestralUncertaintyBehaviour}{Behaviour for dealing with uncertainties when producing ancestral state estimates - see \link{AncStateEstMatrix}.}
 
 \item{Threshold}{Threshold for ancestral state estimation of discrete characters - see \link{AncStateEstMatrix} for details.}
-
-\item{TransformDistances}{The transformation to apply to distances. See \link{MorphDistMatrix} for details.}
 }
 \value{
 \item{Tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{TrimMorphDistMatrix}.}
