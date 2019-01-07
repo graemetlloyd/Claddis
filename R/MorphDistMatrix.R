@@ -8,7 +8,7 @@
 #'
 #' Typically the resulting distance matrix will be used in an ordination procedure such as principal coordinates (effectively classical multidimensional scaling where k, the number of axes, is maximised at N - 1, where N is the number of rows (i.e., taxa) in the matrix). As such the distance should be - or approximate - Euclidean and hence a square root transformation is typically applied (\code{TransformDistances} with the \code{sqrt} option). However, if applying pre-ordination (i.e., ordination-free) disparity metrics (e.g., weighted mean pairwise distance) you may wish to avoid any transformation (\code{none} option). In particular the \code{MORD} will only fall on a zero to one scale if this is the case. However, if transforming the \code{MORD} for ordination this zero to one property may mean the arcsine square root (\code{arcsine_sqrt} option) is preferred. (Note that if using only unordered multistate or binary characters and the \code{GC} the zero to one scale will apply too.)
 #'
-#' An unexplored option in distance matrix construction is how to deal with polymorphisms (Lloyd 2016). Up to version 0.2 of Claddis all polymorphisms were treated the same regardless of whether they were true polymorphisms (multiple states are observed in the taxon) or uncertainties (multiple, but not all states, are posited for the taxon). Since version 0.3, however, these two forms can be distinguished by using the different #NEXUS forms (Maddison et al. 1997), i.e., (01) for polymorphisms and \{01\} for uncertainties and within Claddis these are represented as 0&1 or 0/1, respectively. Thus, since 0.3 Claddis allows these two forms to be treated separately, and hence differently (with \code{PolymorphismBehaviour} and \code{UncertaintyBehaviour}). Again, up to version 0.2 of Claddis no options for polymorphism behaviour were offered, instead only a minimum distance was employed. I.e., the distance between a taxon coded 0&1 and a taxon coded 2 would be the smaller of the comparisons 0 with 2 or 1 with 2. Since version 0.3 this is encoded in the \code{min.difference} option. Currentlly only one alternative (\code{mean.difference}), which takes the mean of each possible difference instead is offered. However, in future other options may be offered and currently no preferred approach is clear.
+#' An unexplored option in distance matrix construction is how to deal with polymorphisms (Lloyd 2016). Up to version 0.2 of Claddis all polymorphisms were treated the same regardless of whether they were true polymorphisms (multiple states are observed in the taxon) or uncertainties (multiple, but not all states, are posited for the taxon). Since version 0.3, however, these two forms can be distinguished by using the different #NEXUS forms (Maddison et al. 1997), i.e., (01) for polymorphisms and \{01\} for uncertainties and within Claddis these are represented as 0&1 or 0/1, respectively. Thus, since 0.3 Claddis allows these two forms to be treated separately, and hence differently (with \code{PolymorphismBehaviour} and \code{UncertaintyBehaviour}). Again, up to version 0.2 of Claddis no options for polymorphism behaviour were offered, instead only a minimum distance was employed. I.e., the distance between a taxon coded 0&1 and a taxon coded 2 would be the smaller of the comparisons 0 with 2 or 1 with 2. Since version 0.3 this is encoded in the \code{min.difference} option. Currentlly two alternatives (\code{mean.difference} and \code{random}) are offered. The first takes the mean of each possible difference and the second simply samples one of the states at random. Note this latter option makes the function stochastic and so it should be rerun multiple times (for example, with a \code{for} loop or \code{apply} function). In general this issue (and these options) are not explored in the literature and so no recommendation can be made beyond that users should think carefully about what this choice may mean for their individual data set(s) and question(s).
 #'
 #' A final consideration is how to deal with inapplicable characters. Up to version 0.2 Claddis treated inapplicable and missing characters the same (as NA values, i.e., missing data). However, since Claddis version 0.3 these can be imported separately, i.e., by using the "MISSING" and "GAP" states in #NEXUS format (Maddison et al. 1997) with the latter typically representing the inapplicable character. These will appear as NA and empty strings (""), respectively in Claddis format. Hopkins and St John (2018) showed how inapplicable characters - typically assumed to represent secondary characters - could be treated in generating distance matrices. These are usually hierarchical in form. E.g., a primary character might record the presence or absence of feathers and a secondary character whether those feathers are symmetric or asymmetric. The latter will generate inapplicable states for taxa without feathers and without correcting for this ranked distances can b incorrect (Hopkins and ST John 2018). Unfortunately, however, the #NEXUS format (Maddison et al. 1997) does not really allow explicit linkage between primary and secondary characters and so at present Claddis can only really operate by assuming any character with at least one taxon encoded as inapplicable as secondary and all other characters as primary.
 #'
@@ -65,7 +65,6 @@
 MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", TransformDistances = "arcsine_sqrt", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference") {
   
   # ADD HOPKINS SUGGESTION FOR FOURTH GEDTYPE WHERE MEAN DISTANCE FOR CHARACTER REPLACES MISSING VALUES.
-  # ADD RANDOM OPTION FOR POLYMORPHISM/UNCERTAINTY (AND STATE IN HELP FILE THAT THIS WILL MAKE OUTPUT STOCHASTIC (AND THAT IF THERE ARE NONE IT WON'T MATTER).
   # CHECK POLYMORPHISM UNCERTAINTY IN GENERAL AS NOT CLEAR IT IS DOING WHAT IT SHOULD DO.
   
   # Subfunction to find comparable characters for a pairwise taxon comparison:
@@ -308,10 +307,10 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", 
   if(length(setdiff(GEDType, c("Legacy", "Hybrid", "Wills"))) > 0) stop("GEDType must be one or more of \"Legacy\", \"Hybrid\", or \"Wills\".")
   
   # Check input for PolymorphismBehaviour is valid and stop and warn if not:
-  if(length(setdiff(PolymorphismBehaviour, c("mean.difference", "min.difference"))) > 0) stop("PolymorphismBehaviour must be one or more of \"mean.difference\", or \"min.difference\".")
+  if(length(setdiff(PolymorphismBehaviour, c("mean.difference", "min.difference"))) > 0) stop("PolymorphismBehaviour must be one or more of \"mean.difference\", \"min.difference\", or \"random\".")
   
   # Check input for UncertaintyBehaviour is valid and stop and warn if not:
-  if(length(setdiff(UncertaintyBehaviour, c("mean.difference", "min.difference"))) > 0) stop("UncertaintyBehaviour must be one or more of \"mean.difference\", or \"min.difference\".")
+  if(length(setdiff(UncertaintyBehaviour, c("mean.difference", "min.difference"))) > 0) stop("UncertaintyBehaviour must be one or more of \"mean.difference\", \"min.difference\", or \"random\".")
   
   # Isolate ordering element:
   ordering <- unlist(lapply(morph.matrix[2:length(morph.matrix)], '[[', "Ordering"))
@@ -327,6 +326,34 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", 
   
   # Combine matrix blocks into a single matrix:
   morph.matrix <- do.call(cbind, lapply(morph.matrix[2:length(morph.matrix)], '[[', "Matrix"))
+  
+  # If PolymorphismBehaviour is to randomly sample one state:
+  if(PolymorphismBehaviour == "random") {
+    
+    # Find cells with polymorphisms:
+    PolymorphismCells <- grep("&", morph.matrix)
+    
+    # If there are polymorphisms randomly sample one value and store:
+    if(length(PolymorphismCells) > 0) morph.matrix[PolymorphismCells] <- unlist(lapply(as.list(morph.matrix[PolymorphismCells]), function(x) sample(strsplit(x, split = "&")[[1]], size = 1)))
+    
+    # Reset behaviour as mean difference to allow it to interact correctly with UncertaintyBehaviour later:
+    PolymorphismBehaviour <- "mean.difference"
+    
+  }
+  
+  # If UncertaintyBehaviour is to randomly sample one state:
+  if(UncertaintyBehaviour == "random") {
+    
+    # Find cells with uncertainties:
+    UncertaintyCells <- grep("/", morph.matrix)
+    
+    # If there are uncertainties randomly sample one value and store:
+    if(length(UncertaintyCells) > 0) morph.matrix[UncertaintyCells] <- unlist(lapply(as.list(morph.matrix[UncertaintyCells]), function(x) sample(strsplit(x, split = "/")[[1]], size = 1)))
+    
+    # Reset behaviour as mean difference to allow it to interact correctly with PolymorphismBehaviour later:
+    UncertaintyBehaviour <- "mean.difference"
+    
+  }
   
   # If there are inapplicables then convert these to NAs:
   if(any(sort(morph.matrix == ""))) morph.matrix[morph.matrix == ""] <- NA
