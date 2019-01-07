@@ -45,7 +45,7 @@ A final consideration is how to deal with inapplicable characters. Up to version
 }
 \examples{
 
-# Get morphological distances for Day et
+# Get morphological distances for the Day et
 # al. (2016) data set:
 distances <- MorphDistMatrix(Day2016)
 
