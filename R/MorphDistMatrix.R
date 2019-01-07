@@ -307,10 +307,10 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
   if(length(setdiff(GEDType, c("Legacy", "Hybrid", "Wills"))) > 0) stop("GEDType must be one or more of \"Legacy\", \"Hybrid\", or \"Wills\".")
   
   # Check input for PolymorphismBehaviour is valid and stop and warn if not:
-  if(length(setdiff(PolymorphismBehaviour, c("mean.difference", "min.difference"))) > 0) stop("PolymorphismBehaviour must be one or more of \"mean.difference\", \"min.difference\", or \"random\".")
+  if(length(setdiff(PolymorphismBehaviour, c("mean.difference", "min.difference", "random"))) > 0) stop("PolymorphismBehaviour must be one or more of \"mean.difference\", \"min.difference\", or \"random\".")
   
   # Check input for UncertaintyBehaviour is valid and stop and warn if not:
-  if(length(setdiff(UncertaintyBehaviour, c("mean.difference", "min.difference"))) > 0) stop("UncertaintyBehaviour must be one or more of \"mean.difference\", \"min.difference\", or \"random\".")
+  if(length(setdiff(UncertaintyBehaviour, c("mean.difference", "min.difference", "random"))) > 0) stop("UncertaintyBehaviour must be one or more of \"mean.difference\", \"min.difference\", or \"random\".")
   
   # Isolate ordering element:
   ordering <- unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Ordering"))
