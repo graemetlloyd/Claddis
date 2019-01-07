@@ -6,7 +6,7 @@
 #'
 #' Note that Lloyd (2016) misidentified the substitute dissimilarity for the \code{GED} as the mean for the whole data set (Hopkins and St John 2018) and this was the way the GED implementation of Claddis operated up to version 0.2. This has now been amended (as of version 0.3) so that the function produces the \code{GED} in the form that Wills (1998) intended. However, this implementation can still be accessed as the \code{Legacy} option for \code{GEDType}, with \code{Wills} being the WIlls (1998) implementation. An advantage of this misinterpreted form of \code{GED} is that it will always return a complete pairwise distance matrix, however it is not recommended (see Lloyd 2016). Instead a third option for \code{GEDType} - (\code{Hybrid}) - offers the same outcome but only uses the mean distance from the entire matrix in the case where there are no codable characters in common in a pairwise comparison. This new hybrid option has not been used in a published study.
 #'
-#' Typically the resulting distance matrix will be used in an ordination procedure such as principal coordinates (effectively classical multidimensional scaling where k, the number of axes, is maximised at N - 1, where N is the number of rows (i.e., taxa) in the matrix). As such the distance should be - or approximate - Euclidean and hence a square root transformation is typically applied (\code{TransformProportionalDistances} with the \code{sqrt} option). However, if applying pre-ordination (i.e., ordination-free) disparity metrics (e.g., weighted mean pairwise distance) you may wish to avoid any transformation (\code{none} option). In particular the \code{MORD} will only fall on a zero to one scale if this is the case. However, if transforming the \code{MORD} for ordination this zero to one property may mean the arcsine square root (\code{arcsine_sqrt} option) is preferred. (Note that if using only unordered multistate or binary characters and the \code{GC} the zero to one scale will apply too.)
+#' Typically the resulting distance matrix will be used in an ordination procedure such as principal coordinates (effectively classical multidimensional scaling where k, the number of axes, is maximised at N - 1, where N is the number of rows (i.e., taxa) in the matrix). As such the distance should be - or approximate - Euclidean and hence a square root transformation is typically applied (\code{TransformDistances} with the \code{sqrt} option). However, if applying pre-ordination (i.e., ordination-free) disparity metrics (e.g., weighted mean pairwise distance) you may wish to avoid any transformation (\code{none} option). In particular the \code{MORD} will only fall on a zero to one scale if this is the case. However, if transforming the \code{MORD} for ordination this zero to one property may mean the arcsine square root (\code{arcsine_sqrt} option) is preferred. (Note that if using only unordered multistate or binary characters and the \code{GC} the zero to one scale will apply too.)
 #'
 #' An unexplored option in distance matrix construction is how to deal with polymorphisms (Lloyd 2016). Up to version 0.2 of Claddis all polymorphisms were treated the same regardless of whether they were true polymorphisms (multiple states are observed in the taxon) or uncertainties (multiple, but not all states, are posited for the taxon). Since version 0.3, however, these two forms can be distinguished by using the different #NEXUS forms (Maddison et al. 1997), i.e., (01) for polymorphisms and \{01\} for uncertainties and within Claddis these are represented as 0&1 or 0/1, respectively. Thus, since 0.3 Claddis allows these two forms to be treated separately, and hence differently (with \code{PolymorphismBehaviour} and \code{UncertaintyBehaviour}). Again, up to version 0.2 of Claddis no options for polymorphism behaviour were offered, instead only a minimum distance was employed. I.e., the distance between a taxon coded 0&1 and a taxon coded 2 would be the smaller of the comparisons 0 with 2 or 1 with 2. Since version 0.3 this is encoded in the \code{min.difference} option. Currentlly only one alternative (\code{mean.difference}), which takes the mean of each possible difference instead is offered. However, in future other options may be offered and currently no preferred approach is clear.
 #'
@@ -14,8 +14,8 @@
 #'
 #' @param morph.matrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
 #' @param Distance The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).
-#' @param GEDType The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.
-#' @param TransformProportionalDistances Whether to transform the proportional distances (Gower and max). Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default).
+#' @param GEDType The type of GED to use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.
+#' @param TransformDistances Whether to transform the distances. Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default). (Note: this is only really appropriate for the proportional distances, i.e., "GC" and "MORD".)
 #' @param PolymorphismBehaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
 #' @param UncertaintyBehaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
 #'
@@ -62,7 +62,11 @@
 #' distances$ComparableCharacterMatrix
 #'
 #' @export MorphDistMatrix
-MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", TransformProportionalDistances = "arcsine_sqrt", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference") {
+MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", TransformDistances = "arcsine_sqrt", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference") {
+  
+  # ADD HOPKINS SUGGESTION FOR FOURTH GEDTYPE WHERE MEAN DISTANCE FOR CHARACTER REPLACES MISSING VALUES.
+  # ADD RANDOM OPTION FOR POLYMORPHISM/UNCERTAINTY (AND STATE IN HELP FILE THAT THIS WILL MAKE OUTPUT STOCHASTIC (AND THAT IF THERE ARE NONE IT WON'T MATTER).
+  # CHECK POLYMORPHISM UNCERTAINTY IN GENERAL AS NOT CLEAR IT IS DOING WHAT IT SHOULD DO.
   
   # Subfunction to find comparable characters for a pairwise taxon comparison:
   GetComparableCharacters <- function(interest.col, morph.matrix) {
@@ -294,8 +298,8 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", 
   # Check for step matrices and stop and warn user if found:
   if(is.list(morph.matrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
   
-  # Check input of TransformProportionalDistances is valid and stop and warn if not:
-  if(length(setdiff(TransformProportionalDistances, c("arcsine_sqrt", "none", "sqrt"))) > 0) stop("TransformProportionalDistances must be one of \"none\", \"sqrt\", or \"arcsine_sqrt\".")
+  # Check input of TransformDistances is valid and stop and warn if not:
+  if(length(setdiff(TransformDistances, c("arcsine_sqrt", "none", "sqrt"))) > 0) stop("TransformDistances must be one of \"none\", \"sqrt\", or \"arcsine_sqrt\".")
   
   # Check input of distance is valid and stop and warn if not:
   if(length(setdiff(Distance, c("RED", "GED", "GC", "MORD"))) > 0) stop("Distance must be one or more of \"RED\", \"GED\", \"GC\", or \"MORD\".")
@@ -446,26 +450,31 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", 
   # If there are any NaNs replace with NAs:
   if(any(is.nan(dist.matrix))) dist.matrix[is.nan(dist.matrix)] <- NA
   
-  # If transforming distance matrix by taking the square root - take the square root:
-  if(TransformProportionalDistances == "sqrt") dist.matrix <- sqrt(dist.matrix)
-  
-  # If transforming distance matrix by taking the arcsine square root:
-  if(TransformProportionalDistances == "arcsine_sqrt") {
+  # If using a proportional distance:
+  if(Distance == "MORD" || Distance == "GC") {
     
-    # Check for squared distances greater than 1:
-    if(any(sort(sqrt(dist.matrix)) > 1)) {
+    # If transforming distance matrix by taking the square root - take the square root:
+    if(TransformDistances == "sqrt") dist.matrix <- sqrt(dist.matrix)
+    
+    # If transforming distance matrix by taking the arcsine square root:
+    if(TransformDistances == "arcsine_sqrt") {
       
-      # Warn user that distances were rescaled:
-      print("Squared distances found of greater than 1 so matrix was rescaled prior to taking arcsine.")
-      
-      # Take the arcsine square root of the rescaled distance matrix:
-      dist.matrix <- asin(sqrt(dist.matrix) / max(sort(sqrt(dist.matrix))))
-      
-    # If squared distances are less than or equal to one:
-    } else {
-      
-      # Take the arcsine square root directly:
-      dist.matrix <- asin(sqrt(dist.matrix))
+      # Check for squared distances greater than 1:
+      if(any(sort(sqrt(dist.matrix)) > 1)) {
+        
+        # Warn user that distances were rescaled:
+        print("Squared distances found of greater than 1 so matrix was rescaled prior to taking arcsine.")
+        
+        # Take the arcsine square root of the rescaled distance matrix:
+        dist.matrix <- asin(sqrt(dist.matrix) / max(sort(sqrt(dist.matrix))))
+        
+      # If squared distances are less than or equal to one:
+      } else {
+        
+        # Take the arcsine square root directly:
+        dist.matrix <- asin(sqrt(dist.matrix))
+        
+      }
       
     }
     
@@ -481,3 +490,237 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", 
   return(result)
   
 }
+
+
+
+
+
+
+
+
+###################Hopkins and St. John 2018#####################
+##function for applying proposed family of metrics. Input: character matrix in Claddis object format; table showing hierarchical relationships between characters; alpha value.
+##Input required:
+##matr = character matrix in Claddis object format (see "ReadMorphNexus")
+##type = table with three columns with headings "Char", "Type", and "Sub"
+##      "Char" is the character number
+##      "Type" is the type of character, either "S" for secondary or "T" for tertiary.  In our experience, quaternary characters are rarely to never used
+##      "Sub" is the character numeber that the secondary or tertiary character is contingent on
+##alpha = desired alpha value.  Should vary between 0 and 1.
+##      If alpha = 0, only primary characters will contribute to dissimilarity estimate
+##      If alpha = 1, then shared primary characters will be weighted by the secondary characters shared; same for secondary characters with tertiary characters
+##      See text for further explanation.
+
+##note that delta{ijk} = 1 when characters are comparable, consistent with Gower's initial formulation. It may be preferable to replace the total number of
+#comparable characters with the maximum character total possible (Lloyd's MORB metric) especially if there are ordered characters. This is not implemented here
+#but could be done by modifying lines 90 and 212 for the new metric and Gower's, respectively
+#################
+
+alpha.coefficient <- function(matr, type, alpha) {
+  
+  #matr <- Day2016
+  #alpha <- 0.5 # Check values make sense if incorporating in function
+  #type <- matrix(c(8, "S", 7), nrow = 1, dimnames = list(c(), c("Char", "Type", "Sub")))
+  
+  
+  #Type should more logically be a two-column matrix with first character dependent on second character then can do any level of depth (sevndary tertiary etc.)
+  #Will require checking for non-circularity of character-dependency
+  #Need to do operation in order from most to least "nested" character
+  #Does weighting cause issue later though? I..e, clash with satrting weights?
+  
+  Matrix <- do.call(cbind, lapply(matr[2:length(matr)], function(x) x$Matrix))
+  Ordering <- unname(unlist(lapply(matr[2:length(matr)], function(x) x$Ordering)))
+  MaxVals <- unname(unlist(lapply(matr[2:length(matr)], function(x) x$MaxVals)))
+  Weights <- unname(unlist(lapply(matr[2:length(matr)], function(x) x$Weights)))
+  
+  pairs <- combn(nrow(Matrix), 2)
+  
+  HSJ <- matrix(NA, nrow = nrow(Matrix), ncol = nrow(Matrix))
+  
+  # This does nothing????
+  alpha <- alpha
+  
+  for(i in 1:ncol(pairs)) {
+    
+    sim.temp <- matrix(abs(suppressWarnings(as.numeric(Matrix[pairs[1, i], ])) - suppressWarnings(as.numeric(Matrix[pairs[2, i], ]))))
+    
+    #correct values for ordered multistate characters
+    if(any(Ordering == 'ord')) {
+      
+      m.o <- which(Ordering == 'ord')
+      
+      sim.temp[m.o] <- abs(suppressWarnings(as.numeric(Matrix[pairs[1, i], ][m.o])) - suppressWarnings(as.numeric(Matrix[pairs[2, i], ][m.o]))) #/MaxVals[m.o]
+      
+    }
+    
+    #correct values for unordered multistate characters
+    if(any(Ordering == "unord" && MaxVals > 1)) {
+      
+      m.u <- which(Ordering == "unord" && MaxVals > 1)
+      
+      sim.temp[m.u] <- replace(sim.temp[m.u], which(sim.temp[m.u] > 1), 1)
+      
+    }
+    #correct polymorphic characters
+    if(length(grep("&", unique(c(Matrix[pairs[1, i], ], Matrix[pairs[2, i], ])))) > 0) {
+      
+      polym.states <- sort(c(grep("&", Matrix[pairs[1, i], ]), grep("&", Matrix[pairs[2, i], ])))
+      for(v in 1:length(polym.states)) {
+        char.state1 <- strsplit(Matrix[pairs[1, i], ][polym.states[v]], "&")[[1]]
+        char.state2 <- strsplit(Matrix[pairs[2, i], ][polym.states[v]], "&")[[1]]
+        int.value <- intersect(char.state1, char.state2)
+        if(length(int.value) > 0) sim.temp[polym.states[v]] <- 0
+        if(length(int.value) == 0 && anyNA(c(char.state1, char.state2)) == FALSE) {
+          if(Ordering[polym.states[v]] == "unord") sim.temp[polym.states[v]] <- 1
+          if(Ordering[polym.states[v]] == "ord"){
+            pairs.poly <- matrix(0, nrow = length(char.state1), ncol = length(char.state2))
+            for(m in 1:length(char.state1)) for(n in 1:length(char.state2)) pairs.poly[m, n] <- abs(as.numeric(char.state1[m]) - as.numeric(char.state2[n]))
+            sim.temp[polym.states[v]] <- min(pairs.poly)
+          }
+        }
+      }
+    }
+    #account for Tertiary characters (by weighting)
+    if(any(type[, "Type"] == "T")) {
+      te <- which(type[, "Type"] == "T")
+      for(j in 1:length(unique(type[, "Sub"][te]))) {
+        te.sub <- which(type[, "Sub"] == as.character(unique(type[, "Sub"][te])[j]))
+        te.sim <- sim.temp[te.sub]
+        s.te <- as.numeric(as.character(unique(na.omit(type[, "Sub"][te])))[j])
+        if(length(na.omit(te.sim)) > 0) {
+          sim.temp[s.te] <- 1 - (alpha * (1 - (sum(na.omit(te.sim)) / length(na.omit(te.sim)))) + (1 - alpha))  #alpha is applied as if it were a similarity measure, therefore the distance is converted to a similarity by substracted from one, then the whole thing is substracted from one to convert back to dissimilarity
+          sim.temp[te.sub] <- NA
+        }
+      }
+    }
+    #account for secondary characters (by weighting)
+    
+    # If there are secondary characters:
+    if(any(type[, "Type"] == "S")) {
+      
+      # Rows with secondary characters:
+      s <- which(type[, "Type"] == "S")
+      
+      # For each dependent character (i.e., unique primary character):
+      for(j in 1:length(unique(type[s, "Sub"]))) {
+        
+        # This seems wrong? Should be the secondary characters?:
+        s.sub <- which(type[, "Sub"] == as.character(unique(type[s, "Sub"])[j]))
+        
+        #
+        s.sim <- sim.temp[s.sub]
+        
+        # Primary character number:
+        p.s <- as.numeric(as.character(unique(na.omit(type[s, "Sub"])))[j])
+        
+        #
+        if(length(na.omit(s.sim)) > 0) {
+          
+          # Set primary character as reweighted distance value:
+          sim.temp[p.s] <- 1 - (alpha * (1 - (sum(na.omit(s.sim)) / length(na.omit(s.sim)))) + (1 - alpha))
+          
+          # Set secondary distances to NA?:
+          sim.temp[s.sub] <- NA
+          
+        }
+        
+      }
+      
+    }
+    
+    #calculate total dissimilarity
+    wt.comp.char <- sum(na.omit(cbind(sim.temp, Weights))[, 2])
+    
+    
+    HSJ[pairs[1, i], pairs[2, i]] <- HSJ[pairs[2, i], pairs[1, i]] <- sum(na.omit(sim.temp * Weights)) / wt.comp.char
+  
+  }
+  
+  diag(HSJ) <- 0
+  
+  return(HSJ)
+  
+}
+
+
+
+###############
+##Implementation of Will's GED
+##matr = character matrix in Claddis object format (see "ReadMorphNexus")
+
+GED <- function(matr) {
+  
+  Matrix <- do.call(cbind, lapply(matr[2:length(matr)], function(x) x$Matrix))
+  Ordering <- unname(unlist(lapply(matr[2:length(matr)], function(x) x$Ordering)))
+  MaxVals <- unname(unlist(lapply(matr[2:length(matr)], function(x) x$MaxVals)))
+  Weights <- unname(unlist(lapply(matr[2:length(matr)], function(x) x$Weights)))
+  
+  pairs <- combn(nrow(Matrix), 2)
+  
+  GED <- matrix(NA, nrow = nrow(Matrix), ncol = nrow(Matrix))
+  
+  for (i in 1:ncol(pairs)) {
+    sim.temp <- matrix(abs(suppressWarnings(as.numeric(Matrix[pairs[1, i], ])) - suppressWarnings(as.numeric(Matrix[pairs[2, i], ]))))
+    #correct values for ordered multistate characters
+    if(any(Ordering == "ord")) {
+      m.o <- which(Ordering == "ord")
+      sim.temp[m.o] <- abs(suppressWarnings(as.numeric(Matrix[pairs[1, i], ][m.o])) - suppressWarnings(as.numeric(Matrix[pairs[2, i], ][m.o])))
+    }
+    #correct values for unordered multistate characters
+    if(any(Ordering == "unord" && MaxVals > 1)){
+      m.u <- which(Ordering == "unord" && MaxVals > 1)
+      sim.temp[m.u] <- replace(sim.temp[m.u], which(sim.temp[m.u] > 1), 1)
+    }
+    #correct polymorphic characters
+    if(length(grep("&", unique(c(Matrix[pairs[1, i], ], Matrix[pairs[2, i], ])))) > 0){
+      polym.states <- sort(c(grep("&", Matrix[pairs[1, i], ]), grep("&", Matrix[pairs[2, i], ])))
+      for(v in 1:length(polym.states)) {
+        char.state1 <- strsplit(Matrix[pairs[1, i], ][polym.states[v]], "&")[[1]]
+        char.state2 <- strsplit(Matrix[pairs[2, i], ][polym.states[v]], "&")[[1]]
+        int.value <- intersect(char.state1, char.state2)
+        if(length(int.value) > 0) sim.temp[polym.states[v]] <- 0
+        if(length(int.value) == 0 & anyNA(c(char.state1,char.state2)) == FALSE){
+          if(Ordering[polym.states[v]] == "unord") sim.temp[polym.states[v]] <- 1
+          if(Ordering[polym.states[v]] == "ord") {
+            pairs.poly <- matrix(0, nrow = length(char.state1), ncol = length(char.state2))
+            for(m in 1:length(char.state1)) for(n in 1:length(char.state2)) pairs.poly[m, n] <- abs(as.numeric(char.state1[m]) - as.numeric(char.state2[n]))
+            sim.temp[polym.states[v]] <- min(pairs.poly)
+          }
+        }
+      }
+    }
+    
+    #replace missing values
+    Sij <- mean(na.omit(sim.temp))
+    sim.temp[which(is.na(sim.temp) == TRUE)] <- Sij
+    
+    #calculate total dissimilarity
+    #wt.comp.char<-sum(na.omit(cbind(sim.temp, Weights))[,2])
+    GED[pairs[1, i], pairs[2, i]] <- GED[pairs[2, i], pairs[1, i]] <- sqrt(sum((sim.temp * Weights)^2))
+  }
+  diag(GED)<-0
+  return(GED)
+}
+
+#DayDiscrete <- MatrixPruner(Day2016, characters2prune = 1:3)
+#DayDiscrete$Matrix_2$Matrix[, 30] <- gsub("2", "1", gsub("1", "0", DayDiscrete$Matrix_2$Matrix[, 30]))
+#DayDiscrete$Matrix_2$Matrix[, 5] <- gsub("", NA, DayDiscrete$Matrix_2$Matrix[, 5])
+#DayDiscrete$Matrix_2$MinVals[30] <- 0
+#DayDiscrete$Matrix_2$Matrix[which(DayDiscrete$Matrix_2$Matrix[, 5] == ""), 5] <- NA
+
+#x <- as.vector(as.dist(GED(DayDiscrete)))
+#y <- as.vector(as.dist(MorphDistMatrix(morph.matrix = DayDiscrete, Distance = "GED", GEDType = "Wills", TransformDistances = "none", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference")$DistanceMatrix))
+#cor.test(x,y)$estimate
+
+#x <- as.vector(as.dist(GED(Michaux1989)))
+#y <- as.vector(as.dist(MorphDistMatrix(morph.matrix = Michaux1989, Distance = "GED", GEDType = "Wills", TransformDistances = "none", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference")$DistanceMatrix))
+#cor.test(x,y)$estimate
+
+#x <- as.vector(as.dist(GED(Gauthier1986)))
+#y <- as.vector(as.dist(MorphDistMatrix(morph.matrix = Gauthier1986, Distance = "GED", GEDType = "Wills", TransformDistances = "none", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference")$DistanceMatrix))
+#cor.test(x,y)$estimate
+
+
+
+#sim.temp[s.te] <- 1 - (alpha * (1 - (sum(na.omit(te.sim)) / length(na.omit(te.sim)))) + (1 - alpha))  #alpha is applied as if it were a similarity
+

@@ -20,11 +20,9 @@ MorphMatrix2PCoA(morph.matrix, distance.method = "MORD",
 
 \item{GEDType}{The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.}
 
-\item{TransformProportionalDistances}{The transformation to apply to propotional (0 to 1) distances (one of "none", "sqrt", or "arcsine_sqrt" - the default). See \link{MorphDistMatrix} for more details.}
+\item{DistPolymorphismBehaviour}{The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{MorphDistMatrix} for details.}
 
-\item{DistPolymorphismBehaviour}{The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.}
-
-\item{DistUncertaintyBehaviour}{The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.}
+\item{DistUncertaintyBehaviour}{The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{MorphDistMatrix} for details.}
 
 \item{correction}{The negative eigenvalue correction to use (one of "lingoes", "none", or "cailliez" - the default). See \link{pcoa} for more details.}
 
@@ -41,6 +39,8 @@ MorphMatrix2PCoA(morph.matrix, distance.method = "MORD",
 \item{AncestralUncertaintyBehaviour}{Behaviour for dealing with uncertainties when producing ancestral state estimates - see \link{AncStateEstMatrix}.}
 
 \item{Threshold}{Threshold for ancestral state estimation of discrete characters - see \link{AncStateEstMatrix} for details.}
+
+\item{TransformDistances}{The transformation to apply to distances. See \link{MorphDistMatrix} for details.}
 }
 \value{
 \item{Tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{TrimMorphDistMatrix}.}
@@ -107,5 +107,7 @@ Gower, J. C., 1966. Some distance properties of latent root and vector methods u
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
+\keyword{classic}
 \keyword{coordinates}
-\keyword{principal}
+\keyword{multidimensional}
+\keyword{scaling,principal}
