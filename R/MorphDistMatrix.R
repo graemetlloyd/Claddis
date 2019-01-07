@@ -47,7 +47,7 @@
 #'
 #' @examples
 #'
-#' # Get morphological distances for Day et
+#' # Get morphological distances for the Day et
 #' # al. (2016) data set:
 #' distances <- MorphDistMatrix(Day2016)
 #'

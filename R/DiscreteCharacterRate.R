@@ -319,7 +319,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
   DescendantEdgesForEachInternalNode <- lapply(as.list(InternalNodeNumbers), GetDescendantEdges, tree = tree)
   
   # Get ancestral character states:
-  AncestralStates <- AncStateEstMatrix(InputMatrix = CladisticMatrix, Tree = tree, EstimateAllNodes = EstimateAllNodes, EstimateTipValues = EstimateTipValues, InapplicablesAsMissing = InapplicablesAsMissing, PolymorphismBehaviour = PolymorphismBehaviour, UncertaintyBehaviour = UncertaintyBehaviour, Threshold = Threshold)
+  AncestralStates <- AncStateEstMatrix(CladisticMatrix = CladisticMatrix, Tree = tree, EstimateAllNodes = EstimateAllNodes, EstimateTipValues = EstimateTipValues, InapplicablesAsMissing = InapplicablesAsMissing, PolymorphismBehaviour = PolymorphismBehaviour, UncertaintyBehaviour = UncertaintyBehaviour, Threshold = Threshold)
   
   # Build single matrix of all states in tip label then node number order:
   AllStates <- do.call(cbind, lapply(lapply(AncestralStates[2:length(AncestralStates)], '[[', "Matrix"), function(x) x[c(tree$tip.label, 1:ape::Nnode(tree) + ape::Ntip(tree)), , drop = FALSE]))

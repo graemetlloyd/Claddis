@@ -72,7 +72,7 @@ SafeTaxonomicReduction <- function(CladisticMatrix) {
   }
   
   # Prune out any zero weight characters, if they exist:
-  if(any(CladisticMatrix[[2]]$Weights == 0)) CladisticMatrix <- MatrixPruner(clad.matrix = CladisticMatrix, characters2prune = which(CladisticMatrix[[2]]$Weights == 0))
+  if(any(CladisticMatrix[[2]]$Weights == 0)) CladisticMatrix <- MatrixPruner(CladisticMatrix = CladisticMatrix, characters2prune = which(CladisticMatrix[[2]]$Weights == 0))
   
   # Order matrix from least to most complete taxon (as least is most likely to be removed):
   CladisticMatrix[[2]]$Matrix <- CladisticMatrix[[2]]$Matrix[order(apply(apply(CladisticMatrix[[2]]$Matrix, 1, is.na), 2, sum), decreasing = TRUE), ]
