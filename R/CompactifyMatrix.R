@@ -8,7 +8,7 @@
 #'
 #' The function also deletes any characters weighted zero from the matrix.
 #'
-#' @param clad.matrix The cladistic matrix in the format imported by \link{ReadMorphNexus}.
+#' @param CladisticMatrix The cladistic matrix in the format imported by \link{ReadMorphNexus}.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -34,21 +34,21 @@
 #' Michaux1989compact$weights
 #'
 #' @export CompactifyMatrix
-CompactifyMatrix <- function(clad.matrix) {
+CompactifyMatrix <- function(CladisticMatrix) {
   
   # FUTURE COULD CHECK FOR UNORD AND ORD WHEN BINARY AND HENCE MEANINGLESS
   
   # List any zero weight characters:
-  ZeroWeightCharacters <- which(unlist(lapply(clad.matrix[2:length(clad.matrix)], '[[', "Weights")) == 0)
+  ZeroWeightCharacters <- which(unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Weights")) == 0)
   
   # If there are zero weight characters then prune them:
-  if(length(ZeroWeightCharacters) > 0) clad.matrix <- MatrixPruner(clad.matrix, characters2prune = ZeroWeightCharacters)
+  if(length(ZeroWeightCharacters) > 0) CladisticMatrix <- MatrixPruner(CladisticMatrix, characters2prune = ZeroWeightCharacters)
   
   # For each matrix block:
-  for(i in 2:length(clad.matrix)) {
+  for(i in 2:length(CladisticMatrix)) {
     
     # Get strings for each character distribution, including ordering:
-    char.distrib.strings <- paste(apply(clad.matrix[[i]]$Matrix, 2, paste, collapse = ""), clad.matrix[[i]]$Ordering, sep = " ")
+    char.distrib.strings <- paste(apply(CladisticMatrix[[i]]$Matrix, 2, paste, collapse = ""), CladisticMatrix[[i]]$Ordering, sep = " ")
     
     # Case if matrix can be compactified:
     if(length(unique(char.distrib.strings)) < length(char.distrib.strings)) {
@@ -57,22 +57,22 @@ CompactifyMatrix <- function(clad.matrix) {
       rle.char.distrib.strings <- rle(sort(char.distrib.strings, decreasing = TRUE))
       
       # Set ordering of newly collapsed characters:
-      clad.matrix[[i]]$Ordering <- unlist(lapply(strsplit(rle.char.distrib.strings$values, " "), '[', 2))
+      CladisticMatrix[[i]]$Ordering <- unlist(lapply(strsplit(rle.char.distrib.strings$values, " "), '[', 2))
       
       # Set weights of newly collapsed characters by aggregating weights of source characters:
-      clad.matrix[[i]]$Weights <- unlist(lapply(lapply(lapply(lapply(as.list(rle.char.distrib.strings$values), '==', char.distrib.strings), which), function(x) clad.matrix[[i]]$Weights[x]), sum))
+      CladisticMatrix[[i]]$Weights <- unlist(lapply(lapply(lapply(lapply(as.list(rle.char.distrib.strings$values), '==', char.distrib.strings), which), function(x) CladisticMatrix[[i]]$Weights[x]), sum))
       
       # Build new collapsed matrix:
-      clad.matrix[[i]]$Matrix <- matrix(unlist(lapply(lapply(strsplit(rle.char.distrib.strings$values, " "), '[', 1), strsplit, split = "")), nrow = nrow(clad.matrix[[i]]$Matrix), dimnames = list(rownames(clad.matrix[[i]]$Matrix), c()))
+      CladisticMatrix[[i]]$Matrix <- matrix(unlist(lapply(lapply(strsplit(rle.char.distrib.strings$values, " "), '[', 1), strsplit, split = "")), nrow = nrow(CladisticMatrix[[i]]$Matrix), dimnames = list(rownames(CladisticMatrix[[i]]$Matrix), c()))
       
       # Get ranges of values for characters in new collapsed matrix:
-      MinMax <- lapply(lapply(lapply(lapply(lapply(lapply(apply(clad.matrix[[i]]$Matrix, 2, strsplit, split = "/"), unlist), strsplit, split = "&"), unlist), unique), as.numeric), range)
+      MinMax <- lapply(lapply(lapply(lapply(lapply(lapply(apply(CladisticMatrix[[i]]$Matrix, 2, strsplit, split = "/"), unlist), strsplit, split = "&"), unlist), unique), as.numeric), range)
       
       # Set new minimum values for collapsed matrix:
-      clad.matrix[[i]]$MinVals <- unlist(lapply(MinMax, '[', 1))
+      CladisticMatrix[[i]]$MinVals <- unlist(lapply(MinMax, '[', 1))
       
       # Set new maximum values for collapsed matrix:
-      clad.matrix[[i]]$MaxVals <- unlist(lapply(MinMax, '[', 2))
+      CladisticMatrix[[i]]$MaxVals <- unlist(lapply(MinMax, '[', 2))
       
     # Case if matrix cannot be compactified:
     } else {
@@ -85,6 +85,6 @@ CompactifyMatrix <- function(clad.matrix) {
   }
 
   # Output unaltered matrix:
-  return(clad.matrix)
+  return(CladisticMatrix)
   
 }

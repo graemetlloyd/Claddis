@@ -4,8 +4,8 @@
 \alias{MorphMatrix2PCoA}
 \title{Principal Coordinates on a Cladistic Matrix}
 \usage{
-MorphMatrix2PCoA(morph.matrix, distance.method = "MORD",
-  GEDType = "Wills", TransformDistances = "arcsine_sqrt",
+MorphMatrix2PCoA(CladisticMatrix, Distance = "MORD", GEDType = "Wills",
+  TransformDistances = "arcsine_sqrt",
   DistPolymorphismBehaviour = "min.difference",
   DistUncertaintyBehaviour = "min.difference", correction = "cailliez",
   Tree = NULL, EstimateAllNodes = FALSE, EstimateTipValues = FALSE,
@@ -14,9 +14,9 @@ MorphMatrix2PCoA(morph.matrix, distance.method = "MORD",
   AncestralUncertaintyBehaviour = "equalp", Threshold = 0.01)
 }
 \arguments{
-\item{morph.matrix}{A vector of mode character representing the tip names for which an ancestor is sought.}
+\item{CladisticMatrix}{A vector of mode character representing the tip names for which an ancestor is sought.}
 
-\item{distance.method}{The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{MorphDistMatrix} for more details.}
+\item{Distance}{The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{MorphDistMatrix} for more details.}
 
 \item{GEDType}{The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.}
 

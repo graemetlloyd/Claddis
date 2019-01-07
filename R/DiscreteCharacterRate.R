@@ -59,8 +59,8 @@
 #'
 #' Given a tree and a cladistic-type matrix uses likelihood ratio tests to compare N-rate and 1-rate models across branches, clades, time bins, or character partitions.
 #'
-#' @param tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{clad.matrix}.
-#' @param clad.matrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#' @param tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{CladisticMatrix}.
+#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
 #' @param TimeBins A vector of ages (in millions of years) indicating the boundaries of a series of time bins in order from oldest to youngest.
 #' @param BranchPartitionsToTest A list of branch(es) (edge numbers) to test for a 2-rate parameter model (i.e., one rate for the edge and another for the rest of the tree). If NULL (the default) then no partition test(s) will be made.
 #' @param CharacterPartitionsToTest A list of character partition(s) (character numbers) to test for a 2-rate parameter model (i.e., one rate for the partition and another for the remaining characters). If NULL (the default) then no partition test(s) will be made.
@@ -128,7 +128,7 @@
 #' tree$root.time <- max(diag(vcv(tree)))
 #' 
 #' # Get discrete character rates:
-#' x <- DiscreteCharacterRate(tree = tree, clad.matrix =
+#' x <- DiscreteCharacterRate(tree = tree, CladisticMatrix =
 #'   Michaux1989, TimeBins = seq(from = tree$root.time,
 #'   to = 0, length.out = 5), BranchPartitionsToTest =
 #'   lapply(as.list(1:nrow(tree$edge)), as.list),
@@ -143,7 +143,7 @@
 #'   "Lloyd")
 #'
 #' @export DiscreteCharacterRate
-DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
+DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
   
   # DESIDERATA (STUFF IT WOULD BE NICE TO ADD IN FUTURE):
   #
@@ -161,7 +161,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   # WHAT IS SIGNIFICANTLY HIGH OR LOW IF THERE ARE THREE OR MORE PARTITIONS? THIS IS NOT EVEN IN OUTPUT YET.
 
   # Check for step matrices and stop and warn user if found:
-  if(is.list(clad.matrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
+  if(is.list(CladisticMatrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
 
   # Check tree has branch lengths:
   if(is.null(tree$edge.length)) stop("Tree does not have branch lengths (durations). Try timescaling the tree, e.g., with DatePhylo.")
@@ -197,7 +197,7 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   EdgeNumbers <- 1:nrow(tree$edge)
   
   # Get character numbers:
-  CharacterNumbers <- 1:sum(unlist(lapply(lapply(clad.matrix[2:length(clad.matrix)], '[[', "Matrix"), ncol)))
+  CharacterNumbers <- 1:sum(unlist(lapply(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Matrix"), ncol)))
   
   # Ensure time bins are in correct order:
   TimeBins <- sort(unique(TimeBins), decreasing = TRUE)
@@ -319,22 +319,22 @@ DiscreteCharacterRate <- function(tree, clad.matrix, TimeBins, BranchPartitionsT
   DescendantEdgesForEachInternalNode <- lapply(as.list(InternalNodeNumbers), GetDescendantEdges, tree = tree)
   
   # Get ancestral character states:
-  AncestralStates <- AncStateEstMatrix(InputMatrix = clad.matrix, Tree = tree, EstimateAllNodes = EstimateAllNodes, EstimateTipValues = EstimateTipValues, InapplicablesAsMissing = InapplicablesAsMissing, PolymorphismBehaviour = PolymorphismBehaviour, UncertaintyBehaviour = UncertaintyBehaviour, Threshold = Threshold)
+  AncestralStates <- AncStateEstMatrix(InputMatrix = CladisticMatrix, Tree = tree, EstimateAllNodes = EstimateAllNodes, EstimateTipValues = EstimateTipValues, InapplicablesAsMissing = InapplicablesAsMissing, PolymorphismBehaviour = PolymorphismBehaviour, UncertaintyBehaviour = UncertaintyBehaviour, Threshold = Threshold)
   
   # Build single matrix of all states in tip label then node number order:
   AllStates <- do.call(cbind, lapply(lapply(AncestralStates[2:length(AncestralStates)], '[[', "Matrix"), function(x) x[c(tree$tip.label, 1:ape::Nnode(tree) + ape::Ntip(tree)), , drop = FALSE]))
   
   # Make vector of ordering of characters:
-  Ordering <- unname(unlist(lapply(clad.matrix[2:length(clad.matrix)], '[[', "Ordering")))
+  Ordering <- unname(unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Ordering")))
   
   # Make vector of weights of characters:
-  Weights <- unname(unlist(lapply(clad.matrix[2:length(clad.matrix)], '[[', "Weights")))
+  Weights <- unname(unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Weights")))
   
   # Make vector of minimum values:
-  MinVals <- unname(unlist(lapply(clad.matrix[2:length(clad.matrix)], '[[', "MinVals")))
+  MinVals <- unname(unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "MinVals")))
   
   # Make vector of maximum values:
-  MaxVals <- unname(unlist(lapply(clad.matrix[2:length(clad.matrix)], '[[', "MaxVals")))
+  MaxVals <- unname(unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "MaxVals")))
   
   # Find positions in matrix with polymorphisms:
   PolymorphismPositions <- grep("&", AllStates)

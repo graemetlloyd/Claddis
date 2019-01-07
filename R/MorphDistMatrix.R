@@ -12,7 +12,7 @@
 #'
 #' A final consideration is how to deal with inapplicable characters. Up to version 0.2 Claddis treated inapplicable and missing characters the same (as NA values, i.e., missing data). However, since Claddis version 0.3 these can be imported separately, i.e., by using the "MISSING" and "GAP" states in #NEXUS format (Maddison et al. 1997) with the latter typically representing the inapplicable character. These will appear as NA and empty strings (""), respectively in Claddis format. Hopkins and St John (2018) showed how inapplicable characters - typically assumed to represent secondary characters - could be treated in generating distance matrices. These are usually hierarchical in form. E.g., a primary character might record the presence or absence of feathers and a secondary character whether those feathers are symmetric or asymmetric. The latter will generate inapplicable states for taxa without feathers and without correcting for this ranked distances can b incorrect (Hopkins and ST John 2018). Unfortunately, however, the #NEXUS format (Maddison et al. 1997) does not really allow explicit linkage between primary and secondary characters and so at present Claddis can only really operate by assuming any character with at least one taxon encoded as inapplicable as secondary and all other characters as primary.
 #'
-#' @param morph.matrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
 #' @param Distance The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).
 #' @param GEDType The type of GED to use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.
 #' @param TransformDistances Whether to transform the distances. Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default). (Note: this is only really appropriate for the proportional distances, i.e., "GC" and "MORD".)
@@ -62,16 +62,16 @@
 #' distances$ComparableCharacterMatrix
 #'
 #' @export MorphDistMatrix
-MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", TransformDistances = "arcsine_sqrt", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference") {
+MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills", TransformDistances = "arcsine_sqrt", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference") {
   
   # ADD HOPKINS SUGGESTION FOR FOURTH GEDTYPE WHERE MEAN DISTANCE FOR CHARACTER REPLACES MISSING VALUES.
   # CHECK POLYMORPHISM UNCERTAINTY IN GENERAL AS NOT CLEAR IT IS DOING WHAT IT SHOULD DO.
   
   # Subfunction to find comparable characters for a pairwise taxon comparison:
-  GetComparableCharacters <- function(interest.col, morph.matrix) {
+  GetComparableCharacters <- function(interest.col, CladisticMatrix) {
     
     # Get intersection of characters that are coded for both taxa in a pair:
-    output <- intersect(which(!is.na(morph.matrix[interest.col[[1]], ])), which(!is.na(morph.matrix[interest.col[[2]], ])))
+    output <- intersect(which(!is.na(CladisticMatrix[interest.col[[1]], ])), which(!is.na(CladisticMatrix[interest.col[[2]], ])))
     
     # Return output:
     return(list(output))
@@ -79,13 +79,13 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", 
   }
   
   # Subfunction to get character strings for each pair of taxa:
-  GetPairwiseCharacterStrings <- function(interest.col, morph.matrix) {
+  GetPairwiseCharacterStrings <- function(interest.col, CladisticMatrix) {
     
     # Get character states for first taxon in pair:
-    row1 <- morph.matrix[rownames(morph.matrix)[interest.col[[1]]], ]
+    row1 <- CladisticMatrix[rownames(CladisticMatrix)[interest.col[[1]]], ]
     
     # Get character states for second taxon in pair:
-    row2 <- morph.matrix[rownames(morph.matrix)[interest.col[[2]]], ]
+    row2 <- CladisticMatrix[rownames(CladisticMatrix)[interest.col[[2]]], ]
     
     # Return output as a list:
     return(list(row1, row2))
@@ -237,7 +237,7 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", 
   }
   
   # Subfunction to find incomparable characters:
-  FindIncomparableCharacters <- function(comparable.characters, morph.matrix) return(setdiff(1:ncol(morph.matrix), comparable.characters))
+  FindIncomparableCharacters <- function(comparable.characters, CladisticMatrix) return(setdiff(1:ncol(CladisticMatrix), comparable.characters))
   
   # Subfunction to get weighted differences:
   WeightDifferences <- function(differences, comparable.characters, weights) return(list(as.numeric(weights[comparable.characters]) * differences))
@@ -249,10 +249,10 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", 
   MaximumDIfferences <- function(comparable.characters, max.vals, min.vals) return(as.numeric(max.vals[comparable.characters]) - as.numeric(min.vals[comparable.characters]))
   
   # Subfunction to transform list of distances into an actual distance matrix:
-  ConvertListToMatrix <- function(list, morph.matrix, diag = NULL) {
+  ConvertListToMatrix <- function(list, CladisticMatrix, diag = NULL) {
     
     # Set the number of rows:
-    k <- nrow(morph.matrix)
+    k <- nrow(CladisticMatrix)
     
     # Create the empty matrix:
     mat.out <- matrix(ncol = k, nrow = k)
@@ -292,10 +292,10 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", 
   CalculateMORD <- function(differences, maximum.differences) return(sum(differences) / sum(maximum.differences))
   
   # Subfunction for building starting GED data:
-  BuildStartingGEDData <- function(differences, comparable.characters, morph.matrix, weights) return(rbind(c(differences, rep(NA, length(FindIncomparableCharacters(comparable.characters, morph.matrix)))), c(weights[comparable.characters], weights[FindIncomparableCharacters(comparable.characters, morph.matrix)])))
+  BuildStartingGEDData <- function(differences, comparable.characters, CladisticMatrix, weights) return(rbind(c(differences, rep(NA, length(FindIncomparableCharacters(comparable.characters, CladisticMatrix)))), c(weights[comparable.characters], weights[FindIncomparableCharacters(comparable.characters, CladisticMatrix)])))
 
   # Check for step matrices and stop and warn user if found:
-  if(is.list(morph.matrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
+  if(is.list(CladisticMatrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
   
   # Check input of TransformDistances is valid and stop and warn if not:
   if(length(setdiff(TransformDistances, c("arcsine_sqrt", "none", "sqrt"))) > 0) stop("TransformDistances must be one of \"none\", \"sqrt\", or \"arcsine_sqrt\".")
@@ -313,28 +313,28 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", 
   if(length(setdiff(UncertaintyBehaviour, c("mean.difference", "min.difference"))) > 0) stop("UncertaintyBehaviour must be one or more of \"mean.difference\", \"min.difference\", or \"random\".")
   
   # Isolate ordering element:
-  ordering <- unlist(lapply(morph.matrix[2:length(morph.matrix)], '[[', "Ordering"))
+  ordering <- unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Ordering"))
   
   # Isolate minimum values:
-  min.vals <- unlist(lapply(morph.matrix[2:length(morph.matrix)], '[[', "MinVals"))
+  min.vals <- unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "MinVals"))
   
   # Isolate maximum values:
-  max.vals <- unlist(lapply(morph.matrix[2:length(morph.matrix)], '[[', "MaxVals"))
+  max.vals <- unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "MaxVals"))
   
   # Isolate weights:
-  weights <- unlist(lapply(morph.matrix[2:length(morph.matrix)], '[[', "Weights"))
+  weights <- unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Weights"))
   
   # Combine matrix blocks into a single matrix:
-  morph.matrix <- do.call(cbind, lapply(morph.matrix[2:length(morph.matrix)], '[[', "Matrix"))
+  CladisticMatrix <- do.call(cbind, lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Matrix"))
   
   # If PolymorphismBehaviour is to randomly sample one state:
   if(PolymorphismBehaviour == "random") {
     
     # Find cells with polymorphisms:
-    PolymorphismCells <- grep("&", morph.matrix)
+    PolymorphismCells <- grep("&", CladisticMatrix)
     
     # If there are polymorphisms randomly sample one value and store:
-    if(length(PolymorphismCells) > 0) morph.matrix[PolymorphismCells] <- unlist(lapply(as.list(morph.matrix[PolymorphismCells]), function(x) sample(strsplit(x, split = "&")[[1]], size = 1)))
+    if(length(PolymorphismCells) > 0) CladisticMatrix[PolymorphismCells] <- unlist(lapply(as.list(CladisticMatrix[PolymorphismCells]), function(x) sample(strsplit(x, split = "&")[[1]], size = 1)))
     
     # Reset behaviour as mean difference to allow it to interact correctly with UncertaintyBehaviour later:
     PolymorphismBehaviour <- "mean.difference"
@@ -345,10 +345,10 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", 
   if(UncertaintyBehaviour == "random") {
     
     # Find cells with uncertainties:
-    UncertaintyCells <- grep("/", morph.matrix)
+    UncertaintyCells <- grep("/", CladisticMatrix)
     
     # If there are uncertainties randomly sample one value and store:
-    if(length(UncertaintyCells) > 0) morph.matrix[UncertaintyCells] <- unlist(lapply(as.list(morph.matrix[UncertaintyCells]), function(x) sample(strsplit(x, split = "/")[[1]], size = 1)))
+    if(length(UncertaintyCells) > 0) CladisticMatrix[UncertaintyCells] <- unlist(lapply(as.list(CladisticMatrix[UncertaintyCells]), function(x) sample(strsplit(x, split = "/")[[1]], size = 1)))
     
     # Reset behaviour as mean difference to allow it to interact correctly with PolymorphismBehaviour later:
     UncertaintyBehaviour <- "mean.difference"
@@ -356,16 +356,16 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", 
   }
   
   # If there are inapplicables then convert these to NAs:
-  if(any(sort(morph.matrix == ""))) morph.matrix[morph.matrix == ""] <- NA
+  if(any(sort(CladisticMatrix == ""))) CladisticMatrix[CladisticMatrix == ""] <- NA
   
   # Find all possible (symmetric) pariwise comparisons for the N taxa in the matrix (excluding self-comparisons):
-  comparisons <- combn(1:nrow(morph.matrix), 2)
+  comparisons <- combn(1:nrow(CladisticMatrix), 2)
   
   # Find all comparable characters for each pair of taxa:
-  list.of.compchar <- unlist(apply(comparisons, 2, GetComparableCharacters, morph.matrix), recursive = FALSE)
+  list.of.compchar <- unlist(apply(comparisons, 2, GetComparableCharacters, CladisticMatrix), recursive = FALSE)
   
   # Get character states for each pairwise comparison:
-  rows.pairs <- apply(comparisons, 2, GetPairwiseCharacterStrings, morph.matrix)
+  rows.pairs <- apply(comparisons, 2, GetPairwiseCharacterStrings, CladisticMatrix)
   
   # Subset each pairwise comparison by just the comparable characters:
   matrix.of.char.comp <- mapply(SubsetPairwiseByComparable, rows.pairs, list.of.compchar)
@@ -397,25 +397,25 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", 
   }
   
   # If calculating Raw Eucldiean Distances build the distance matrix:
-  if(Distance == "RED") dist.matrix <- ConvertListToMatrix(raw.dist, morph.matrix)
+  if(Distance == "RED") dist.matrix <- ConvertListToMatrix(raw.dist, CladisticMatrix)
 
   # If calculating the Gower Coefficient build the distance matrix:
-  if(Distance == "GC") dist.matrix <- ConvertListToMatrix(as.list(mapply(CalculateGowerCoefficient, diffs, list.of.compchar, MoreArgs = list(weights))), morph.matrix)
+  if(Distance == "GC") dist.matrix <- ConvertListToMatrix(as.list(mapply(CalculateGowerCoefficient, diffs, list.of.compchar, MoreArgs = list(weights))), CladisticMatrix)
   
   # If calculating the MORD build the distance matrix:
-  if(Distance == "MORD") dist.matrix <- ConvertListToMatrix(mapply(CalculateMORD, diffs, maxdiffs), morph.matrix)
+  if(Distance == "MORD") dist.matrix <- ConvertListToMatrix(mapply(CalculateMORD, diffs, maxdiffs), CladisticMatrix)
   
   # If calculating the GED:
   if(Distance == "GED") {
     
     # Build starting GED data:
-    GED.data <- mapply(BuildStartingGEDData, diffs, list.of.compchar, MoreArgs = list(morph.matrix, weights), SIMPLIFY = FALSE)
+    GED.data <- mapply(BuildStartingGEDData, diffs, list.of.compchar, MoreArgs = list(CladisticMatrix, weights), SIMPLIFY = FALSE)
     
     # Transpose matrices:
     GED.data <- lapply(GED.data, t)
     
     # Now build into matrix of pairwise comparisons (odds to be compared with adjacent evens):
-    GED.data <- matrix(data = (unlist(GED.data)), ncol = ncol(morph.matrix), byrow = TRUE)
+    GED.data <- matrix(data = (unlist(GED.data)), ncol = ncol(CladisticMatrix), byrow = TRUE)
     
     # Calculate single weighted mean univariate distance for calculating GED Legacy or Hybrid (after equation 2 in Wills 2001):
     if(GEDType != "Wills") NonWills_S_ijk_bar <- rep(sum(unlist(diffs)) / sum(unlist(maxdiffs)), length.out = length(diffs))
@@ -464,15 +464,15 @@ MorphDistMatrix <- function(morph.matrix, Distance = "MORD", GEDType = "Wills", 
     GED_ij <- sqrt(apply(W_ijk * (S_ijk ^ 2), 1, sum))
     
     # Create GED distance matrix:
-    dist.matrix <- ConvertListToMatrix(as.list(GED_ij), morph.matrix)
+    dist.matrix <- ConvertListToMatrix(as.list(GED_ij), CladisticMatrix)
     
   }
   
   # Build comparable characters matrix:
-  comp.char.matrix <- ConvertListToMatrix(lapply(list.of.compchar, length), morph.matrix, diag = apply(morph.matrix, 1, CountCompleteCharacters))
+  comp.char.matrix <- ConvertListToMatrix(lapply(list.of.compchar, length), CladisticMatrix, diag = apply(CladisticMatrix, 1, CountCompleteCharacters))
   
   # Add row and column names (taxa) to distance matrices:
-  rownames(dist.matrix) <- colnames(dist.matrix) <- rownames(comp.char.matrix) <- colnames(comp.char.matrix) <- rownames(morph.matrix)
+  rownames(dist.matrix) <- colnames(dist.matrix) <- rownames(comp.char.matrix) <- colnames(comp.char.matrix) <- rownames(CladisticMatrix)
   
   # If there are any NaNs replace with NAs:
   if(any(is.nan(dist.matrix))) dist.matrix[is.nan(dist.matrix)] <- NA
@@ -736,15 +736,15 @@ GED <- function(matr) {
 #DayDiscrete$Matrix_2$Matrix[which(DayDiscrete$Matrix_2$Matrix[, 5] == ""), 5] <- NA
 
 #x <- as.vector(as.dist(GED(DayDiscrete)))
-#y <- as.vector(as.dist(MorphDistMatrix(morph.matrix = DayDiscrete, Distance = "GED", GEDType = "Wills", TransformDistances = "none", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference")$DistanceMatrix))
+#y <- as.vector(as.dist(MorphDistMatrix(CladisticMatrix = DayDiscrete, Distance = "GED", GEDType = "Wills", TransformDistances = "none", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference")$DistanceMatrix))
 #cor.test(x,y)$estimate
 
 #x <- as.vector(as.dist(GED(Michaux1989)))
-#y <- as.vector(as.dist(MorphDistMatrix(morph.matrix = Michaux1989, Distance = "GED", GEDType = "Wills", TransformDistances = "none", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference")$DistanceMatrix))
+#y <- as.vector(as.dist(MorphDistMatrix(CladisticMatrix = Michaux1989, Distance = "GED", GEDType = "Wills", TransformDistances = "none", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference")$DistanceMatrix))
 #cor.test(x,y)$estimate
 
 #x <- as.vector(as.dist(GED(Gauthier1986)))
-#y <- as.vector(as.dist(MorphDistMatrix(morph.matrix = Gauthier1986, Distance = "GED", GEDType = "Wills", TransformDistances = "none", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference")$DistanceMatrix))
+#y <- as.vector(as.dist(MorphDistMatrix(CladisticMatrix = Gauthier1986, Distance = "GED", GEDType = "Wills", TransformDistances = "none", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference")$DistanceMatrix))
 #cor.test(x,y)$estimate
 
 

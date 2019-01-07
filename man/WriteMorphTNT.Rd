@@ -4,10 +4,10 @@
 \alias{WriteMorphTNT}
 \title{Writes out a morphological TNT data file}
 \usage{
-WriteMorphTNT(clad.matrix, filename, add.analysis.block = FALSE)
+WriteMorphTNT(CladisticMatrix, filename, add.analysis.block = FALSE)
 }
 \arguments{
-\item{clad.matrix}{The cladistic matrix in the format imported by \link{ReadMorphNexus}.}
+\item{CladisticMatrix}{The cladistic matrix in the format imported by \link{ReadMorphNexus}.}
 
 \item{filename}{The file name to write to. Should end in \code{.tnt}.}
 
@@ -26,7 +26,7 @@ Currently all empty values (missing or inapplicable) are treated as missing and 
 \examples{
 
 # Write out Michaux 1989 to current working directory:
-WriteMorphTNT(clad.matrix = Michaux1989, filename = "Michaux1989.tnt")
+WriteMorphTNT(CladisticMatrix = Michaux1989, filename = "Michaux1989.tnt")
 
 # Remove file when finished:
 file.remove("Michaux1989.tnt")

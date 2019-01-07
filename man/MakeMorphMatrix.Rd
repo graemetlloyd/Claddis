@@ -4,11 +4,11 @@
 \alias{MakeMorphMatrix}
 \title{Creates a morphological data file from a matrix}
 \usage{
-MakeMorphMatrix(CTmatrix, header = "", weights = NULL,
+MakeMorphMatrix(CharacterTaxonMatrix, header = "", weights = NULL,
   ordering = NULL, symbols = NULL, equalise.weights = FALSE)
 }
 \arguments{
-\item{CTmatrix}{A Character-Taxon (columns-rows) matrix, with taxon names as rownames.}
+\item{CharacterTaxonMatrix}{A Character-Taxon (columns-rows) matrix, with taxon names as rownames.}
 
 \item{header}{A scalar indicating any header text (defaults to an empty string: "").}
 
@@ -35,14 +35,14 @@ NB: Currently the function cannot deal directly with step matrices or continuous
 \examples{
 
 # Create random 10-by-50 matrix:
-CTmatrix <- matrix(sample(c("0", "1", "0&1", NA, ""),
+CharacterTaxonMatrix <- matrix(sample(c("0", "1", "0&1", NA, ""),
   500, replace = TRUE), nrow = 10, dimnames =
   list(apply(matrix(sample(LETTERS, 40,
   replace = TRUE), nrow = 10), 1, paste,
   collapse = ""), c()))
 
 # Reformat for use elsewhere in Claddis:
-MakeMorphMatrix(CTmatrix)
+MakeMorphMatrix(CharacterTaxonMatrix)
 
 }
 \seealso{

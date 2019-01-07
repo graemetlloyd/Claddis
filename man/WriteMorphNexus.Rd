@@ -4,10 +4,10 @@
 \alias{WriteMorphNexus}
 \title{Writes out a morphological #NEXUS data file}
 \usage{
-WriteMorphNexus(clad.matrix, filename)
+WriteMorphNexus(CladisticMatrix, filename)
 }
 \arguments{
-\item{clad.matrix}{The cladistic matrix in the format imported by \link{ReadMorphNexus}.}
+\item{CladisticMatrix}{The cladistic matrix in the format imported by \link{ReadMorphNexus}.}
 
 \item{filename}{The file name to write to. Should end in \code{.nex}.}
 }
@@ -22,7 +22,7 @@ Currently all empty values (missing or inapplicable) are treated as missing and 
 \examples{
 
 # Write out Michaux 1989 to current working directory:
-WriteMorphNexus(clad.matrix = Michaux1989, filename = "Michaux1989.nex")
+WriteMorphNexus(CladisticMatrix = Michaux1989, filename = "Michaux1989.nex")
 
 # Remove file when finished:
 file.remove("Michaux1989.nex")

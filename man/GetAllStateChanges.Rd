@@ -4,12 +4,12 @@
 \alias{GetAllStateChanges}
 \title{Finds all state changes on a tree using stochastic character mapping}
 \usage{
-GetAllStateChanges(clad.matrix, tree, time.bins, Nsim = 10)
+GetAllStateChanges(CladisticMatrix, tree, time.bins, Nsim = 10)
 }
 \arguments{
-\item{clad.matrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
+\item{CladisticMatrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
 
-\item{tree}{A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{clad.matrix}.}
+\item{tree}{A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{CladisticMatrix}.}
 
 \item{time.bins}{A vector of ages representing the boundaries of a series of time bins.}
 

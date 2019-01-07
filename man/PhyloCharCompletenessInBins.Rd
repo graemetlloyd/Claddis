@@ -4,13 +4,13 @@
 \alias{PhyloCharCompletenessInBins}
 \title{Phylogenetic character completeness in time-bins}
 \usage{
-PhyloCharCompletenessInBins(CladMatrix, TimeTree, TimeBins, plot = FALSE,
-  CI = 0.95)
+PhyloCharCompletenessInBins(CladisticMatrix, TimeTree, TimeBins,
+  plot = FALSE, CI = 0.95)
 }
 \arguments{
-\item{CladMatrix}{A cladistic matrix in the form imported by \link{ReadMorphNexus}.}
+\item{CladisticMatrix}{A cladistic matrix in the form imported by \link{ReadMorphNexus}.}
 
-\item{TimeTree}{A time-scaled phylogenetic tree containing all the taxa in \code{CladMatrix}.}
+\item{TimeTree}{A time-scaled phylogenetic tree containing all the taxa in \code{CladisticMatrix}.}
 
 \item{TimeBins}{A set of time bin boundaries (oldest to youngest) in millions of years.}
 
@@ -38,7 +38,7 @@ Day2016tree$root.time <- max(diag(vcv(Day2016tree)))
 
 # Get proportional phylogenetic character completeness in ten equal-length
 # time bins:
-PhyloCharCompletenessInBins(CladMatrix = Day2016,
+PhyloCharCompletenessInBins(CladisticMatrix = Day2016,
   TimeTree = Day2016tree, TimeBins = seq(from =
   Day2016tree$root.time, to = Day2016tree$root.time -
   max(diag(vcv(Day2016tree))), length.out = 11))

@@ -6,8 +6,8 @@
 #'
 #' This function returns the proportional phylogenetic character completeness for a set of time bins.
 #'
-#' @param CladMatrix A cladistic matrix in the form imported by \link{ReadMorphNexus}.
-#' @param TimeTree A time-scaled phylogenetic tree containing all the taxa in \code{CladMatrix}.
+#' @param CladisticMatrix A cladistic matrix in the form imported by \link{ReadMorphNexus}.
+#' @param TimeTree A time-scaled phylogenetic tree containing all the taxa in \code{CladisticMatrix}.
 #' @param TimeBins A set of time bin boundaries (oldest to youngest) in millions of years.
 #' @param plot An optional choice to plot the results (default is \code{FALSE}).
 #' @param CI The confidence interval to be used as a proportion (0 to 1). Default is 0.95 (i.e., 95\%).
@@ -27,13 +27,13 @@
 #'
 #' # Get proportional phylogenetic character completeness in ten equal-length
 #' # time bins:
-#' PhyloCharCompletenessInBins(CladMatrix = Day2016,
+#' PhyloCharCompletenessInBins(CladisticMatrix = Day2016,
 #'   TimeTree = Day2016tree, TimeBins = seq(from =
 #'   Day2016tree$root.time, to = Day2016tree$root.time -
 #'   max(diag(vcv(Day2016tree))), length.out = 11))
 #'
 #' @export PhyloCharCompletenessInBins
-PhyloCharCompletenessInBins <- function(CladMatrix, TimeTree, TimeBins, plot = FALSE, CI = 0.95) {
+PhyloCharCompletenessInBins <- function(CladisticMatrix, TimeTree, TimeBins, plot = FALSE, CI = 0.95) {
   
   # Subfunction for getting missing and inapplicable characters:
   MissingAndInapplicables <- function(x) {
@@ -59,7 +59,7 @@ PhyloCharCompletenessInBins <- function(CladMatrix, TimeTree, TimeBins, plot = F
   TimeBinNames <- paste(round(TimeBins[1:(length(TimeBins) - 1)], 1), round(TimeBins[2:length(TimeBins)], 1), sep = "-")
   
   # Get total number of characters:
-  NCharacters <- sum(unlist(lapply(lapply(CladMatrix[2:length(CladMatrix)], '[[', "Matrix"), ncol)))
+  NCharacters <- sum(unlist(lapply(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Matrix"), ncol)))
   
   # Get edge lengths in bins for complete tree (measure of a complete character):
   CompleteEdgesInBins <- EdgeLengthsInBins(TimeTree, TimeBins)$edge.length.in.bin
@@ -68,7 +68,7 @@ PhyloCharCompletenessInBins <- function(CladMatrix, TimeTree, TimeBins, plot = F
   MissingValues <- rep("", NCharacters)
   
   # If there are missing or inapplicable values collapse row numbers for them with double percentage:
-  if(any(unlist(lapply(lapply(CladMatrix[2:length(CladMatrix)], '[[', "Matrix"), is.na))) || any(unlist(lapply(lapply(CladMatrix[2:length(CladMatrix)], '[[', "Matrix"), '==', "")))) MissingValues <- unname(unlist(lapply(lapply(lapply(lapply(lapply(CladMatrix[2:length(CladMatrix)], '[[', "Matrix"), MissingAndInapplicables), apply, 2, '==', 1), apply, 2, which), lapply, paste, collapse = "%%")))
+  if(any(unlist(lapply(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Matrix"), is.na))) || any(unlist(lapply(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Matrix"), '==', "")))) MissingValues <- unname(unlist(lapply(lapply(lapply(lapply(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Matrix"), MissingAndInapplicables), apply, 2, '==', 1), apply, 2, which), lapply, paste, collapse = "%%")))
   
   # Set up matrix to store edge lengths in each character bin (columns) per character (rows):
   EdgeLengthsInBinsByCharacter <- matrix(0, ncol = length(TimeBins) - 1, nrow = NCharacters)
@@ -80,7 +80,7 @@ PhyloCharCompletenessInBins <- function(CladMatrix, TimeTree, TimeBins, plot = F
     if(nchar(i) > 0) {
       
       # List taxa to prune:
-      TaxaToPrune <- rownames(CladMatrix$Matrix_1$Matrix)[as.numeric(strsplit(i, "%%")[[1]])]
+      TaxaToPrune <- rownames(CladisticMatrix$Matrix_1$Matrix)[as.numeric(strsplit(i, "%%")[[1]])]
       
       # Check that there are still enough taxa left for a tree to exist:
       if(length(setdiff(TimeTree$tip.label, TaxaToPrune)) > 1) {

@@ -4,8 +4,8 @@
 #' 
 #' Uses either the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package (discrete characters) or the \link{ace} function in the \link{ape} package (continuous characters) to make ancestral state estimates. For discrete characters these are collapsed to the most likely state (or states, given equal likelihoods or likelihood within a defined threshold value). In the latter case the resulting states are represented as an uncertainty (i.e., states separated by a slash, e.g., 0/1. This is the method used by Brusatte et al. (2014).
 #' 
-#' @param InputMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
-#' @param Tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{InputMatrix}.
+#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#' @param Tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{CladisticMatrix}.
 #' @param EstimateAllNodes Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).
 #' @param EstimateTipValues Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).
 #' @param InapplicablesAsMissing Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).
@@ -38,10 +38,10 @@
 #' tree$root.time <- max(diag(vcv(tree)))
 #' 
 #' # Estimate ancestral states:
-#' AncStateEstMatrix(InputMatrix = Day2016, Tree = tree)
+#' AncStateEstMatrix(CladisticMatrix = Day2016, Tree = tree)
 #' 
 #' @export AncStateEstMatrix
-AncStateEstMatrix <- function(InputMatrix, Tree, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
+AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
   
   # How to get tip states for a continuous character?
   # How to deal with step matrices?
@@ -57,7 +57,7 @@ AncStateEstMatrix <- function(InputMatrix, Tree, EstimateAllNodes = FALSE, Estim
   if(any(Tree$edge.length == 0)) stop("Tree must not have zero-length branches.")
   
   # Check for step matrices and stop and warn if found:
-  if(length(InputMatrix$Topper$StepMatrices) > 0) stop("Function can not currently deal with step matrices.")
+  if(length(CladisticMatrix$Topper$StepMatrices) > 0) stop("Function can not currently deal with step matrices.")
   
   # Check EstimateAllNodes is a logical:
   if(!is.logical(EstimateAllNodes)) stop("EstimateAllNodes must be a logical (TRUE or FALSE).")
@@ -69,25 +69,25 @@ AncStateEstMatrix <- function(InputMatrix, Tree, EstimateAllNodes = FALSE, Estim
   if(!is.logical(InapplicablesAsMissing)) stop("InapplicablesAsMissing must be a logical (TRUE or FALSE).")
   
   # Collapse matrix to vectors for each character (state and ordering combination):
-  collapse.matrix <- unname(unlist(lapply(InputMatrix[2:length(InputMatrix)], function(x) apply(rbind(x$Matrix, x$Ordering), 2, paste, collapse = ""))))
+  collapse.matrix <- unname(unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], function(x) apply(rbind(x$Matrix, x$Ordering), 2, paste, collapse = ""))))
   
   # Isolate ordering elements:
-  ordering <- unlist(lapply(InputMatrix[2:length(InputMatrix)], '[[', "Ordering"))
+  ordering <- unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Ordering"))
   
   # Isolate minimum values:
-  min.vals <- unlist(lapply(InputMatrix[2:length(InputMatrix)], '[[', "MinVals"))
+  min.vals <- unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "MinVals"))
   
   # Isolate maximum values:
-  max.vals <- unlist(lapply(InputMatrix[2:length(InputMatrix)], '[[', "MaxVals"))
+  max.vals <- unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "MaxVals"))
   
   # Store raw original matrix:
-  RawInputMatrix <- InputMatrix
+  RawCladisticMatrix <- CladisticMatrix
   
   # Combine matrix blocks into a single matrix:
-  InputMatrix <- OriginalMatrix <- do.call(cbind, lapply(InputMatrix[2:length(InputMatrix)], '[[', "Matrix"))
+  CladisticMatrix <- OriginalMatrix <- do.call(cbind, lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Matrix"))
   
   # Find any failed name matches:
-  FailedNameMatches <- c(setdiff(rownames(InputMatrix), Tree$tip.label), setdiff(Tree$tip.label, rownames(InputMatrix)))
+  FailedNameMatches <- c(setdiff(rownames(CladisticMatrix), Tree$tip.label), setdiff(Tree$tip.label, rownames(CladisticMatrix)))
   
   # Check there are no failed name matches and stop and report if found:
   if(length(FailedNameMatches) > 0) stop(paste("The following names do not match between the tree and matrix: ", paste(sort(FailedNameMatches), collapse = ", "), ". Check spelling and try again.", sep = ""))
@@ -102,16 +102,16 @@ AncStateEstMatrix <- function(InputMatrix, Tree, EstimateAllNodes = FALSE, Estim
   if(Threshold < 0 || Threshold > 0.5) stop("Threshold must be between 0 and 0.5.")
   
   # If treating inapplicables as missing (and there is at least one inapplicable) replace with NA:
-  if(InapplicablesAsMissing && length(which(InputMatrix == "")) > 0) InputMatrix[which(InputMatrix == "")] <- NA
+  if(InapplicablesAsMissing && length(which(CladisticMatrix == "")) > 0) CladisticMatrix[which(CladisticMatrix == "")] <- NA
   
   # If treating polymorphisms as missing:
-  if(PolymorphismBehaviour == "treatasmissing" && length(grep("&", InputMatrix)) > 0) InputMatrix[grep("&", InputMatrix)] <- NA
+  if(PolymorphismBehaviour == "treatasmissing" && length(grep("&", CladisticMatrix)) > 0) CladisticMatrix[grep("&", CladisticMatrix)] <- NA
   
   # If treating uncertainties as missing:
-  if(UncertaintyBehaviour == "treatasmissing" && length(grep("/", InputMatrix)) > 0) InputMatrix[grep("/", InputMatrix)] <- NA
+  if(UncertaintyBehaviour == "treatasmissing" && length(grep("/", CladisticMatrix)) > 0) CladisticMatrix[grep("/", CladisticMatrix)] <- NA
   
   # Convert tip states into a list:
-  DataAsList <- apply(InputMatrix, 2, list)
+  DataAsList <- apply(CladisticMatrix, 2, list)
   
   # Add Tipsattes name to list:
   DataAsList <- lapply(DataAsList, function(x) {names(x) <- "TipStates"; return(x)})
@@ -393,13 +393,13 @@ AncStateEstMatrix <- function(InputMatrix, Tree, EstimateAllNodes = FALSE, Estim
   }
   
   # Get column (character) count for each matrix block:
-  MatrixColumns <- unlist(lapply(lapply(RawInputMatrix[2:length(RawInputMatrix)], '[[', "Matrix"), ncol))
+  MatrixColumns <- unlist(lapply(lapply(RawCladisticMatrix[2:length(RawCladisticMatrix)], '[[', "Matrix"), ncol))
   
   # For each matrix block:
   for(i in 1:length(MatrixColumns)) {
     
     # Insert portion of ancestral state estimate into block:
-    RawInputMatrix[[(i + 1)]]$Matrix <- AncestralStateMatrix[, 1:MatrixColumns[i], drop = FALSE]
+    RawCladisticMatrix[[(i + 1)]]$Matrix <- AncestralStateMatrix[, 1:MatrixColumns[i], drop = FALSE]
     
     # Remove that portion from the block:
     AncestralStateMatrix <- AncestralStateMatrix[, -(1:MatrixColumns[i]), drop = FALSE]
@@ -407,7 +407,7 @@ AncStateEstMatrix <- function(InputMatrix, Tree, EstimateAllNodes = FALSE, Estim
   }
   
   # Overwrite ancestral state output with updated raw input:
-  AncestralStateMatrix <- RawInputMatrix
+  AncestralStateMatrix <- RawCladisticMatrix
   
   # Add tree to output:
   AncestralStateMatrix$Topper$Tree <- Tree

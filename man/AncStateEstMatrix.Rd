@@ -4,15 +4,15 @@
 \alias{AncStateEstMatrix}
 \title{Ancestral Character State Estimation}
 \usage{
-AncStateEstMatrix(InputMatrix, Tree, EstimateAllNodes = FALSE,
+AncStateEstMatrix(CladisticMatrix, Tree, EstimateAllNodes = FALSE,
   EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE,
   PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp",
   Threshold = 0.01)
 }
 \arguments{
-\item{InputMatrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
+\item{CladisticMatrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
 
-\item{Tree}{A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{InputMatrix}.}
+\item{Tree}{A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{CladisticMatrix}.}
 
 \item{EstimateAllNodes}{Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).}
 
@@ -50,7 +50,7 @@ tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
 tree$root.time <- max(diag(vcv(tree)))
 
 # Estimate ancestral states:
-AncStateEstMatrix(InputMatrix = Day2016, Tree = tree)
+AncStateEstMatrix(CladisticMatrix = Day2016, Tree = tree)
 
 }
 \references{

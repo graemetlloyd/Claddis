@@ -6,7 +6,7 @@
 #'
 #' NB: Currently the function cannot deal directly with step matrices or continuous characters.
 #' 
-#' @param CTmatrix A Character-Taxon (columns-rows) matrix, with taxon names as rownames.
+#' @param CharacterTaxonMatrix A Character-Taxon (columns-rows) matrix, with taxon names as rownames.
 #' @param header A scalar indicating any header text (defaults to an empty string: "").
 #' @param weights A vector specifying the weights used (if not specified defaults to 1).
 #' @param ordering A vector indicating whether characters are ordered ("ord") or unordered ("unord") (if no specified defaults to ordered).
@@ -25,29 +25,29 @@
 #' @examples
 #'
 #' # Create random 10-by-50 matrix:
-#' CTmatrix <- matrix(sample(c("0", "1", "0&1", NA, ""),
+#' CharacterTaxonMatrix <- matrix(sample(c("0", "1", "0&1", NA, ""),
 #'   500, replace = TRUE), nrow = 10, dimnames =
 #'   list(apply(matrix(sample(LETTERS, 40,
 #'   replace = TRUE), nrow = 10), 1, paste,
 #'   collapse = ""), c()))
 #'
 #' # Reformat for use elsewhere in Claddis:
-#' MakeMorphMatrix(CTmatrix)
+#' MakeMorphMatrix(CharacterTaxonMatrix)
 #'
 #' @export MakeMorphMatrix
-MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NULL, symbols = NULL, equalise.weights = FALSE) {
+MakeMorphMatrix <- function(CharacterTaxonMatrix, header = "", weights = NULL, ordering = NULL, symbols = NULL, equalise.weights = FALSE) {
   
   # Check input is a matrix:
-  if(!is.matrix(CTmatrix)) stop("CTmatrix must be a matrix.")
+  if(!is.matrix(CharacterTaxonMatrix)) stop("CharacterTaxonMatrix must be a matrix.")
   
   # Check taxon names are supplied:
-  if(is.null(rownames(CTmatrix))) stop("CTmatrix must have rownames indicating taxa.")
+  if(is.null(rownames(CharacterTaxonMatrix))) stop("CharacterTaxonMatrix must have rownames indicating taxa.")
   
   # Check taxon names are unique (could cause downstream issues if not):
-  if(any(duplicated(rownames(CTmatrix)))) stop("Taxon names must be unique.")
+  if(any(duplicated(rownames(CharacterTaxonMatrix)))) stop("Taxon names must be unique.")
   
   # Delete any column names (could cause downstream issues otherwise):
-  if(!is.null(colnames(CTmatrix))) colnames(CTmatrix) <- NULL
+  if(!is.null(colnames(CharacterTaxonMatrix))) colnames(CharacterTaxonMatrix) <- NULL
   
   
   
@@ -58,7 +58,7 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
   
   
   # List any mystery character types:
-  mystery.characters <- setdiff(unique(unlist(strsplit(as.character(unique(as.vector(CTmatrix))), split = "&|/"))), c(as.character(0:31), NA))
+  mystery.characters <- setdiff(unique(unlist(strsplit(as.character(unique(as.vector(CharacterTaxonMatrix))), split = "&|/"))), c(as.character(0:31), NA))
   
   
   
@@ -69,7 +69,7 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
   if(length(mystery.characters) > 0) stop("Characters must either be the integers 0 to 31, NA for missing, & for polymorphisms, or / for uncertainties.")
 
   # Check supplied weights are correct length:
-  if(!is.null(weights) && length(weights) != ncol(CTmatrix)) stop("Weights must have same length as number of characters in CTmatrix.")
+  if(!is.null(weights) && length(weights) != ncol(CharacterTaxonMatrix)) stop("Weights must have same length as number of characters in CharacterTaxonMatrix.")
   
   # Check supplied weights are numeric:
   if(!is.null(weights) && !is.numeric(weights)) stop("Weights must be numeric.")
@@ -78,13 +78,13 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
   if(!is.null(weights) && any(weights < 0)) stop("Weights must not be negative.")
   
   # Check supplied ordering is the correct length:
-  if(!is.null(ordering) && length(ordering) != ncol(CTmatrix)) stop("Ordering must have same length as number of characters in CTmatrix.")
+  if(!is.null(ordering) && length(ordering) != ncol(CharacterTaxonMatrix)) stop("Ordering must have same length as number of characters in CharacterTaxonMatrix.")
   
   # Check ordering is of unord or ord type only:
   if(!is.null(ordering) && length(setdiff(ordering, c("unord", "ord"))) > 0) stop("Ordering must be unord or ord only.")
   
   # Check symbols are of correct length:
-  if(!is.null(symbols) && length(symbols) >= (diff(range(sort(as.numeric(unique(unlist(strsplit(as.character(unique(as.vector(CTmatrix))), "&"))))))) + 1)) stop("Symbols must be at least as long as the range of character values in CTmatrix.")
+  if(!is.null(symbols) && length(symbols) >= (diff(range(sort(as.numeric(unique(unlist(strsplit(as.character(unique(as.vector(CharacterTaxonMatrix))), "&"))))))) + 1)) stop("Symbols must be at least as long as the range of character values in CharacterTaxonMatrix.")
 
   # Check symbols are single characters only:
   if(!is.null(symbols) && any(nchar(symbols) != 1)) stop("Symbols must be single characters only.")
@@ -93,16 +93,16 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
   if(length(header) != 1)  stop("Header text must be a single value.")
   
   # If no ordering set default to ordered.
-  if(is.null(ordering)) ordering <- rep("ord", ncol(CTmatrix))
+  if(is.null(ordering)) ordering <- rep("ord", ncol(CharacterTaxonMatrix))
 
   # If no weights are set:
-  if(is.null(weights)) weights <- rep(1, ncol(CTmatrix))
+  if(is.null(weights)) weights <- rep(1, ncol(CharacterTaxonMatrix))
 
   # Calculate minimum values:
-  min.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CTmatrix, 2, as.character), 2, strsplit, split = "&|/"), unlist), as.numeric), sort), min))
+  min.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CharacterTaxonMatrix, 2, as.character), 2, strsplit, split = "&|/"), unlist), as.numeric), sort), min))
 
   # Calculate maximum values:
-  max.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CTmatrix, 2, as.character), 2, strsplit, split = "&|/"), unlist), as.numeric), sort), max))
+  max.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CharacterTaxonMatrix, 2, as.character), 2, strsplit, split = "&|/"), unlist), as.numeric), sort), max))
 
   # Default step matrices to NULL for now (may add this option in future):
   step.matrices <- NULL
@@ -182,7 +182,7 @@ MakeMorphMatrix <- function(CTmatrix, header = "", weights = NULL, ordering = NU
   names(Characters) <- c("Symbols", "Missing", "Gap")
   
   # Build Matrix_1 list:
-  Matrix_1 <- list(NA, "STANDARD", CTmatrix, ordering, weights, min.vals, max.vals, Characters)
+  Matrix_1 <- list(NA, "STANDARD", CharacterTaxonMatrix, ordering, weights, min.vals, max.vals, Characters)
   
   # Add names to Matrix_1:
   names(Matrix_1) <- c("BlockName", "Datatype", "Matrix", "Ordering", "Weights", "MinVals", "MaxVals", "Characters")

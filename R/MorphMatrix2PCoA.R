@@ -12,8 +12,8 @@
 #'
 #' IMPORTANT: The function can remove taxa (or if including a tree, nodes as well) if they lead to an incomplete distance matrix (see \link{TrimMorphDistMatrix}).
 #'
-#' @param morph.matrix A vector of mode character representing the tip names for which an ancestor is sought.
-#' @param distance.method The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{MorphDistMatrix} for more details.
+#' @param CladisticMatrix A vector of mode character representing the tip names for which an ancestor is sought.
+#' @param Distance The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{MorphDistMatrix} for more details.
 #' @param GEDType The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.
 #' @param TransformDistances The transformation to apply to distances. See \link{MorphDistMatrix} for details.
 #' @param DistPolymorphismBehaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{MorphDistMatrix} for details.
@@ -71,7 +71,7 @@
 #' y
 #'
 #' @export MorphMatrix2PCoA
-MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", GEDType = "Wills", TransformDistances = "arcsine_sqrt", DistPolymorphismBehaviour = "min.difference", DistUncertaintyBehaviour = "min.difference", correction = "cailliez", Tree = NULL, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, AncestralPolymorphismBehaviour = "equalp", AncestralUncertaintyBehaviour = "equalp", Threshold = 0.01) {
+MorphMatrix2PCoA <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills", TransformDistances = "arcsine_sqrt", DistPolymorphismBehaviour = "min.difference", DistUncertaintyBehaviour = "min.difference", correction = "cailliez", Tree = NULL, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, AncestralPolymorphismBehaviour = "equalp", AncestralUncertaintyBehaviour = "equalp", Threshold = 0.01) {
     
 # Add some top level conditionsl here to check input is valid.
   
@@ -79,7 +79,7 @@ MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", GEDType = "
   if(is.null(Tree)) {
     
     # Get morphological distances from the cladistic matrix:
-    morph_distances <- MorphDistMatrix(morph.matrix, Distance = distance.method, TransformDistances = TransformDistances, PolymorphismBehaviour = DistPolymorphismBehaviour, UncertaintyBehaviour = DistUncertaintyBehaviour)
+    morph_distances <- MorphDistMatrix(CladisticMatrix, Distance = Distance, TransformDistances = TransformDistances, PolymorphismBehaviour = DistPolymorphismBehaviour, UncertaintyBehaviour = DistUncertaintyBehaviour)
     
     # Get trimmed distances:
     trimmed_distances <- TrimMorphDistMatrix(morph_distances$DistanceMatrix)
@@ -94,10 +94,10 @@ MorphMatrix2PCoA <- function(morph.matrix, distance.method = "MORD", GEDType = "
   } else {
       
     # Get ancestral character states:
-    ancestral_values <- AncStateEstMatrix(InputMatrix = morph.matrix, Tree = Tree, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = InapplicablesAsMissing, PolymorphismBehaviour = AncestralPolymorphismBehaviour, UncertaintyBehaviour = AncestralUncertaintyBehaviour, Threshold = Threshold)
+    ancestral_values <- AncStateEstMatrix(InputMatrix = CladisticMatrix, Tree = Tree, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = InapplicablesAsMissing, PolymorphismBehaviour = AncestralPolymorphismBehaviour, UncertaintyBehaviour = AncestralUncertaintyBehaviour, Threshold = Threshold)
 
     # Get morphological distances from the cladistic matrix:
-    morph_distances <- MorphDistMatrix(ancestral_values, Distance = distance.method, GEDType = GEDType, TransformDistances = TransformDistances, PolymorphismBehaviour = DistPolymorphismBehaviour, UncertaintyBehaviour = DistUncertaintyBehaviour)
+    morph_distances <- MorphDistMatrix(ancestral_values, Distance = Distance, GEDType = GEDType, TransformDistances = TransformDistances, PolymorphismBehaviour = DistPolymorphismBehaviour, UncertaintyBehaviour = DistUncertaintyBehaviour)
     
     # Get trimmed distances:
     trimmed_distances <- TrimMorphDistMatrix(morph_distances$DistanceMatrix, Tree = Tree)

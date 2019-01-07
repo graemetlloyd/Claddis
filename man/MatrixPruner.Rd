@@ -4,17 +4,17 @@
 \alias{MatrixPruner}
 \title{Prunes a character matrix of characters or taxa}
 \usage{
-MatrixPruner(clad.matrix, blocks2prune = c(), characters2prune = c(),
-  taxa2prune = c(), removeinvariant = FALSE)
+MatrixPruner(CladisticMatrix, blocks2prune = c(),
+  characters2prune = c(), taxa2prune = c(), removeinvariant = FALSE)
 }
 \arguments{
-\item{clad.matrix}{The cladistic matrix in the format imported by \link{ReadMorphNexus}.}
+\item{CladisticMatrix}{The cladistic matrix in the format imported by \link{ReadMorphNexus}.}
 
 \item{blocks2prune}{A vector of number(s) of any blocks to prune.}
 
 \item{characters2prune}{A vector of character numbers to prune.}
 
-\item{taxa2prune}{A vector of taxon names to prune (these must be present in \code{rownames(clad.matrix$matrix}).}
+\item{taxa2prune}{A vector of taxon names to prune (these must be present in \code{rownames(CladisticMatrix$matrix}).}
 
 \item{removeinvariant}{A logical for whether invariant characters should (TRUE) or should not (FALSE, default) be pruned.}
 }
@@ -27,7 +27,7 @@ Removing characters or taxa from a matrix imported using \link{ReadMorphNexus} i
 \examples{
 
 # Remove the outgroup taxon and characters 11 and 53 from Gauthier1986:
-prunedmatrix <- MatrixPruner(clad.matrix = Gauthier1986, characters2prune = c(11, 53),
+prunedmatrix <- MatrixPruner(CladisticMatrix = Gauthier1986, characters2prune = c(11, 53),
   taxa2prune = c("Outgroup"))
 
 # Show priuned matrix:

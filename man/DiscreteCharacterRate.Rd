@@ -4,7 +4,7 @@
 \alias{DiscreteCharacterRate}
 \title{Discrete character rates across trees, time, and character types}
 \usage{
-DiscreteCharacterRate(tree, clad.matrix, TimeBins,
+DiscreteCharacterRate(tree, CladisticMatrix, TimeBins,
   BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL,
   CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL,
   ChangeTimes = "random", Alpha = 0.01,
@@ -17,9 +17,9 @@ DiscreteCharacterRate(tree, clad.matrix, TimeBins,
   Threshold = 0.01)
 }
 \arguments{
-\item{tree}{A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{clad.matrix}.}
+\item{tree}{A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{CladisticMatrix}.}
 
-\item{clad.matrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
+\item{CladisticMatrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
 
 \item{TimeBins}{A vector of ages (in millions of years) indicating the boundaries of a series of time bins in order from oldest to youngest.}
 
@@ -142,7 +142,7 @@ tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
 tree$root.time <- max(diag(vcv(tree)))
 
 # Get discrete character rates:
-x <- DiscreteCharacterRate(tree = tree, clad.matrix =
+x <- DiscreteCharacterRate(tree = tree, CladisticMatrix =
   Michaux1989, TimeBins = seq(from = tree$root.time,
   to = 0, length.out = 5), BranchPartitionsToTest =
   lapply(as.list(1:nrow(tree$edge)), as.list),

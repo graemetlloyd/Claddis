@@ -4,10 +4,10 @@
 \alias{CompactifyMatrix}
 \title{Collapses matrix to unique character state distributions}
 \usage{
-CompactifyMatrix(clad.matrix)
+CompactifyMatrix(CladisticMatrix)
 }
 \arguments{
-\item{clad.matrix}{The cladistic matrix in the format imported by \link{ReadMorphNexus}.}
+\item{CladisticMatrix}{The cladistic matrix in the format imported by \link{ReadMorphNexus}.}
 }
 \description{
 Collapses matrix to unique character state distributions.
