@@ -4,7 +4,7 @@
 #'
 #' Important: not recommended for general use.
 #'
-#' This function is intended to make a matrix with redundant character state distributions smaller by collapsing these to single characters and upweighting them accordingly. It is intended purely for us with MRP matrices, but may have some very restricted uses elsewhere.
+#' This function is intended to make a matrix with redundant character state distributions smaller by collapsing these to single characters and upweighting them accordingly. It is intended purely for use with MRP matrices, but may have some very restricted uses elsewhere.
 #'
 #' The function also deletes any characters weighted zero from the matrix.
 #'
@@ -21,7 +21,7 @@
 #' # Examine the matrix pre-compactification:
 #' Michaux1989$matrix
 #'
-#' # Examine the wieights pre-compactification:
+#' # Examine the weights pre-compactification:
 #' Michaux1989$weights
 #'
 #' # Compactify the matrix:
