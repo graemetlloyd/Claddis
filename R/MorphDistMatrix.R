@@ -335,10 +335,10 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
     ComparableCharacters <- comparable.characters
     
     # Set ordering for comparable characters:
-    CharacterOrdering <- ordering[compchar]
+    CharacterOrdering <- ordering[ComparableCharacters]
     
     # Set ordering for comparable characters:
-    Weights <- weights[compchar]
+    Weights <- weights[ComparableCharacters]
     
     # Fof each character level (from most to least nested):
     for(i in length(CharactersByLevel):2) {
