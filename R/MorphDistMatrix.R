@@ -21,7 +21,7 @@
 #' @param PolymorphismBehaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}.
 #' @param UncertaintyBehaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}.
 #' @param InapplicableBehaviour The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"} (Hopkins and St John 2018; see details).
-#' @param CharacterDependencies Only relevant if using \code{InapplicableBehaviour = "HSJ"}. Must be a two-column matrix with rownames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See details.
+#' @param CharacterDependencies Only relevant if using \code{InapplicableBehaviour = "HSJ"}. Must be a two-column matrix with colnames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See details.
 #' @param Alpha The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{InapplicableBehaviour = "HSJ"}. See details.
 #'
 #' @description

@@ -26,7 +26,7 @@ MorphDistMatrix(CladisticMatrix, Distance = "MORD", GEDType = "Wills",
 
 \item{InapplicableBehaviour}{The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"} (Hopkins and St John 2018; see details).}
 
-\item{CharacterDependencies}{Only relevant if using \code{InapplicableBehaviour = "HSJ"}. Must be a two-column matrix with rownames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See details.}
+\item{CharacterDependencies}{Only relevant if using \code{InapplicableBehaviour = "HSJ"}. Must be a two-column matrix with colnames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See details.}
 
 \item{Alpha}{The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{InapplicableBehaviour = "HSJ"}. See details.}
 }
