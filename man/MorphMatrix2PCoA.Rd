@@ -41,6 +41,12 @@ MorphMatrix2PCoA(CladisticMatrix, Distance = "MORD", GEDType = "Wills",
 \item{AncestralUncertaintyBehaviour}{Behaviour for dealing with uncertainties when producing ancestral state estimates - see \link{AncStateEstMatrix}.}
 
 \item{Threshold}{Threshold for ancestral state estimation of discrete characters - see \link{AncStateEstMatrix} for details.}
+
+\item{DistInapplicableBehaviour}{The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"}. See \link{MorphDistMatrix} for details.}
+
+\item{CharacterDependencies}{Only relevant if using \code{InapplicableBehaviour = "HSJ"}. Must be a two-column matrix with colnames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See \link{MorphDistMatrix} for details.}
+
+\item{Alpha}{The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{InapplicableBehaviour = "HSJ"}. See \link{MorphDistMatrix} for details.}
 }
 \value{
 \item{Tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{TrimMorphDistMatrix}.}

@@ -18,6 +18,9 @@
 #' @param TransformDistances The transformation to apply to distances. See \link{MorphDistMatrix} for details.
 #' @param DistPolymorphismBehaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{MorphDistMatrix} for details.
 #' @param DistUncertaintyBehaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{MorphDistMatrix} for details.
+#' @param DistInapplicableBehaviour The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"}. See \link{MorphDistMatrix} for details.
+#' @param CharacterDependencies Only relevant if using \code{InapplicableBehaviour = "HSJ"}. Must be a two-column matrix with colnames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See \link{MorphDistMatrix} for details.
+#' @param Alpha The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{InapplicableBehaviour = "HSJ"}. See \link{MorphDistMatrix} for details.
 #' @param correction The negative eigenvalue correction to use (one of "lingoes", "none", or "cailliez" - the default). See \link{pcoa} for more details.
 #' @param Tree If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.
 #' @param EstimateAllNodes If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{AncStateEstMatrix} for more details.
@@ -79,7 +82,7 @@ MorphMatrix2PCoA <- function(CladisticMatrix, Distance = "MORD", GEDType = "Will
   if(is.null(Tree)) {
     
     # Get morphological distances from the cladistic matrix:
-    morph_distances <- MorphDistMatrix(CladisticMatrix, Distance = Distance, TransformDistances = TransformDistances, PolymorphismBehaviour = DistPolymorphismBehaviour, UncertaintyBehaviour = DistUncertaintyBehaviour)
+    morph_distances <- MorphDistMatrix(CladisticMatrix, Distance = Distance, TransformDistances = TransformDistances, PolymorphismBehaviour = DistPolymorphismBehaviour, UncertaintyBehaviour = DistUncertaintyBehaviour, InapplicableBehaviour = DistInapplicableBehaviour, CharacterDependencies = CharacterDependencies, Alpha = Alpha)
     
     # Get trimmed distances:
     trimmed_distances <- TrimMorphDistMatrix(morph_distances$DistanceMatrix)
@@ -97,7 +100,7 @@ MorphMatrix2PCoA <- function(CladisticMatrix, Distance = "MORD", GEDType = "Will
     ancestral_values <- AncStateEstMatrix(CladisticMatrix = CladisticMatrix, Tree = Tree, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = InapplicablesAsMissing, PolymorphismBehaviour = AncestralPolymorphismBehaviour, UncertaintyBehaviour = AncestralUncertaintyBehaviour, Threshold = Threshold)
 
     # Get morphological distances from the cladistic matrix:
-    morph_distances <- MorphDistMatrix(ancestral_values, Distance = Distance, GEDType = GEDType, TransformDistances = TransformDistances, PolymorphismBehaviour = DistPolymorphismBehaviour, UncertaintyBehaviour = DistUncertaintyBehaviour)
+    morph_distances <- MorphDistMatrix(ancestral_values, Distance = Distance, GEDType = GEDType, TransformDistances = TransformDistances, PolymorphismBehaviour = DistPolymorphismBehaviour, UncertaintyBehaviour = DistUncertaintyBehaviour, InapplicableBehaviour = DistInapplicableBehaviour, CharacterDependencies = CharacterDependencies, Alpha = Alpha)
     
     # Get trimmed distances:
     trimmed_distances <- TrimMorphDistMatrix(morph_distances$DistanceMatrix, Tree = Tree)
