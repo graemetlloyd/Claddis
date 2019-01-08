@@ -7,7 +7,9 @@
 MorphDistMatrix(CladisticMatrix, Distance = "MORD", GEDType = "Wills",
   TransformDistances = "arcsine_sqrt",
   PolymorphismBehaviour = "min.difference",
-  UncertaintyBehaviour = "min.difference")
+  UncertaintyBehaviour = "min.difference",
+  InapplicableBehaviour = "missing", CharacterDependencies = NULL,
+  Alpha = 0.5)
 }
 \arguments{
 \item{CladisticMatrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
@@ -18,9 +20,15 @@ MorphDistMatrix(CladisticMatrix, Distance = "MORD", GEDType = "Wills",
 
 \item{TransformDistances}{Whether to transform the distances. Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default). (Note: this is only really appropriate for the proportional distances, i.e., "GC" and "MORD".)}
 
-\item{PolymorphismBehaviour}{The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.}
+\item{PolymorphismBehaviour}{The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}.}
 
-\item{UncertaintyBehaviour}{The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.}
+\item{UncertaintyBehaviour}{The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}.}
+
+\item{InapplicableBehaviour}{The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"} (Hopkins and St John 2018; see details).}
+
+\item{CharacterDependencies}{Only relevant if using \code{InapplicableBehaviour = "HSJ"}. Must be a two-column matrix with rownames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See details.}
+
+\item{Alpha}{The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{InapplicableBehaviour = "HSJ"}. See details.}
 }
 \value{
 \item{DistanceMetric}{The distance metric used.}
@@ -41,13 +49,39 @@ Typically the resulting distance matrix will be used in an ordination procedure 
 
 An unexplored option in distance matrix construction is how to deal with polymorphisms (Lloyd 2016). Up to version 0.2 of Claddis all polymorphisms were treated the same regardless of whether they were true polymorphisms (multiple states are observed in the taxon) or uncertainties (multiple, but not all states, are posited for the taxon). Since version 0.3, however, these two forms can be distinguished by using the different #NEXUS forms (Maddison et al. 1997), i.e., (01) for polymorphisms and \{01\} for uncertainties and within Claddis these are represented as 0&1 or 0/1, respectively. Thus, since 0.3 Claddis allows these two forms to be treated separately, and hence differently (with \code{PolymorphismBehaviour} and \code{UncertaintyBehaviour}). Again, up to version 0.2 of Claddis no options for polymorphism behaviour were offered, instead only a minimum distance was employed. I.e., the distance between a taxon coded 0&1 and a taxon coded 2 would be the smaller of the comparisons 0 with 2 or 1 with 2. Since version 0.3 this is encoded in the \code{min.difference} option. Currentlly two alternatives (\code{mean.difference} and \code{random}) are offered. The first takes the mean of each possible difference and the second simply samples one of the states at random. Note this latter option makes the function stochastic and so it should be rerun multiple times (for example, with a \code{for} loop or \code{apply} function). In general this issue (and these options) are not explored in the literature and so no recommendation can be made beyond that users should think carefully about what this choice may mean for their individual data set(s) and question(s).
 
-A final consideration is how to deal with inapplicable characters. Up to version 0.2 Claddis treated inapplicable and missing characters the same (as NA values, i.e., missing data). However, since Claddis version 0.3 these can be imported separately, i.e., by using the "MISSING" and "GAP" states in #NEXUS format (Maddison et al. 1997) with the latter typically representing the inapplicable character. These will appear as NA and empty strings (""), respectively in Claddis format. Hopkins and St John (2018) showed how inapplicable characters - typically assumed to represent secondary characters - could be treated in generating distance matrices. These are usually hierarchical in form. E.g., a primary character might record the presence or absence of feathers and a secondary character whether those feathers are symmetric or asymmetric. The latter will generate inapplicable states for taxa without feathers and without correcting for this ranked distances can b incorrect (Hopkins and ST John 2018). Unfortunately, however, the #NEXUS format (Maddison et al. 1997) does not really allow explicit linkage between primary and secondary characters and so at present Claddis can only really operate by assuming any character with at least one taxon encoded as inapplicable as secondary and all other characters as primary.
+A final consideration is how to deal with inapplicable characters. Up to version 0.2 Claddis treated inapplicable and missing characters the same (as NA values, i.e., missing data). However, since Claddis version 0.3 these can be imported separately, i.e., by using the "MISSING" and "GAP" states in #NEXUS format (Maddison et al. 1997), with the latter typically representing the inapplicable character. These will appear as NA and empty strings (""), respectively, in Claddis format. Hopkins and St John (2018) showed how inapplicable characters - typically assumed to represent secondary characters - could be treated in generating distance matrices. These are usually hierarchical in form. E.g., a primary character might record the presence or absence of feathers and a secondary character whether those feathers are symmetric or asymmetric. The latter will generate inapplicable states for taxa without feathers and without correcting for this ranked distances can be incorrect (Hopkins and St John 2018). Unfortunately, however, the #NEXUS format (Maddison et al. 1997) does not really allow explicit linkage between primary and secondary characters and so this information must be provided separately to use the Hopkins and St John (2018) approach. MORE HERE ON HOW TO USE A NEW VARIABLE FOR DEFINING CHARACTER HIERARCHIES PLUS ALPHA. (Extends Hopkins approach as alpha can be used in conjunction with any distance metrics. Characters numbered for whole matrix, not independent blocks.
 }
 \examples{
 
 # Get morphological distances for the Day et
 # al. (2016) data set:
 distances <- MorphDistMatrix(Day2016)
+
+# Show distance metric:
+distances$DistanceMetric
+
+# Show distance matrix:
+distances$DistanceMatrix
+
+# Show number of characters that can be scored for
+# each pairwise comparison:
+distances$ComparableCharacterMatrix
+
+# To repeat using the Hopkins and St John approach
+# we first need to define the character dependency
+# (here there is only one, character 8 is a
+# secondary where 7 is the primary character):
+CharacterDependencies <- matrix(c(8, 7), ncol = 2,
+  byrow = TRUE, dimnames = list(c(),
+  c("DependentCharacter",
+  "IndependentCharacter")))
+
+# Get morphological distances for the Day et
+# al. (2016) data set using HSJ approach:
+distances <- MorphDistMatrix(Day2016,
+  InapplicableBehaviour = "HSJ",
+  CharacterDependencies = CharacterDependencies,
+  Alpha = 0.5)
 
 # Show distance metric:
 distances$DistanceMetric

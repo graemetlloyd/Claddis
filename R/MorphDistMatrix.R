@@ -10,14 +10,17 @@
 #'
 #' An unexplored option in distance matrix construction is how to deal with polymorphisms (Lloyd 2016). Up to version 0.2 of Claddis all polymorphisms were treated the same regardless of whether they were true polymorphisms (multiple states are observed in the taxon) or uncertainties (multiple, but not all states, are posited for the taxon). Since version 0.3, however, these two forms can be distinguished by using the different #NEXUS forms (Maddison et al. 1997), i.e., (01) for polymorphisms and \{01\} for uncertainties and within Claddis these are represented as 0&1 or 0/1, respectively. Thus, since 0.3 Claddis allows these two forms to be treated separately, and hence differently (with \code{PolymorphismBehaviour} and \code{UncertaintyBehaviour}). Again, up to version 0.2 of Claddis no options for polymorphism behaviour were offered, instead only a minimum distance was employed. I.e., the distance between a taxon coded 0&1 and a taxon coded 2 would be the smaller of the comparisons 0 with 2 or 1 with 2. Since version 0.3 this is encoded in the \code{min.difference} option. Currentlly two alternatives (\code{mean.difference} and \code{random}) are offered. The first takes the mean of each possible difference and the second simply samples one of the states at random. Note this latter option makes the function stochastic and so it should be rerun multiple times (for example, with a \code{for} loop or \code{apply} function). In general this issue (and these options) are not explored in the literature and so no recommendation can be made beyond that users should think carefully about what this choice may mean for their individual data set(s) and question(s).
 #'
-#' A final consideration is how to deal with inapplicable characters. Up to version 0.2 Claddis treated inapplicable and missing characters the same (as NA values, i.e., missing data). However, since Claddis version 0.3 these can be imported separately, i.e., by using the "MISSING" and "GAP" states in #NEXUS format (Maddison et al. 1997) with the latter typically representing the inapplicable character. These will appear as NA and empty strings (""), respectively in Claddis format. Hopkins and St John (2018) showed how inapplicable characters - typically assumed to represent secondary characters - could be treated in generating distance matrices. These are usually hierarchical in form. E.g., a primary character might record the presence or absence of feathers and a secondary character whether those feathers are symmetric or asymmetric. The latter will generate inapplicable states for taxa without feathers and without correcting for this ranked distances can b incorrect (Hopkins and ST John 2018). Unfortunately, however, the #NEXUS format (Maddison et al. 1997) does not really allow explicit linkage between primary and secondary characters and so at present Claddis can only really operate by assuming any character with at least one taxon encoded as inapplicable as secondary and all other characters as primary.
+#' A final consideration is how to deal with inapplicable characters. Up to version 0.2 Claddis treated inapplicable and missing characters the same (as NA values, i.e., missing data). However, since Claddis version 0.3 these can be imported separately, i.e., by using the "MISSING" and "GAP" states in #NEXUS format (Maddison et al. 1997), with the latter typically representing the inapplicable character. These will appear as NA and empty strings (""), respectively, in Claddis format. Hopkins and St John (2018) showed how inapplicable characters - typically assumed to represent secondary characters - could be treated in generating distance matrices. These are usually hierarchical in form. E.g., a primary character might record the presence or absence of feathers and a secondary character whether those feathers are symmetric or asymmetric. The latter will generate inapplicable states for taxa without feathers and without correcting for this ranked distances can be incorrect (Hopkins and St John 2018). Unfortunately, however, the #NEXUS format (Maddison et al. 1997) does not really allow explicit linkage between primary and secondary characters and so this information must be provided separately to use the Hopkins and St John (2018) approach. MORE HERE ON HOW TO USE A NEW VARIABLE FOR DEFINING CHARACTER HIERARCHIES PLUS ALPHA. (Extends Hopkins approach as alpha can be used in conjunction with any distance metrics. Characters numbered for whole matrix, not independent blocks.
 #'
 #' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
 #' @param Distance The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).
 #' @param GEDType The type of GED to use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.
 #' @param TransformDistances Whether to transform the distances. Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default). (Note: this is only really appropriate for the proportional distances, i.e., "GC" and "MORD".)
-#' @param PolymorphismBehaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
-#' @param UncertaintyBehaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"} or \code{"min.difference"} (the default.
+#' @param PolymorphismBehaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}.
+#' @param UncertaintyBehaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}.
+#' @param InapplicableBehaviour The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"} (Hopkins and St John 2018; see details).
+#' @param CharacterDependencies Only relevant if using \code{InapplicableBehaviour = "HSJ"}. Must be a two-column matrix with rownames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See details.
+#' @param Alpha The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{InapplicableBehaviour = "HSJ"}. See details.
 #'
 #' @description
 #'
@@ -61,10 +64,36 @@
 #' # each pairwise comparison:
 #' distances$ComparableCharacterMatrix
 #'
+#' # To repeat using the Hopkins and St John approach
+#' # we first need to define the character dependency
+#' # (here there is only one, character 8 is a
+#' # secondary where 7 is the primary character):
+#' CharacterDependencies <- matrix(c(8, 7), ncol = 2,
+#'   byrow = TRUE, dimnames = list(c(),
+#'   c("DependentCharacter",
+#'   "IndependentCharacter")))
+#'
+#' # Get morphological distances for the Day et
+#' # al. (2016) data set using HSJ approach:
+#' distances <- MorphDistMatrix(Day2016,
+#'   InapplicableBehaviour = "HSJ",
+#'   CharacterDependencies = CharacterDependencies,
+#'   Alpha = 0.5)
+#'
+#' # Show distance metric:
+#' distances$DistanceMetric
+#'
+#' # Show distance matrix:
+#' distances$DistanceMatrix
+#'
+#' # Show number of characters that can be scored for
+#' # each pairwise comparison:
+#' distances$ComparableCharacterMatrix
+#'
 #' @export MorphDistMatrix
-MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills", TransformDistances = "arcsine_sqrt", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference") {
+MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills", TransformDistances = "arcsine_sqrt", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference", InapplicableBehaviour = "missing", CharacterDependencies = NULL, Alpha = 0.5) {
   
-  # ADD HOPKINS SUGGESTION FOR FOURTH GEDTYPE WHERE MEAN DISTANCE FOR CHARACTER REPLACES MISSING VALUES.
+  # ADD HOPKINS SUGGESTION (VIA EMAIL) FOR FOURTH GEDTYPE WHERE MEAN DISTANCE FOR CHARACTER REPLACES MISSING VALUES.
   # CHECK POLYMORPHISM UNCERTAINTY IN GENERAL AS NOT CLEAR IT IS DOING WHAT IT SHOULD DO.
   
   # Subfunction to find comparable characters for a pairwise taxon comparison:
@@ -293,6 +322,65 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
   
   # Subfunction for building starting GED data:
   BuildStartingGEDData <- function(differences, comparable.characters, CladisticMatrix, weights) return(rbind(c(differences, rep(NA, length(FindIncomparableCharacters(comparable.characters, CladisticMatrix)))), c(weights[comparable.characters], weights[FindIncomparableCharacters(comparable.characters, CladisticMatrix)])))
+  
+  # Subfunction to apply Hopkins and St John (2018) Alpha weighting of inapplicables:
+  AlphaWeightingOfInapplicables <- function(diffs, comparable.characters, ordering, weights, CharacterDependencies, CharactersByLevel, Alpha) {
+    
+    # Set differences:
+    Differences <- diffs
+    
+    # Set comparable characters:
+    ComparableCharacters <- comparable.characters
+    
+    # Set ordering for comparable characters:
+    CharacterOrdering <- ordering[compchar]
+    
+    # Set ordering for comparable characters:
+    Weights <- weights[compchar]
+    
+    # Fof each character level (from most to least nested):
+    for(i in length(CharactersByLevel):2) {
+      
+      # Get independent characters for current levels dependent characters:
+      IndependentCharacters <- unique(unlist(lapply(as.list(CharactersByLevel[[i]]), function(x) unname(CharacterDependencies[CharacterDependencies[, "DependentCharacter"] == x, "IndependentCharacter"]))))
+      
+      # For each independent character:
+      for(j in IndependentCharacters) {
+        
+        # Find dependent characters:
+        DependentCharacters <- unname(CharacterDependencies[CharacterDependencies[, "IndependentCharacter"] == j, "DependentCharacter"])
+        
+        # Check characters are present in current distance:
+        CharactersPresent <- intersect(ComparableCharacters, DependentCharacters)
+        
+        # If characters are present:
+        if(length(CharactersPresent) > 0) {
+          
+          # Set positions of dependent characters in current differences vector:
+          DependentPositions <- match(CharactersPresent, ComparableCharacters)
+          
+          # Get position of independent character in current differences vector:
+          IndependentPosition <- which(ComparableCharacters == j)
+          
+          # Stop and warn user if matrix contains an impossible coding (i.e., dependent character coded when independent character is missing):
+          if(length(IndependentPosition) == 0) stop("Found a dependent character coded when character it depends on is missing. Check matrix codings.")
+          
+          # Overwrite independent position with alpha-weighted value:
+          diffs[IndependentPosition] <- 1 - (Alpha * (1 - (sum(diffs[DependentPositions] * Weights[DependentPositions]) / sum(Weights[DependentPositions]))) + (1 - Alpha))
+          
+          # Overwrite dependent positions with NAs:
+          diffs[DependentPositions] <- NA
+          
+        }
+        
+      }
+      
+    }
+    
+    # Return modified character comparisons:
+    return(diffs)
+    
+  }
 
   # Check for step matrices and stop and warn user if found:
   if(is.list(CladisticMatrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
@@ -312,17 +400,85 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
   # Check input for UncertaintyBehaviour is valid and stop and warn if not:
   if(length(setdiff(UncertaintyBehaviour, c("mean.difference", "min.difference", "random"))) > 0) stop("UncertaintyBehaviour must be one or more of \"mean.difference\", \"min.difference\", or \"random\".")
   
+  # Check input for UncertaintyBehaviour is valid and stop and warn if not:
+  if(length(setdiff(InapplicableBehaviour, c("missing", "HSJ"))) > 0) stop("InapplicableBehaviour must be one or more of \"missing\", or \"HSJ\".")
+  
+  # Check if the
+  if(InapplicableBehaviour == "HSJ" && is.null(CharacterDependencies)) stop("If using the \"HSJ\" InapplicableBehaviour then CharacterDependencies must be specified.")
+  
+  # If using HSJ and CharacterDependencies is set (will check data are formatted correctly):
+  if(InapplicableBehaviour == "HSJ" && !is.null(CharacterDependencies)) {
+    
+    # Check CharacterDependencies is a matrix and stop and warn user if not:
+    if(!is.matrix(CharacterDependencies)) stop("CharacterDependencies must be in the form of a two-column matrix.")
+    
+    # Check CharacterDependencies has two columns and stop and warn user if not:
+    if(ncol(CharacterDependencies) != 2) stop("CharacterDependencies must be in the form of a two-column matrix.")
+    
+    # Check CharacterDependencies column names are correct and stop and warn user if not:
+    if(length(setdiff(c("DependentCharacter", "IndependentCharacter"), colnames(CharacterDependencies))) > 0) stop("CharacterDependencies column names must be exactly \"DependentCharacter\" and \"IndependentCharacter\".")
+    
+    # Check CharacterDependencies are numeric values and stop and warn user if not:
+    if(!is.numeric(CharacterDependencies)) stop("CharacterDependencies values must be numeric.")
+    
+    # Check CharacterDependencies values are within range of matrix dimensions and stop and warn user if not:
+    if(length(setdiff(as.vector(CharacterDependencies), 1:sum(unname(unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], function(x) ncol(x$Matrix))))))) > 0) stop("CharacterDependencies can only contain character numbers within the dimensions of the CladisticMatrix specified.")
+    
+    # Check CharacterDependencies values do not lead to duplicated parent characters and stop and warn user if not:
+    if(any(duplicated(CharacterDependencies[, "DependentCharacter"]))) stop("CharacterDependencies characters can not be dependent on two or more different independent characters.")
+    
+    # Find any characters that are both dependent and independent (and hence may lead to circularity issues):
+    CharactersToCheckForCircularDependency <- intersect(CharacterDependencies[, "DependentCharacter"], CharacterDependencies[, "IndependentCharacter"])
+    
+    # If there is the possibility for circularity:
+    if(length(CharactersToCheckForCircularDependency) > 0) {
+      
+      # For the ith independent character:
+      for(i in unique(CharacterDependencies[, "IndependentCharacter"])) {
+        
+        # Set current character as ith character:
+        CurrentCharacter <- i
+        
+        # Ste starting found character as ith character:
+        FoundCharacters <- i
+        
+        # Keep going until the current character is not an independent character:
+        while(sum(unlist(lapply(as.list(CurrentCharacter), function(x) sum(CharacterDependencies[, "IndependentCharacter"] == x)))) > 0) {
+          
+          # Find any dependent character(s):
+          DependentCharacter <- unlist(lapply(as.list(CurrentCharacter), function(x) unname(CharacterDependencies[CharacterDependencies[, "IndependentCharacter"] == x, "DependentCharacter"])))
+          
+          # Check character was not already found (creating a circularity) and stop and wanr user if true:
+          if(length(intersect(DependentCharacter, FoundCharacters)) > 0) stop("Circularity found in CharacterDependencies.")
+          
+          # Update found characters:
+          FoundCharacters <- c(FoundCharacters, DependentCharacter)
+          
+          # Update current character(s):
+          CurrentCharacter <- DependentCharacter
+          
+        }
+        
+      }
+      
+    }
+    
+    # Check alpha is a value between zero and one and stop and warn user if not:
+    if(Alpha > 1 || Alpha < 0) stop("Alpha must be a value between zero and one")
+
+  }
+  
   # Isolate ordering element:
-  ordering <- unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Ordering"))
+  ordering <- unname(unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Ordering")))
   
   # Isolate minimum values:
-  min.vals <- unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "MinVals"))
+  min.vals <- unname(unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "MinVals")))
   
   # Isolate maximum values:
-  max.vals <- unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "MaxVals"))
+  max.vals <- unname(unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "MaxVals")))
   
   # Isolate weights:
-  weights <- unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Weights"))
+  weights <- unname(unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Weights")))
   
   # Combine matrix blocks into a single matrix:
   CladisticMatrix <- do.call(cbind, lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Matrix"))
@@ -355,8 +511,8 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
     
   }
   
-  # If there are inapplicables then convert these to NAs:
-  if(any(sort(CladisticMatrix == ""))) CladisticMatrix[CladisticMatrix == ""] <- NA
+  # If there are inapplicables and using the missing option then convert these to NAs:
+  if(any(sort(CladisticMatrix == "")) && InapplicableBehaviour == "missing") CladisticMatrix[CladisticMatrix == ""] <- NA
   
   # Find all possible (symmetric) pariwise comparisons for the N taxa in the matrix (excluding self-comparisons):
   comparisons <- combn(1:nrow(CladisticMatrix), 2)
@@ -374,10 +530,44 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
   matrix.of.char.comp <- mapply(EditPolymorphisms, unlist(apply(matrix.of.char.comp, 2, list), recursive = FALSE), list.of.compchar, MoreArgs = list(ordering, PolymorphismBehaviour, UncertaintyBehaviour))
   
   # Get the absolute differences between each comparable character for each pairwise comparison:
-  raw.diffs <- diffs <- unlist(apply(matrix.of.char.comp, 2, GetAbsoluteCharacterDifferences), recursive = FALSE)
+  diffs <- unlist(apply(matrix.of.char.comp, 2, GetAbsoluteCharacterDifferences), recursive = FALSE)
   
   # Correct distances for unordered characters where distance is greater than one:
   diffs <- mapply(CorrectForUnordered, diffs, list.of.compchar, MoreArgs = list(ordering))
+  
+  # If applying the Hopkins and St John Alpha approach:
+  if(InapplicableBehaviour == "HSJ") {
+    
+    # Set primary-level characters in a list (where secondary etc. level characters will be added in turn):
+    CharactersByLevel <- list(unname(setdiff(unique(CharacterDependencies[, "IndependentCharacter"]), unique(CharacterDependencies[, "DependentCharacter"]))))
+    
+    # Set starting more nested characters:
+    HigherLevelCharacters <- setdiff(unique(c(CharacterDependencies)), unlist(CharactersByLevel))
+    
+    # Whilst there are still more nested levels of characters:
+    while(length(HigherLevelCharacters) > 0) {
+      
+      # Add next level characters to characters by level list at next level:
+      CharactersByLevel[[(length(CharactersByLevel) + 1)]] <- unname(CharacterDependencies[unlist(lapply(as.list(CharactersByLevel[[length(CharactersByLevel)]]), function(x) which(CharacterDependencies[, "IndependentCharacter"] == x))), "DependentCharacter"])
+      
+      # Set new higher level characters:
+      HigherLevelCharacters <- setdiff(unique(c(CharacterDependencies)), unlist(CharactersByLevel))
+      
+    }
+    
+    # Update differences with HSJ alpha weights:
+    diffs <- mapply(AlphaWeightingOfInapplicables, diffs, list.of.compchar, MoreArgs = list(ordering, weights, CharacterDependencies, CharactersByLevel, Alpha))
+    
+    # Reweight dependent characters zero:
+    weights[unlist(CharactersByLevel[2:length(CharactersByLevel)])] <- 0
+    
+    # Update comparable characters by pruning out NAs:
+    list.of.compchar <- mapply(function(x, y) y[!is.na(x)], x = diffs, y = list.of.compchar)
+    
+    # Update differences by pruning out NAs:
+    diffs <- lapply(diffs, function(x) x[!is.na(x)])
+    
+  }
   
   # Weight differences:
   diffs <- mapply(WeightDifferences, diffs, list.of.compchar, MoreArgs = list(weights))
@@ -396,7 +586,7 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
     
   }
   
-  # If calculating Raw Eucldiean Distances build the distance matrix:
+  # If calculating Raw Euclidean Distances build the distance matrix:
   if(Distance == "RED") dist.matrix <- ConvertListToMatrix(raw.dist, CladisticMatrix)
 
   # If calculating the Gower Coefficient build the distance matrix:
@@ -517,237 +707,3 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
   return(result)
   
 }
-
-
-
-
-
-
-
-
-###################Hopkins and St. John 2018#####################
-##function for applying proposed family of metrics. Input: character matrix in Claddis object format; table showing hierarchical relationships between characters; alpha value.
-##Input required:
-##matr = character matrix in Claddis object format (see "ReadMorphNexus")
-##type = table with three columns with headings "Char", "Type", and "Sub"
-##      "Char" is the character number
-##      "Type" is the type of character, either "S" for secondary or "T" for tertiary.  In our experience, quaternary characters are rarely to never used
-##      "Sub" is the character numeber that the secondary or tertiary character is contingent on
-##alpha = desired alpha value.  Should vary between 0 and 1.
-##      If alpha = 0, only primary characters will contribute to dissimilarity estimate
-##      If alpha = 1, then shared primary characters will be weighted by the secondary characters shared; same for secondary characters with tertiary characters
-##      See text for further explanation.
-
-##note that delta{ijk} = 1 when characters are comparable, consistent with Gower's initial formulation. It may be preferable to replace the total number of
-#comparable characters with the maximum character total possible (Lloyd's MORB metric) especially if there are ordered characters. This is not implemented here
-#but could be done by modifying lines 90 and 212 for the new metric and Gower's, respectively
-#################
-
-alpha.coefficient <- function(matr, type, alpha) {
-  
-  #matr <- Day2016
-  #alpha <- 0.5 # Check values make sense if incorporating in function
-  #type <- matrix(c(8, "S", 7), nrow = 1, dimnames = list(c(), c("Char", "Type", "Sub")))
-  
-  
-  #Type should more logically be a two-column matrix with first character dependent on second character then can do any level of depth (sevndary tertiary etc.)
-  #Will require checking for non-circularity of character-dependency
-  #Need to do operation in order from most to least "nested" character
-  #Does weighting cause issue later though? I..e, clash with satrting weights?
-  
-  Matrix <- do.call(cbind, lapply(matr[2:length(matr)], function(x) x$Matrix))
-  Ordering <- unname(unlist(lapply(matr[2:length(matr)], function(x) x$Ordering)))
-  MaxVals <- unname(unlist(lapply(matr[2:length(matr)], function(x) x$MaxVals)))
-  Weights <- unname(unlist(lapply(matr[2:length(matr)], function(x) x$Weights)))
-  
-  pairs <- combn(nrow(Matrix), 2)
-  
-  HSJ <- matrix(NA, nrow = nrow(Matrix), ncol = nrow(Matrix))
-  
-  # This does nothing????
-  alpha <- alpha
-  
-  for(i in 1:ncol(pairs)) {
-    
-    sim.temp <- matrix(abs(suppressWarnings(as.numeric(Matrix[pairs[1, i], ])) - suppressWarnings(as.numeric(Matrix[pairs[2, i], ]))))
-    
-    #correct values for ordered multistate characters
-    if(any(Ordering == 'ord')) {
-      
-      m.o <- which(Ordering == 'ord')
-      
-      sim.temp[m.o] <- abs(suppressWarnings(as.numeric(Matrix[pairs[1, i], ][m.o])) - suppressWarnings(as.numeric(Matrix[pairs[2, i], ][m.o]))) #/MaxVals[m.o]
-      
-    }
-    
-    #correct values for unordered multistate characters
-    if(any(Ordering == "unord" && MaxVals > 1)) {
-      
-      m.u <- which(Ordering == "unord" && MaxVals > 1)
-      
-      sim.temp[m.u] <- replace(sim.temp[m.u], which(sim.temp[m.u] > 1), 1)
-      
-    }
-    #correct polymorphic characters
-    if(length(grep("&", unique(c(Matrix[pairs[1, i], ], Matrix[pairs[2, i], ])))) > 0) {
-      
-      polym.states <- sort(c(grep("&", Matrix[pairs[1, i], ]), grep("&", Matrix[pairs[2, i], ])))
-      for(v in 1:length(polym.states)) {
-        char.state1 <- strsplit(Matrix[pairs[1, i], ][polym.states[v]], "&")[[1]]
-        char.state2 <- strsplit(Matrix[pairs[2, i], ][polym.states[v]], "&")[[1]]
-        int.value <- intersect(char.state1, char.state2)
-        if(length(int.value) > 0) sim.temp[polym.states[v]] <- 0
-        if(length(int.value) == 0 && anyNA(c(char.state1, char.state2)) == FALSE) {
-          if(Ordering[polym.states[v]] == "unord") sim.temp[polym.states[v]] <- 1
-          if(Ordering[polym.states[v]] == "ord"){
-            pairs.poly <- matrix(0, nrow = length(char.state1), ncol = length(char.state2))
-            for(m in 1:length(char.state1)) for(n in 1:length(char.state2)) pairs.poly[m, n] <- abs(as.numeric(char.state1[m]) - as.numeric(char.state2[n]))
-            sim.temp[polym.states[v]] <- min(pairs.poly)
-          }
-        }
-      }
-    }
-    #account for Tertiary characters (by weighting)
-    if(any(type[, "Type"] == "T")) {
-      te <- which(type[, "Type"] == "T")
-      for(j in 1:length(unique(type[, "Sub"][te]))) {
-        te.sub <- which(type[, "Sub"] == as.character(unique(type[, "Sub"][te])[j]))
-        te.sim <- sim.temp[te.sub]
-        s.te <- as.numeric(as.character(unique(na.omit(type[, "Sub"][te])))[j])
-        if(length(na.omit(te.sim)) > 0) {
-          sim.temp[s.te] <- 1 - (alpha * (1 - (sum(na.omit(te.sim)) / length(na.omit(te.sim)))) + (1 - alpha))  #alpha is applied as if it were a similarity measure, therefore the distance is converted to a similarity by substracted from one, then the whole thing is substracted from one to convert back to dissimilarity
-          sim.temp[te.sub] <- NA
-        }
-      }
-    }
-    #account for secondary characters (by weighting)
-    
-    # If there are secondary characters:
-    if(any(type[, "Type"] == "S")) {
-      
-      # Rows with secondary characters:
-      s <- which(type[, "Type"] == "S")
-      
-      # For each dependent character (i.e., unique primary character):
-      for(j in 1:length(unique(type[s, "Sub"]))) {
-        
-        # This seems wrong? Should be the secondary characters?:
-        s.sub <- which(type[, "Sub"] == as.character(unique(type[s, "Sub"])[j]))
-        
-        #
-        s.sim <- sim.temp[s.sub]
-        
-        # Primary character number:
-        p.s <- as.numeric(as.character(unique(na.omit(type[s, "Sub"])))[j])
-        
-        #
-        if(length(na.omit(s.sim)) > 0) {
-          
-          # Set primary character as reweighted distance value:
-          sim.temp[p.s] <- 1 - (alpha * (1 - (sum(na.omit(s.sim)) / length(na.omit(s.sim)))) + (1 - alpha))
-          
-          # Set secondary distances to NA?:
-          sim.temp[s.sub] <- NA
-          
-        }
-        
-      }
-      
-    }
-    
-    #calculate total dissimilarity
-    wt.comp.char <- sum(na.omit(cbind(sim.temp, Weights))[, 2])
-    
-    
-    HSJ[pairs[1, i], pairs[2, i]] <- HSJ[pairs[2, i], pairs[1, i]] <- sum(na.omit(sim.temp * Weights)) / wt.comp.char
-  
-  }
-  
-  diag(HSJ) <- 0
-  
-  return(HSJ)
-  
-}
-
-
-
-###############
-##Implementation of Will's GED
-##matr = character matrix in Claddis object format (see "ReadMorphNexus")
-
-GED <- function(matr) {
-  
-  Matrix <- do.call(cbind, lapply(matr[2:length(matr)], function(x) x$Matrix))
-  Ordering <- unname(unlist(lapply(matr[2:length(matr)], function(x) x$Ordering)))
-  MaxVals <- unname(unlist(lapply(matr[2:length(matr)], function(x) x$MaxVals)))
-  Weights <- unname(unlist(lapply(matr[2:length(matr)], function(x) x$Weights)))
-  
-  pairs <- combn(nrow(Matrix), 2)
-  
-  GED <- matrix(NA, nrow = nrow(Matrix), ncol = nrow(Matrix))
-  
-  for (i in 1:ncol(pairs)) {
-    sim.temp <- matrix(abs(suppressWarnings(as.numeric(Matrix[pairs[1, i], ])) - suppressWarnings(as.numeric(Matrix[pairs[2, i], ]))))
-    #correct values for ordered multistate characters
-    if(any(Ordering == "ord")) {
-      m.o <- which(Ordering == "ord")
-      sim.temp[m.o] <- abs(suppressWarnings(as.numeric(Matrix[pairs[1, i], ][m.o])) - suppressWarnings(as.numeric(Matrix[pairs[2, i], ][m.o])))
-    }
-    #correct values for unordered multistate characters
-    if(any(Ordering == "unord" && MaxVals > 1)){
-      m.u <- which(Ordering == "unord" && MaxVals > 1)
-      sim.temp[m.u] <- replace(sim.temp[m.u], which(sim.temp[m.u] > 1), 1)
-    }
-    #correct polymorphic characters
-    if(length(grep("&", unique(c(Matrix[pairs[1, i], ], Matrix[pairs[2, i], ])))) > 0){
-      polym.states <- sort(c(grep("&", Matrix[pairs[1, i], ]), grep("&", Matrix[pairs[2, i], ])))
-      for(v in 1:length(polym.states)) {
-        char.state1 <- strsplit(Matrix[pairs[1, i], ][polym.states[v]], "&")[[1]]
-        char.state2 <- strsplit(Matrix[pairs[2, i], ][polym.states[v]], "&")[[1]]
-        int.value <- intersect(char.state1, char.state2)
-        if(length(int.value) > 0) sim.temp[polym.states[v]] <- 0
-        if(length(int.value) == 0 & anyNA(c(char.state1,char.state2)) == FALSE){
-          if(Ordering[polym.states[v]] == "unord") sim.temp[polym.states[v]] <- 1
-          if(Ordering[polym.states[v]] == "ord") {
-            pairs.poly <- matrix(0, nrow = length(char.state1), ncol = length(char.state2))
-            for(m in 1:length(char.state1)) for(n in 1:length(char.state2)) pairs.poly[m, n] <- abs(as.numeric(char.state1[m]) - as.numeric(char.state2[n]))
-            sim.temp[polym.states[v]] <- min(pairs.poly)
-          }
-        }
-      }
-    }
-    
-    #replace missing values
-    Sij <- mean(na.omit(sim.temp))
-    sim.temp[which(is.na(sim.temp) == TRUE)] <- Sij
-    
-    #calculate total dissimilarity
-    #wt.comp.char<-sum(na.omit(cbind(sim.temp, Weights))[,2])
-    GED[pairs[1, i], pairs[2, i]] <- GED[pairs[2, i], pairs[1, i]] <- sqrt(sum((sim.temp * Weights)^2))
-  }
-  diag(GED)<-0
-  return(GED)
-}
-
-#DayDiscrete <- MatrixPruner(Day2016, characters2prune = 1:3)
-#DayDiscrete$Matrix_2$Matrix[, 30] <- gsub("2", "1", gsub("1", "0", DayDiscrete$Matrix_2$Matrix[, 30]))
-#DayDiscrete$Matrix_2$Matrix[, 5] <- gsub("", NA, DayDiscrete$Matrix_2$Matrix[, 5])
-#DayDiscrete$Matrix_2$MinVals[30] <- 0
-#DayDiscrete$Matrix_2$Matrix[which(DayDiscrete$Matrix_2$Matrix[, 5] == ""), 5] <- NA
-
-#x <- as.vector(as.dist(GED(DayDiscrete)))
-#y <- as.vector(as.dist(MorphDistMatrix(CladisticMatrix = DayDiscrete, Distance = "GED", GEDType = "Wills", TransformDistances = "none", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference")$DistanceMatrix))
-#cor.test(x,y)$estimate
-
-#x <- as.vector(as.dist(GED(Michaux1989)))
-#y <- as.vector(as.dist(MorphDistMatrix(CladisticMatrix = Michaux1989, Distance = "GED", GEDType = "Wills", TransformDistances = "none", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference")$DistanceMatrix))
-#cor.test(x,y)$estimate
-
-#x <- as.vector(as.dist(GED(Gauthier1986)))
-#y <- as.vector(as.dist(MorphDistMatrix(CladisticMatrix = Gauthier1986, Distance = "GED", GEDType = "Wills", TransformDistances = "none", PolymorphismBehaviour = "min.difference", UncertaintyBehaviour = "min.difference")$DistanceMatrix))
-#cor.test(x,y)$estimate
-
-
-
-#sim.temp[s.te] <- 1 - (alpha * (1 - (sum(na.omit(te.sim)) / length(na.omit(te.sim)))) + (1 - alpha))  #alpha is applied as if it were a similarity
-
