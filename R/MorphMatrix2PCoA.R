@@ -74,7 +74,7 @@
 #' y
 #'
 #' @export MorphMatrix2PCoA
-MorphMatrix2PCoA <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills", TransformDistances = "arcsine_sqrt", DistPolymorphismBehaviour = "min.difference", DistUncertaintyBehaviour = "min.difference", correction = "cailliez", Tree = NULL, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, AncestralPolymorphismBehaviour = "equalp", AncestralUncertaintyBehaviour = "equalp", Threshold = 0.01) {
+MorphMatrix2PCoA <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills", TransformDistances = "arcsine_sqrt", DistPolymorphismBehaviour = "min.difference", DistUncertaintyBehaviour = "min.difference", DistInapplicableBehaviour = "missing", CharacterDependencies = NULL, Alpha = 0.5, correction = "cailliez", Tree = NULL, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, AncestralPolymorphismBehaviour = "equalp", AncestralUncertaintyBehaviour = "equalp", Threshold = 0.01) {
     
 # Add some top level conditionsl here to check input is valid.
   

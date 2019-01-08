@@ -7,8 +7,10 @@
 MorphMatrix2PCoA(CladisticMatrix, Distance = "MORD", GEDType = "Wills",
   TransformDistances = "arcsine_sqrt",
   DistPolymorphismBehaviour = "min.difference",
-  DistUncertaintyBehaviour = "min.difference", correction = "cailliez",
-  Tree = NULL, EstimateAllNodes = FALSE, EstimateTipValues = FALSE,
+  DistUncertaintyBehaviour = "min.difference",
+  DistInapplicableBehaviour = "missing", CharacterDependencies = NULL,
+  Alpha = 0.5, correction = "cailliez", Tree = NULL,
+  EstimateAllNodes = FALSE, EstimateTipValues = FALSE,
   InapplicablesAsMissing = FALSE,
   AncestralPolymorphismBehaviour = "equalp",
   AncestralUncertaintyBehaviour = "equalp", Threshold = 0.01)
@@ -26,6 +28,12 @@ MorphMatrix2PCoA(CladisticMatrix, Distance = "MORD", GEDType = "Wills",
 
 \item{DistUncertaintyBehaviour}{The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{MorphDistMatrix} for details.}
 
+\item{DistInapplicableBehaviour}{The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"}. See \link{MorphDistMatrix} for details.}
+
+\item{CharacterDependencies}{Only relevant if using \code{InapplicableBehaviour = "HSJ"}. Must be a two-column matrix with colnames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See \link{MorphDistMatrix} for details.}
+
+\item{Alpha}{The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{InapplicableBehaviour = "HSJ"}. See \link{MorphDistMatrix} for details.}
+
 \item{correction}{The negative eigenvalue correction to use (one of "lingoes", "none", or "cailliez" - the default). See \link{pcoa} for more details.}
 
 \item{Tree}{If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.}
@@ -41,12 +49,6 @@ MorphMatrix2PCoA(CladisticMatrix, Distance = "MORD", GEDType = "Wills",
 \item{AncestralUncertaintyBehaviour}{Behaviour for dealing with uncertainties when producing ancestral state estimates - see \link{AncStateEstMatrix}.}
 
 \item{Threshold}{Threshold for ancestral state estimation of discrete characters - see \link{AncStateEstMatrix} for details.}
-
-\item{DistInapplicableBehaviour}{The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"}. See \link{MorphDistMatrix} for details.}
-
-\item{CharacterDependencies}{Only relevant if using \code{InapplicableBehaviour = "HSJ"}. Must be a two-column matrix with colnames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See \link{MorphDistMatrix} for details.}
-
-\item{Alpha}{The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{InapplicableBehaviour = "HSJ"}. See \link{MorphDistMatrix} for details.}
 }
 \value{
 \item{Tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{TrimMorphDistMatrix}.}
