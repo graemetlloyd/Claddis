@@ -1,17 +1,21 @@
 #' Finds all state changes on a tree using stochastic character mapping
 #'
+#' @description
+#'
 #' Takes a cladistic matrix and time-scaled tree and makes point estimates for every character change using stochastic character mapping.
+#'
+#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#' @param tree A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{CladisticMatrix}.
+#' @param time.bins A vector of ages representing the boundaries of a series of time bins.
+#' @param Nsim The number of simulations to perform (passed to \code{make.simmap}.
+#'
+#' @details
 #'
 #' Important: this function is not yet complete and should not be used.
 #'
 #' A wrapper function for \link{make.simmap} in the \link{phytools} package.
 #'
 #' This function is intended to enumerate all possible changes on a tree (including to and from missing or inapplicable states) under the assumptions of stochastic character mapping as an alternative means of establishing branch-lengths (for rate analyses) or recording the state occupied at a particular point in time for disparity analyses.
-#'
-#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
-#' @param tree A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{CladisticMatrix}.
-#' @param time.bins A vector of ages representing the boundaries of a series of time bins.
-#' @param Nsim The number of simulations to perform (passed to \code{make.simmap}.
 #'
 #' @return
 #'

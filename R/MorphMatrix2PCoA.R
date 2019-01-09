@@ -1,16 +1,8 @@
 #' Principal Coordinates on a Cladistic Matrix
-#' 
+#'
+#' @description
+#'
 #' Performs Principal Coordinates Analysis (PCoA) on a cladistic matrix.
-#' 
-#' Takes a cladistic matrix in the format imported by \link{ReadMorphNexus} and performs Principal Coordinates (Gower 1966) analysis on it.
-#'
-#' This function is effectively a wrapper for \link{pcoa} from the \link{ape} package and the user is referred there for some of the options (e.g., using the Caillez 1983 approach to avoiding negative eigenvalues).
-#'
-#' If providing a tree and inferring ancestral states then options to also infer missing or uncertain tips and whether to infer values for all characters at all internal nodes are provided (via \link{AncStateEstMatrix}).
-#'
-#' Other options within the function concern the distance metric to use and the transformation to be used if selecting a propotional distance (see \link{MorphDistMatrix}).
-#'
-#' IMPORTANT: The function can remove taxa (or if including a tree, nodes as well) if they lead to an incomplete distance matrix (see \link{TrimMorphDistMatrix}).
 #'
 #' @param CladisticMatrix A vector of mode character representing the tip names for which an ancestor is sought.
 #' @param Distance The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{MorphDistMatrix} for more details.
@@ -30,6 +22,18 @@
 #' @param AncestralUncertaintyBehaviour Behaviour for dealing with uncertainties when producing ancestral state estimates - see \link{AncStateEstMatrix}.
 #' @param Threshold Threshold for ancestral state estimation of discrete characters - see \link{AncStateEstMatrix} for details.
 #'
+#' @details
+#'
+#' Takes a cladistic matrix in the format imported by \link{ReadMorphNexus} and performs Principal Coordinates (Gower 1966) analysis on it.
+#'
+#' This function is effectively a wrapper for \link{pcoa} from the \link{ape} package and the user is referred there for some of the options (e.g., using the Caillez 1983 approach to avoiding negative eigenvalues).
+#'
+#' If providing a tree and inferring ancestral states then options to also infer missing or uncertain tips and whether to infer values for all characters at all internal nodes are provided (via \link{AncStateEstMatrix}).
+#'
+#' Other options within the function concern the distance metric to use and the transformation to be used if selecting a propotional distance (see \link{MorphDistMatrix}).
+#'
+#' IMPORTANT: The function can remove taxa (or if including a tree, nodes as well) if they lead to an incomplete distance matrix (see \link{TrimMorphDistMatrix}).
+#'
 #' @return \item{Tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{TrimMorphDistMatrix}.}
 #' @return \item{DistMatrix}{The distance matrix. Note this may be pruned by \link{TrimMorphDistMatrix} and thus not include all taxa.}
 #' @return \item{RemovedTaxa}{A vector of taxa (or nodes) removed by \link{TrimMorphDistMatrix}. Returns NULL if none are removed.}
@@ -48,7 +52,7 @@
 #'
 #' Gower, J. C., 1966. Some distance properties of latent root and vector methods used in multivariate analysis. Biometrika, 53, 325-338.
 #'
-#' @keywords classic multidimensional scaling,principal coordinates
+#' @keywords classic multidimensional scaling, principal coordinates
 #'
 #' @examples
 #'

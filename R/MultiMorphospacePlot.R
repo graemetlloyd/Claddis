@@ -1,10 +1,8 @@
 #' Plot Multiple Morphopaces
-#' 
-#' Plots morphospaces for any number of axes.
-#' 
-#' Takes output from \link{MorphMatrix2PCoA} as input and serves as a wrapper function for \link{MorphospacePlot}.
 #'
-#' Plots multiple bivariate plots of ordination axes starting with 1 and up to N, such that every possible bivariate plot is produced.
+#' @description
+#'
+#' Plots morphospaces for any number of axes.
 #'
 #' @param pcoa_input The main input in the format output from \link{MorphMatrix2PCoA}.
 #' @param N_axes An integer indicating the total number of axes to plot (should minimally be three).
@@ -12,6 +10,12 @@
 #' @param plot_internal_nodes Optional to plot the internal nodes of the tree (if included in \code{pcoa_input}) (defaults to FALSE).
 #' @param plot_root Optional to plot the root separately (defaults to FALSE).
 #' @param root_colour If plotting the root separately (previous option) sets the root colour.
+#'
+#' @details
+#'
+#' Takes output from \link{MorphMatrix2PCoA} as input and serves as a wrapper function for \link{MorphospacePlot}.
+#'
+#' Plots multiple bivariate plots of ordination axes starting with 1 and up to N, such that every possible bivariate plot is produced.
 #'
 #' @author Emma Sherratt \email{emma.sherratt@@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'

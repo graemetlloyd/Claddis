@@ -1,14 +1,18 @@
 #' Prunes a character matrix of characters or taxa
 #'
-#' Prunes a character matrix of characters, taxa, or both.
+#' @description
 #'
-#' Removing characters or taxa from a matrix imported using \link{ReadMorphNexus} is not simple due to associated vectors for ordering, character weights etc. To save repetitively pruning each part this function takes the matrix as input and vector(s) of either block numbers, character numbers, taxon names, or any combination thereof and returns a matrix with these items removed. Minimum and maximum values (used by \link{MorphDistMatrix}) are also updated and the user has the option to remove constant characters this way as well (e.g, to reduce the memory required for a DNA matrix).
+#' Prunes a character matrix of characters, taxa, or both.
 #'
 #' @param CladisticMatrix The cladistic matrix in the format imported by \link{ReadMorphNexus}.
 #' @param blocks2prune A vector of number(s) of any blocks to prune.
 #' @param characters2prune A vector of character numbers to prune.
 #' @param taxa2prune A vector of taxon names to prune (these must be present in \code{rownames(CladisticMatrix$matrix}).
 #' @param removeinvariant A logical for whether invariant characters should (TRUE) or should not (FALSE, default) be pruned.
+#'
+#' @details
+#'
+#' Removing characters or taxa from a matrix imported using \link{ReadMorphNexus} is not simple due to associated vectors for ordering, character weights etc. To save repetitively pruning each part this function takes the matrix as input and vector(s) of either block numbers, character numbers, taxon names, or any combination thereof and returns a matrix with these items removed. Minimum and maximum values (used by \link{MorphDistMatrix}) are also updated and the user has the option to remove constant characters this way as well (e.g, to reduce the memory required for a DNA matrix).
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'

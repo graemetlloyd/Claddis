@@ -1,14 +1,18 @@
 #' Collapses matrix to unique character state distributions
 #'
-#' Collapses matrix to unique character state distributions.
+#' @description
+#'
+#' Collapses a cladistic matrix to just unique character state distributions.
+#'
+#' @param CladisticMatrix The cladistic matrix in the format imported by \link{ReadMorphNexus}.
+#'
+#' @details
 #'
 #' Important: not recommended for general use.
 #'
 #' This function is intended to make a matrix with redundant character state distributions smaller by collapsing these to single characters and upweighting them accordingly. It is intended purely for use with MRP matrices, but may have some very restricted uses elsewhere.
 #'
 #' The function also deletes any characters weighted zero from the matrix.
-#'
-#' @param CladisticMatrix The cladistic matrix in the format imported by \link{ReadMorphNexus}.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'

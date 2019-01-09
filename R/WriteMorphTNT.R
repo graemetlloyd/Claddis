@@ -1,16 +1,16 @@
 #' Writes out a morphological TNT data file
 #'
+#' @description
+#'
 #' Writes out a morphological data file in Hennig86/TNT format.
-#'
-#' Writes out a TNT (Goloboff et al. 2008) data file representing the distribution of discrete morphological characters in a set of taxa. Data must be in the format created by importing data with \link{ReadMorphNexus}.
-#'
-#' Note that the function cannot yet deal with continuous characters, but can use step matrices.
-#'
-#' Currently all empty values (missing or inapplicable) are treated as missing and will be written to file as question marks.
 #'
 #' @param CladisticMatrix The cladistic matrix in the format imported by \link{ReadMorphNexus}.
 #' @param filename The file name to write to. Should end in \code{.tnt}.
 #' @param add.analysis.block Whether or not to add analysis block (i.e., tree search commands).
+#'
+#' @details
+#'
+#' Writes out a TNT (Goloboff et al. 2008) data file representing the distribution of discrete morphological characters in a set of taxa. Data must be in the format created by importing data with \link{ReadMorphNexus}.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'

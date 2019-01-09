@@ -1,10 +1,14 @@
 #' Returns node ages for a time-scaled tree
-#' 
+#'
+#' @description
+#'
 #' Given a tree with branch-lengths scaled to time and a value for \code{$root.time} will return a vector of node ages.
-#' 
-#' Returns a vector of node ages (terminal and internal) labelled by their node number.
-#' 
+#'
 #' @param tree A tree (phylo object) with branch lengths representing time and a value for \code{$root.time}.
+#'
+#' @details
+#'
+#' Returns a vector of node ages (terminal and internal) labelled by their node number.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'

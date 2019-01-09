@@ -19,7 +19,7 @@ PhyloCharCompletenessInBins(CladisticMatrix, TimeTree, TimeBins,
 \item{CI}{The confidence interval to be used as a proportion (0 to 1). Default is 0.95 (i.e., 95\%).}
 }
 \value{
-A list summarising the mean, upper and lower 95% conifidence interval, and per character proportional character completeness in each time bin.
+A list summarising the mean, upper and lower 95% confidence interval, and per character proportional character completeness in each time bin.
 }
 \description{
 Given a cladistic matrix, time-scaled tree, and set of time bin boundaries will return the proportional character completeness in each bin.

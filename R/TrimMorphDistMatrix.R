@@ -1,15 +1,19 @@
 #' Trims a morphological distance matrix
 #'
+#' @description
+#'
 #' Trims a morphological distance matrix by removing objects that cause empty cells.
+#'
+#' @param dist.matrix A distance matrix in the format created by \link{MorphDistMatrix}.
+#' @param Tree If the distance matrix includes ancestors this should be the tree (phylo object) used to reconstruct them.
+#'
+#' @details
 #'
 #' Trims a morphological distance matrix by removing nodes (terminal or internal) that cause empty cells allowing it to be passed to an ordination function such as \link{cmdscale}.
 #'
 #' Some distances are not calculable from cladistic matrices if there are taxa that have no coded characters in common. This algorithm iteratively removes the taxa responsible for the most empty cells until the matrix is complete (no empty cells).
 #'
 #' If the matrix includes reconstructed ancestors the user should also provide the tree used (as the \code{tree} argument). The function will then also remove the tips from the tree and where reconstructed ancestors also cause empty cells will prune the minimum number of descendants of that node. The function will then renumber the nodes in the distance matrix so they match the pruned tree.
-#'
-#' @param dist.matrix A distance matrix in the format created by \link{MorphDistMatrix}.
-#' @param Tree If the distance matrix includes ancestors this should be the tree (phylo object) used to reconstruct them.
 #'
 #' @return
 #'

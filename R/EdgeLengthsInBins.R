@@ -1,14 +1,18 @@
 #' Edge-lengths present in time-bins
-#' 
+#'
+#' @description
+#'
 #' Given a time-scaled tree and set of time bin boundaries will sum the edge-lengths present in each bin.
-#' 
-#' Calculates the total edge length present in each of a series of time bins. This is intended as an internal function for rate calculations, but may be of use to someone.
-#' 
-#' The option of using a \code{pruned.tree} allows the user to correctly classify internal and terminal branches in a subtree of the larger tree. So for example, if taxa A and B are sisters then after pruning B the subtree branch leading to A is composed of an internal and a terminal branch on the complete tree.
 #' 
 #' @param tree A time-scaled tree in phylo format with a \code{$root.time} value.
 #' @param time.bins A vector of ages in millions of years of time bin boundaries in old-to-young order.
 #' @param pruned.tree A time-scaled tree in phylo format with a \code{$root.time} value that is a subset of \code{tree}.
+#'
+#' @details
+#'
+#' Calculates the total edge length present in each of a series of time bins. This is intended as an internal function for rate calculations, but may be of use to someone.
+#'
+#' The option of using a \code{pruned.tree} allows the user to correctly classify internal and terminal branches in a subtree of the larger tree. So for example, if taxa A and B are sisters then after pruning B the subtree branch leading to A is composed of an internal and a terminal branch on the complete tree.
 #'
 #' @return
 #'

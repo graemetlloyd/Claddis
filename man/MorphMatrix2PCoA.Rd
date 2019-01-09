@@ -118,4 +118,5 @@ Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 \keyword{classic}
 \keyword{coordinates}
 \keyword{multidimensional}
-\keyword{scaling,principal}
+\keyword{principal}
+\keyword{scaling,}

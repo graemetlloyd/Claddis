@@ -1,14 +1,18 @@
 #' Safe Taxonomic Reduction
 #'
+#' @description
+#'
 #' Performs Safe Taxonomic Reduction (STR) on a character-taxon matrix.
+#'
+#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#'
+#' @details
 #'
 #' Performs Safe Taxonomic Reduction (Wilkinson 1995).
 #'
 #' If no taxa can be safely removed will print the text "No taxa can be safely removed", and the \code{str.list} and \code{removed.matrix} will have no rows.
 #'
 #' NB: If your data contains inapplicable characters these will be treated as missing data, but this is inappropriate. Thus the user is advised to double check that any removed taxa make sense in the light of inapplicable states. (As far as I am aware this same behaviour occurs in the TAXEQ3 software.)
-#'
-#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
 #'
 #' @return
 #'

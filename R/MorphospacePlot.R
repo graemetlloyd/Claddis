@@ -1,10 +1,8 @@
 #' Plot Morphopace
-#' 
-#' Plots a morphospace using the output from MorphMatrix2PCoA.
-#' 
-#' uses output from \link{MorphMatrix2PCoA} as input.
 #'
-#' Allows plotting of a third axis using the technique of Matthew Wills (Wills et al. 1994; their Figures 4 and 8; Wills 1998; his Figure 4), where black and white indicate postivie and negative values respectovely, and the size of points there magnitudes.
+#' @description
+#'
+#' Plots a morphospace using the output from MorphMatrix2PCoA.
 #'
 #' @param pcoa_input The main input in the format output from \link{MorphMatrix2PCoA}.
 #' @param x_axis Which ordination axis to plot as the x-axis (defaults to 1).
@@ -14,6 +12,12 @@
 #' @param plot_internal_nodes Optional to plot the internal nodes of the tree (if included in \code{pcoa_input}) (defaults to FALSE).
 #' @param plot_root Optional to plot the root separately (defaults to FALSE).
 #' @param root_colour If plotting the root separately (previous option) sets the root colour.
+#'
+#' @details
+#'
+#' Uses output from \link{MorphMatrix2PCoA} as input.
+#'
+#' Allows plotting of a third axis using the technique of Matthew Wills (Wills et al. 1994; their Figures 4 and 8; Wills 1998; his Figure 4), where black and white indicate positive and negative values respectovely, and the size of points there magnitudes.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Emma Sherratt \email{emma.sherratt@@gmail.com}
 #'

@@ -1,5 +1,33 @@
 #' Discrete character rates across trees, time, and character types
 #'
+#' @description
+#'
+#' Given a tree and a cladistic-type matrix uses likelihood ratio tests to compare N-rate and 1-rate models across branches, clades, time bins, or character partitions.
+#'
+#' @param tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{CladisticMatrix}.
+#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#' @param TimeBins A vector of ages (in millions of years) indicating the boundaries of a series of time bins in order from oldest to youngest.
+#' @param BranchPartitionsToTest A list of branch(es) (edge numbers) to test for a 2-rate parameter model (i.e., one rate for the edge and another for the rest of the tree). If NULL (the default) then no partition test(s) will be made.
+#' @param CharacterPartitionsToTest A list of character partition(s) (character numbers) to test for a 2-rate parameter model (i.e., one rate for the partition and another for the remaining characters). If NULL (the default) then no partition test(s) will be made.
+#' @param CladePartitionsToTest A list of clade partition(s) (node numbers) to test for a 2-rate parameter model (i.e., one rate for the clade and another for the rest of the tree). If NULL (the default) then no partition test(s) will be made.
+#' @param TimeBinPartitionsToTest A list of time bin partition(s) (numbered 1 to N) to test for a 2-rate parameter model (i.e., one rate for the time bin(s) and another for the remaining time bins). If NULL (the default) then no partition test(s) will be made.
+#' @param ChangeTimes The time at which to record the character changes. One of \code{"midpoint"} (changes occur at the midpoint of the branch), \code{"spaced"} (changes equally spaced along branch), or \code{"random"} (change times drawn at random from a uniform distribution; the default and recommended option). Note: this is only meaningful if testing for time bin partitions.
+#' @param Alpha The alpha value to be used for the significance tests. The default is 0.01.
+#' @param MultipleComparisonCorrection One of \code{"BenjaminiHochberg"} (the Benjamini and Hochberg 1995 false discovery rate approach; default and recommended) or \code{"Bonferroni"} (the Bonferroni correction).
+#' @param PolymorphismState One of \code{"missing"} (converts polymorphic values to NA; the default) or \code{"random"} (picks one of the possible polymorphic states at random).
+#' @param UncertaintyState One of \code{"missing"} (converts uncertain values to NA; the default) or \code{"random"} (picks one of the possible uncertain states at random).
+#' @param InapplicableState The only current option is \code{"missing"} (converts value to NA).
+#' @param TimeBinApproach One of \code{"Close"} or \code{"Lloyd"} (the default).
+#' @param EnsureAllWeightsAreIntegers Logical for whether (\code{TRUE}) to reweight non-integer weights until all weights are integers or to leave them as they are (\code{FALSE}; the default).
+#' @param EstimateAllNodes Option passed to internal use of \link{AncStateEstMatrix}.
+#' @param EstimateTipValues Option passed to internal use of \link{AncStateEstMatrix}.
+#' @param InapplicablesAsMissing Option passed to internal use of \link{AncStateEstMatrix}.
+#' @param PolymorphismBehaviour Option passed to internal use of \link{AncStateEstMatrix}.
+#' @param UncertaintyBehaviour Option passed to internal use of \link{AncStateEstMatrix}.
+#' @param Threshold Option passed to internal use of \link{AncStateEstMatrix}.
+#'
+#' @details
+#'
 #' \bold{Introduction}
 #'
 #' Morphological change can be captured by discrete characters and their evolution modelled as occurring along the branches of a phylogenetic tree. This function takes as primary input a character-taxon matrix of discrete characters (in the format imported by \link{ReadMorphNexus}) and a time-scaled phylogenetic tree (in the format of \pkg{paleotree} or \pkg{strap}) and begins by inferring ancestral states at the tree's internal nodes using the \link{AncStateEstMatrix} function. From here changes along individual branches can be estimated (only the minimum number of changes are inferred; see \link{GetAllStateChanges} for an alternative but unfinished approach) and hence rates can be calculated.
@@ -54,32 +82,6 @@
 #' Finally, the ramaining options (\code{EstimateAllNodes}, \code{EstimateTipValues}, \code{InapplicablesAsMissing}, \code{PolymorphismBehaviour}, \code{UncertaintyBehaviour}, and \code{Threshold}) are all simply passed directly to \link{AncStateEstMatrix} for estimating the ancestral states and users should consult the help file for that function for further details.
 #'
 #' Note that currently the function cannot deal with step matrices and that the terminal versus internal option from Brusatte et al. (2014) is yet to be implemented.
-#'
-#' @description
-#'
-#' Given a tree and a cladistic-type matrix uses likelihood ratio tests to compare N-rate and 1-rate models across branches, clades, time bins, or character partitions.
-#'
-#' @param tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{CladisticMatrix}.
-#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
-#' @param TimeBins A vector of ages (in millions of years) indicating the boundaries of a series of time bins in order from oldest to youngest.
-#' @param BranchPartitionsToTest A list of branch(es) (edge numbers) to test for a 2-rate parameter model (i.e., one rate for the edge and another for the rest of the tree). If NULL (the default) then no partition test(s) will be made.
-#' @param CharacterPartitionsToTest A list of character partition(s) (character numbers) to test for a 2-rate parameter model (i.e., one rate for the partition and another for the remaining characters). If NULL (the default) then no partition test(s) will be made.
-#' @param CladePartitionsToTest A list of clade partition(s) (node numbers) to test for a 2-rate parameter model (i.e., one rate for the clade and another for the rest of the tree). If NULL (the default) then no partition test(s) will be made.
-#' @param TimeBinPartitionsToTest A list of time bin partition(s) (numbered 1 to N) to test for a 2-rate parameter model (i.e., one rate for the time bin(s) and another for the remaining time bins). If NULL (the default) then no partition test(s) will be made.
-#' @param ChangeTimes The time at which to record the character changes. One of \code{"midpoint"} (changes occur at the midpoint of the branch), \code{"spaced"} (changes equally spaced along branch), or \code{"random"} (change times drawn at random from a uniform distribution; the default and recommended option). Note: this is only meaningful if testing for time bin partitions.
-#' @param Alpha The alpha value to be used for the significance tests. The default is 0.01.
-#' @param MultipleComparisonCorrection One of \code{"BenjaminiHochberg"} (the Benjamini and Hochberg 1995 false discovery rate approach; default and recommended) or \code{"Bonferroni"} (the Bonferroni correction).
-#' @param PolymorphismState One of \code{"missing"} (converts polymorphic values to NA; the default) or \code{"random"} (picks one of the possible polymorphic states at random).
-#' @param UncertaintyState One of \code{"missing"} (converts uncertain values to NA; the default) or \code{"random"} (picks one of the possible uncertain states at random).
-#' @param InapplicableState The only current option is \code{"missing"} (converts value to NA).
-#' @param TimeBinApproach One of \code{"Close"} or \code{"Lloyd"} (the default).
-#' @param EnsureAllWeightsAreIntegers Logical for whether (\code{TRUE}) to reweight non-integer weights until all weights are integers or to leave them as they are (\code{FALSE}; the default).
-#' @param EstimateAllNodes Option passed to internal use of \link{AncStateEstMatrix}.
-#' @param EstimateTipValues Option passed to internal use of \link{AncStateEstMatrix}.
-#' @param InapplicablesAsMissing Option passed to internal use of \link{AncStateEstMatrix}.
-#' @param PolymorphismBehaviour Option passed to internal use of \link{AncStateEstMatrix}.
-#' @param UncertaintyBehaviour Option passed to internal use of \link{AncStateEstMatrix}.
-#' @param Threshold Option passed to internal use of \link{AncStateEstMatrix}.
 #'
 #' @return
 #'

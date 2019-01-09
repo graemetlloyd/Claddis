@@ -1,12 +1,16 @@
 #' Find linked edges for a tree
-#' 
+#'
+#' @description
+#'
 #' Given a tree finds edges that are linked to each other.
-#' 
-#' Finds all edges that link (share a node) with each edge of a tree.
-#' 
-#' This is intended as an internal function, but may be of use to someone else.
-#' 
+#'
 #' @param tree A tree (phylo object).
+#'
+#' @details
+#'
+#' Finds all edges that link (share a node) with each edge of a tree.
+#'
+#' This is intended as an internal function, but may be of use to someone else.
 #'
 #' @return Returns a matrix where links are scored 1 and everything else 0. The diagonal is left as zero.
 #'

@@ -29,9 +29,9 @@ MorphospacePlot(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL,
 Plots a morphospace using the output from MorphMatrix2PCoA.
 }
 \details{
-uses output from \link{MorphMatrix2PCoA} as input.
+Uses output from \link{MorphMatrix2PCoA} as input.
 
-Allows plotting of a third axis using the technique of Matthew Wills (Wills et al. 1994; their Figures 4 and 8; Wills 1998; his Figure 4), where black and white indicate postivie and negative values respectovely, and the size of points there magnitudes.
+Allows plotting of a third axis using the technique of Matthew Wills (Wills et al. 1994; their Figures 4 and 8; Wills 1998; his Figure 4), where black and white indicate positive and negative values respectovely, and the size of points there magnitudes.
 }
 \examples{
 

@@ -1,12 +1,8 @@
 #' Plot Stacked Ordination Spaces
-#' 
+#'
+#' @description
+#'
 #' Plots a stack of ordination spaces representing multiple time-slices.
-#'
-#' This style of plot is taken from various papers by Michael Foote (Foote 1993; his Figures 2, 4, 6, 8, 10, 12, and 14; Foote 1994; his Figure 2; Foote 1995; his Figure 3; Foote 1999; his Figure 22), and can be seen elsehwere in the litarture (e.g., Friedman and Coates 2006; their Figure 2c).
-#'
-#' Here multiple ordination (or morpho-) spaces are plotted as a seriours of successive "stacks" representing specific intervals of time. Following geologic conventions the oldest time-slice is plotted at the base and the sequence gets younger towards the top.
-#'
-#' Note that the user needs to supply three pieces of data: 1) a matrix representing the ordination axes (NB: these can come from any source, they do not have to be from \link{Claddis} functions), 2) a set of ages (first adn last appearances) in the same format as required by the \link{DatePhylo} function in the \link{strap} library, and 3) a vector of ages marking the boundaries of the time-slices.
 #'
 #' @param ordination_axes A matrix of the ordination axes supplied (rownames should be object names). First column should be values for first axis, second for second axis and so on.
 #' @param ages A two-column matrix of the first and last apperance dates for the taxa in the same format supplied to \link{DatePhylo}.
@@ -16,6 +12,14 @@
 #' @param x_axis The ordination axis to plot on the x-axis.
 #' @param y_axis The ordination axis to plot nn the y-axis.
 #' @param axis_label The text used to precede the axis number. Here "PC" (for principal components/coordinates) is the assumed default, but the user may wish to use something else like "RW" instead.
+#'
+#' @details
+#'
+#' This style of plot is taken from various papers by Michael Foote (Foote 1993; his Figures 2, 4, 6, 8, 10, 12, and 14; Foote 1994; his Figure 2; Foote 1995; his Figure 3; Foote 1999; his Figure 22), and can be seen elsehwere in the litarture (e.g., Friedman and Coates 2006; their Figure 2c).
+#'
+#' Here multiple ordination (or morpho-) spaces are plotted as a seriours of successive "stacks" representing specific intervals of time. Following geologic conventions the oldest time-slice is plotted at the base and the sequence gets younger towards the top.
+#'
+#' Note that the user needs to supply three pieces of data: 1) a matrix representing the ordination axes (NB: these can come from any source, they do not have to be from \link{Claddis} functions), 2) a set of ages (first adn last appearances) in the same format as required by the \link{DatePhylo} function in the \link{strap} library, and 3) a vector of ages marking the boundaries of the time-slices.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Emma Sherratt \email{emma.sherratt@@gmail.com}
 #'

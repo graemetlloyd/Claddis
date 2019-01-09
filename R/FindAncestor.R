@@ -1,11 +1,15 @@
 #' Find ancestor
-#' 
-#' Finds last common ancestor (node) of a set of two or more descendant tips.
-#' 
-#' Intended for use as an internal function for \link{TrimMorphDistMatrix}, but potentially of more general use.
-#' 
+#'
+#' @description
+#'
+#' Finds the last common ancestor (node) of a set of two or more descendant tips.
+#'
 #' @param descs A vector of mode character representing the tip names for which an ancestor is sought.
 #' @param tree The tree as a phylo object.
+#'
+#' @details
+#'
+#' Intended for use as an internal function for \link{TrimMorphDistMatrix}, but potentially of more general use.
 #'
 #' @return \item{anc.node}{The ancestral node number.}
 #'

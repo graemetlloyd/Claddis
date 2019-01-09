@@ -1,10 +1,8 @@
 #' Phylogenetic character completeness in time-bins
 #'
+#' @description
+#'
 #' Given a cladistic matrix, time-scaled tree, and set of time bin boundaries will return the proportional character completeness in each bin.
-#'
-#' Character completeness metrics have been used as an additional metric for comparing fossil record quality across time, space, and taxa. However, these only usually refer to point samples of fossils in bins, and not our ability to infer information along the branches of a phylogenetic tree.
-#'
-#' This function returns the proportional phylogenetic character completeness for a set of time bins.
 #'
 #' @param CladisticMatrix A cladistic matrix in the form imported by \link{ReadMorphNexus}.
 #' @param TimeTree A time-scaled phylogenetic tree containing all the taxa in \code{CladisticMatrix}.
@@ -12,9 +10,15 @@
 #' @param plot An optional choice to plot the results (default is \code{FALSE}).
 #' @param CI The confidence interval to be used as a proportion (0 to 1). Default is 0.95 (i.e., 95\%).
 #'
+#' @details
+#'
+#' Character completeness metrics have been used as an additional metric for comparing fossil record quality across time, space, and taxa. However, these only usually refer to point samples of fossils in bins, and not our ability to infer information along the branches of a phylogenetic tree.
+#'
+#' This function returns the proportional phylogenetic character completeness for a set of time bins.
+#'
 #' @return
 #'
-#' A list summarising the mean, upper and lower 95% conifidence interval, and per character proportional character completeness in each time bin.
+#' A list summarising the mean, upper and lower 95% confidence interval, and per character proportional character completeness in each time bin.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'

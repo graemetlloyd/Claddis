@@ -1,13 +1,15 @@
 #' Writes out a morphological #NEXUS data file
 #'
+#' @description
+#'
 #' Writes out a morphological data file in #NEXUS format.
-#'
-#' Writes out a #NEXUS (Maddison et al. 1997) data file representing the distribution of characters in a set of taxa. Data must be in the format created by importing data with \link{ReadMorphNexus}.
-#'
-#' Currently all empty values (missing or inapplicable) are treated as missing and will be written to file as question marks.
 #'
 #' @param CladisticMatrix The cladistic matrix in the format imported by \link{ReadMorphNexus}.
 #' @param filename The file name to write to. Should end in \code{.nex}.
+#'
+#' @details
+#'
+#' Writes out a #NEXUS (Maddison et al. 1997) data file representing the distribution of characters in a set of taxa. Data must be in the format created by importing data with \link{ReadMorphNexus}.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'

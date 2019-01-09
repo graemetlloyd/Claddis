@@ -22,7 +22,7 @@ Plots a 3D chronophylomorphospace.
 \details{
 Creates a movable three-dimensional (two ordination axes plus time) plot of a phylomorphospace.
 
-Intended to mimic the data visualisation of Sakamoto adn Ruta (2012; their Video S1).
+Intended to mimic the data visualisation of Sakamoto and Ruta (2012; their Video S1).
 }
 \examples{
 

@@ -23,7 +23,7 @@ Nothing is returned, but a new file (\code{treefile.out}) is written.
 Following Safe Taxonomic Reduction reinsert removed taxa.
 }
 \details{
-Explanatory text.
+TEXT NEEDED!
 }
 \examples{
 

@@ -1,11 +1,15 @@
 #' Plots character changes on branches
-#' 
+#'
+#' @description
+#'
 #' Plots character changes in boxes on branches.
 #'
-#' Takes the \code{character.changes} output from \link{DiscreteCharacterRate} and plots it on the tree used to generate it.
-#' 
 #' @param character.changes A matrix of character changes.
 #' @param tree Tree on which character changes occur.
+#'
+#' @details
+#'
+#' Takes the \code{character.changes} output from \link{DiscreteCharacterRate} and plots it on the tree used to generate it.
 #'
 #' @return A plot of character changes on a tree.
 #'

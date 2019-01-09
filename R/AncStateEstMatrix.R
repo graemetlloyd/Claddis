@@ -1,9 +1,9 @@
 #' Ancestral Character State Estimation
-#' 
+#'
+#' @description
+#'
 #' Given a tree and a cladistic matrix uses likelihood to estimate the ancestral states for every character.
-#' 
-#' Uses either the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package (discrete characters) or the \link{ace} function in the \link{ape} package (continuous characters) to make ancestral state estimates. For discrete characters these are collapsed to the most likely state (or states, given equal likelihoods or likelihood within a defined threshold value). In the latter case the resulting states are represented as an uncertainty (i.e., states separated by a slash, e.g., 0/1. This is the method used by Brusatte et al. (2014).
-#' 
+#'
 #' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
 #' @param Tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{CladisticMatrix}.
 #' @param EstimateAllNodes Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).
@@ -12,6 +12,10 @@
 #' @param PolymorphismBehaviour One of either "equalp" or "treatasmissing".
 #' @param UncertaintyBehaviour One of either "equalp" or "treatasmissing".
 #' @param Threshold The threshold value to use when collapsing marginal likelihoods to discrete state(s).
+#'
+#' @details
+#'
+#' Uses either the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package (discrete characters) or the \link{ace} function in the \link{ape} package (continuous characters) to make ancestral state estimates. For discrete characters these are collapsed to the most likely state (or states, given equal likelihoods or likelihood within a defined threshold value). In the latter case the resulting states are represented as an uncertainty (i.e., states separated by a slash, e.g., 0/1. This is the method used by Brusatte et al. (2014).
 #'
 #' @return \item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral states.}
 #'

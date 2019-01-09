@@ -15,7 +15,7 @@ FindAncestor(descs, tree)
 \item{anc.node}{The ancestral node number.}
 }
 \description{
-Finds last common ancestor (node) of a set of two or more descendant tips.
+Finds the last common ancestor (node) of a set of two or more descendant tips.
 }
 \details{
 Intended for use as an internal function for \link{TrimMorphDistMatrix}, but potentially of more general use.

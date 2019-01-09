@@ -10,7 +10,7 @@ CompactifyMatrix(CladisticMatrix)
 \item{CladisticMatrix}{The cladistic matrix in the format imported by \link{ReadMorphNexus}.}
 }
 \description{
-Collapses matrix to unique character state distributions.
+Collapses a cladistic matrix to just unique character state distributions.
 }
 \details{
 Important: not recommended for general use.

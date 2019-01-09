@@ -1,10 +1,8 @@
 #' Creates a morphological data file from a matrix
-#' 
-#' Creates a morphological data file from a character-taxon matrix.
-#' 
-#' Claddis generally assumes that matrices will be imported into R from the #NEXUS format, but in some cases (e.g., when using simulated data) it might be desirable to build a matrix within R. This function allows the user to convert such a matrix into the format required by other Claddis functions as long as it only contains a single block.
 #'
-#' NB: Currently the function cannot deal directly with step matrices or continuous characters.
+#' @description
+#'
+#' Creates a morphological data file from a character-taxon matrix.
 #' 
 #' @param CharacterTaxonMatrix A Character-Taxon (columns-rows) matrix, with taxon names as rownames.
 #' @param header A scalar indicating any header text (defaults to an empty string: "").
@@ -12,6 +10,12 @@
 #' @param ordering A vector indicating whether characters are ordered ("ord") or unordered ("unord") (if no specified defaults to ordered).
 #' @param symbols The symbols to use if writing to a file (defaults to the numbers 0:9 then the letters A to V).
 #' @param equalise.weights Optional that overrides the weights specified above make all characters truly equally weighted.
+#'
+#' @details
+#'
+#' Claddis generally assumes that matrices will be imported into R from the #NEXUS format, but in some cases (e.g., when using simulated data) it might be desirable to build a matrix within R. This function allows the user to convert such a matrix into the format required by other Claddis functions as long as it only contains a single block.
+#'
+#' NB: Currently the function cannot deal directly with step matrices or continuous characters.
 #'
 #' @return
 #'

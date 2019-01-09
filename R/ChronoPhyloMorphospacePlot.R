@@ -1,15 +1,19 @@
 #' Chronophylomorphospace Plot
-#' 
+#'
+#' @description
+#'
 #' Plots a 3D chronophylomorphospace.
-#'
-#' Creates a movable three-dimensional (two ordination axes plus time) plot of a phylomorphospace.
-#'
-#' Intended to mimic the data visualisation of Sakamoto adn Ruta (2012; their Video S1).
 #'
 #' @param pcoa_data Principal coordinate data in the format output by \link{MorphMatrix2PCoA} that includes a tree and ancestral states.
 #' @param x_axis Which ordination axis to plot as the x-axis.
 #' @param y_axis Which ordination axis to plot as the y-axis.
 #' @param shadow Whether or not to plot a shadow (2D plot) on the bottom face of the 3D plot (defaults to TRUE).
+#'
+#' @details
+#'
+#' Creates a movable three-dimensional (two ordination axes plus time) plot of a phylomorphospace.
+#'
+#' Intended to mimic the data visualisation of Sakamoto and Ruta (2012; their Video S1).
 #'
 #' @author Emma Sherratt \email{emma.sherratt@@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'

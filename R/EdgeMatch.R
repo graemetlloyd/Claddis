@@ -1,11 +1,15 @@
 #' Edge matching function
-#' 
+#'
+#' @description
+#'
 #' Given two trees where one is a pruned version of the other gives matching edges and nodes of pruned tree to original tree.
-#' 
-#' Finds matching edge(s) and node(s) for a pruned tree in the original tree from which it was created. This is intended as an internal function, but may be of use to someone.
-#' 
+#'
 #' @param original.tree A tree in phylo format.
 #' @param pruned.tree A tree in phylo format that represents a pruned version of \code{original.tree}.
+#'
+#' @details
+#'
+#' Finds matching edge(s) and node(s) for a pruned tree in the original tree from which it was created. This is intended as an internal function, but may be of use to someone.
 #'
 #' @return
 #'
