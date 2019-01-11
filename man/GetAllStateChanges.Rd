@@ -4,23 +4,32 @@
 \alias{GetAllStateChanges}
 \title{Finds all state changes on a tree using stochastic character mapping}
 \usage{
-GetAllStateChanges(CladisticMatrix, tree, time.bins, Nsim = 10)
+GetAllStateChanges(CladisticMatrix, Tree, TimeBins, NSimulations = 10,
+  PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp",
+  InapplicableBehaviour = "missing")
 }
 \arguments{
 \item{CladisticMatrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
 
-\item{tree}{A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{CladisticMatrix}.}
+\item{Tree}{A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{CladisticMatrix}.}
 
-\item{time.bins}{A vector of ages representing the boundaries of a series of time bins.}
+\item{TimeBins}{A vector of ages representing the boundaries of a series of time bins.}
 
-\item{Nsim}{The number of simulations to perform (passed to \code{make.simmap}.}
+\item{NSimulations}{The number of simulations to perform (passed to \code{make.simmap}.}
+
+\item{PolymorphismBehaviour}{What to do with polymorphic (&) characters. One of "equalp", "missing", or "random". See details.}
+
+\item{UncertaintyBehaviour}{What to do with uncertain (/) characters. One of "equalp", "missing", or "random". See details.}
+
+\item{InapplicableBehaviour}{What to do with inapplicable characters. Only one option currently ("missing"). See details.}
 }
 \value{
-\item{all.state.changes}{A matrix of rows for each change with columns corresponding to: the character concerned, the simulation number, the edge number, the time, and the start and end states.}
-\item{character.times}{A vector of the sampled tree-length (in Ma) for each character.}
-\item{edge.length.per.bin}{A matrix of time bins (columns) and characters (rows) indicating the sampled tree-length (in Ma).}
-\item{terminal.edge.length.per.bin}{As above, but for terminal edges only.}
-\item{internal.edge.length.per.bin}{As above, but for internal edges only.}
+\item{RootStates}{A matrix of the root states for each character (column) and simulation (rows).}
+\item{AllStateChanges}{A matrix of rows for each change with columns corresponding to the character, the simulation number, the edge number, the time the change occurred, and the start and end states.}
+\item{CharacterTimes}{A vector of the sampled tree-length (in Ma) for each character.}
+\item{EdgeLengthsPerBin}{A matrix of time bins (columns) and characters (rows) indicating the sampled tree-length (in Ma).}
+\item{TerminalEdgeLengthsPerBin}{As above, but for terminal edges only.}
+\item{InternalEdgeLengthsPerBin}{As above, but for internal edges only.}
 }
 \description{
 Takes a cladistic matrix and time-scaled tree and makes point estimates for every character change using stochastic character mapping.
@@ -38,17 +47,17 @@ This function is intended to enumerate all possible changes on a tree (including
 set.seed(17)
 
 # Generate a random tree for the Michaux data set:
-tree <- rtree(nrow(Michaux1989$Matrix_1$Matrix))
+Tree <- rtree(nrow(Michaux1989$Matrix_1$Matrix))
 
 # Update taxon names to match those in the data matrix:
-tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
+Tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
 
 # Set root time by making youngest taxon extant:
-tree$root.time <- max(diag(vcv(tree)))
+Tree$root.time <- max(diag(vcv(Tree)))
 
 # Get all state changes:
-GetAllStateChanges(Michaux1989, tree,
-  seq(tree$root.time, 0, length.out = 3), Nsim = 2)
+GetAllStateChanges(Michaux1989, Tree,
+  seq(Tree$root.time, 0, length.out = 3), NSimulations = 2)
 
 }
 \author{
