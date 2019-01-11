@@ -45,7 +45,7 @@ tree <- rtree(length(rownames(Michaux1989$Matrix_1$Matrix)))
 tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
 
 # Perform a phylogenetic Principal Coordinates Analysis:
-pcoa_input <- MorphMatrix2PCoA(Michaux1989, tree = tree)
+pcoa_input <- MorphMatrix2PCoA(Michaux1989, Tree = tree)
 
 # Plot the results:
 MorphospacePlot(pcoa_input, plot_taxon_names = TRUE)
