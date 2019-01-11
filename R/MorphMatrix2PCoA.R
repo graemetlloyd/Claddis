@@ -63,16 +63,16 @@
 #' x
 #'
 #' # Generate a (made up) tree:
-#' tree <- rtree(length(rownames(Michaux1989$Matrix_1$Matrix)))
+#' Tree <- rtree(length(rownames(Michaux1989$Matrix_1$Matrix)))
 #'
 #' # Add taxon names to it:
-#' tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
+#' Tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
 #'
 #' # Set root time by making youngest taxon extant:
-#' tree$root.time <- max(diag(vcv(tree)))
+#' Tree$root.time <- max(diag(vcv(Tree)))
 #'
 #' # Run with tree:
-#' y <- MorphMatrix2PCoA(Michaux1989, Tree = tree)
+#' y <- MorphMatrix2PCoA(Michaux1989, Tree = Tree)
 #'
 #' # Show new output:
 #' y
