@@ -36,10 +36,12 @@ tree$root.time <- max(diag(vcv(tree)))
 
 # Get discrete character rates (includes changes):
 out <- DiscreteCharacterRate(tree, Michaux1989,
-  seq(tree$root.time, 0, length.out = 3), alpha = 0.01)
+  seq(tree$root.time, 0, length.out = 3),
+  BranchPartitionsToTest = list(list(1)), Alpha = 0.01)
 
 # Plot character changes on the tree:
-PlotCharacterChanges(out$character.changes, tree)
+PlotCharacterChanges(out$InferredCharacterChanges,
+  tree)
 
 }
 \author{
