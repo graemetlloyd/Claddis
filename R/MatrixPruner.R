@@ -62,7 +62,7 @@ MatrixPruner <- function(CladisticMatrix, blocks2prune = c(), characters2prune =
   if(!is.null(characters2prune)) {
     
     # Get character blocks for each character in descendng order (as want to work backwards so things match up properly):
-    CharacterBlocks <- unlist(lapply(lapply(lapply(as.list(sort(characters2prune, decreasing = TRUE)), '>', unlist(lapply(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Matrix"), ncol))), which), length)) + 1
+    CharacterBlocks <- unlist(lapply(lapply(lapply(as.list(sort(characters2prune, decreasing = TRUE)), '>', cumsum(unlist(lapply(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Matrix"), ncol)))), which), length)) + 1
     
     # Initial build of characters in list form:
     CharactersAsList <- lapply(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Matrix"), function(x) 1:ncol(x))
