@@ -22,19 +22,19 @@ The function also deletes any characters weighted zero from the matrix.
 \examples{
 
 # Examine the matrix pre-compactification:
-Michaux1989$matrix
+Michaux1989$Matrix_1$Matrix
 
 # Examine the weights pre-compactification:
-Michaux1989$weights
+Michaux1989$Matrix_1$Weights
 
 # Compactify the matrix:
 Michaux1989compact <- CompactifyMatrix(Michaux1989)
 
 # Examine the matrix post-compactification:
-Michaux1989compact$matrix
+Michaux1989compact$Matrix_1$Matrix
 
 # Examine the weights post-compactification:
-Michaux1989compact$weights
+Michaux1989compact$Matrix_1$Weights
 
 }
 \seealso{
