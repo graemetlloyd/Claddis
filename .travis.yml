@@ -1,5 +1,4 @@
-# as of 04-17-15 can be just
-
+#
 addons:
   apt:
     packages:
@@ -27,32 +26,3 @@ r_packages:
 after_success:
   - Rscript -e 'library(covr); codecov()'
 
-###########
-#OLD: brought back due to r-travis not failing bad builds
-
-
-# Sample .travis.yml for R projects from https://github.com/craigcitro/r-travis
- 
-# language: c
-# sudo: required
- 
-# env:
-# - WARNINGS_ARE_ERRORS=1
- 
-# before_install:
-#   - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
-#  - chmod 755 ./travis-tool.sh
-#   - ./travis-tool.sh bootstrap
- 
-# install:
-#   - ./travis-tool.sh install_deps
- 
-# script: ./travis-tool.sh run_tests
- 
-# on_failure:
-#   - ./travis-tool.sh dump_logs
- 
-# notifications:
-#   email:
-#     on_success: change
-#     on_failure: change
