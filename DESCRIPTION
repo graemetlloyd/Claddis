@@ -8,12 +8,12 @@ Maintainer: Graeme T. Lloyd <graemetlloyd@gmail.com>
 Depends:
     ape,
     phytools,
-    rgl,
     strap
 Imports:
     gdata,
     graphics,
     grDevices,
+	rgl,
     stats,
     utils
 Description: Measures morphological diversity from discrete character data and

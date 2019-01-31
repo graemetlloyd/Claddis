@@ -29,59 +29,16 @@
 #' @exportPattern "^[[:alpha:]]+"
 #' @import ape
 #' @import phytools
-#' @import rgl
 #' @import strap
-NULL
 
-#' @importFrom gdata trim
-NULL
+# @import rgl
 
-#' @importFrom graphics layout
-NULL
-
-#' @importFrom graphics lines
-NULL
-
-#' @importFrom graphics par
-NULL
-
-#' @importFrom graphics plot
-NULL
-
-#' @importFrom graphics points
-NULL
-
-#' @importFrom graphics polygon
-NULL
-
-#' @importFrom graphics text
-NULL
-
-#' @importFrom grDevices adjustcolor
-NULL
-
-#' @importFrom grDevices chull
-NULL
-
-#' @importFrom stats as.dist
-NULL
-
-#' @importFrom stats dist
-NULL
-
-#' @importFrom stats dpois
-NULL
-
-#' @importFrom stats pchisq
-NULL
-
-#' @importFrom stats runif
-NULL
-
-#' @importFrom stats var
-NULL
-
-#' @importFrom utils combn
+#' @importFrom rgl plot3d lines3d points3d text3d view3d 
+#' @importFrom gdata trim 
+#' @importFrom graphics layout lines par plot points polygon text 
+#' @importFrom grDevices adjustcolor chull 
+#' @importFrom stats as.dist dist dpois pchisq runif var 
+#' @importFrom utils combn 
 NULL
 
 #' Character-taxon matrix from Day et al. 2016
