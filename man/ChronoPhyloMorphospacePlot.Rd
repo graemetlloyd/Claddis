@@ -25,6 +25,7 @@ Creates a movable three-dimensional (two ordination axes plus time) plot of a ph
 Intended to mimic the data visualisation of Sakamoto and Ruta (2012; their Video S1).
 }
 \examples{
+\donttest{
 
 # Set random seed:
 set.seed(4)
@@ -44,6 +45,7 @@ pcoa_data <- MorphMatrix2PCoA(Michaux1989, Tree = Tree)
 # Plot a chronophylomorphospace:
 ChronoPhyloMorphospacePlot(pcoa_data)
 
+}
 }
 \references{
 Sakamoto, M. and Ruta, M. 2012. Convergence and divergence in the evolution of cat skulls: temporal and spatial patterns of morphological diversity. PLoS ONE, 7, e39752.

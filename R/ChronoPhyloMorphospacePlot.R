@@ -23,26 +23,30 @@
 #'
 #' @keywords principal coordinates
 #'
+
 #' @examples
-#'
+#' \donttest{
+#' 
 #' # Set random seed:
 #' set.seed(4)
-#'
+#' 
 #' # Generate a random tree for the Michaux 1989 data set:
 #' Tree <- rtree(nrow(Michaux1989$Matrix_1$Matrix))
-#'
+#' 
 #' # Set root time so latest tip terminates at the present:
 #' Tree$root.time <- max(diag(vcv(Tree)))
-#'
+#' 
 #' # Add taxon names to the tree:
 #' Tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
-#'
+#' 
 #' # Perform a phylogenetic Principal Coordinates Analysis:
 #' pcoa_data <- MorphMatrix2PCoA(Michaux1989, Tree = Tree)
-#'
+#' 
 #' # Plot a chronophylomorphospace:
 #' ChronoPhyloMorphospacePlot(pcoa_data)
-#'
+#' 
+#' }
+
 #' @export ChronoPhyloMorphospacePlot
 ChronoPhyloMorphospacePlot <- function(pcoa_data, x_axis = 1, y_axis = 2, shadow = TRUE) {
 
@@ -115,7 +119,10 @@ ChronoPhyloMorphospacePlot <- function(pcoa_data, x_axis = 1, y_axis = 2, shadow
 	size = p.p$t.cex * 4)
 
   #plots nodes
-  rgl::points3d(pcoa_data[(N + 1):nrow(pcoa_data), 1], pcoa_data[(N + 1):nrow(pcoa_data), 2], z_axis[(N + 1):nrow(pcoa_data)], col = p.p$n.bg, size = p.p$n.cex * 4)
+  rgl::points3d(pcoa_data[(N + 1):nrow(pcoa_data), 1], 
+	pcoa_data[(N + 1):nrow(pcoa_data), 2], 
+	z_axis[(N + 1):nrow(pcoa_data)], 
+	col = p.p$n.bg, size = p.p$n.cex * 4)
 
   # plots branches
   for (i in 1:nrow(Tree$edge)) {
@@ -159,7 +166,12 @@ ChronoPhyloMorphospacePlot <- function(pcoa_data, x_axis = 1, y_axis = 2, shadow
 		alpha = 0.5)
       
     # Plot tips:
-    rgl::points3d(pcoa_data[1:N, 1], pcoa_data[1:N, 2], Tree$root.time, col = p.p$t.bg, size = p.p$t.cex * 4, alpha = 0.5)
+    rgl::points3d(pcoa_data[1:N, 1], 
+		pcoa_data[1:N, 2], 
+		Tree$root.time, 
+		col = p.p$t.bg, 
+		size = p.p$t.cex * 4, 
+		alpha = 0.5)
       
   }
 

@@ -13,9 +13,10 @@ Imports:
     gdata,
     graphics,
     grDevices,
-	rgl,
     stats,
     utils
+Suggests:
+    rgl
 Description: Measures morphological diversity from discrete character data and
     estimates evolutionary tempo on phylogenetic trees.
 Encoding: UTF-8
