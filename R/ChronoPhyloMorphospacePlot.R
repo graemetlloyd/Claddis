@@ -50,7 +50,13 @@
 #' @export ChronoPhyloMorphospacePlot
 ChronoPhyloMorphospacePlot <- function(pcoa_data, x_axis = 1, y_axis = 2, shadow = TRUE) {
 
-# Add top level conditionals to check for a tree etc.
+   if (! requireNamespace("rgl", quietly = TRUE)) {
+      stop(paste0(
+		"To plot three-dimensional chrono-phylo-morphospaces, please install package rgl",
+		"\n install.packages('lattice')"))
+	  }
+  
+  # Add top level conditionals to check for a tree etc.
 
   # Default plotting parameters for a 2D morphospace. Need to change node colour for 3D using rgl
   p.p <- list()

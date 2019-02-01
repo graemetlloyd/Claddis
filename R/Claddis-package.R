@@ -31,9 +31,11 @@
 #' @import phytools
 #' @import strap
 
-# @import rgl
 
-#' @importFrom rgl plot3d lines3d points3d text3d view3d 
+# there's no hope, move rgl to suggests!
+# @import rgl
+# @importFrom rgl plot3d lines3d points3d text3d view3d 
+
 #' @importFrom gdata trim 
 #' @importFrom graphics layout lines par plot points polygon text 
 #' @importFrom grDevices adjustcolor chull 
