@@ -1,0 +1,28 @@
+#
+addons:
+  apt:
+    packages:
+      - libgsl2
+      - gsl-bin
+      - libgsl-dev
+      - libmagick++-dev
+
+language: r
+sudo: required
+
+##because of phangorn
+#bioc_packages: 
+#   - Biostrings
+
+# Be strict when checking our package
+warnings_are_errors: true
+
+# r_check_args: --as-cran --run-donttest 
+
+# for code coverage
+r_packages:
+  - covr
+
+after_success:
+  - Rscript -e 'library(covr); codecov()'
+

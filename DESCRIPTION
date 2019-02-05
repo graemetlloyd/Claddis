@@ -8,7 +8,6 @@ Maintainer: Graeme T. Lloyd <graemetlloyd@gmail.com>
 Depends:
     ape,
     phytools,
-    rgl,
     strap
 Imports:
     gdata,
@@ -16,6 +15,8 @@ Imports:
     grDevices,
     stats,
     utils
+Suggests:
+    rgl
 Description: Measures morphological diversity from discrete character data and
     estimates evolutionary tempo on phylogenetic trees.
 Encoding: UTF-8
