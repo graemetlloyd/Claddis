@@ -3,7 +3,11 @@ Type: Package
 Title: Measuring Morphological Diversity and Evolutionary Tempo
 Version: 0.3.0
 Date: 2019-02-12
-Author: Graeme T. Lloyd, Thomas Guillerme, Emma Sherratt, Steve C. Wang, 
+Authors@R: c(
+    person(given = "Graeme T.", family = "Lloyd", email = "graemetlloyd@gmail.com", role = c("aut", "cre", "cph")),
+    person(given = "Thomas", family = "Guillerme", role = "aut"),
+    person(given = "Emma", family = "Sherratt", role = "aut"),
+    person(given = "Steve C.", family = "Wang", role = "aut"))
 Maintainer: Graeme T. Lloyd <graemetlloyd@gmail.com>
 Depends:
     ape,
