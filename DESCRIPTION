@@ -3,7 +3,7 @@ Type: Package
 Title: Measuring Morphological Diversity and Evolutionary Tempo
 Version: 0.3.0
 Date: 2019-01-17
-Author: Graeme T. Lloyd
+Author: Graeme T. Lloyd, Thomas Guillerme, Emma Sherratt, Steve C. Wang, 
 Maintainer: Graeme T. Lloyd <graemetlloyd@gmail.com>
 Depends:
     ape,
