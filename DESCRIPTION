@@ -20,7 +20,7 @@ Suggests:
 Description: Measures morphological diversity from discrete character data and
     estimates evolutionary tempo on phylogenetic trees.
 Encoding: UTF-8
-License: GPL (>=2)
+License: CC0
 LazyData: yes
 ByteCompile: yes
 RoxygenNote: 6.1.1
