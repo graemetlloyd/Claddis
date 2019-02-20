@@ -31,7 +31,7 @@ Note that I have previously produced tutorials for the package [here](http://www
 Citation
 ========
 
-Claddis was recently placed back on [CRAN](https://cran.r-project.org/package=Claddis), (version 0.3.0), but will continue to be developed on github. The first formal paper describing Claddis was published as Lloyd (2016), with further discussion in Lloyd (2018):
+Claddis was recently placed back on [CRAN](https://cran.r-project.org/package=Claddis) (version 0.3.0) but will continue to be developed on github. The first formal paper describing Claddis was published as Lloyd (2016), with further discussion in Lloyd (2018):
 
 Lloyd, G. T., 2016. Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. *Biological Journal of the Linnean Society*, **118**, 131-151.
 
