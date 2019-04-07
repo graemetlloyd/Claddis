@@ -99,6 +99,19 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
   
   # ADD HOPKINS SUGGESTION (VIA EMAIL) FOR FOURTH GEDTYPE WHERE MEAN DISTANCE FOR CHARACTER REPLACES MISSING VALUES.
   # CHECK POLYMORPHISM UNCERTAINTY IN GENERAL AS NOT CLEAR IT IS DOING WHAT IT SHOULD DO.
+  # ADD IF STATEMENT TO RAW.DIST LINE i.e, if(Distance == "RED")
+  
+  library(Claddis)
+  CladisticMatrix <- Day2016
+  CladisticMatrix[[3]]$Matrix["Lende_chiweta", 5] <- "0&1"
+  Distance = "MORD"
+  GEDType = "Wills"
+  TransformDistances = "arcsine_sqrt"
+  PolymorphismBehaviour = "min.difference"
+  UncertaintyBehaviour = "min.difference"
+  InapplicableBehaviour = "HSJ"
+  CharacterDependencies = matrix(c(8, 7), ncol = 2, byrow = TRUE, dimnames = list(c(), c("DependentCharacter", "IndependentCharacter")))
+  Alpha = 0.5
   
   # Subfunction to find comparable characters for a pairwise taxon comparison:
   GetComparableCharacters <- function(interest.col, CladisticMatrix) {
@@ -147,6 +160,31 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
     
     # Set second taxon values:
     secondrow <- comparisons[[2]]
+    
+    # If there are any inapplicables:
+    if(any(c(firstrow, secondrow) == "")) {
+      
+      # Find inapplicable positions:
+      InapplicablePositions <- sort(unique(c(which(firstrow == ""), which(secondrow == ""))))
+      
+      # Find polymorphism and uncertainty positions:
+      PolymorphismAndUncertaintyPositions <- sort(unique(c(grep("/|&", firstrow), grep("/|&", secondrow))))
+      
+      # If there are polymorphisms or uncertianties that match up with inapplicables:
+      if(length(intersect(InapplicablePositions, PolymorphismAndUncertaintyPositions)) > 0) {
+        
+        # Find positions where collapsing to a single value is required:
+        CollapsePositions <- intersect(InapplicablePositions, PolymorphismAndUncertaintyPositions)
+        
+        # Collapse any polymorphisms or uncertianties in first row to just first value:
+        firstrow[CollapsePositions] <- unlist(lapply(strsplit(firstrow[CollapsePositions], split = "/|&"), function(x) ifelse(length(x) == 0, "", x[1])))
+        
+        # Collapse any polymorphisms or uncertianties in second row to just first value:
+        secondrow[CollapsePositions] <- unlist(lapply(strsplit(secondrow[CollapsePositions], split = "/|&"), function(x) ifelse(length(x) == 0, "", x[1])))
+
+      }
+      
+    }
     
     # Set comparable characters:
     compchar <- comparable.characters
@@ -404,10 +442,10 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
   # Check input for UncertaintyBehaviour is valid and stop and warn if not:
   if(length(setdiff(UncertaintyBehaviour, c("mean.difference", "min.difference", "random"))) > 0) stop("UncertaintyBehaviour must be one or more of \"mean.difference\", \"min.difference\", or \"random\".")
   
-  # Check input for UncertaintyBehaviour is valid and stop and warn if not:
+  # Check input for InapplicableBehaviour is valid and stop and warn if not:
   if(length(setdiff(InapplicableBehaviour, c("missing", "HSJ"))) > 0) stop("InapplicableBehaviour must be one or more of \"missing\", or \"HSJ\".")
   
-  # Check if the
+  # Check that if using HSJ character dependencies have been specified:
   if(InapplicableBehaviour == "HSJ" && is.null(CharacterDependencies)) stop("If using the \"HSJ\" InapplicableBehaviour then CharacterDependencies must be specified.")
   
   # If using HSJ and CharacterDependencies is set (will check data are formatted correctly):
@@ -518,7 +556,7 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
   # If there are inapplicables and using the missing option then convert these to NAs:
   if(any(sort(CladisticMatrix == "")) && InapplicableBehaviour == "missing") CladisticMatrix[CladisticMatrix == ""] <- NA
   
-  # Find all possible (symmetric) pariwise comparisons for the N taxa in the matrix (excluding self-comparisons):
+  # Find all possible (symmetric) pairwise comparisons for the N taxa in the matrix (excluding self-comparisons):
   comparisons <- combn(1:nrow(CladisticMatrix), 2)
   
   # Find all comparable characters for each pair of taxa:
