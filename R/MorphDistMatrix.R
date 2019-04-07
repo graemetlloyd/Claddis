@@ -101,18 +101,6 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
   # CHECK POLYMORPHISM UNCERTAINTY IN GENERAL AS NOT CLEAR IT IS DOING WHAT IT SHOULD DO.
   # ADD IF STATEMENT TO RAW.DIST LINE i.e, if(Distance == "RED")
   
-  library(Claddis)
-  CladisticMatrix <- Day2016
-  CladisticMatrix[[3]]$Matrix["Lende_chiweta", 5] <- "0&1"
-  Distance = "MORD"
-  GEDType = "Wills"
-  TransformDistances = "arcsine_sqrt"
-  PolymorphismBehaviour = "min.difference"
-  UncertaintyBehaviour = "min.difference"
-  InapplicableBehaviour = "HSJ"
-  CharacterDependencies = matrix(c(8, 7), ncol = 2, byrow = TRUE, dimnames = list(c(), c("DependentCharacter", "IndependentCharacter")))
-  Alpha = 0.5
-  
   # Subfunction to find comparable characters for a pairwise taxon comparison:
   GetComparableCharacters <- function(interest.col, CladisticMatrix) {
     
