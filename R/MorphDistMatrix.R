@@ -99,7 +99,6 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
   
   # ADD HOPKINS SUGGESTION (VIA EMAIL) FOR FOURTH GEDTYPE WHERE MEAN DISTANCE FOR CHARACTER REPLACES MISSING VALUES.
   # CHECK POLYMORPHISM UNCERTAINTY IN GENERAL AS NOT CLEAR IT IS DOING WHAT IT SHOULD DO.
-  # ADD IF STATEMENT TO RAW.DIST LINE i.e, if(Distance == "RED")
   
   # Subfunction to find comparable characters for a pairwise taxon comparison:
   GetComparableCharacters <- function(interest.col, CladisticMatrix) {
@@ -602,8 +601,8 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
   # Weight differences:
   diffs <- mapply(WeightDifferences, diffs, list.of.compchar, MoreArgs = list(weights))
   
-  # Get raw Euclidean distance:
-  raw.dist <- lapply(diffs, RawEuclideanDistance)
+  # Get raw Euclidean distance (if using it):
+  if(Distance == "RED") raw.dist <- lapply(diffs, RawEuclideanDistance)
   
   # Only calculate the max differences for "GED" or "MORD" matrices:
   if(Distance == "GED" || Distance == "MORD") {
