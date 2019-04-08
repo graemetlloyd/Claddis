@@ -584,10 +584,6 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
       
     }
     
-    # BREAKS BELOW:
-    
-    
-    
     # Update differences with HSJ alpha weights:
     diffs <- mapply(AlphaWeightingOfInapplicables, diffs, list.of.compchar, MoreArgs = list(ordering, weights, CharacterDependencies, CharactersByLevel, Alpha))
     
