@@ -104,7 +104,7 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
   GetComparableCharacters <- function(interest.col, CladisticMatrix) {
     
     # Get intersection of characters that are coded for both taxa in a pair:
-    output <- intersect(which(!is.na(CladisticMatrix[interest.col[[1]], ])), which(!is.na(CladisticMatrix[interest.col[[2]], ])))
+    output <- intersect(intersect(which(!is.na(CladisticMatrix[interest.col[[1]], ])), which(CladisticMatrix[interest.col[[1]], ] != "")), intersect(which(!is.na(CladisticMatrix[interest.col[[2]], ])), which(CladisticMatrix[interest.col[[2]], ] != "")))
     
     # Return output:
     return(list(output))
@@ -583,6 +583,10 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
       HigherLevelCharacters <- setdiff(unique(c(CharacterDependencies)), unlist(CharactersByLevel))
       
     }
+    
+    # BREAKS BELOW:
+    
+    
     
     # Update differences with HSJ alpha weights:
     diffs <- mapply(AlphaWeightingOfInapplicables, diffs, list.of.compchar, MoreArgs = list(ordering, weights, CharacterDependencies, CharactersByLevel, Alpha))
