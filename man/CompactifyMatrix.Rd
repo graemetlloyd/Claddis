@@ -4,10 +4,12 @@
 \alias{CompactifyMatrix}
 \title{Collapses matrix to unique character state distributions}
 \usage{
-CompactifyMatrix(CladisticMatrix)
+CompactifyMatrix(CladisticMatrix, Message = TRUE)
 }
 \arguments{
 \item{CladisticMatrix}{The cladistic matrix in the format imported by \link{ReadMorphNexus}.}
+
+\item{Message}{Logical indicating whether or not a message should be printed to the screen if the matrix cannot be compactified.}
 }
 \description{
 Collapses a cladistic matrix to just unique character state distributions.

@@ -5,6 +5,7 @@
 #' Collapses a cladistic matrix to just unique character state distributions.
 #'
 #' @param CladisticMatrix The cladistic matrix in the format imported by \link{ReadMorphNexus}.
+#' @param Message Logical indicating whether or not a message should be printed to the screen if the matrix cannot be compactified.
 #'
 #' @details
 #'
@@ -38,7 +39,7 @@
 #' Michaux1989compact$Matrix_1$Weights
 #'
 #' @export CompactifyMatrix
-CompactifyMatrix <- function(CladisticMatrix) {
+CompactifyMatrix <- function(CladisticMatrix, Message = TRUE) {
   
   # FUTURE COULD CHECK FOR UNORD AND ORD WHEN BINARY AND HENCE MEANINGLESS
   
@@ -82,7 +83,7 @@ CompactifyMatrix <- function(CladisticMatrix) {
     } else {
       
       # Print message to user:
-      print("Matrix cannot be compactified. All character distributions are unique and weights are greater than zero.")
+      if(Message) print("Matrix cannot be compactified. All character distributions are unique and weights are greater than zero.")
       
     }
     
