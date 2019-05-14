@@ -43,9 +43,6 @@ CompactifyMatrix <- function(CladisticMatrix, Message = TRUE) {
   
   # FUTURE COULD CHECK FOR UNORD AND ORD WHEN BINARY AND HENCE MEANINGLESS
   
-  CladisticMatrix <- MorphMatrix
-  
-  
   # List any zero weight characters:
   ZeroWeightCharacters <- which(unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], '[[', "Weights")) == 0)
   
