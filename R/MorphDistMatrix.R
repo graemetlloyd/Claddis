@@ -100,6 +100,20 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
   # ADD HOPKINS SUGGESTION (VIA EMAIL) FOR FOURTH GEDTYPE WHERE MEAN DISTANCE FOR CHARACTER REPLACES MISSING VALUES.
   # CHECK POLYMORPHISM UNCERTAINTY IN GENERAL AS NOT CLEAR IT IS DOING WHAT IT SHOULD DO.
   
+  
+  CladisticMatrix <- ReadMorphNexus("~/Documents/Packages/Claddis/matrix2-4.nex")
+  Distance <- "GC"
+  GEDType = "Wills"
+  TransformDistances = "none"
+  PolymorphismBehaviour = "min.difference"
+  UncertaintyBehaviour = "min.difference"
+  InapplicableBehaviour = "HSJ"
+  CharacterDependencies = matrix(c(2, 1, 3, 1), ncol = 2, byrow = TRUE, dimnames = list(c(), c("DependentCharacter", "IndependentCharacter")))
+  Alpha = 0.5
+  
+  
+  
+  
   # Subfunction to find comparable characters for a pairwise taxon comparison:
   GetComparableCharacters <- function(interest.col, CladisticMatrix) {
     
@@ -591,7 +605,7 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
     weights[unlist(CharactersByLevel[2:length(CharactersByLevel)])] <- 0
     
     # Update comparable characters by pruning out NAs:
-    list.of.compchar <- mapply(function(x, y) y[!is.na(x)], x = diffs, y = list.of.compchar)
+    list.of.compchar <- mapply(function(x, y) y[!is.na(x)], x = diffs, y = list.of.compchar, SIMPLIFY = FALSE)
     
     # Update differences by pruning out NAs:
     diffs <- lapply(diffs, function(x) x[!is.na(x)])
