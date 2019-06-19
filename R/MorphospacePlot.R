@@ -103,22 +103,22 @@ MorphospacePlot <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, p
   }
 
   # Case if tree supplied:
-  if(!is.null(pcoa_input$tree)) {
+  if(!is.null(pcoa_input$Tree)) {
 
     # Sort axes by node number in tree:
-    pcoa_input$vectors <- pcoa_input$vectors[c(pcoa_input$tree$tip.label, setdiff(rownames(pcoa_input$vectors), pcoa_input$tree$tip.label)), ]
+    pcoa_input$vectors <- pcoa_input$vectors[c(pcoa_input$Tree$tip.label, setdiff(rownames(pcoa_input$vectors), pcoa_input$Tree$tip.label)), ]
 
     # For each branch, plot branch:
-    for(i in 1:nrow(pcoa_input$tree$edge)) lines(x = pcoa_input$vectors[pcoa_input$tree$edge[i, ], x_axis], y = pcoa_input$vectors[pcoa_input$tree$edge[i, ], y_axis], col = "black")
+    for(i in 1:nrow(pcoa_input$Tree$edge)) lines(x = pcoa_input$vectors[pcoa_input$Tree$edge[i, ], x_axis], y = pcoa_input$vectors[pcoa_input$Tree$edge[i, ], y_axis], col = "black")
 
     # Establish tip node numbers:
-    tip_numbers <- c(1:ape::Ntip(pcoa_input$tree))
+    tip_numbers <- c(1:ape::Ntip(pcoa_input$Tree))
     
     # Establish internal node numbers:
     node_numbers <- setdiff(1:nrow(pcoa_input$vectors), tip_numbers)
     
     # Establish root number:
-    root_number <- ape::Ntip(pcoa_input$tree) + 1
+    root_number <- ape::Ntip(pcoa_input$Tree) + 1
 
     # If plotting internal nodes, plot internal nodes:
     if(plot_internal_nodes) points(pcoa_input$vectors[node_numbers, x_axis], pcoa_input$vectors[node_numbers, y_axis], pch = 21, bg = z_colours[node_numbers], cex = z_sizes[node_numbers])
