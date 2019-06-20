@@ -261,8 +261,14 @@ TrimMorphDistMatrix <- function(dist.matrix, Tree = NULL) {
         
       }
       
+      # Store tree prior to any pruning:
+      FullTree <- Tree
+      
       # Remove pruned taxa from tree:
       Tree <- drop.tip(Tree, tips.to.remove)
+      
+      # Correct root time (if necessary):
+      Tree <- CorrectRootTime(original.tree = FullTree, pruned.tree = Tree)
       
       # Find node names:
       node.names <- rownames(dist.matrix)[grep("%%", rownames(dist.matrix))]
