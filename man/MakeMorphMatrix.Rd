@@ -5,7 +5,8 @@
 \title{Creates a morphological data file from a matrix}
 \usage{
 MakeMorphMatrix(CharacterTaxonMatrix, header = "", weights = NULL,
-  ordering = NULL, symbols = NULL, equalise.weights = FALSE)
+  ordering = NULL, symbols = NULL, equalise.weights = FALSE,
+  ignore.duplicate.taxa = FALSE)
 }
 \arguments{
 \item{CharacterTaxonMatrix}{A Character-Taxon (columns-rows) matrix, with taxon names as rownames.}
@@ -19,6 +20,8 @@ MakeMorphMatrix(CharacterTaxonMatrix, header = "", weights = NULL,
 \item{symbols}{The symbols to use if writing to a file (defaults to the numbers 0:9 then the letters A to V).}
 
 \item{equalise.weights}{Optional that overrides the weights specified above make all characters truly equally weighted.}
+
+\item{ignore.duplicate.taxa}{Logical indicating whether or not to ignore (allow; TRUE) duplicate taxa or not (FALSE; default).}
 }
 \value{
 \item{Topper}{Contains any header text or step matrices and pertains to the entire file.}

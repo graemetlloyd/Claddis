@@ -10,6 +10,7 @@
 #' @param ordering A vector indicating whether characters are ordered ("ord") or unordered ("unord") (if no specified defaults to ordered).
 #' @param symbols The symbols to use if writing to a file (defaults to the numbers 0:9 then the letters A to V).
 #' @param equalise.weights Optional that overrides the weights specified above make all characters truly equally weighted.
+#' @param ignore.duplicate.taxa Logical indicating whether or not to ignore (allow; TRUE) duplicate taxa or not (FALSE; default).
 #'
 #' @details
 #'
@@ -39,7 +40,7 @@
 #' MakeMorphMatrix(CharacterTaxonMatrix)
 #'
 #' @export MakeMorphMatrix
-MakeMorphMatrix <- function(CharacterTaxonMatrix, header = "", weights = NULL, ordering = NULL, symbols = NULL, equalise.weights = FALSE) {
+MakeMorphMatrix <- function(CharacterTaxonMatrix, header = "", weights = NULL, ordering = NULL, symbols = NULL, equalise.weights = FALSE, ignore.duplicate.taxa = FALSE) {
   
   # Check input is a matrix:
   if(!is.matrix(CharacterTaxonMatrix)) stop("CharacterTaxonMatrix must be a matrix.")
@@ -48,7 +49,7 @@ MakeMorphMatrix <- function(CharacterTaxonMatrix, header = "", weights = NULL, o
   if(is.null(rownames(CharacterTaxonMatrix))) stop("CharacterTaxonMatrix must have rownames indicating taxa.")
   
   # Check taxon names are unique (could cause downstream issues if not):
-  if(any(duplicated(rownames(CharacterTaxonMatrix)))) stop("Taxon names must be unique.")
+  if(!ignore.duplicate.taxa) if(any(duplicated(rownames(CharacterTaxonMatrix)))) stop("Taxon names must be unique.")
   
   # Delete any column names (could cause downstream issues otherwise):
   if(!is.null(colnames(CharacterTaxonMatrix))) colnames(CharacterTaxonMatrix) <- NULL
