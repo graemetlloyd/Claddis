@@ -4,7 +4,7 @@
 \alias{MakeMorphMatrix}
 \title{Creates a morphological data file from a matrix}
 \usage{
-MakeMorphMatrix(CharacterTaxonMatrix, header = "", weights = NULL,
+MakeMorphMatrix(CharacterTaxonMatrix, header = "", Weights = NULL,
   ordering = NULL, symbols = NULL, equalise.weights = FALSE,
   ignore.duplicate.taxa = FALSE)
 }
@@ -13,7 +13,7 @@ MakeMorphMatrix(CharacterTaxonMatrix, header = "", weights = NULL,
 
 \item{header}{A scalar indicating any header text (defaults to an empty string: "").}
 
-\item{weights}{A vector specifying the weights used (if not specified defaults to 1).}
+\item{Weights}{A vector specifying the weights used (if not specified defaults to 1).}
 
 \item{ordering}{A vector indicating whether characters are ordered ("ord") or unordered ("unord") (if no specified defaults to ordered).}
 
