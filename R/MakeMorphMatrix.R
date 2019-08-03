@@ -89,7 +89,7 @@ MakeMorphMatrix <- function(CharacterTaxonMatrix, header = "", Weights = NULL, o
   if(!is.null(ordering) && length(setdiff(ordering, c("unord", "ord"))) > 0) stop("Ordering must be unord or ord only.")
   
   # Check symbols are of correct length:
-  if(!is.null(symbols) && length(symbols) >= (diff(range(sort(as.numeric(unique(unlist(strsplit(as.character(unique(as.vector(CharacterTaxonMatrix))), "&"))))))) + 1)) stop("Symbols must be at least as long as the range of character values in CharacterTaxonMatrix.")
+  if(!is.null(symbols) && length(symbols) >= (diff(range(as.numeric(unique(sort(unlist(strsplit(as.vector(CharacterTaxonMatrix), split = "&|/"))))))) + 1)) stop("Symbols must be at least as long as the range of character values in CharacterTaxonMatrix.")
 
   # Check symbols are single characters only:
   if(!is.null(symbols) && any(nchar(symbols) != 1)) stop("Symbols must be single characters only.")
@@ -104,10 +104,16 @@ MakeMorphMatrix <- function(CharacterTaxonMatrix, header = "", Weights = NULL, o
   if(is.null(Weights)) Weights <- rep(1, ncol(CharacterTaxonMatrix))
 
   # Calculate minimum values:
-  min.vals <- apply(CharacterTaxonMatrix, 2, function(x) sort(as.numeric(strsplit(x, split = "&|/")[[1]]), decreasing = FALSE)[1])
-
+  min.vals <- apply(CharacterTaxonMatrix, 2, function(x) sort(as.numeric(unlist(strsplit(x, split = "&|/"))), decreasing = FALSE)[1])
+  
   # Calculate maximum values:
-  max.vals <- apply(CharacterTaxonMatrix, 2, function(x) sort(as.numeric(strsplit(x, split = "&|/")[[1]]), decreasing = TRUE)[1])
+  max.vals <- apply(CharacterTaxonMatrix, 2, function(x) sort(as.numeric(unlist(strsplit(x, split = "&|/"))), decreasing = TRUE)[1])
+  
+  # If any NAs in min.vals replace with zero:
+  if(any(is.na(min.vals))) min.vals[is.na(min.vals)] <- 0
+  
+  # If any NAs in max.vals replace with zero:
+  if(any(is.na(max.vals))) max.vals[is.na(max.vals)] <- 0
 
   # Default step matrices to NULL for now (may add this option in future):
   step.matrices <- NULL
