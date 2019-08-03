@@ -104,10 +104,10 @@ MakeMorphMatrix <- function(CharacterTaxonMatrix, header = "", weights = NULL, o
   if(is.null(weights)) weights <- rep(1, ncol(CharacterTaxonMatrix))
 
   # Calculate minimum values:
-  min.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CharacterTaxonMatrix, 2, as.character), 2, strsplit, split = "&|/"), unlist), as.numeric), sort), min))
+  min.vals <- unlist(apply(CharacterTaxonMatrix, 2, function(x) min(as.numeric(strsplit(x, split = "&|/")[[1]]))))
 
   # Calculate maximum values:
-  max.vals <- unlist(lapply(lapply(lapply(lapply(apply(apply(CharacterTaxonMatrix, 2, as.character), 2, strsplit, split = "&|/"), unlist), as.numeric), sort), max))
+  max.vals <- unlist(apply(CharacterTaxonMatrix, 2, function(x) max(as.numeric(strsplit(x, split = "&|/")[[1]]))))
 
   # Default step matrices to NULL for now (may add this option in future):
   step.matrices <- NULL
