@@ -179,7 +179,7 @@ WriteMorphNexus <- function(CladisticMatrix, filename) {
   if(!is.list(CladisticMatrix$Topper$StepMatrices)) CladisticMatrix$Topper$StepMatrices <- list(NULL)
   
   # Create step matrix block:
-  StepMatrixBlock <- paste(ifelse(!unlist(lapply(CladisticMatrix$Topper$StepMatrices, is.null)), paste(paste("\tUSERTYPE '", names(CladisticMatrix$Topper$StepMatrices), "' (STEPMATRIX) = ", unlist(lapply(CladisticMatrix$Topper$StepMatrices, ncol)), "\n", sep = ""), paste("\t", unlist(lapply(lapply(CladisticMatrix$Topper$StepMatrices, colnames), paste, collapse = " ")), "\n\t", sep = ""), unlist(lapply(lapply(lapply(CladisticMatrix$Topper$StepMatrices, function(x) { diag(x) <- "."; return(x) }), apply, 2, paste, collapse = " "), paste, collapse = "\n\t")), "\n\t;\n", sep = ""), ""), collapse = "")
+  StepMatrixBlock <- paste(ifelse(!unlist(lapply(CladisticMatrix$Topper$StepMatrices, is.null)), paste(paste("\tUSERTYPE '", names(CladisticMatrix$Topper$StepMatrices), "' (STEPMATRIX) = ", unlist(lapply(CladisticMatrix$Topper$StepMatrices, ncol)), "\n", sep = ""), paste("\t", unlist(lapply(lapply(CladisticMatrix$Topper$StepMatrices, colnames), paste, collapse = " ")), "\n\t", sep = ""), unlist(lapply(lapply(lapply(CladisticMatrix$Topper$StepMatrices, function(x) { diag(x) <- "."; return(x) }), apply, 1, paste, collapse = " "), paste, collapse = "\n\t")), "\n\t;\n", sep = ""), ""), collapse = "")
 
   # Get ordering of all characters in sequence:
   Ordering <- unlist(lapply(DataBlocks, '[[', "Ordering"))
