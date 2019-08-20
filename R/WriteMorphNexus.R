@@ -188,7 +188,7 @@ WriteMorphNexus <- function(CladisticMatrix, filename) {
   Weights <- unlist(lapply(DataBlocks, '[[', "Weights"))
 
   # Create options block (if no block names):
-  if(all(is.na(BlockNames))) OptionsBlock <- paste(ifelse(all(Ordering == "unord"), "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n", ifelse(all(Ordering == "ord"), "\tOPTIONS  DEFTYPE=ord PolyTcount=MINSTEPS ;\n", "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n")), paste("\tTYPESET * UNTITLED  = ", paste(paste(sort(unique(Ordering)), unlist(lapply(lapply(lapply(as.list(sort(unique(Ordering))), '==', Ordering), which), Zipper)), sep = ": "), collapse = ", "), ";\n", sep = ""), collapse = "")
+  if(all(is.na(BlockNames))) OptionsBlock <- paste(ifelse(all(Ordering == "unord"), "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n", ifelse(all(Ordering == "ord"), "\tOPTIONS  DEFTYPE=ord PolyTcount=MINSTEPS ;\n", "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n")), ifelse(length(unique(Ordering)) == 1 && length(setdiff(unique(Ordering), c("ord", "unord"))) == 0, "", paste("\tTYPESET * UNTITLED  = ", paste(paste(sort(unique(Ordering)), unlist(lapply(lapply(lapply(as.list(sort(unique(Ordering))), '==', Ordering), which), Zipper)), sep = ": "), collapse = ", "), ";\n", sep = "")), collapse = "")
   
   # Create options block (if there are block names):
   if(!all(is.na(unlist(BlockNames)))) OptionsBlock <- paste(paste("\tTYPESET * UNTITLED  (CHARACTERS = ", BlockNames, ")  =  ", unlist(lapply(lapply(DataBlocks, '[[', "Ordering"), function(x) paste(paste(paste(sort(unique(x)), unlist(lapply(lapply(lapply(as.list(sort(unique(x))), '==', x), which), Zipper)), sep = ": "), collapse = ", "), sep = ""))), ";\n", sep = ""), collapse = "")
