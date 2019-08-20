@@ -91,7 +91,7 @@ WriteMorphNexus <- function(CladisticMatrix, filename) {
       
     }
     
-    # Return just the newly fromateed matrix (now a vector):
+    # Return just the newly formatted matrix (now a vector):
     return(DataMatrix$Matrix)
     
   }
