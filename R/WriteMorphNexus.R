@@ -199,8 +199,11 @@ WriteMorphNexus <- function(CladisticMatrix, filename) {
   # Convert continuosu character weights to one before making weights block:
   Weights[Ordering == "cont"] <- 1
   
-  # Make weights block:
-  WeightsBlock <- ifelse(all(Weights == 1), "", paste("\tWTSET * UNTITLED  = ", paste(paste(sort(unique(Weights)), unlist(lapply(lapply(lapply(as.list(sort(unique(Weights))), '==', Weights), which), Zipper)), sep = ": "), collapse = ", "), ";\n", sep = ""))
+  # Create weights block (if no block names):
+  if(all(is.na(BlockNames))) WeightsBlock <- ifelse(all(Weights == 1), "", paste("\tWTSET * UNTITLED  = ", paste(paste(sort(unique(Weights)), unlist(lapply(lapply(lapply(as.list(sort(unique(Weights))), '==', Weights), which), Zipper)), sep = ": "), collapse = ", "), ";\n", sep = ""))
+  
+  # Create weights block (if there are block names):
+  if(!all(is.na(unlist(BlockNames)))) WeightsBlock <- paste(paste("\tWTSET * UNTITLED  (CHARACTERS = ", BlockNames, ")  =  ", unlist(lapply(lapply(DataBlocks, '[[', "Weights"), function(x) paste(paste(paste(sort(unique(x)), unlist(lapply(lapply(lapply(as.list(sort(unique(x))), '==', x), which), Zipper)), sep = ": "), collapse = ", "), sep = ""))), ";\n", sep = ""), collapse = "")
   
   # Build assumptions block:
   AssumptionBlock <- paste("BEGIN ASSUMPTIONS;\n", StepMatrixBlock, OptionsBlock, WeightsBlock, "END;\n", sep = "")
