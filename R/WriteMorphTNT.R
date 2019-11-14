@@ -238,10 +238,10 @@ WriteMorphTNT <- function(CladisticMatrix, filename, add.analysis.block = FALSE)
     } else {
       
       # First iteration with new tech (where scratch.tre is created):
-      AnalysisBlock <- c("rseed*;", "hold 999;", "xmult=rss fuse 50 drift 50 ratchet 50;", "mult 50 =tbr drift;", "tsave scratch.tre;", "save;", "tsave /;")
+      AnalysisBlock <- c("rseed*;", "hold 999;", "xmult=rss fuse 50 drift 50 ratchet 50;", "tsave scratch.tre;", "save;", "tsave /;")
       
       # Iterations 2-20 (where trees are appended to scratch.tre):
-      AnalysisBlock <- c(AnalysisBlock, rep(c("rseed*;", "hold 999;", "xmult=rss fuse 50 drift 50 ratchet 50;", "mult 50 =tbr drift;", "tsave scratch.tre +;", "save;", "tsave /;"), 19))
+      AnalysisBlock <- c(AnalysisBlock, rep(c("rseed*;", "hold 999;", "xmult=rss fuse 50 drift 50 ratchet 50;", "tsave scratch.tre +;", "save;", "tsave /;"), 19))
       
       # Read in new technology trees (scratch.tre) and finish with a heuristic (tbr) search for all mpts:
       AnalysisBlock <- c(AnalysisBlock, c("hold 100000;", "shortread scratch.tre;", "bbreak=tbr;"))
