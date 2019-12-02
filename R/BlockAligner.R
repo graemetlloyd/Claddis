@@ -38,8 +38,14 @@
 #'
 #' @examples
 #'
-#' # :
-#' BlockAligner("Allosaurus  012100?1011\nAbelisaurus  0100???0000\nTyrannosaurus  01012012010\nYi  10101?0????")
+#' # Example block from above:
+#' BlockAligner("Allosaurus  012100?1011\n
+#'   Abelisaurus  0100???0000\n
+#'   Tyrannosaurus  01012012010\n
+#'   Yi  10101?0????")
+#'
+#' # To test the response open a text editor and paste the
+#' # contents of the clipboard.
 #'
 #' @export BlockAligner
 BlockAligner <- function(Block) {
