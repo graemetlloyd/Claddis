@@ -28,6 +28,7 @@
 #'
 #' @exportPattern "^[[:alpha:]]+"
 #' @import ape
+#' @import clipr
 #' @import phytools
 #' @import strap
 

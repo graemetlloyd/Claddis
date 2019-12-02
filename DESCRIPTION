@@ -13,6 +13,7 @@ Authors@R: c(
 Maintainer: Graeme T. Lloyd <graemetlloyd@gmail.com>
 Depends:
     ape,
+    clipr,
     phytools,
     strap
 Imports:
