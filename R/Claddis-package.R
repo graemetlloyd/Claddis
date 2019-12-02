@@ -28,7 +28,6 @@
 #'
 #' @exportPattern "^[[:alpha:]]+"
 #' @import ape
-#' @import clipr
 #' @import phytools
 #' @import strap
 
@@ -37,7 +36,8 @@
 # @import rgl
 # @importFrom rgl plot3d lines3d points3d text3d view3d 
 
-#' @importFrom gdata trim 
+#' @importFrom clipr write_clip
+#' @importFrom gdata trim
 #' @importFrom graphics layout lines par plot points polygon text 
 #' @importFrom grDevices adjustcolor chull 
 #' @importFrom stats as.dist dist dpois pchisq runif var 
