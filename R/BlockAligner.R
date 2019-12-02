@@ -34,15 +34,21 @@
 #'
 #' @keywords
 #'
-#' NEXUS, TNT
+#' NEXUS,TNT
 #'
 #' @examples
 #'
+#' # Build example block from above:
+#' x <- paste(c("Allosaurus  012100?1011",
+#'   "Abelisaurus  0100???0000",
+#'   "Tyrannosaurus  01012012010",
+#'   "Yi  10101?0????"), collapse = "\n")
+#'
+#' # Look at block pre-alignment:
+#' x
+#'
 #' # Example block from above:
-#' BlockAligner("Allosaurus  012100?1011\n
-#'   Abelisaurus  0100???0000\n
-#'   Tyrannosaurus  01012012010\n
-#'   Yi  10101?0????")
+#' #BlockAligner(x)
 #'
 #' # To test the response open a text editor and paste the
 #' # contents of the clipboard.
