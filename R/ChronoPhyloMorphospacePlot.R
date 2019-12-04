@@ -4,10 +4,17 @@
 #'
 #' Plots a 3D chronophylomorphospace.
 #'
-#' @param pcoa_data Principal coordinate data in the format output by \link{MorphMatrix2PCoA} that includes a tree and ancestral states.
+
+#' @param pcoa_data Principal coordinate data in the format output by 
+#' \link{MorphMatrix2PCoA} that includes a tree and ancestral states.
+#' 
 #' @param x_axis Which ordination axis to plot as the x-axis.
+
 #' @param y_axis Which ordination axis to plot as the y-axis.
-#' @param shadow Whether or not to plot a shadow (2D plot) on the bottom face of the 3D plot (defaults to TRUE).
+
+#' @param shadow Whether or not to plot a shadow (2D plot) on 
+#' the bottom face of the 3D plot (defaults to TRUE).
+
 #'
 #' @details
 #'
@@ -19,13 +26,16 @@
 #'
 #' @references
 #'
-#' Sakamoto, M. and Ruta, M. 2012. Convergence and divergence in the evolution of cat skulls: temporal and spatial patterns of morphological diversity. PLoS ONE, 7, e39752.
-#'
-#' @keywords principal coordinates
+#' Sakamoto, M. and Ruta, M. 2012. Convergence and divergence in the evolution of cat skulls:
+#'  temporal and spatial patterns of morphological diversity. PLoS ONE, 7, e39752.
 #'
 
+# @keywords principalcoordinates
+#
+
 #' @examples
-#' \donttest{
+#' \dontrun{
+#' require(rgl)
 #' 
 #' # Set random seed:
 #' set.seed(4)

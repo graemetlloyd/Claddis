@@ -26,7 +26,7 @@ Basic help can be found with:
 
 And clicking on the Index link at the base of the help file will reveal links to every available function.
 
-Note that I have previously produced tutorials for the package [here](http://www.graemetlloyd.com/teaching/RE2014/disparity_and_rates.r), but that current substantial reworking of the core code means these will no longer work and so the example code in each function's help file is the current best substitute for this.
+Note that I have previously produced various tutorials for the package, but that current substantial reworking of the core code means these will no longer work and so the example code in each function's help file is the current best substitute for this. Please refer to package documentation for the most up-to-date usage of Claddis.
 
 Citation
 ========
