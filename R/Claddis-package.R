@@ -16,8 +16,6 @@
 #'
 #' Lloyd, G. T., 2016. Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. Biological Journal of the Linnean Society, 118, 131-151.
 #'
-#' @keywords disparity,distance,morphology,phylogeny
-#'
 #' @examples
 #' 
 #' # Get morphological distances for Michaux (1989) data set:

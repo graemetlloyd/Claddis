@@ -50,8 +50,6 @@
 #'
 #' Wills, M. A., 1998. Crustacean disparity through the Phanerozoic: comparing morphological and stratigraphic data. Biological Journal of the Linnean Society, 65, 455-500.
 #'
-#' @keywords distance
-#'
 #' @examples
 #'
 #' # Get morphological distances for the Day et

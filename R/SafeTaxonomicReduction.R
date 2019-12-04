@@ -24,8 +24,6 @@
 #'
 #' @references Wilkinson, M., 1995. Coping with abundant missing entries in phylogenetic inference using parsimony. Systematic Biology, 44, 501-514.
 #'
-#' @keywords Safe Taxonomic Reduction
-#'
 #' @examples
 #'
 #' # Performs STR on the Gauthier 1986 dataset used in Wilkinson (1995):

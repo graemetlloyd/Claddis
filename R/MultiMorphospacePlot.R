@@ -19,8 +19,6 @@
 #'
 #' @author Emma Sherratt \email{emma.sherratt@@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
-#' @keywords principal coordinates
-#'
 #' @examples
 #'
 #' # Create PCOA data:

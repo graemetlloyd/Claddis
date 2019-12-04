@@ -193,4 +193,3 @@ Thiele, K.. 1993. The Holy Grail of the perfect character: the cladistic treatme
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Steve C. Wang \email{scwang@swarthmore.edu}
 }
-\keyword{evolution,rates}

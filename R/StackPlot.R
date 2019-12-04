@@ -35,8 +35,6 @@
 #'
 #' Friedman, M. and Coates, M. I., 2006. A newly recognized fossil coelacanth highlights the early morphological diversification of the clade. Proceedings of the Royal Society of London B, 273, 245-250
 #'
-#' @keywords principal coordinates
-#'
 #' @examples
 #'
 #' # Create x-values that will form a grid:

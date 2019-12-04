@@ -18,8 +18,6 @@
 #'
 #' @seealso \link{ReadMorphNexus}
 #'
-#' @keywords NEXUS
-#'
 #' @examples
 #'
 #' # Remove the outgroup taxon and characters 11 and 53 from Gauthier1986:

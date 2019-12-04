@@ -115,8 +115,3 @@ Gower, J. C., 1966. Some distance properties of latent root and vector methods u
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-\keyword{classic}
-\keyword{coordinates}
-\keyword{multidimensional}
-\keyword{principal}
-\keyword{scaling,}

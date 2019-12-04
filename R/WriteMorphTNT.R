@@ -18,8 +18,6 @@
 #'
 #' @references Goloboff, P., Farris, J. and Nixon, K., 2008. TNT, a free program for phylogenetic analysis. Cladistics, 24, 774-786.
 #'
-#' @keywords TNT
-#'
 #' @examples
 #'
 #' # Write out Michaux 1989 to current working directory:

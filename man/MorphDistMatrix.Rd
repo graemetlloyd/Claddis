@@ -110,4 +110,3 @@ Wills, M. A., 1998. Crustacean disparity through the Phanerozoic: comparing morp
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Thomas Guillerme \email{guillert@tcd.ie}
 }
-\keyword{distance}

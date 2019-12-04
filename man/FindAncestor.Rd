@@ -40,4 +40,3 @@ FindAncestor(c("B", "C", "D"), tree)
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-\keyword{ancestor}

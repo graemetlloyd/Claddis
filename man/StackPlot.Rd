@@ -102,5 +102,3 @@ Friedman, M. and Coates, M. I., 2006. A newly recognized fossil coelacanth highl
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Emma Sherratt \email{emma.sherratt@gmail.com}
 }
-\keyword{coordinates}
-\keyword{principal}

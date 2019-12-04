@@ -56,4 +56,3 @@ Maddison, D. R., Swofford, D. L. and Maddison, W. P., 1997. NEXUS: an extensible
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-\keyword{NEXUS}

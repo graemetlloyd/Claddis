@@ -37,4 +37,3 @@ Goloboff, P., Farris, J. and Nixon, K., 2008. TNT, a free program for phylogenet
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-\keyword{TNT}

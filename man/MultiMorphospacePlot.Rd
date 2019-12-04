@@ -41,5 +41,3 @@ MultiMorphospacePlot(pcoa_input, N_axes = 3)
 \author{
 Emma Sherratt \email{emma.sherratt@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-\keyword{coordinates}
-\keyword{principal}

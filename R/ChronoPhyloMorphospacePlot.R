@@ -30,8 +30,6 @@
 #'  temporal and spatial patterns of morphological diversity. PLoS ONE, 7, e39752.
 #'
 
-# @keywords principalcoordinates
-#
 
 #' @examples
 #' \dontrun{

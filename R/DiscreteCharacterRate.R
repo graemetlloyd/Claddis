@@ -129,8 +129,6 @@
 #'
 #' Thiele, K.. 1993. The Holy Grail of the perfect character: the cladistic treatment of morphometric data. Cladistics, 9, 275-304.
 #'
-#' @keywords evolution,rates
-#'
 #' @examples
 #' 
 #' # Set random seed:

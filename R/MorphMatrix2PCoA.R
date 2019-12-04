@@ -52,8 +52,6 @@
 #'
 #' Gower, J. C., 1966. Some distance properties of latent root and vector methods used in multivariate analysis. Biometrika, 53, 325-338.
 #'
-#' @keywords classic multidimensional scaling, principal coordinates
-#'
 #' @examples
 #'
 #' # Run on Michaux (189) data set with defaults:

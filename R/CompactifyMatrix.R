@@ -19,8 +19,6 @@
 #'
 #' @seealso \link{SafeTaxonomicReduction} and \link{MatrixPruner}
 #'
-#' @keywords NEXUS
-#'
 #' @examples
 #'
 #' # Examine the matrix pre-compactification:

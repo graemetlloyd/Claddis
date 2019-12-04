@@ -45,4 +45,3 @@ Michaux1989compact$Matrix_1$Weights
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-\keyword{NEXUS}

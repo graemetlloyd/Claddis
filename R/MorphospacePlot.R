@@ -27,8 +27,6 @@
 #'
 #' Wills, M. A., Briggs, D. E. G. and Fortey, R. A., 1994. Disparity as an evolutionary index: a comparison of Cambrian and Recent arthropods. Paleobiology, 20, 93-130.
 #'
-#' @keywords principal coordinates
-#'
 #' @examples
 #'
 #' # Set random seed:

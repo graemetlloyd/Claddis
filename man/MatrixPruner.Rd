@@ -40,4 +40,3 @@ prunedmatrix$Matrix_1$Matrix
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-\keyword{NEXUS}

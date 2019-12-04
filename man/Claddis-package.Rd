@@ -23,4 +23,3 @@ Lloyd, G. T., 2016. Estimating morphological diversity and tempo with discrete c
 \author{
 Graeme T. Lloyd <graemetlloyd@gmail.com>
 }
-\keyword{disparity,distance,morphology,phylogeny}

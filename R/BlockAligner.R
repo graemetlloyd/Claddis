@@ -32,10 +32,6 @@
 #'
 #' Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
-#' @keywords
-#'
-#' NEXUS,TNT
-#'
 #' @examples
 #'
 #' # Build example block from above:

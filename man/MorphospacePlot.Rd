@@ -59,5 +59,3 @@ Wills, M. A., Briggs, D. E. G. and Fortey, R. A., 1994. Disparity as an evolutio
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Emma Sherratt \email{emma.sherratt@gmail.com}
 }
-\keyword{coordinates}
-\keyword{principal}

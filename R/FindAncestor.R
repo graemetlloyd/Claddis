@@ -15,8 +15,6 @@
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
-#' @keywords ancestor
-#'
 #' @examples
 #'
 #' # Create a simple four-taxon tree:

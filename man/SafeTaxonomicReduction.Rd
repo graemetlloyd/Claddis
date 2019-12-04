@@ -45,6 +45,3 @@ Wilkinson, M., 1995. Coping with abundant missing entries in phylogenetic infere
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
-\keyword{Reduction}
-\keyword{Safe}
-\keyword{Taxonomic}

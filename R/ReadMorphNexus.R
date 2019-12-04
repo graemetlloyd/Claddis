@@ -28,8 +28,6 @@
 #'
 #' Maddison, D. R., Swofford, D. L. and Maddison, W. P., 1997. NEXUS: an extensible file format for systematic information. Systematic Biology, 46, 590-621.
 #'
-#' @keywords NEXUS
-#'
 #' @examples
 #' 
 #' # Create example matrix (NB: creates a file in the current
