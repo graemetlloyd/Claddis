@@ -42,7 +42,9 @@ MinSpanTreeEdges <- function(dist.matrix) {
   links.matrix <- ape::mst(dist.matrix)
 	
 	# Update matrix class to NULL:
-	class(links.matrix) <- NULL
+	# class(links.matrix) <- NULL
+  # DWB, 12-04-19: commented out above
+    # Why remove any class? This seems very problematic and not necessitated by code below
 	
 	# Create empty matrix to store edges for minimum spanning tree:
 	min.span.tree.edges <- matrix(nrow = 0, ncol = 2, dimnames = list(c(), c("From", "To")))
@@ -54,7 +56,14 @@ MinSpanTreeEdges <- function(dist.matrix) {
 		for(j in (i + 1):ncol(links.matrix)) {
 			
 			# If there is a link then record it:
-			if(links.matrix[i, j] == 1) min.span.tree.edges <- rbind(min.span.tree.edges, c(rownames(links.matrix)[i], colnames(links.matrix)[j]))
+			if(links.matrix[i, j] == 1){
+			  min.span.tree.edges <- rbind(
+			     min.span.tree.edges, 
+			     c(rownames(links.matrix)[i], 
+			        colnames(links.matrix)[j]
+			        )
+			     )
+			  }
 			
 		}
 		

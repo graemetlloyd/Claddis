@@ -327,7 +327,9 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   UniqueTrees <- read.tree(text = UniqueNewickStrings)
   
   # If only a single tree reformat as a list:
-  if(class(UniqueTrees) == "phylo") UniqueTrees <- list(UniqueTrees)
+  if(inherits(UniqueTrees, what = "phylo")){
+    UniqueTrees <- list(UniqueTrees)
+    }
   
   # Subfunction map nodes from pruned tree to full tree:
   MapPrunedTreeNodesToFullTreeNodes <- function(tree, fulltree) {
