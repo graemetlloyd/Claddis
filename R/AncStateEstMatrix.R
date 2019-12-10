@@ -15,7 +15,7 @@
 #'
 #' @details
 #'
-#' At its' core the functyion uses either the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package (for discrete characters) or the \link{ace} function in the \link{ape} package (for continuous characters) to make ancestral state estimates. For discrete characters these are collapsed to the most likely state (or states, given equal likelihoods or likelihood within a defined threshold value). In the latter case the resulting states are represented as an uncertainty (i.e., states separated by a slash, e.g., 0/1. This is the method used by Brusatte et al. (2014).
+#' At its' core the function uses either the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package (for discrete characters) or the \link{ace} function in the \link{ape} package (for continuous characters) to make ancestral state estimates. For discrete characters these are collapsed to the most likely state (or states, given equal likelihoods or likelihood within a defined threshold value). In the latter case the resulting states are represented as an uncertainty (i.e., states separated by a slash, e.g., 0/1. This is the method used by Brusatte et al. (2014).
 #'
 #' The method can deal with ordered or unordered characters and does so by allowing only indirect transitions (from 0 to 2 must pass through 1) or direct transitions (from 0 straight to 2), respectively. However, more complex step matrix transitions are not currently supported.
 #'
@@ -91,7 +91,7 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   if(length(UncertaintyBehaviour) != 1 || !any(c("equalp", "treatasmissing") == UncertaintyBehaviour)) stop("UncertaintyBehaviour must be a single value of either, \"equalp\" or \"treatasmissing\".")
   
   # Check Threshold is a numeric value between the limits of zero and one:
-  if(!is.numeric(Threshold) || Threshold > 1 || Threshold < 0) stop("Threshold must be a numeric value between 0 and 1.")
+  if(!is.numeric(Threshold) || Threshold > 0.5 || Threshold < 0) stop("Threshold must be a numeric value between 0 and 1.")
   
   # Collapse matrix to vectors for each character (state and ordering combination):
   collapse.matrix <- unname(unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], function(x) apply(rbind(x$Matrix, x$Ordering), 2, paste, collapse = ""))))
@@ -117,15 +117,6 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   # Check there are no failed name matches and stop and report if found:
   if(length(FailedNameMatches) > 0) stop(paste("The following names do not match between the tree and matrix: ", paste(sort(FailedNameMatches), collapse = ", "), ". Check spelling and try again.", sep = ""))
   
-  # Check PolymorphismBehaviour is a valid option and stop and report if not:
-  if(length(setdiff(PolymorphismBehaviour, c("equalp", "treatasmissing"))) > 0) stop("PolymorphismBehaviour must be one of \"equalp\" or \"treatasmissing\".")
-  
-  # Check UncertaintyBehaviour is a valid option and stop and report if not:
-  if(length(setdiff(UncertaintyBehaviour, c("equalp", "treatasmissing"))) > 0) stop("UncertaintyBehaviour must be one of \"equalp\" or \"treatasmissing\".")
-  
-  # Check threshold is in correct window of possible values:
-  if(Threshold < 0 || Threshold > 0.5) stop("Threshold must be between 0 and 0.5.")
-  
   # If treating inapplicables as missing (and there is at least one inapplicable) replace with NA:
   if(InapplicablesAsMissing && length(which(CladisticMatrix == "")) > 0) CladisticMatrix[which(CladisticMatrix == "")] <- NA
   
@@ -138,7 +129,7 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   # Convert tip states into a list:
   DataAsList <- apply(CladisticMatrix, 2, list)
   
-  # Add Tipsattes name to list:
+  # Add Tip states name to list:
   DataAsList <- lapply(DataAsList, function(x) {names(x) <- "TipStates"; return(x)})
   
   # For each character:
