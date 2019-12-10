@@ -15,7 +15,11 @@
 #'
 #' @details
 #'
-#' Uses either the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package (discrete characters) or the \link{ace} function in the \link{ape} package (continuous characters) to make ancestral state estimates. For discrete characters these are collapsed to the most likely state (or states, given equal likelihoods or likelihood within a defined threshold value). In the latter case the resulting states are represented as an uncertainty (i.e., states separated by a slash, e.g., 0/1. This is the method used by Brusatte et al. (2014).
+#' At its' core the functyion uses either the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package (for discrete characters) or the \link{ace} function in the \link{ape} package (for continuous characters) to make ancestral state estimates. For discrete characters these are collapsed to the most likely state (or states, given equal likelihoods or likelihood within a defined threshold value). In the latter case the resulting states are represented as an uncertainty (i.e., states separated by a slash, e.g., 0/1. This is the method used by Brusatte et al. (2014).
+#'
+#' The method can deal with ordered or unordered characters and does so by allowing only indirect transitions (from 0 to 2 must pass through 1) or direct transitions (from 0 straight to 2), respectively. However, more complex step matrix transitions are not currently supported.
+#'
+#' Ancestral state estimation is complicated where polymorphic or
 #'
 #' @return \item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral states.}
 #'
@@ -57,7 +61,7 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   
   # How to get tip states for a continuous character?
   # How to deal with step matrices?
-  # Change help file to explain interactions between all options, e.g., if doing all chars then polymorphsims used for discrete, midpoint for continuous etc.
+  # Change help file to explain interactions between all options, e.g., if doing all chars then polymorphisms used for discrete, midpoint for continuous etc.
   
   # Catch problem with trees with no branch lengths:
   if(is.null(Tree$edge.length)) stop("Tree must have branch lengths.")
@@ -79,6 +83,15 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   
   # Check InapplicablesAsMissing is a logical:
   if(!is.logical(InapplicablesAsMissing)) stop("InapplicablesAsMissing must be a logical (TRUE or FALSE).")
+  
+  # Check PolymorphismBehaviour is a single allowable value:
+  if(length(PolymorphismBehaviour) != 1 || !any(c("equalp", "treatasmissing") == PolymorphismBehaviour)) stop("PolymorphismBehaviour must be a single value of either, \"equalp\" or \"treatasmissing\".")
+  
+  # Check UncertaintyBehaviour is a single allowable value:
+  if(length(UncertaintyBehaviour) != 1 || !any(c("equalp", "treatasmissing") == UncertaintyBehaviour)) stop("UncertaintyBehaviour must be a single value of either, \"equalp\" or \"treatasmissing\".")
+  
+  # Check Threshold is a numeric value between the limits of zero and one:
+  if(!is.numeric(Threshold) || Threshold > 1 || Threshold < 0) stop("Threshold must be a numeric value between 0 and 1.")
   
   # Collapse matrix to vectors for each character (state and ordering combination):
   collapse.matrix <- unname(unlist(lapply(CladisticMatrix[2:length(CladisticMatrix)], function(x) apply(rbind(x$Matrix, x$Ordering), 2, paste, collapse = ""))))
