@@ -381,7 +381,7 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   # Get number of tips in tree:
   NTips <- ape::Ntip(Tree)
   
-  # Get number of ndoes in tree:
+  # Get number of nodes in tree:
   NNodes <- ape::Nnode(Tree)
   
   # Get all node names and numbers:
@@ -399,7 +399,7 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   # If there are any missing values:
   if(any(is.na(TipMatrix))) {
     
-    # Isolate misisng values:
+    # Isolate missing values:
     MissingTipStates <- which(is.na(TipMatrix))
     
     # Replace missing values with original (unmodified) input values:
