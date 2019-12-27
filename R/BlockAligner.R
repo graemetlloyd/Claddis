@@ -44,7 +44,9 @@
 #' x
 #'
 #' # Align block and place on clipboard:
+#' \dontrun{
 #' BlockAligner(x)
+#' }
 #'
 #' # To test the response open a text editor and paste the
 #' # contents of the clipboard.

@@ -44,7 +44,9 @@ x <- paste(c("Allosaurus  012100?1011",
 x
 
 # Align block and place on clipboard:
+\dontrun{
 BlockAligner(x)
+}
 
 # To test the response open a text editor and paste the
 # contents of the clipboard.
