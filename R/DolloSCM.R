@@ -32,7 +32,7 @@
 #'
 #' @references
 #'
-#' Tarver, J. E., Taylor, R. S., Puttick, M. N., Lloyd, G. T., Pett, W., Fromm, B., Schirrmeister, B. E., Pisani, D., Peterson, K. J. and Donoghue, P. C. J., 2018. Well-annotated microRNAomes do not evidence pervasive miRNA loss. Genome Biology and Evolution, 6, 1457-1470.
+#' Tarver, J. E., Taylor, R. S., Puttick, M. N., Lloyd, G. T., Pett, W., Fromm, B., Schirrmeister, B. E., Pisani, D., Peterson, K. J. and Donoghue, P. C. J., 2018. Well-annotated microRNAomes do not evidence pervasive miRNA loss. \emph{Genome Biology and Evolution}, \bold{6}, 1457-1470.
 #'
 #' @examples
 #' 
