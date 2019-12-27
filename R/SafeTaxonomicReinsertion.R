@@ -13,6 +13,8 @@
 #'
 #' TEXT NEEDED!
 #'
+#' OPERATES ON TEXT FILES, NOT APE IMPORTED TREES AS ASSUMES VERY LARGE FILES AND HENCE WILL BE SLOW IF RUN ON APE FORMAT TREES
+#'
 #' @return
 #'
 #' Nothing is returned, but a new file (\code{treefile.out}) is written.
