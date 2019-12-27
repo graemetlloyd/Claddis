@@ -13,11 +13,13 @@
 #'
 #' This function is intended to make a matrix with redundant character state distributions smaller by collapsing these to single characters and upweighting them accordingly. It is intended purely for use with MRP matrices, but may have some very restricted uses elsewhere.
 #'
-#' The function also deletes any characters weighted zero from the matrix and will merge duplicate taxon anmes into unique character strings.
+#' The function also deletes any characters weighted zero from the matrix and will merge duplicate taxon names into unique character strings.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
-#' @seealso \link{SafeTaxonomicReduction} and \link{MatrixPruner}
+#' @seealso
+#'
+#' \link{SafeTaxonomicReduction} and \link{MatrixPruner}
 #'
 #' @examples
 #'
