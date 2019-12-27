@@ -1,4 +1,4 @@
-#' Plot Stacked Ordination Spaces
+#' Plot stacked ordination spaces
 #'
 #' @description
 #'
@@ -6,8 +6,8 @@
 #'
 #' @param ordination_axes A matrix of the ordination axes supplied (rownames should be object names). First column should be values for first axis, second for second axis and so on.
 #' @param ages A two-column matrix of the first and last apperance dates for the taxa in the same format supplied to \link{DatePhylo}.
-#' @param groups A vector of colours (for plotting) with for each object name.
-#' @param time_slices A vector of the boundaries for a series of time slices.
+#' @param groups A vector of colours (for plotting) for each object name.
+#' @param time_slices A vector of the boundaries (beginning and ending) for a series of time slices.
 #' @param shear A single value (0 to 1) for the degree of shearing in the stacked ordination spaces.
 #' @param x_axis The ordination axis to plot on the x-axis.
 #' @param y_axis The ordination axis to plot nn the y-axis.
@@ -25,15 +25,15 @@
 #'
 #' @references
 #'
-#' Foote, M., 1993. Discordance and concordance between morphological and taxonomic diversity. Paleobiology, 19, 185-204.
+#' Foote, M., 1993. Discordance and concordance between morphological and taxonomic diversity. \emph{Paleobiology}, \bold{19], 185-204.
 #'
-#' Foote, M., 1994. Morphological disparity in Ordovician-Devonian crinoids and the early saturation of morphological space. Paleobiology, 20, 320-344.
+#' Foote, M., 1994. Morphological disparity in Ordovician-Devonian crinoids and the early saturation of morphological space. \emph{Paleobiology}, \bold{20}, 320-344.
 #'
-#' Foote, M., 1995. Morphological diversification of Paleozoic crinoids. Paleobiology, 21, 273-299.
+#' Foote, M., 1995. Morphological diversification of Paleozoic crinoids. \emph{Paleobiology}, \bold{21}, 273-299.
 #'
-#' Foote, M., 1999. Morphological diversity in the evolutionary radiation of Paleozoic and post-Paleozoic crinoids. Paleobiology, 25, 1-115.
+#' Foote, M., 1999. Morphological diversity in the evolutionary radiation of Paleozoic and post-Paleozoic crinoids. \emph{Paleobiology}, \bold{25}, 1-115.
 #'
-#' Friedman, M. and Coates, M. I., 2006. A newly recognized fossil coelacanth highlights the early morphological diversification of the clade. Proceedings of the Royal Society of London B, 273, 245-250
+#' Friedman, M. and Coates, M. I., 2006. A newly recognized fossil coelacanth highlights the early morphological diversification of the clade. \emph{Proceedings of the Royal Society of London B}, \bold{273}, 245-250
 #'
 #' @examples
 #'
