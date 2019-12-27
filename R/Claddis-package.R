@@ -14,7 +14,7 @@
 #'
 #' @references
 #'
-#' Lloyd, G. T., 2016. Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. Biological Journal of the Linnean Society, 118, 131-151.
+#' Lloyd, G. T., 2016. Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. \emph{Biological Journal of the Linnean Society}, \bold{118}, 131-151.
 #'
 #' @examples
 #' 
@@ -46,50 +46,33 @@ NULL
 #'
 #' The character-taxon matrix from Day et al. (2016).
 #'
-#'
 #' @name Day2016
 #' @docType data
 #' @format A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
-#' @references Day, M. O., Rubidge, B. S. and Abdala, F., 2016. A new mid-Permian
-#' burnetiamorph therapsid from the Main Karoo Basin of South Africa and a
-#' phylogenetic review of Burnetiamorpha. Acta Palaeontologica Polonica, 61, 701-719.
+#' @references Day, M. O., Rubidge, B. S. and Abdala, F., 2016. A new mid-Permian burnetiamorph therapsid from the Main Karoo Basin of South Africa and a phylogenetic review of Burnetiamorpha. \emph{Acta Palaeontologica Polonica}, \bold{61}, 701-719.
 #' @keywords datasets
 NULL
-
-
-
-
-
 
 #' Character-taxon matrix from Gauthier 1986
 #'
 #' The character-taxon matrix from Gauthier (1986).
 #'
-#'
 #' @name Gauthier1986
 #' @docType data
 #' @format A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
-#' @references Gauthier, J. A., 1986. Saurischian monophyly and the origin of
-#' birds. In Padian, K. (ed.) The Origin of Birds and the Evolution of Flight.
-#' Towne and Bacon, San Francisco, CA, United States, 1-55.
+#' @references Gauthier, J. A., 1986. Saurischian monophyly and the origin of birds. In Padian, K. (ed.) \emph{The Origin of Birds and the Evolution of Flight}. Towne and Bacon, San Francisco, CA, United States, 1-55.
 #' @keywords datasets
 NULL
-
-
-
-
 
 #' Character-taxon matrix from Michaux 1989
 #' 
 #' The character-taxon matrix from Michaux (1989).
 #' 
-#' 
 #' @name Michaux1989
 #' @docType data
 #' @format A character-taxon matrix in the format imported by
 #' \link{ReadMorphNexus}.
-#' @references Michaux, B., 1989. Cladograms can reconstruct phylogenies: an
-#' example from the fossil record. Alcheringa, 13, 21-36.
+#' @references Michaux, B., 1989. Cladograms can reconstruct phylogenies: an example from the fossil record. \emph{Alcheringa}, \bold{13}, 21-36.
 #' @keywords datasets
 NULL
 
