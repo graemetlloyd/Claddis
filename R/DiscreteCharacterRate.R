@@ -526,7 +526,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
       if(ChangeTimes == "spaced") CharacterChanges <- cbind(CharacterChanges, x$NodeAgeFromTo[1] - (seq(from = 0, to = x$BranchDuration, length.out = nrow(CharacterChanges) + 1)[1:nrow(CharacterChanges)] + (diff(seq(from = 0, to = x$BranchDuration, length.out = nrow(CharacterChanges) + 1))[1] / 2)))
       
       # If using random then set character change times as random draws from a uniform distribution:
-      if(ChangeTimes == "random") CharacterChanges <- cbind(CharacterChanges, x$NodeAgeFromTo[1] - runif(n = nrow(CharacterChanges), min = 0, max = x$BranchDuration))
+      if(ChangeTimes == "random") CharacterChanges <- cbind(CharacterChanges, x$NodeAgeFromTo[1] - stats::runif(n = nrow(CharacterChanges), min = 0, max = x$BranchDuration))
       
       # Add column name to change time column:
       colnames(CharacterChanges)[ncol(CharacterChanges)] <- "Time"
