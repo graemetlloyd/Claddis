@@ -14,7 +14,7 @@ DiscreteCharacterRate(tree, CladisticMatrix, TimeBins,
   EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE,
   EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE,
   PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp",
-  Threshold = 0.01)
+  Threshold = 0.01, LikelihoodTest = "AIC")
 }
 \arguments{
 \item{tree}{A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{CladisticMatrix}.}
@@ -58,6 +58,8 @@ DiscreteCharacterRate(tree, CladisticMatrix, TimeBins,
 \item{UncertaintyBehaviour}{Option passed to internal use of \link{AncStateEstMatrix}.}
 
 \item{Threshold}{Option passed to internal use of \link{AncStateEstMatrix}.}
+
+\item{LikelihoodTest}{Whether to apply an Akikae Information Criterion (\code{"AIC"}; the default) or likelihood ratio test (\code{"LRT"}).}
 }
 \value{
 \item{InferredCharacterChanges}{Matrix of inferred character changes.}
