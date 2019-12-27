@@ -15,7 +15,9 @@
 #'
 #' @seealso \link{WriteMorphTNT}
 #'
-#' @references Maddison, D. R., Swofford, D. L. and Maddison, W. P., 1997. NEXUS: an extensible file format for systematic information. Systematic Biology, 46, 590-621.
+#' @references
+#'
+#' Maddison, D. R., Swofford, D. L. and Maddison, W. P., 1997. NEXUS: an extensible file format for systematic information. \emph{Systematic Biology}, \bold{46}, 590-621.
 #'
 #' @examples
 #'
