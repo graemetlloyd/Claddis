@@ -24,6 +24,8 @@ Following Safe Taxonomic Reduction reinsert removed taxa.
 }
 \details{
 TEXT NEEDED!
+
+OPERATES ON TEXT FILES, NOT APE IMPORTED TREES AS ASSUMES VERY LARGE FILES AND HENCE WILL BE SLOW IF RUN ON APE FORMAT TREES
 }
 \examples{
 

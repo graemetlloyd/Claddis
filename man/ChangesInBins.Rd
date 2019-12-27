@@ -22,11 +22,11 @@ Calculates the total number of evolutionary changes in a series of time bins. Th
 }
 \examples{
 
-# Create a random dataset of 100 changes:
+# Create a random dataset of 100 changes (between 100 and 0 Ma):
 change.times <- runif(100, 0, 100)
 
-# Create time bins:
-time.bins <- seq(100, 0, length.out=11)
+# Create 10 equal-length time bins:
+time.bins <- seq(100, 0, length.out = 11)
 
 # Get N changes for each bin:
 ChangesInBins(change.times, time.bins)

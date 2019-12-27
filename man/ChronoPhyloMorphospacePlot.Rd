@@ -8,25 +8,24 @@ ChronoPhyloMorphospacePlot(pcoa_data, x_axis = 1, y_axis = 2,
   shadow = TRUE)
 }
 \arguments{
-\item{pcoa_data}{Principal coordinate data in the format output by 
-\link{MorphMatrix2PCoA} that includes a tree and ancestral states.}
+\item{pcoa_data}{Principal coordinate data in the format output by  \link{MorphMatrix2PCoA} that includes a tree and ancestral states.}
 
 \item{x_axis}{Which ordination axis to plot as the x-axis.}
 
 \item{y_axis}{Which ordination axis to plot as the y-axis.}
 
-\item{shadow}{Whether or not to plot a shadow (2D plot) on 
-the bottom face of the 3D plot (defaults to TRUE).}
+\item{shadow}{Whether or not to plot a shadow (2D plot) on the bottom face of the 3D plot (defaults to TRUE).}
 }
 \description{
-Plots a 3D chronophylomorphospace.
+Plots a three-dimensional chronophylomorphospace.
 }
 \details{
-Creates a movable three-dimensional (two ordination axes plus time) plot of a phylomorphospace.
+Creates a manually repositionable three-dimensional (two ordination axes plus time) plot of a phylomorphospace.
 
-Intended to mimic the data visualisation of Sakamoto and Ruta (2012; their Video S1).
+This function aims to mimic the data visualisation of Sakamoto and Ruta (2012; their Video S1).
 }
 \examples{
+
 \dontrun{
 require(rgl)
 
@@ -51,8 +50,7 @@ ChronoPhyloMorphospacePlot(pcoa_data)
 }
 }
 \references{
-Sakamoto, M. and Ruta, M. 2012. Convergence and divergence in the evolution of cat skulls:
- temporal and spatial patterns of morphological diversity. PLoS ONE, 7, e39752.
+Sakamoto, M. and Ruta, M. 2012. Convergence and divergence in the evolution of cat skulls: temporal and spatial patterns of morphological diversity. \emph{PLoS ONE}, \bold{7}, e39752.
 }
 \author{
 Emma Sherratt \email{emma.sherratt@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@gmail.com}

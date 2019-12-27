@@ -16,7 +16,7 @@ Nothing is returned, instead the aligned block is sent to the clipboard ready fo
 Given a block of taxa and characters aligns start of character block.
 }
 \details{
-The function serves to help build NEXUS files by neatly aligning block of taxa and characters. Or in simple terms it takes inut that looks like this:
+The function serves to help build NEXUS files by neatly aligning raw text blocks of taxa and characters. Or in simple terms it takes input that looks like this:
 
 \preformatted{Allosaurus  012100?1011
 Abelisaurus  0100???0000
@@ -30,7 +30,7 @@ Abelisaurus    0100???0000
 Tyrannosaurus  01012012010
 Yi             10101?0????}
 
-I use this in building the NEXUS on my site, \href{http://www.graemetlloyd.com/matr.html}{graemetlloyd.com}.
+I use this in building the NEXUS files on my site, \href{http://www.graemetlloyd.com/matr.html}{graemetlloyd.com}.
 }
 \examples{
 
@@ -43,8 +43,8 @@ x <- paste(c("Allosaurus  012100?1011",
 # Look at block pre-alignment:
 x
 
-# Example block from above:
-#BlockAligner(x)
+# Align block and place on clipboard:
+BlockAligner(x)
 
 # To test the response open a text editor and paste the
 # contents of the clipboard.

@@ -9,8 +9,6 @@
 The character-taxon matrix from Gauthier (1986).
 }
 \references{
-Gauthier, J. A., 1986. Saurischian monophyly and the origin of
-birds. In Padian, K. (ed.) The Origin of Birds and the Evolution of Flight.
-Towne and Bacon, San Francisco, CA, United States, 1-55.
+Gauthier, J. A., 1986. Saurischian monophyly and the origin of birds. In Padian, K. (ed.) \emph{The Origin of Birds and the Evolution of Flight}. Towne and Bacon, San Francisco, CA, United States, 1-55.
 }
 \keyword{datasets}

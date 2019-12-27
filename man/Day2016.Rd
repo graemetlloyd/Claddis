@@ -9,8 +9,6 @@
 The character-taxon matrix from Day et al. (2016).
 }
 \references{
-Day, M. O., Rubidge, B. S. and Abdala, F., 2016. A new mid-Permian
-burnetiamorph therapsid from the Main Karoo Basin of South Africa and a
-phylogenetic review of Burnetiamorpha. Acta Palaeontologica Polonica, 61, 701-719.
+Day, M. O., Rubidge, B. S. and Abdala, F., 2016. A new mid-Permian burnetiamorph therapsid from the Main Karoo Basin of South Africa and a phylogenetic review of Burnetiamorpha. \emph{Acta Palaeontologica Polonica}, \bold{61}, 701-719.
 }
 \keyword{datasets}

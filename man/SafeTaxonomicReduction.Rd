@@ -40,7 +40,7 @@ str.out$removed.matrix
 
 }
 \references{
-Wilkinson, M., 1995. Coping with abundant missing entries in phylogenetic inference using parsimony. Systematic Biology, 44, 501-514.
+Wilkinson, M., 1995. Coping with abundant missing entries in phylogenetic inference using parsimony. \emph{Systematic Biology}, \bold{44}, 501-514.
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

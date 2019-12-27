@@ -108,9 +108,9 @@ y
 
 }
 \references{
-Cailliez, F., 1983. The analytical solution of the additive constant problem. Psychometrika, 48, 305-308.
+Cailliez, F., 1983. The analytical solution of the additive constant problem. \emph{Psychometrika}, \bold{48}, 305-308.
 
-Gower, J. C., 1966. Some distance properties of latent root and vector methods used in multivariate analysis. Biometrika, 53, 325-338.
+Gower, J. C., 1966. Some distance properties of latent root and vector methods used in multivariate analysis. \emph{Biometrika}, \bold{53}, 325-338.
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

@@ -52,9 +52,9 @@ MorphospacePlot(pcoa_input, plot_taxon_names = TRUE)
 
 }
 \references{
-Wills, M. A., 1998. Cambrian and Recent disparity: the picture from priapulids. Paleobiology, 24, 177-199.
+Wills, M. A., 1998. Cambrian and Recent disparity: the picture from priapulids. \emph{Paleobiology}, \bold{24}, 177-199.
 
-Wills, M. A., Briggs, D. E. G. and Fortey, R. A., 1994. Disparity as an evolutionary index: a comparison of Cambrian and Recent arthropods. Paleobiology, 20, 93-130.
+Wills, M. A., Briggs, D. E. G. and Fortey, R. A., 1994. Disparity as an evolutionary index: a comparison of Cambrian and Recent arthropods. \emph{Paleobiology}, \bold{20}, 93-130.
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Emma Sherratt \email{emma.sherratt@gmail.com}

@@ -10,7 +10,6 @@
 The character-taxon matrix from Michaux (1989).
 }
 \references{
-Michaux, B., 1989. Cladograms can reconstruct phylogenies: an
-example from the fossil record. Alcheringa, 13, 21-36.
+Michaux, B., 1989. Cladograms can reconstruct phylogenies: an example from the fossil record. \emph{Alcheringa}, \bold{13}, 21-36.
 }
 \keyword{datasets}

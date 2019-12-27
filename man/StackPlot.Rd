@@ -2,7 +2,7 @@
 % Please edit documentation in R/StackPlot.R
 \name{StackPlot}
 \alias{StackPlot}
-\title{Plot Stacked Ordination Spaces}
+\title{Plot stacked ordination spaces}
 \usage{
 StackPlot(ordination_axes, ages, groups = NULL, time_slices,
   shear = 0.2, x_axis = 1, y_axis = 2, axis_label = "PC")
@@ -12,9 +12,9 @@ StackPlot(ordination_axes, ages, groups = NULL, time_slices,
 
 \item{ages}{A two-column matrix of the first and last apperance dates for the taxa in the same format supplied to \link{DatePhylo}.}
 
-\item{groups}{A vector of colours (for plotting) with for each object name.}
+\item{groups}{A vector of colours (for plotting) for each object name.}
 
-\item{time_slices}{A vector of the boundaries for a series of time slices.}
+\item{time_slices}{A vector of the boundaries (beginning and ending) for a series of time slices.}
 
 \item{shear}{A single value (0 to 1) for the degree of shearing in the stacked ordination spaces.}
 
@@ -87,17 +87,6 @@ names(groups) <- rownames(ordination_axes)
 # Make stacked ordination plot with convex hulls for groups:
 StackPlot(ordination_axes, ages, groups, time_slices)
 
-}
-\references{
-Foote, M., 1993. Discordance and concordance between morphological and taxonomic diversity. Paleobiology, 19, 185-204.
-
-Foote, M., 1994. Morphological disparity in Ordovician-Devonian crinoids and the early saturation of morphological space. Paleobiology, 20, 320-344.
-
-Foote, M., 1995. Morphological diversification of Paleozoic crinoids. Paleobiology, 21, 273-299.
-
-Foote, M., 1999. Morphological diversity in the evolutionary radiation of Paleozoic and post-Paleozoic crinoids. Paleobiology, 25, 1-115.
-
-Friedman, M. and Coates, M. I., 2006. A newly recognized fossil coelacanth highlights the early morphological diversification of the clade. Proceedings of the Royal Society of London B, 273, 245-250
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Emma Sherratt \email{emma.sherratt@gmail.com}
