@@ -4,19 +4,27 @@
 #'
 #' Writes out a morphological data file in Hennig86/TNT format.
 #'
-#' @param CladisticMatrix The cladistic matrix in the format imported by \link{ReadMorphNexus}.
+#' @param CladisticMatrix A cladistic matrix in the format imported by \link{ReadMorphNexus}.
 #' @param filename The file name to write to. Should end in \code{.tnt}.
 #' @param add.analysis.block Whether or not to add analysis block (i.e., tree search commands).
 #'
 #' @details
 #'
-#' Writes out a TNT (Goloboff et al. 2008) data file representing the distribution of discrete morphological characters in a set of taxa. Data must be in the format created by importing data with \link{ReadMorphNexus}.
+#' Writes out a TNT (Goloboff et al. 2008; Goloboff and Catalano 2016) data file representing the distribution of discrete morphological characters in a set of taxa. Data must be in the format created by importing data with \link{ReadMorphNexus}.
+#'
+#' Note that the format can currently deal with continuous characters, sequence (DNA) data, and combinations of these and discrete morphology, but not yet the morphometric format introduced in Goloboff and Catalano (2016).
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
-#' @seealso \link{WriteMorphNexus}
+#' @seealso
 #'
-#' @references Goloboff, P., Farris, J. and Nixon, K., 2008. TNT, a free program for phylogenetic analysis. Cladistics, 24, 774-786.
+#' \link{WriteMorphNexus}
+#'
+#' @references
+#'
+#' Goloboff, P. A. and Catalano, S. A., 2016. TNT version 1.5, including a full implementation of phylogenetic morphometrics/ \emph{Cladistics}, \bold{32}. 221-238
+#'
+#' Goloboff, P., Farris, J. and Nixon, K., 2008. TNT, a free program for phylogenetic analysis. \emph{Cladistics}, \bold{24}, 774-786.
 #'
 #' @examples
 #'
