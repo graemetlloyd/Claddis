@@ -162,6 +162,8 @@
 #' @export DiscreteCharacterRate
 DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01, LikelihoodTest = "AIC") {
   
+  # NEED TO CHECK FOR SINGLE PARTITION WITH LRT (ALLOWED WITH AIC)
+  
   # DESIDERATA (STUFF IT WOULD BE NICE TO ADD IN FUTURE):
   #
   # WRITE SEARCH VERSION FOR FINDING RATE SHIFTS? SHOULD THIS EVEN BE AN OPTION? DOES THIS REQUIRE MODIFYING LRT TO COMPARE E.G. 2-RATE DIRECTLY WITH 3-RATE MODEL? OR CAN USE OUTPUT P-VALUES AND CONVERT MODELS TO AICS? WOULD NEED TO PERMUTE ALL POSSIBLE COMBOS AND NOT SURE HOW LARGE THESE MIGHT GET. CAN CONVERT TO AICS SO THIS SHOULD BE IMPLEMENTED.
@@ -258,7 +260,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     PartitionsToTest <- lapply(PartitionsToTest, AddMissingPartitions, ValidValues = ValidValues)
     
     # Check partitions are all at least two in size or else no comparison can be made:
-    if(any(unlist(lapply(PartitionsToTest, length)) == 1)) stop("Partitions must divide the available data into at least two parts.")
+    if(any(unlist(lapply(PartitionsToTest, length)) == 1) && LikelihoodTest == "LRT") stop("Partitions must divide the available data into at least two parts if performing likelihood ratio tests.")
 
     # Return formatted partitions to test:
     return(PartitionsToTest)
@@ -693,7 +695,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     CladePartitionTestResults <- NULL
 
   }
-  
+
   # If performing branch partition tests:
   if(!is.null(CharacterPartitionsToTest)) {
     
@@ -728,7 +730,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     CharacterPartitionTestResults <- NULL
     
   }
-  
+
   # If performing time bin partition tests:
   if(!is.null(TimeBinPartitionsToTest)) {
     
@@ -766,53 +768,58 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     TimeBinTestResults <- NULL
     
   }
-  
+
   # Set global rate for output:
   GlobalRate <- sum(unlist(lapply(EdgeList, function(x) sum(x$CharacterChanges[, "Steps"] * x$CharacterChanges[, "Weight"])))) / sum(unlist(lapply(EdgeList, function(x) sum(Weights[x$ComparableCharacters]) / sum(Weights))) * unlist(lapply(EdgeList, function(x) x$BranchDuration)))
-
-  # Subfunction to calculate adjusted alphas for multiple comparison corrections:
-  AddMultipleComparisonCorrectionCutoffs <- function(TestResults, Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection) {
+  
+  # If performing Likelihood Ratio Test:
+  if(LikelihoodTest == "LRT") {
     
-    # Get number of comparisons performed:
-    NComparisons <- length(TestResults)
-    
-    # If using the Benjamini-Hochberg false discovery rate approach:
-    if(MultipleComparisonCorrection == "BenjaminiHochberg") {
+    # Subfunction to calculate adjusted alphas for multiple comparison corrections:
+    AddMultipleComparisonCorrectionCutoffs <- function(TestResults, Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection) {
       
-      # Set cutoff values:
-      CutoffValues <- ((1:NComparisons) / NComparisons) * Alpha
+      # Get number of comparisons performed:
+      NComparisons <- length(TestResults)
       
-      # Get actual p-values found:
-      PValues <- unlist(lapply(TestResults, '[[', "PValue"))
+      # If using the Benjamini-Hochberg false discovery rate approach:
+      if(MultipleComparisonCorrection == "BenjaminiHochberg") {
+        
+        # Set cutoff values:
+        CutoffValues <- ((1:NComparisons) / NComparisons) * Alpha
+        
+        # Get actual p-values found:
+        PValues <- unlist(lapply(TestResults, '[[', "PValue"))
+        
+        # Order cutoffs by p-value rank:
+        CutoffValues <- CutoffValues[rank(PValues, ties.method = "random")]
+        
+      }
       
-      # Order cutoffs by p-value rank:
-      CutoffValues <- CutoffValues[rank(PValues, ties.method = "random")]
+      # If using the Bonferroni correction set cutoff values as alpha over N:
+      if(MultipleComparisonCorrection == "Bonferroni") CutoffValues <- Alpha / NComparisons
+      
+      # Add cutoffs to output:
+      for(i in 1:length(TestResults)) TestResults[[i]]$CorrectedAlpha <- CutoffValues[i]
+      
+      # Return modified test results:
+      return(TestResults)
       
     }
     
-    # If using the Bonferroni correction set cutoff values as alpha over N:
-    if(MultipleComparisonCorrection == "Bonferroni") CutoffValues <- Alpha / NComparisons
+    # If doing branch partition tests then add multiple comparison alpha cutoffs:
+    if(!is.null(BranchPartitionsToTest)) BranchPartitionTestResults <- AddMultipleComparisonCorrectionCutoffs(TestResults = BranchPartitionTestResults, Alpha = Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection)
     
-    # Add cutoffs to output:
-    for(i in 1:length(TestResults)) TestResults[[i]]$CorrectedAlpha <- CutoffValues[i]
+    # If doing character partition tests then add multiple comparison alpha cutoffs:
+    if(!is.null(CharacterPartitionsToTest)) CharacterPartitionTestResults <- AddMultipleComparisonCorrectionCutoffs(TestResults = CharacterPartitionTestResults, Alpha = Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection)
     
-    # Return modified test results:
-    return(TestResults)
+    # If doing clade partition tests then add multiple comparison alpha cutoffs:
+    if(!is.null(CladePartitionsToTest)) CladePartitionTestResults <- AddMultipleComparisonCorrectionCutoffs(TestResults = CladePartitionTestResults, Alpha = Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection)
+    
+    # If doing time bin partition tests then add multiple comparison alpha cutoffs:
+    if(!is.null(TimeBinPartitionsToTest)) TimeBinTestResults <- AddMultipleComparisonCorrectionCutoffs(TestResults = TimeBinTestResults, Alpha = Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection)
     
   }
-  
-  # If doing branch partition tests then add multiple comparison alpha cutoffs:
-  if(!is.null(BranchPartitionsToTest)) BranchPartitionTestResults <- AddMultipleComparisonCorrectionCutoffs(TestResults = BranchPartitionTestResults, Alpha = Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection)
-  
-  # If doing character partition tests then add multiple comparison alpha cutoffs:
-  if(!is.null(CharacterPartitionsToTest)) CharacterPartitionTestResults <- AddMultipleComparisonCorrectionCutoffs(TestResults = CharacterPartitionTestResults, Alpha = Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection)
-  
-  # If doing clade partition tests then add multiple comparison alpha cutoffs:
-  if(!is.null(CladePartitionsToTest)) CladePartitionTestResults <- AddMultipleComparisonCorrectionCutoffs(TestResults = CladePartitionTestResults, Alpha = Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection)
-  
-  # If doing time bin partition tests then add multiple comparison alpha cutoffs:
-  if(!is.null(TimeBinPartitionsToTest)) TimeBinTestResults <- AddMultipleComparisonCorrectionCutoffs(TestResults = TimeBinTestResults, Alpha = Alpha, MultipleComparisonCorrection = MultipleComparisonCorrection)
-  
+
   # Compile output:
   Output <- list(AllChanges, GlobalRate, ContinuousCharactersConverted, BranchPartitionTestResults, CharacterPartitionTestResults, CladePartitionTestResults, TimeBinTestResults)
   
