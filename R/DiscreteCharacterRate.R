@@ -2,18 +2,19 @@
 #'
 #' @description
 #'
-#' Given a tree and a cladistic-type matrix uses likelihood ratio tests to compare N-rate and 1-rate models across branches, clades, time bins, or character partitions.
+#' Given a tree and a cladistic-type matrix uses either likelihood ratio tests or the Akiake Information Criterion to compare rate models across branches, clades, time bins, or character partitions.
 #'
 #' @param tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{CladisticMatrix}.
 #' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
 #' @param TimeBins A vector of ages (in millions of years) indicating the boundaries of a series of time bins in order from oldest to youngest.
-#' @param BranchPartitionsToTest A list of branch(es) (edge numbers) to test for a 2-rate parameter model (i.e., one rate for the edge and another for the rest of the tree). If NULL (the default) then no partition test(s) will be made.
-#' @param CharacterPartitionsToTest A list of character partition(s) (character numbers) to test for a 2-rate parameter model (i.e., one rate for the partition and another for the remaining characters). If NULL (the default) then no partition test(s) will be made.
-#' @param CladePartitionsToTest A list of clade partition(s) (node numbers) to test for a 2-rate parameter model (i.e., one rate for the clade and another for the rest of the tree). If NULL (the default) then no partition test(s) will be made.
-#' @param TimeBinPartitionsToTest A list of time bin partition(s) (numbered 1 to N) to test for a 2-rate parameter model (i.e., one rate for the time bin(s) and another for the remaining time bins). If NULL (the default) then no partition test(s) will be made.
+#' @param BranchPartitionsToTest A list of branch(es) (edge number) partitions to test as N-rate parameter model (where N is the total number of partitions). If NULL (the default) then no partition test(s) will be made.
+#' @param CharacterPartitionsToTest A list of character partition(s) (character numbers) to test as N-rate parameter model (where N is the total number of partitions). If NULL (the default) then no partition test(s) will be made.
+#' @param CladePartitionsToTest A list of clade partition(s) (node numbers) to test as N-rate parameter model (where N is the total number of partitions). If NULL (the default) then no partition test(s) will be made.
+#' @param TimeBinPartitionsToTest A list of time bin partition(s) (numbered 1 to N) to test as N-rate parameter model (where N is the total number of partitions). If NULL (the default) then no partition test(s) will be made.
 #' @param ChangeTimes The time at which to record the character changes. One of \code{"midpoint"} (changes occur at the midpoint of the branch), \code{"spaced"} (changes equally spaced along branch), or \code{"random"} (change times drawn at random from a uniform distribution; the default and recommended option). Note: this is only meaningful if testing for time bin partitions.
-#' @param Alpha The alpha value to be used for the significance tests. The default is 0.01.
-#' @param MultipleComparisonCorrection One of \code{"BenjaminiHochberg"} (the Benjamini and Hochberg 1995 false discovery rate approach; default and recommended) or \code{"Bonferroni"} (the Bonferroni correction).
+#' @param LikelihoodTest Whether to apply an Akaike Information Criterion (\code{"AIC"}; the default) or likelihood ratio test (\code{"LRT"}).
+#' @param Alpha The alpha value to be used for the significance tests (only relevant if using the likelihood ratio test). The default is 0.01.
+#' @param MultipleComparisonCorrection One of \code{"BenjaminiHochberg"} (the Benjamini and Hochberg 1995 false discovery rate approach; default and recommended) or \code{"Bonferroni"} (the Bonferroni correction). Only relevant if using the likelihood ratio test.
 #' @param PolymorphismState One of \code{"missing"} (converts polymorphic values to NA; the default) or \code{"random"} (picks one of the possible polymorphic states at random).
 #' @param UncertaintyState One of \code{"missing"} (converts uncertain values to NA; the default) or \code{"random"} (picks one of the possible uncertain states at random).
 #' @param InapplicableState The only current option is \code{"missing"} (converts value to NA).
@@ -25,7 +26,6 @@
 #' @param PolymorphismBehaviour Option passed to internal use of \link{AncStateEstMatrix}.
 #' @param UncertaintyBehaviour Option passed to internal use of \link{AncStateEstMatrix}.
 #' @param Threshold Option passed to internal use of \link{AncStateEstMatrix}.
-#' @param LikelihoodTest Whether to apply an Akikae Information Criterion (\code{"AIC"}; the default) or likelihood ratio test (\code{"LRT"}).
 #'
 #' @details
 #'
@@ -33,13 +33,13 @@
 #'
 #' Morphological change can be captured by discrete characters and their evolution modelled as occurring along the branches of a phylogenetic tree. This function takes as primary input a character-taxon matrix of discrete characters (in the format imported by \link{ReadMorphNexus}) and a time-scaled phylogenetic tree (in the format of \pkg{paleotree} or \pkg{strap}) and begins by inferring ancestral states at the tree's internal nodes using the \link{AncStateEstMatrix} function. From here changes along individual branches can be estimated (only the minimum number of changes are inferred; see \link{GetAllStateChanges} for an alternative but unfinished approach) and hence rates can be calculated.
 #'
-#' A discrete character rate can be expressed as the mean number of changes per million years (users may wish to normalise this by the number of characters for interpretation) and can be calculated for a branch (edge) of the tree, a clade (a mean rate for the edges descended from a single node), a character partition (the mean rate for a subset of the characters across all edges), or, most complex (see Lloyd 2016), the mean rate across the edges (or parts of edges) present in a time bin (defined by two values denoting the beginning and end of the time bin). In an ideal scenario these rates could be compared at face value, but that would require a large number of characters and very minimal (or zero) missing data. I.e., at an extreme of missing data if only one character can be observed along a branch it will either change (the maximum possible rate of evolution) or it will not (the minimum possible rate of evolution). In such cases it would be unwise to consider either outcome as being a significant departure from the mean rate.
+#' A discrete character rate can be expressed as the mean number of changes per million years (users may wish to normalise this by the number of characters for interpretation) and can be calculated for a branch (edge) of the tree, a clade (a mean rate for the edges descended from a single node), a character partition (the mean rate for a subset of the characters across all edges), or, most complex (see Lloyd 2016), the mean rate across the edges (or parts of edges) present in a time bin (defined by two values denoting the beginning and end of the time bin). In an ideal scenario these rates could be compared at face value, but that would require a large number of characters and very minimal (or zero) missing data. I.e., at an extreme of missing data if only one character can be observed along a branch it will either change (the maximum possible inferrable rate of evolution) or it will not (the minimum possible inferrable rate of evolution). In such cases it would be unwise to consider either outcome as being a significant departure from the mean rate.
 #'
-#' Because of these complications Lloyd et al. (2012) devised tests by which the significance of an edge (or other paritioning of the data, i.e., a clade, time bin etc.) could be considered to be significantly high or low in comparison to the mean rate for the whole tree (i.e., whether a two-rate model could be considered more likely than a one-rate model). This is achieved through a likelihood ratio test:
+#' Because of these complications Lloyd et al. (2012) tests by which the significance of an edge (or other paritioning of the data, i.e., a clade, time bin etc.) could be considered to be significantly high or low in comparison to the mean rate for the whole tree (i.e., whether a two-rate model could be considered more likely than a one-rate model). This is achieved through a likelihood ratio test:
 #'
 #' \deqn{LR = value of likehood function under the null (one-rate) hypothesis / maximum possible value of likehood function under the alternative (two-rate) hypotheses}
 #'
-#' Typically we might expect the two hypotheses to be well defined a priori. E.g., an expectation that a specific branch of the tree might have a higher or lower rate than background due to some evolutionary shift. However, Lloyd et al. (2012) instead provided an exploratory approach whereby every possible one edge value was compared with the rate for the rest of the tree (and the equivalent with clades and time bins). This was the default in Claddis up to version 0.2, but this has now been replaced (since version 0.3) with a more customisable set of options that allows different types of hypotheses (e.g., partitioning the data by character), as well as more complex hypotheses (e.g., a three-rate model), to be tested.
+#' Typically we might expect the two hypotheses to be well defined a priori. E.g., an expectation that a specific branch of the tree might have a higher or lower rate than background due to some evolutionary shift. However, Lloyd et al. (2012) instead provided an exploratory approach whereby every possible one edge value was compared with the rate for the rest of the tree (and the equivalent with clades and time bins). This was the default in Claddis up to version 0.2, but this has now been replaced (since version 0.3) with a more customisable set of options that allows different types of hypotheses (e.g., partitioning the data by character), as well as more complex hypotheses (e.g., a three-rate model), to be tested. Since version 0.4 the option to replace likelihood ratio tests with the Akaike Information Criterion has also been added.
 #'
 #' \bold{The four types of rate hypothesis}
 #'
@@ -160,7 +160,7 @@
 #'   "Lloyd")
 #'
 #' @export DiscreteCharacterRate
-DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01, LikelihoodTest = "AIC") {
+DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", LikelihoodTest = "AIC", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
   
   # NEED TO CHECK FOR SINGLE PARTITION WITH LRT (ALLOWED WITH AIC)
   
