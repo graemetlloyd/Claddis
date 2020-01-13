@@ -59,6 +59,7 @@
 #' @export AncStateEstMatrix
 AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
   
+  # Add conditional for case where there is only one state (constant characters) - just estimate that state for those nodes.
   # How to get tip states for a continuous character?
   # How to deal with step matrices?
   # Change help file to explain interactions between all options, e.g., if doing all chars then polymorphisms used for discrete, midpoint for continuous etc.
