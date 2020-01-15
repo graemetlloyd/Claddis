@@ -79,6 +79,7 @@
 MorphMatrix2PCoA <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills", TransformDistances = "arcsine_sqrt", DistPolymorphismBehaviour = "min.difference", DistUncertaintyBehaviour = "min.difference", DistInapplicableBehaviour = "missing", CharacterDependencies = NULL, Alpha = 0.5, correction = "cailliez", Tree = NULL, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, AncestralPolymorphismBehaviour = "equalp", AncestralUncertaintyBehaviour = "equalp", Threshold = 0.01) {
     
 # Add some top level conditionsl here to check input is valid.
+# NEED TO PERMUTE THROUGH ISSUE WITH WHAT VECTORS TO USE FROM ape::pcoa() AS HAS RAW AND CORRECTED VERSIONS. (E.G., PLOTTING FUNCTIONS NEED THIS
   
   # If no tree is supplied:
   if(is.null(Tree)) {
