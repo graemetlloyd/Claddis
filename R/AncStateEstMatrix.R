@@ -303,8 +303,20 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
     # If character is discrete:
     } else {
       
-      # Get ancestral states using rerooting method:
-      x$AncestralStates <- rerootingMethod(tree = x$Tree, x = x$TipStates, model = x$Model)$marginal.anc
+      # If invariant character:
+      if(ncol(x$TipStates) == 1) {
+        
+        # Get number of tips:
+        NTreeTips <- ape::Ntip(x$Tree)
+        
+        
+        # Set ancestral states as all the same:
+        x$AncestralStates <- matrix(rep(x = 1, times = (NTreeTips + x$Tree$Nnode)), ncol = 1, dimnames = list(c(x$Tree$tip.label, (NTreeTips + 1):(NTreeTips + x$Tree$Nnode)), colnames(x$TipStates)))
+      
+      }
+      
+      # If variant character then get ancestral states using rerooting method:
+      if(ncol(x$TipStates) > 1) x$AncestralStates <- rerootingMethod(tree = x$Tree, x = x$TipStates, model = x$Model)$marginal.anc
       
       # Reformat to most likely state
       x$AncestralStates <- unlist(lapply(lapply(apply(x$AncestralStates, 1, list), unlist), function(x) {paste(names(x[x > (max(x) - Threshold)]), collapse = "/")}))
