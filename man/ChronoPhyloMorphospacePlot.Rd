@@ -4,8 +4,7 @@
 \alias{ChronoPhyloMorphospacePlot}
 \title{Chronophylomorphospace Plot}
 \usage{
-ChronoPhyloMorphospacePlot(pcoa_data, x_axis = 1, y_axis = 2,
-  shadow = TRUE)
+ChronoPhyloMorphospacePlot(pcoa_data, x_axis = 1, y_axis = 2, shadow = TRUE)
 }
 \arguments{
 \item{pcoa_data}{Principal coordinate data in the format output by  \link{MorphMatrix2PCoA} that includes a tree and ancestral states.}

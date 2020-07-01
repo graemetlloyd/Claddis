@@ -4,9 +4,15 @@
 \alias{GetAllStateChanges}
 \title{Finds all state changes on a tree using stochastic character mapping}
 \usage{
-GetAllStateChanges(CladisticMatrix, Tree, TimeBins, NSimulations = 10,
-  PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp",
-  InapplicableBehaviour = "missing")
+GetAllStateChanges(
+  CladisticMatrix,
+  Tree,
+  TimeBins,
+  NSimulations = 10,
+  PolymorphismBehaviour = "equalp",
+  UncertaintyBehaviour = "equalp",
+  InapplicableBehaviour = "missing"
+)
 }
 \arguments{
 \item{CladisticMatrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}

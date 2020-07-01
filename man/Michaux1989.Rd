@@ -4,8 +4,10 @@
 \name{Michaux1989}
 \alias{Michaux1989}
 \title{Character-taxon matrix from Michaux 1989}
-\format{A character-taxon matrix in the format imported by
-\link{ReadMorphNexus}.}
+\format{
+A character-taxon matrix in the format imported by
+\link{ReadMorphNexus}.
+}
 \description{
 The character-taxon matrix from Michaux (1989).
 }

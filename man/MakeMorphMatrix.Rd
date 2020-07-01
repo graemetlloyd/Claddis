@@ -4,9 +4,15 @@
 \alias{MakeMorphMatrix}
 \title{Creates a morphological data file from a matrix}
 \usage{
-MakeMorphMatrix(CharacterTaxonMatrix, header = "", Weights = NULL,
-  ordering = NULL, symbols = NULL, equalise.weights = FALSE,
-  ignore.duplicate.taxa = FALSE)
+MakeMorphMatrix(
+  CharacterTaxonMatrix,
+  header = "",
+  Weights = NULL,
+  ordering = NULL,
+  symbols = NULL,
+  equalise.weights = FALSE,
+  ignore.duplicate.taxa = FALSE
+)
 }
 \arguments{
 \item{CharacterTaxonMatrix}{A Character-Taxon (columns-rows) matrix, with taxon names as rownames.}

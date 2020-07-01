@@ -4,12 +4,17 @@
 \alias{MorphDistMatrix}
 \title{Get distance matrices from a cladistic matrix}
 \usage{
-MorphDistMatrix(CladisticMatrix, Distance = "MORD", GEDType = "Wills",
+MorphDistMatrix(
+  CladisticMatrix,
+  Distance = "MORD",
+  GEDType = "Wills",
   TransformDistances = "arcsine_sqrt",
   PolymorphismBehaviour = "min.difference",
   UncertaintyBehaviour = "min.difference",
-  InapplicableBehaviour = "missing", CharacterDependencies = NULL,
-  Alpha = 0.5)
+  InapplicableBehaviour = "missing",
+  CharacterDependencies = NULL,
+  Alpha = 0.5
+)
 }
 \arguments{
 \item{CladisticMatrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}

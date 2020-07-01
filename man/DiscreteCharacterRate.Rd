@@ -4,17 +4,30 @@
 \alias{DiscreteCharacterRate}
 \title{Discrete character rates across trees, time, and character types}
 \usage{
-DiscreteCharacterRate(tree, CladisticMatrix, TimeBins,
-  BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL,
-  CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL,
-  ChangeTimes = "random", LikelihoodTest = "AIC", Alpha = 0.01,
+DiscreteCharacterRate(
+  tree,
+  CladisticMatrix,
+  TimeBins,
+  BranchPartitionsToTest = NULL,
+  CharacterPartitionsToTest = NULL,
+  CladePartitionsToTest = NULL,
+  TimeBinPartitionsToTest = NULL,
+  ChangeTimes = "random",
+  LikelihoodTest = "AIC",
+  Alpha = 0.01,
   MultipleComparisonCorrection = "BenjaminiHochberg",
-  PolymorphismState = "missing", UncertaintyState = "missing",
-  InapplicableState = "missing", TimeBinApproach = "Lloyd",
-  EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE,
-  EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE,
-  PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp",
-  Threshold = 0.01)
+  PolymorphismState = "missing",
+  UncertaintyState = "missing",
+  InapplicableState = "missing",
+  TimeBinApproach = "Lloyd",
+  EnsureAllWeightsAreIntegers = FALSE,
+  EstimateAllNodes = FALSE,
+  EstimateTipValues = FALSE,
+  InapplicablesAsMissing = FALSE,
+  PolymorphismBehaviour = "equalp",
+  UncertaintyBehaviour = "equalp",
+  Threshold = 0.01
+)
 }
 \arguments{
 \item{tree}{A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{CladisticMatrix}.}

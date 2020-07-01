@@ -4,8 +4,13 @@
 \alias{MatrixPruner}
 \title{Prunes a character matrix of characters or taxa}
 \usage{
-MatrixPruner(CladisticMatrix, blocks2prune = c(),
-  characters2prune = c(), taxa2prune = c(), removeinvariant = FALSE)
+MatrixPruner(
+  CladisticMatrix,
+  blocks2prune = c(),
+  characters2prune = c(),
+  taxa2prune = c(),
+  removeinvariant = FALSE
+)
 }
 \arguments{
 \item{CladisticMatrix}{The cladistic matrix in the format imported by \link{ReadMorphNexus}.}

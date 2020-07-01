@@ -4,8 +4,12 @@
 \alias{SafeTaxonomicReinsertion}
 \title{Reinsert Safely Removed Taxa Into A Tree}
 \usage{
-SafeTaxonomicReinsertion(treefile.in, treefile.out, str.list,
-  multi.placements = "exclude")
+SafeTaxonomicReinsertion(
+  treefile.in,
+  treefile.out,
+  str.list,
+  multi.placements = "exclude"
+)
 }
 \arguments{
 \item{treefile.in}{A Newick-formatted tree file containing tree(s) without safely removed taxa.}

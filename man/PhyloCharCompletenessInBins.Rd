@@ -4,8 +4,13 @@
 \alias{PhyloCharCompletenessInBins}
 \title{Phylogenetic character completeness in time-bins}
 \usage{
-PhyloCharCompletenessInBins(CladisticMatrix, TimeTree, TimeBins,
-  plot = FALSE, CI = 0.95)
+PhyloCharCompletenessInBins(
+  CladisticMatrix,
+  TimeTree,
+  TimeBins,
+  plot = FALSE,
+  CI = 0.95
+)
 }
 \arguments{
 \item{CladisticMatrix}{A cladistic matrix in the form imported by \link{ReadMorphNexus}.}

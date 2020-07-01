@@ -38,7 +38,7 @@ I use this in building the NEXUS files on my site, \href{http://www.graemetlloyd
 x <- paste(c("Allosaurus  012100?1011",
   "Abelisaurus  0100???0000",
   "Tyrannosaurus  01012012010",
-  "Yi  10101?0????"), collapse = "\\n")
+  "Yi  10101?0????"), collapse = "\n")
 
 # Look at block pre-alignment:
 x

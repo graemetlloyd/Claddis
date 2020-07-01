@@ -4,16 +4,25 @@
 \alias{MorphMatrix2PCoA}
 \title{Principal Coordinates on a Cladistic Matrix}
 \usage{
-MorphMatrix2PCoA(CladisticMatrix, Distance = "MORD", GEDType = "Wills",
+MorphMatrix2PCoA(
+  CladisticMatrix,
+  Distance = "MORD",
+  GEDType = "Wills",
   TransformDistances = "arcsine_sqrt",
   DistPolymorphismBehaviour = "min.difference",
   DistUncertaintyBehaviour = "min.difference",
-  DistInapplicableBehaviour = "missing", CharacterDependencies = NULL,
-  Alpha = 0.5, correction = "cailliez", Tree = NULL,
-  EstimateAllNodes = FALSE, EstimateTipValues = FALSE,
+  DistInapplicableBehaviour = "missing",
+  CharacterDependencies = NULL,
+  Alpha = 0.5,
+  correction = "cailliez",
+  Tree = NULL,
+  EstimateAllNodes = FALSE,
+  EstimateTipValues = FALSE,
   InapplicablesAsMissing = FALSE,
   AncestralPolymorphismBehaviour = "equalp",
-  AncestralUncertaintyBehaviour = "equalp", Threshold = 0.01)
+  AncestralUncertaintyBehaviour = "equalp",
+  Threshold = 0.01
+)
 }
 \arguments{
 \item{CladisticMatrix}{A vector of mode character representing the tip names for which an ancestor is sought.}

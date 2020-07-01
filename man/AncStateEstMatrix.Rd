@@ -4,10 +4,16 @@
 \alias{AncStateEstMatrix}
 \title{Ancestral Character State Estimation}
 \usage{
-AncStateEstMatrix(CladisticMatrix, Tree, EstimateAllNodes = FALSE,
-  EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE,
-  PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp",
-  Threshold = 0.01)
+AncStateEstMatrix(
+  CladisticMatrix,
+  Tree,
+  EstimateAllNodes = FALSE,
+  EstimateTipValues = FALSE,
+  InapplicablesAsMissing = FALSE,
+  PolymorphismBehaviour = "equalp",
+  UncertaintyBehaviour = "equalp",
+  Threshold = 0.01
+)
 }
 \arguments{
 \item{CladisticMatrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
