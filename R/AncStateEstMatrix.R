@@ -59,9 +59,9 @@
 #' @export AncStateEstMatrix
 AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
   
-  # Add conditional for case where there is only one state (constant characters) - just estimate that state for those nodes.
   # How to get tip states for a continuous character?
   # How to deal with step matrices?
+  # How to deal with models where intermeidate tip states are not even in sample
   # Change help file to explain interactions between all options, e.g., if doing all chars then polymorphisms used for discrete, midpoint for continuous etc.
   
   # Catch problem with trees with no branch lengths:
@@ -291,7 +291,7 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   # Add ancestral state model for each character:
   DataAsList <- lapply(DataAsList, ModelBuilder)
 
-  # Sunfunctio to get ancestral states:
+  # Sunfunction to get ancestral states:
   GetAncStates <- function(x, EstimateTipValues, Threshold) {
     
     # If character is continuous:
@@ -308,7 +308,6 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
         
         # Get number of tips:
         NTreeTips <- ape::Ntip(x$Tree)
-        
         
         # Set ancestral states as all the same:
         x$AncestralStates <- matrix(rep(x = 1, times = (NTreeTips + x$Tree$Nnode)), ncol = 1, dimnames = list(c(x$Tree$tip.label, (NTreeTips + 1):(NTreeTips + x$Tree$Nnode)), colnames(x$TipStates)))
@@ -340,13 +339,11 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   # Get just unique strings (i.e., just those trees that need toa ctyal map to full tree):
   UniqueNewickStrings <- unique(NewickStrings)
   
-  # Convert unique Newcik strings to unique trees:
+  # Convert unique Newick strings to unique trees:
   UniqueTrees <- read.tree(text = UniqueNewickStrings)
   
   # If only a single tree reformat as a list:
-  if(inherits(UniqueTrees, what = "phylo")){
-    UniqueTrees <- list(UniqueTrees)
-    }
+  if(inherits(UniqueTrees, what = "phylo")) UniqueTrees <- list(UniqueTrees)
   
   # Subfunction map nodes from pruned tree to full tree:
   MapPrunedTreeNodesToFullTreeNodes <- function(tree, fulltree) {
