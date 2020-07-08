@@ -341,7 +341,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     
   }
   
-  # Subfunction to calculate maximum likelihood p value:
+  # Subfunction to calculate AIC:
   GetAIC <- function(SampledRates, SampledChanges, SampledCompleteness, SampledTime) {
     
     # Get log maximum likelihood estimate:
@@ -349,6 +349,20 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     
     # Calculate AIC:
     AIC <- (2 * length(SampledRates)) - (2 * LogMLE)
+    
+    # Return AIC:
+    return(AIC)
+    
+  }
+  
+  # Subfunction to calculate AIC from partition (with columns labelled Partition, Rate, Completeness, Duration):
+  GetAICFromPartition <- function(Partition) {
+    
+    # Get log maximum likelihood estimate:
+    LogMLE <- sum(log(dpois(round(Partition[, "Changes"]), Partition[, "Rate"] * Partition[, "Completeness"] * Partition[, "Duration"])))
+    
+    # Calculate AIC:
+    AIC <- (2 * max(Partition[, "Partition"])) - (2 * LogMLE)
     
     # Return AIC:
     return(AIC)
@@ -774,17 +788,30 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     # Set global rate (NB: will differ between Close and Lloyd approaches, but Lloyd approach will match edge or character global rate):
     GlobalRate <- sum(TimeBinChanges) / sum(TimeBinCompleteness * TimeBinDurations)
     
-    # Build partitioned data matrices (NB: completeness and duration get combined here as they cannot be summed separately later):
-    PartitionedData <- lapply(TimeBinPartitionsToTest, function(x) matrix(unlist(lapply(x, function(y) c(sum(TimeBinChanges[y]), sum(TimeBinCompleteness[y] * TimeBinDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))
+    # If using Likelihood Ratio Test:
+    if(LikelihoodTest == "LRT") {
+      
+      # Build partitioned data matrices (NB: completeness and duration get combined here as they cannot be summed separately later) for LRT:
+      PartitionedData <- lapply(TimeBinPartitionsToTest, function(x) matrix(unlist(lapply(x, function(y) c(sum(TimeBinChanges[y]), sum(TimeBinCompleteness[y] * TimeBinDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))
+      
+      # Add sampled rate to paritioned data matrices for LRT:
+      PartitionedData <- lapply(PartitionedData, function(x) {x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x); colnames(x)[1] <- "Rate"; x})
+      
+      # Get P-Values and combine output as edge test results:
+      TimeBinTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], GetMaximumLikelihoodPValue(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "PValue"); x})
+      
+    }
     
-    # Add sampled rate to paritioned data matrices:
-    PartitionedData <- lapply(PartitionedData, function(x) {x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x); colnames(x)[1] <- "Rate"; x})
     
-    # Get P-Values and combine output as edge test results:
-    if(LikelihoodTest== "LRT") TimeBinTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], GetMaximumLikelihoodPValue(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "PValue"); x})
-    
-    # Get AIC and combine output as edge test results:
-    if(LikelihoodTest== "AIC") TimeBinTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], GetAIC(SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "AIC"); x})
+    if(LikelihoodTest == "AIC") {
+      
+      # Build partitioned data for AIC:
+      PartitionedData <- lapply(TimeBinPartitionsToTest, function(x) {y <- cbind(Partition = rep(NA, length(TimeBinChanges)), Rate = rep(NA, length(TimeBinChanges)), Changes = TimeBinChanges, Completeness = TimeBinCompleteness * TimeBinDurations, Duration = rep(1, length(TimeBinChanges))); y[, "Rate"] <- as.numeric(gsub(NaN, 0, unlist(lapply(x, function(x) rep(sum(y[x, "Changes"]) / sum(y[x, "Completeness"]), length(x)))))); y[, "Partition"] <- rep(1:length(x), unlist(lapply(x, length))); y})
+      
+      # Get AIC and rate results:
+      TimeBinTestResults <- lapply(PartitionedData, function(x) list(Rates = unname(unlist(lapply(as.list(unique(x[, "Partition"])), function(y) x[x[, "Partition"] == y, "Rate"][1]))), AIC = GetAICFromPartition(x)))
+      
+    }
     
   # If not performing time bin partition tests:
   } else {
@@ -872,9 +899,9 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
 #BranchPartitionsToTest <- NULL
 #CharacterPartitionsToTest <- NULL
 #CladePartitionsToTest = NULL
-#TimeBinPartitionsToTest = TimeBinPartitioner(7)[-1]
+#TimeBinPartitionsToTest = TimeBinPartitioner(7)
 #ChangeTimes = "random"
-#LikelihoodTest = "LRT"
+#LikelihoodTest = "AIC"
 #Alpha = 0.01
 #MultipleComparisonCorrection = "BenjaminiHochberg"
 #PolymorphismState = "missing"
