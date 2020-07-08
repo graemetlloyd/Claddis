@@ -181,11 +181,13 @@
 #' @export DiscreteCharacterRate
 DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", LikelihoodTest = "AIC", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
   
+  # AIC IS BROKEN AS NEEDS ACROSS FULL PARTITIONS TO MAKE SENSE
+  
   # NEED TO CHECK FOR SINGLE PARTITION WITH LRT (ALLOWED WITH AIC)
   # NEED TO CHECK FOR FULLY BIFURCATING IF IMPLEMENTING WANG STUDENTS APPROACH? OR IS THAT DONE ANYWAY?
   # IF USING AIC NEED TO CHECK FOR EACH TEST TYPE AT LEAST TWO PARTITIONS ARE SUPPLIED OR ELSE THE RESULTS ARE MEANINGLESS
   # ADD CHECK TO INCLUDE ALL LESS COMPLEX SUBPARTITIONS OF ANY 3 OR MORE SIZE PARTITOINING OF THE DATA
-  # ADD SAMPLE-SIE CORRECTED AIC (AICc)
+  # ADD SAMPLE-SIZE CORRECTED AIC (AICc)
   
   # DESIDERATA (STUFF IT WOULD BE NICE TO ADD IN FUTURE):
   #
@@ -745,7 +747,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     
     # Get AIC and combine output as edge test results:
     if(LikelihoodTest== "AIC") CharacterPartitionTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], GetAIC(SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "AIC"); x})
-
+    
   # If performing branch partition tests:
   } else {
     
@@ -853,3 +855,38 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
   return(Output)
 
 }
+
+#Ages <- read.table("~/Documents/Packages/Claddis/LungfishTest/ages.txt", sep =",")
+#Matrix <- Claddis::ReadMorphNexus("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.nex")
+#Tree <- ape::read.tree("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.tre")
+#TimeBins <- c(443.8, 419.2, 358.9, 298.9, 251.9, 201.3, 145.0, 0.0)
+
+#Tree <- Tree[sample(1:100000, 100)]
+#Tree <- lapply(Tree, function(x) strap::DatePhylo(x, Ages, rlen = 2, method = "equal"))
+#class(Tree) <- "multiPhylo"
+
+
+#tree <- Tree[[1]]
+#CladisticMatrix <- Matrix
+#TimeBins <- TimeBins
+#BranchPartitionsToTest <- NULL
+#CharacterPartitionsToTest <- NULL
+#CladePartitionsToTest = NULL
+#TimeBinPartitionsToTest = TimeBinPartitioner(7)[-1]
+#ChangeTimes = "random"
+#LikelihoodTest = "LRT"
+#Alpha = 0.01
+#MultipleComparisonCorrection = "BenjaminiHochberg"
+#PolymorphismState = "missing"
+#UncertaintyState = "missing"
+#InapplicableState = "missing"
+#TimeBinApproach = "Lloyd"
+#EnsureAllWeightsAreIntegers = FALSE
+#EstimateAllNodes = FALSE
+#EstimateTipValues = FALSE
+#InapplicablesAsMissing = FALSE
+#PolymorphismBehaviour = "equalp"
+#UncertaintyBehaviour = "equalp"
+#Threshold = 0.01
+
+
