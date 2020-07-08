@@ -68,7 +68,7 @@
 #'
 #' Since Claddis version 0.4 the option to use the Akaike Information Criterion (AIC) instead of likelihood ratio tests (LRTs) has been added. Practically speaking the AIC simply uses the denominator term from the LRT (see equation above) and adds a penalty for the number of parameters (partitions). However, it also fundamentally alters the comparative framework applied and hence needs more careful attention from the user to be applied correctly. Specifically, the LRT is by its nature comparative, always comparing an N-rate partition with a one-rate partition. By contrast the AIC does not directly apply any comparison and so the user must logically supply multiple partitionings of the data in order for the results to be meaningful. It might be assumed that a user will always want to apply a single partition that pools all the data for each type of test, whether this is all the edges (branches), time bins or characters. This will thus be the obvious comparator for any multiple partition supplied, ensuring that any more complex paritioning is minimally superior to this. Additionally, it is alos logical to consider each possible way of joining partitions simpler than the most complex partition being considered. E.g., if considering a four-partition model then the user should also consider all possible three-partition and two-partition combinations of that four-partition model. This can obviously lead to some complexity in supplying partitions on the user's part and so some automating of this process is planned in future (but is not available yet).
 #'
-#' Additionally, AIC values are not simple to compare as there is no direct equivalent of the alpha value from the LRT. Instead the user can modify the AIC values returned themselves to get delta-AIC or Akiake weights. (NB: I will not explain these here as there are better explanations online.) Furthermore, there is no currently implemented sample-size corrected AIC (AICc) although this is planned in future.
+#' Additionally, AIC values are not simple to compare as there is no direct equivalent of the alpha value from the LRT. Instead the user can modify the AIC values returned themselves to get delta-AIC or Akaike weights. (NB: I will not explain these here as there are better explanations online.) Furthermore, there since 0.4.3 sample-size corrected AIC (AICc) is also available in the output.
 #'
 #' \bold{High versus low rates}
 #'
@@ -104,11 +104,12 @@
 #'   \item CorrectedAlpha.
 #' }
 #'
-#' Or for each AIC test there are only two:
+#' Or for each AIC test there are:
 #'
 #' \enumerate{
 #'   \item Rates.
 #'   \item AIC.
+#'   \item AICc.
 #' }
 #'
 #' For each rate test the \code{Rates} part of the output is a vector of the absolute rate (number of changes per million years) for each partition in the test (in the order they were supplied to the function). So, for example, a branch rate for the sixth edge in a tree would be the rate for the sixth edge followed by the pooled rate for all other edges. The length of the vector is the length of the number of partitions.
@@ -117,7 +118,7 @@
 #'
 #' The CorrectedAlpha is the alpha-value that should be used to determine the significance of the current partition test (i.e., The PValue, above). If the PValue exceeds the CorrectedAlpha then the null (single-rate) hypothesis should be accepted, if lower then the null should be rejected in favour of the N-rate hypthesis. Note that the CorrectedAlpha will not typically be the same for each partition and will also typically be different from the input \code{Alpha} value due to the \code{MultipleComparisonCorrection} option used.
 #'
-#' The AIC is the Akaike Information Criterion, and is relatively meaningless on its own and can only really be used to compare with the AIC values for other partitions of the data.
+#' The AIC is the Akaike Information Criterion, and is relatively meaningless on its own and can only really be used to compare with the AIC values for other partitions of the data. The AICc is simply the sample-size corrected version of the AIC and is preferable when sample sizes are small.
 #'
 #' @return
 #'
@@ -357,13 +358,19 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
   }
   
   # Subfunction to calculate AIC from partition (with columns labelled Partition, Rate, Completeness, Duration):
-  GetAICFromPartition <- function(Partition) {
+  GetAICFromPartition <- function(Partition, AICc = FALSE) {
     
     # Get log maximum likelihood estimate:
     LogMLE <- sum(log(dpois(round(Partition[, "Changes"]), Partition[, "Rate"] * Partition[, "Completeness"] * Partition[, "Duration"])))
     
+    # Get k (number of parameters) term:
+    k <- max(Partition[, "Partition"])
+    
     # Calculate AIC:
-    AIC <- (2 * max(Partition[, "Partition"])) - (2 * LogMLE)
+    AIC <- (2 * k) - (2 * LogMLE)
+    
+    # If AICc is desired then calculate this and overwrite AIC with it:
+    if(AICc) AIC <- AIC + (((2 * (k ^ 2)) + (2 * k)) / (nrow(Partition) - k - 1))
     
     # Return AIC:
     return(AIC)
@@ -789,7 +796,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     # Set global rate (NB: will differ between Close and Lloyd approaches, but Lloyd approach will match edge or character global rate):
     GlobalRate <- sum(TimeBinChanges) / sum(TimeBinCompleteness * TimeBinDurations)
     
-    # If using Likelihood Ratio Test:
+    # If using Likelihood Ratio Test to compare partitions:
     if(LikelihoodTest == "LRT") {
       
       # Build partitioned data matrices (NB: completeness and duration get combined here as they cannot be summed separately later) for LRT:
@@ -803,14 +810,14 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
       
     }
     
-    
+    # If using AIC to compare partitions:
     if(LikelihoodTest == "AIC") {
       
       # Build partitioned data for AIC:
       PartitionedData <- lapply(TimeBinPartitionsToTest, function(x) {y <- cbind(Partition = rep(NA, length(TimeBinChanges)), Rate = rep(NA, length(TimeBinChanges)), Changes = TimeBinChanges, Completeness = TimeBinCompleteness * TimeBinDurations, Duration = rep(1, length(TimeBinChanges))); y[, "Rate"] <- as.numeric(gsub(NaN, 0, unlist(lapply(x, function(x) rep(sum(y[x, "Changes"]) / sum(y[x, "Completeness"]), length(x)))))); y[, "Partition"] <- rep(1:length(x), unlist(lapply(x, length))); y})
       
-      # Get AIC and rate results:
-      TimeBinTestResults <- lapply(PartitionedData, function(x) list(Rates = unname(unlist(lapply(as.list(unique(x[, "Partition"])), function(y) x[x[, "Partition"] == y, "Rate"][1]))), AIC = GetAICFromPartition(x)))
+      # Get AIC, AICc and rate results:
+      TimeBinTestResults <- lapply(PartitionedData, function(x) list(Rates = unname(unlist(lapply(as.list(unique(x[, "Partition"])), function(y) x[x[, "Partition"] == y, "Rate"][1]))), AIC = GetAICFromPartition(x), AICc = GetAICFromPartition(x, AICc = TRUE)))
       
     }
     
