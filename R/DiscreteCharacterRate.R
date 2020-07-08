@@ -873,10 +873,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
   }
 
   # Compile output:
-  Output <- list(AllChanges, GlobalRate, ContinuousCharactersConverted, BranchPartitionTestResults, CharacterPartitionTestResults, CladePartitionTestResults, TimeBinTestResults)
-  
-  # Add naems to output:
-  names(Output) <- c("InferredCharacterChanges", "IntrinsicCharacterRate", "ContinuousCharactersConvertedToDiscrete", "BranchPartitionResults", "CharacterPartitionResults", "CladePartitionResults", "TimeBinResults")
+  Output <- list(InferredCharacterChanges = AllChanges, IntrinsicCharacterRate = GlobalRate, ContinuousCharactersConvertedToDiscrete = ContinuousCharactersConverted, BranchPartitionResults = BranchPartitionTestResults, CharacterPartitionResults = CharacterPartitionTestResults, CladePartitionResults = CladePartitionTestResults, TimeBinResults = TimeBinTestResults)
   
   # Return output:
   return(Output)
