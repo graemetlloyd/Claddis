@@ -181,8 +181,9 @@
 #' @export DiscreteCharacterRate
 DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", LikelihoodTest = "AIC", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
   
-  # AIC IS BROKEN AS NEEDS ACROSS FULL PARTITIONS TO MAKE SENSE
+  # AIC IS BROKEN AS NEEDS TO BE CALCULATED ACROSS FULL PARTITIONS TO MAKE SENSE
   
+  # MAYBE DO SOME KIND OF WEIGHTING FOR AIC AS SOME PARTITIONS WILL CONTAIN VERY LITTLE DATA AND BE EXTREME OUTLIERS?
   # NEED TO CHECK FOR SINGLE PARTITION WITH LRT (ALLOWED WITH AIC)
   # NEED TO CHECK FOR FULLY BIFURCATING IF IMPLEMENTING WANG STUDENTS APPROACH? OR IS THAT DONE ANYWAY?
   # IF USING AIC NEED TO CHECK FOR EACH TEST TYPE AT LEAST TWO PARTITIONS ARE SUPPLIED OR ELSE THE RESULTS ARE MEANINGLESS
