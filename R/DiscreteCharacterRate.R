@@ -183,6 +183,8 @@
 DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", LikelihoodTest = "AIC", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
   
   # AIC IS BROKEN AS NEEDS TO BE CALCULATED ACROSS FULL PARTITIONS TO MAKE SENSE
+  # AICc BREAKS IF MORE THAN N-2 PARAMETERS
+  # GLOBAL RATE NEEDS TO GO INTO LRT OPTION IF NOT USED IN AIC
   
   # MAYBE DO SOME KIND OF WEIGHTING FOR AIC AS SOME PARTITIONS WILL CONTAIN VERY LITTLE DATA AND BE EXTREME OUTLIERS?
   # NEED TO CHECK FOR SINGLE PARTITION WITH LRT (ALLOWED WITH AIC)
@@ -204,7 +206,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
   # HOW TO FORMAT OUTPUT? GET CIS FOR EACH PARTITION FOR VISUALISATION (E.G., BARPLOT OF PARTITION VALUES WITH DASHED LINE FOR MEAN AND ERROR BARS FOR CIS)? STICK WITH LIST OR COLLAPSE TO A MATRIX SOMEHOW? PARTITION LIKE THIS: 1 2 | 3 4, 3.658 | 1.254 ETC.?
   # TIME BINS WITH NOTHING IN WILL CAUSE ISSUES AS DIVIDE BY ZEROES WILL OCCUR - ADD CHECK FOR THIS.
   # GET CLADE NUMBERS BACK FOR OUTPUTTING?
-  # WHAT IS SIGNIFICANTLY HIGH OR LOW IF THERE ARE THREE OR MORE PARTITIONS? THIS IS NOT EVEN IN OUTPUT YET. PROLY CANNT DO FULL STOP NOW PARTITIONS ARE MORE COMPLEX
+  # WHAT IS SIGNIFICANTLY HIGH OR LOW IF THERE ARE THREE OR MORE PARTITIONS? THIS IS NOT EVEN IN OUTPUT YET. PROLLY CANNOT DO FULL STOP NOW PARTITIONS ARE MORE COMPLEX
 
   # Check for step matrices and stop and warn user if found:
   if(is.list(CladisticMatrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
@@ -689,17 +691,30 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     # If performing branch partition tests:
     if(!is.null(BranchPartitionsToTest)) {
       
-      # Build partitioned data matrices (NB: completeness and duration get combined here as they cannot be summed separately later):
-      PartitionedData <- lapply(BranchPartitionsToTest, function(x) matrix(unlist(lapply(x, function(y) c(sum(EdgeChanges[y]), sum(EdgeCompleteness[y] * EdgeDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))
+      # If using Likelihood Ratio Test:
+      if(LikelihoodTest == "LRT") {
+        
+        # Build partitioned data matrices (NB: completeness and duration get combined here as they cannot be summed separately later):
+        PartitionedData <- lapply(BranchPartitionsToTest, function(x) matrix(unlist(lapply(x, function(y) c(sum(EdgeChanges[y]), sum(EdgeCompleteness[y] * EdgeDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))
+        
+        # Add sampled rate to paritioned data matrices:
+        PartitionedData <- lapply(PartitionedData, function(x) {x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x); colnames(x)[1] <- "Rate"; x})
+        
+        # Get LRT p-values and combine output as edge test results:
+        BranchPartitionTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], GetMaximumLikelihoodPValue(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "PValue"); x})
+        
+      }
       
-      # Add sampled rate to paritioned data matrices:
-      PartitionedData <- lapply(PartitionedData, function(x) {x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x); colnames(x)[1] <- "Rate"; x})
-      
-      # Get P-Values and combine output as edge test results:
-      if(LikelihoodTest== "LRT") BranchPartitionTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], GetMaximumLikelihoodPValue(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "PValue"); x})
-      
-      # Get AIC and combine output as edge test results:
-      if(LikelihoodTest== "AIC") BranchPartitionTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], GetAIC(SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "AIC"); x})
+      # If using AIC:
+      if(LikelihoodTest == "AIC") {
+        
+        # Build partitioned data for AIC:
+        PartitionedData <- lapply(BranchPartitionsToTest, function(x) {y <- cbind(Partition = rep(NA, length(tree$edge.length)), Rate = rep(NA, length(tree$edge.length)), Changes = EdgeChanges, Completeness = EdgeCompleteness, Duration = EdgeDurations); y[, "Rate"] <- as.numeric(gsub(NaN, 0, unlist(lapply(x, function(x) rep(sum(y[x, "Changes"]) / (sum(y[x, "Completeness"]) * sum(y[x, "Duration"])), length(x))))[order(unlist(x))])); y[, "Partition"] <- rep(1:length(x), unlist(lapply(x, length)))[order(unlist(x))]; y})
+        
+        # Get AIC, AICc and rate results:
+        BranchPartitionTestResults <- lapply(PartitionedData, function(x) list(Rates = unname(unlist(lapply(as.list(unique(x[, "Partition"])), function(y) x[x[, "Partition"] == y, "Rate"][1]))), AIC = GetAICFromPartition(x), AICc = GetAICFromPartition(x, AICc = TRUE)))
+        
+      }
     
     # If not performing branch partition tests:
     } else {
@@ -712,17 +727,30 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     # If performing clade partition tests:
     if(!is.null(CladePartitionsToTest)) {
       
-      # Build partitioned data matrices (NB: completeness and duration get combined here as they cannot be summed separately later):
-      PartitionedData <- lapply(CladePartitionsToTest, function(x) matrix(unlist(lapply(x, function(y) c(sum(EdgeChanges[y]), sum(EdgeCompleteness[y] * EdgeDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))
+      # If using Likelihood Ratio Test:
+      if(LikelihoodTest == "LRT") {
+        
+        # Build partitioned data matrices (NB: completeness and duration get combined here as they cannot be summed separately later):
+        PartitionedData <- lapply(CladePartitionsToTest, function(x) matrix(unlist(lapply(x, function(y) c(sum(EdgeChanges[y]), sum(EdgeCompleteness[y] * EdgeDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))
+        
+        # Add sampled rate to paritioned data matrices:
+        PartitionedData <- lapply(PartitionedData, function(x) {x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x); colnames(x)[1] <- "Rate"; x})
+        
+        # Get LRT p-values and combine output as edge test results:
+        CladePartitionTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], GetMaximumLikelihoodPValue(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "PValue"); x})
+        
+      }
       
-      # Add sampled rate to paritioned data matrices:
-      PartitionedData <- lapply(PartitionedData, function(x) {x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x); colnames(x)[1] <- "Rate"; x})
-      
-      # Get P-Values and combine output as edge test results:
-      if(LikelihoodTest== "LRT") CladePartitionTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], GetMaximumLikelihoodPValue(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "PValue"); x})
-      
-      # Get AIC and combine output as edge test results:
-      if(LikelihoodTest== "AIC") CladePartitionTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], GetAIC(SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "AIC"); x})
+      # If using AIC:
+      if(LikelihoodTest == "AIC") {
+        
+        # Build partitioned data for AIC:
+        PartitionedData <- lapply(CladePartitionsToTest, function(x) {y <- cbind(Partition = rep(NA, length(tree$edge.length)), Rate = rep(NA, length(tree$edge.length)), Changes = EdgeChanges, Completeness = EdgeCompleteness, Duration = EdgeDurations); y[, "Rate"] <- as.numeric(gsub(NaN, 0, unlist(lapply(x, function(x) rep(sum(y[x, "Changes"]) / (sum(y[x, "Completeness"]) * sum(y[x, "Duration"])), length(x))))[order(unlist(x))])); y[, "Partition"] <- rep(1:length(x), unlist(lapply(x, length)))[order(unlist(x))]; y})
+        
+        # Get AIC, AICc and rate results:
+        CladePartitionTestResults <- lapply(PartitionedData, function(x) list(Rates = unname(unlist(lapply(as.list(unique(x[, "Partition"])), function(y) x[x[, "Partition"] == y, "Rate"][1]))), AIC = GetAICFromPartition(x), AICc = GetAICFromPartition(x, AICc = TRUE)))
+        
+      }
       
     # If not performing clade partition tests:
     } else {
@@ -901,9 +929,9 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
 #tree <- Tree[[1]]
 #CladisticMatrix <- Matrix
 #TimeBins <- TimeBins
-#BranchPartitionsToTest <- NULL
+#BranchPartitionsToTest <- lapply(as.list(1:nrow(tree$edge)), as.list)
 #CharacterPartitionsToTest <- NULL
-#CladePartitionsToTest = NULL
+#CladePartitionsToTest = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)
 #TimeBinPartitionsToTest = TimeBinPartitioner(7)
 #ChangeTimes = "random"
 #LikelihoodTest = "AIC"
