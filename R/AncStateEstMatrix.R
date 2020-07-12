@@ -61,8 +61,13 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   
   # How to get tip states for a continuous character?
   # How to deal with step matrices?
-  # How to deal with models where intermeidate tip states are not even in sample
+  # How to deal with models where intermediate tip states are not even in sample
   # Change help file to explain interactions between all options, e.g., if doing all chars then polymorphisms used for discrete, midpoint for continuous etc.
+  # Handle all missing/inapplicable case properly
+  # Handle only two tips case properly
+  # Add Liam Revell polymorphism options
+  # Finish trailing off help file!
+  # Add Lloyd citation
   
   # Catch problem with trees with no branch lengths:
   if(is.null(Tree$edge.length)) stop("Tree must have branch lengths.")
@@ -175,7 +180,7 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
       
     }
     
-    # Apply fill missing fucntion across all characters:
+    # Apply fill missing function across all characters:
     DataAsList <- lapply(DataAsList, FillMissing)
     
   }
@@ -197,7 +202,7 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
       
     }
     
-    # Return pruend output:
+    # Return pruned output:
     return(x)
     
   }
@@ -214,7 +219,7 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
       # Temporarily store tip states so matrix format can overwrite the stored version below:
       TipStates <- x$TipStates
       
-      # Create marix of tip state probabilities:
+      # Create matrix of tip state probabilities:
       x$TipStates <- matrix(0, nrow = length(x$TipStates), ncol = x$MaxVal - x$MinVal + 1, dimnames = list(names(x$TipStates), x$MinVal:x$MaxVal))
       
       # For each character state if a single state is coded store probability as 1:
@@ -291,7 +296,7 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   # Add ancestral state model for each character:
   DataAsList <- lapply(DataAsList, ModelBuilder)
 
-  # Sunfunction to get ancestral states:
+  # Subfunction to get ancestral states:
   GetAncStates <- function(x, EstimateTipValues, Threshold) {
     
     # If character is continuous:
