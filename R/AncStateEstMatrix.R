@@ -132,6 +132,12 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   # If treating uncertainties as missing:
   if(UncertaintyBehaviour == "treatasmissing" && length(grep("/", CladisticMatrix)) > 0) CladisticMatrix[grep("/", CladisticMatrix)] <- NA
   
+  # Get vector of character numbers where all values are NA:
+  AllMissingCharacters <- which(apply(CladisticMatrix, 2, function(x) all(is.na(x))))
+  
+  # Look for all missing characters and stop and wanr user if found:
+  if(length(AllMissingCharacters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(AllMissingCharacters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using Claddis::MatrixPruner) or because of the chosen options for InapplicablesAsMissing, PolymorphismBehaviour, and/or UncertaintyBehaviour (in which case the user may wish to chose different values for these)."))
+  
   # Convert tip states into a list:
   DataAsList <- apply(CladisticMatrix, 2, list)
   
