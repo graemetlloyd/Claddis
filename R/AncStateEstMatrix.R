@@ -139,10 +139,7 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   if(length(AllMissingCharacters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(AllMissingCharacters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using Claddis::MatrixPruner) or because of the chosen options for InapplicablesAsMissing, PolymorphismBehaviour, and/or UncertaintyBehaviour (in which case the user may wish to chose different values for these)."))
   
   # Convert tip states into a list:
-  DataAsList <- apply(CladisticMatrix, 2, list)
-  
-  # Add Tip states name to list:
-  DataAsList <- lapply(DataAsList, function(x) {names(x) <- "TipStates"; return(x)})
+  DataAsList <- apply(CladisticMatrix, 2, function(x) list(TipStates = x))
   
   # For each character:
   for(i in 1:length(DataAsList)) {
