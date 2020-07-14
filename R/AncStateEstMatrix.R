@@ -12,6 +12,7 @@
 #' @param PolymorphismBehaviour One of either "equalp" or "treatasmissing".
 #' @param UncertaintyBehaviour One of either "equalp" or "treatasmissing".
 #' @param Threshold The threshold value to use when collapsing marginal likelihoods to discrete state(s).
+#' @param AllowAllMissing Logical to allow all missing character values (generally not recommended, hence default is FALSE).
 #'
 #' @details
 #'
@@ -57,7 +58,7 @@
 #'   Tree = tree)
 #' 
 #' @export AncStateEstMatrix
-AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
+AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01, AllowAllMissing = FALSE) {
   
   # How to get tip states for a continuous character?
   # How to deal with step matrices?
@@ -136,7 +137,7 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   AllMissingCharacters <- which(apply(CladisticMatrix, 2, function(x) all(is.na(x))))
   
   # Look for all missing characters and stop and wanr user if found:
-  if(length(AllMissingCharacters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(AllMissingCharacters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using Claddis::MatrixPruner) or because of the chosen options for InapplicablesAsMissing, PolymorphismBehaviour, and/or UncertaintyBehaviour (in which case the user may wish to chose different values for these)."))
+  if(!AllowAllMissing && length(AllMissingCharacters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(AllMissingCharacters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using Claddis::MatrixPruner) or because of the chosen options for InapplicablesAsMissing, PolymorphismBehaviour, and/or UncertaintyBehaviour (in which case the user may wish to chose different values for these)."))
   
   # Convert tip states into a list:
   DataAsList <- apply(CladisticMatrix, 2, function(x) list(TipStates = x))
@@ -194,17 +195,23 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
     # Find all missing or inapplicable value tip names:
     Missing <- names(sort(c(which(x$TipStates == ""), which(is.na(x$TipStates)))))
     
-    # If there is at least one:
+    # Work out how many tips will be left after pruning:
+    NTipsRemaining <- length(setdiff(names(x$TipStates), Missing))
+    
+    # If there is at least one missing value:
     if(length(Missing) > 0) {
       
-      # Remove tips from tree:
-      x$Tree <- drop.tip(phy = x$Tree, tip = Missing)
+      # If less than two tips will remain then set tree as NULL:
+      if(NTipsRemaining < 2) x$Tree <- NULL
+
+      # If at least two tips will remain prune missing values from tree:
+      if(NTipsRemaining > 1) x$Tree <- drop.tip(phy = x$Tree, tip = Missing)
       
-      # Remove tips from tip states:
+      # Collapse tip states:
       x$TipStates <- x$TipStates[setdiff(names(x$TipStates), Missing)]
-      
+
     }
-    
+
     # Return pruned output:
     return(x)
     
@@ -216,50 +223,61 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   # Subfunction to build tip state matrices:
   TipStateVectorToMatrix <- function(x) {
     
-    # If the character is not continuous (i.e., it is some form of discrete character):
-    if(x$Ordering != "cont") {
+    # As long asthere is at least one tip state:
+    if(length(x$TipStates) > 0) {
       
-      # Temporarily store tip states so matrix format can overwrite the stored version below:
-      TipStates <- x$TipStates
-      
-      # Create matrix of tip state probabilities:
-      x$TipStates <- matrix(0, nrow = length(x$TipStates), ncol = x$MaxVal - x$MinVal + 1, dimnames = list(names(x$TipStates), x$MinVal:x$MaxVal))
-      
-      # For each character state if a single state is coded store probability as 1:
-      for(i in colnames(x$TipStates)) x$TipStates[TipStates == i, i] <- 1
-      
-      # If there are polymorphisms and/or uncertainties:
-      if(length(grep("&|/", TipStates)) > 0) {
+      # If the character is not continuous (i.e., it is some form of discrete character):
+      if(x$Ordering != "cont") {
         
-        # Get polymorphism locations:
-        Polymorphisms <- grep("&", TipStates)
+        # Temporarily store tip states so matrix format can overwrite the stored version below:
+        TipStates <- x$TipStates
         
-        # Get uncertainty locations:
-        Uncertainties <- grep("/", TipStates)
+        # Create matrix of tip state probabilities:
+        x$TipStates <- matrix(0, nrow = length(x$TipStates), ncol = x$MaxVal - x$MinVal + 1, dimnames = list(names(x$TipStates), x$MinVal:x$MaxVal))
         
-        # If there are polymorphisms and using the "equalp" (equal probability of each state) option:
-        if(length(Polymorphisms) > 0 && PolymorphismBehaviour == "equalp") {
+        # For each character state if a single state is coded store probability as 1:
+        for(i in colnames(x$TipStates)) x$TipStates[TipStates == i, i] <- 1
+        
+        # If there are polymorphisms and/or uncertainties:
+        if(length(grep("&|/", TipStates)) > 0) {
           
-          # For each polymorphisms set each state as equally probable:
-          for(i in Polymorphisms) x$TipStates[i, strsplit(TipStates[i], split = "&")[[1]]] <- 1 / length(strsplit(TipStates[i], split = "&")[[1]])
+          # Get polymorphism locations:
+          Polymorphisms <- grep("&", TipStates)
+          
+          # Get uncertainty locations:
+          Uncertainties <- grep("/", TipStates)
+          
+          # If there are polymorphisms and using the "equalp" (equal probability of each state) option:
+          if(length(Polymorphisms) > 0 && PolymorphismBehaviour == "equalp") {
+            
+            # For each polymorphisms set each state as equally probable:
+            for(i in Polymorphisms) x$TipStates[i, strsplit(TipStates[i], split = "&")[[1]]] <- 1 / length(strsplit(TipStates[i], split = "&")[[1]])
+            
+          }
+          
+          # If there are uncertainties and using the "equalp" (equal probability of each state) option:
+          if(length(Uncertainties) > 0 && UncertaintyBehaviour == "equalp") {
+            
+            # For each uncertainty set each state as equally probable:
+            for(i in Uncertainties) x$TipStates[i, strsplit(TipStates[i], split = "/")[[1]]] <- 1 / length(strsplit(TipStates[i], split = "/")[[1]])
+            
+          }
           
         }
         
-        # If there are uncertainties and using the "equalp" (equal probability of each state) option:
-        if(length(Uncertainties) > 0 && UncertaintyBehaviour == "equalp") {
-          
-          # For each uncertainty set each state as equally probable:
-          for(i in Uncertainties) x$TipStates[i, strsplit(TipStates[i], split = "/")[[1]]] <- 1 / length(strsplit(TipStates[i], split = "/")[[1]])
-          
-        }
+      # If a continuous character:
+      } else {
+        
+        # Simply make tip states the numeric values (should never be a polymorphism) as a vector:
+        x$TipStates <- as.numeric(x$TipStates)
         
       }
       
-    # If a continuous character:
+    # If tip state has no length (all values are missing):
     } else {
       
-      # Simply make tip states the numeric values (should never be a polymorphism) as a vector:
-      x$TipStates <- as.numeric(x$TipStates)
+      # Create row-less tip states matrix:
+      x$TipStates <- matrix(nrow = 0, ncol = 1, dimnames = list(c(), "0"))
       
     }
     
@@ -302,34 +320,45 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   # Subfunction to get ancestral states:
   GetAncStates <- function(x, EstimateTipValues, Threshold) {
     
-    # If character is continuous:
-    if(x$Ordering == "cont") {
+    # As long as there is a tree:
+    if(!is.null(x$Tree)) {
       
-      # Get ancestral states using ace:
-      x$AncestralStates <- ace(x = x$TipStates, phy = x$Tree)$ace
-      
-    # If character is discrete:
+      # If character is continuous:
+      if(x$Ordering == "cont") {
+        
+        # Get ancestral states using ace:
+        x$AncestralStates <- ace(x = x$TipStates, phy = x$Tree)$ace
+        
+      # If character is discrete:
+      } else {
+        
+        # If invariant character:
+        if(ncol(x$TipStates) == 1) {
+          
+          # Get number of tips:
+          NTreeTips <- ape::Ntip(x$Tree)
+          
+          # Set ancestral states as all the same:
+          x$AncestralStates <- matrix(rep(x = 1, times = (NTreeTips + x$Tree$Nnode)), ncol = 1, dimnames = list(c(x$Tree$tip.label, (NTreeTips + 1):(NTreeTips + x$Tree$Nnode)), colnames(x$TipStates)))
+          
+        }
+        
+        # If variant character then get ancestral states using rerooting method:
+        if(ncol(x$TipStates) > 1) x$AncestralStates <- rerootingMethod(tree = x$Tree, x = x$TipStates, model = x$Model)$marginal.anc
+        
+        # Reformat to most likely state
+        x$AncestralStates <- unlist(lapply(lapply(apply(x$AncestralStates, 1, list), unlist), function(x) {paste(names(x[x > (max(x) - Threshold)]), collapse = "/")}))
+        
+        # If not estimating tip values then prune these:
+        if(!EstimateTipValues) x$AncestralStates <- x$AncestralStates[-match(x$Tree$tip.label, names(x$AncestralStates))]
+        
+      }
+     
+    # If no tree:
     } else {
       
-      # If invariant character:
-      if(ncol(x$TipStates) == 1) {
-        
-        # Get number of tips:
-        NTreeTips <- ape::Ntip(x$Tree)
-        
-        # Set ancestral states as all the same:
-        x$AncestralStates <- matrix(rep(x = 1, times = (NTreeTips + x$Tree$Nnode)), ncol = 1, dimnames = list(c(x$Tree$tip.label, (NTreeTips + 1):(NTreeTips + x$Tree$Nnode)), colnames(x$TipStates)))
-      
-      }
-      
-      # If variant character then get ancestral states using rerooting method:
-      if(ncol(x$TipStates) > 1) x$AncestralStates <- rerootingMethod(tree = x$Tree, x = x$TipStates, model = x$Model)$marginal.anc
-      
-      # Reformat to most likely state
-      x$AncestralStates <- unlist(lapply(lapply(apply(x$AncestralStates, 1, list), unlist), function(x) {paste(names(x[x > (max(x) - Threshold)]), collapse = "/")}))
-      
-      # If not estimating tip values then prune these:
-      if(!EstimateTipValues) x$AncestralStates <- x$AncestralStates[-match(x$Tree$tip.label, names(x$AncestralStates))]
+      # Set ancestral states as NULL:
+      x$AncestralStates <- vector(mode = "character")
       
     }
     
@@ -342,10 +371,10 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   DataAsList <- lapply(DataAsList, GetAncStates, EstimateTipValues, Threshold)
   
   # Get Newick strings of all sampled subtrees (to use to avoid redundancy in tree node mapping):
-  NewickStrings <- unlist(lapply(lapply(DataAsList, '[[', "Tree"), ape::write.tree))
+  NewickStrings <- unlist(lapply(DataAsList, function(x) ifelse(is.null(x$Tree), NA, ape::write.tree(x$Tree))))
   
   # Get just unique strings (i.e., the minimum set needded to map everything to the full tree):
-  UniqueNewickStrings <- unique(NewickStrings)
+  UniqueNewickStrings <- unique(NewickStrings[!is.na(NewickStrings)])
   
   # Convert unique Newick strings to unique trees:
   UniqueTrees <- read.tree(text = UniqueNewickStrings)

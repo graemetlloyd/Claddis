@@ -12,7 +12,8 @@ AncStateEstMatrix(
   InapplicablesAsMissing = FALSE,
   PolymorphismBehaviour = "equalp",
   UncertaintyBehaviour = "equalp",
-  Threshold = 0.01
+  Threshold = 0.01,
+  AllowAllMissing = FALSE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ AncStateEstMatrix(
 \item{UncertaintyBehaviour}{One of either "equalp" or "treatasmissing".}
 
 \item{Threshold}{The threshold value to use when collapsing marginal likelihoods to discrete state(s).}
+
+\item{AllowAllMissing}{Logical to allow all missing character values (generally not recommended, hence default is FALSE).}
 }
 \value{
 \item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral states.}
