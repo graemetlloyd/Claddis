@@ -338,10 +338,10 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
   # Get ancestral states for each character:
   DataAsList <- lapply(DataAsList, GetAncStates, EstimateTipValues, Threshold)
   
-  # Get Newick strings of all sampled subtrees (to use to avoid reudunancy in tree node mapping):
+  # Get Newick strings of all sampled subtrees (to use to avoid redundancy in tree node mapping):
   NewickStrings <- unlist(lapply(lapply(DataAsList, '[[', "Tree"), ape::write.tree))
   
-  # Get just unique strings (i.e., just those trees that need toa ctyal map to full tree):
+  # Get just unique strings (i.e., the minimum set needded to map everything to the full tree):
   UniqueNewickStrings <- unique(NewickStrings)
   
   # Convert unique Newick strings to unique trees:
@@ -359,7 +359,7 @@ AncStateEstMatrix <- function(CladisticMatrix, Tree, EstimateAllNodes = FALSE, E
     # Get number of nodes of pruend tree:
     NNodes <- ape::Nnode(tree)
     
-    # Get all internal node numbers for peruend tree:
+    # Get all internal node numbers for pruned tree:
     NodeNumbers <- (NTips + 1):(NTips + NNodes)
     
     # If the pruned tree is different to the full tree:
