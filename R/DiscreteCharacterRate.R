@@ -66,9 +66,9 @@
 #'
 #' \bold{AIC vs LRT}
 #'
-#' Since Claddis version 0.4 the option to use the Akaike Information Criterion (AIC) instead of likelihood ratio tests (LRTs) has been added (although it was not properly functional until version 0.4.2). Practically speaking the AIC uses something similar to the denominator term from the LRT (see equation above) and adds a penalty for the number of parameters (partitions). However, it also fundamentally alters the comparative framework applied and hence needs more careful attention from the user to be applied correctly. Specifically, the LRT is by its nature comparative, always comparing an N-rate partition with a one-rate partition. By contrast the AIC does not directly apply any comparison and so the user must logically supply multiple partitionings of the data in order for the results to be meaningful. It might be assumed that a user will always want to apply a single partition that pools all the data for each type of test, whether this is all the edges (branches), time bins, or characters. This will thus be the obvious comparator for any multiple partition supplied, ensuring that any more complex partitioning is minimally superior to this. Additionally, it is alos logical to consider each possible way of joining partitions simpler than the most complex partition being considered. E.g., if considering a four-partition model then the user should also consider all possible three-partition and two-partition combinations of that four-partition model. This can obviously lead to some complexity in supplying partitions on the user's part and so some automating of this process is planned in future (but is not fully available yet). For an example, see \link{TimeBinPartitioner}.
+#' Since Claddis version 0.4 the option to use the Akaike Information Criterion (AIC) instead of likelihood ratio tests (LRTs) has been added (although it was not properly functional until version 0.4.2). Practically speaking the AIC uses something similar to the denominator term from the LRT (see equation above) and adds a penalty for the number of parameters (partitions). However, it also fundamentally alters the comparative framework applied and hence needs more careful attention from the user to be applied correctly. Specifically, the LRT is by its nature comparative, always comparing an N-rate partition with a one-rate partition. By contrast the AIC does not directly apply any comparison and so the user must logically supply multiple partitionings of the data in order for the results to be meaningful. It might be assumed that a user will always want to apply a single partition that pools all the data for each type of test, whether this is all the edges (branches), time bins, or characters. This will thus be the obvious comparator for any multiple partition supplied, ensuring that any more complex partitioning is minimally superior to this. Additionally, it is also logical to consider each possible way of joining partitions simpler than the most complex partition being considered. E.g., if considering a four-partition model then the user should also consider all possible three-partition and two-partition combinations of that four-partition model. This can obviously lead to some complexity in supplying partitions on the user's part and so some automating of this process is planned in future (but is not fully available yet). For an example, see \link{TimeBinPartitioner}.
 #'
-#' Additionally, AIC values are not simple to compare as there is no direct equivalent of the alpha value from the LRT. Instead the user can modify the AIC values returned themselves to get delta-AIC or Akaike weight values (e.g., with \code{geiger::aicw}). (NB: I will not explain these here as there are better explanations online.) Furthermore, since version 0.4.2 sample-size corrected AIC (AICc) is also available in the output. Note that some caution should be used in applying this if the number of paritions is equal to the sample size or only one fewer. E.g., if you have ten time bins and ten partitions you can get a negative value due to the denominator term in the AICc calculation. Thus it is advised to use the raw AIC values as first approximation and be wary if the AICc flips the preferred model to a more complex model or models (i.e., those with more partitions) as this is the opposite of the intent of the AICc.
+#' Additionally, AIC values are not simple to compare as there is no direct equivalent of the alpha value from the LRT. Instead the user can modify the AIC values returned themselves to get delta-AIC or Akaike weight values (e.g., with \code{geiger::aicw}). (NB: I will not explain these here as there are better explanations online.) Furthermore, since version 0.4.2 sample-size corrected AIC (AICc) is also available in the output. Note that some caution should be used in applying this if the number of partitions is equal to the sample size or only one fewer. E.g., if you have ten time bins and ten partitions you can get a negative value due to the denominator term in the AICc calculation. Thus it is advised to use the raw AIC values as first approximation and be wary if the AICc flips the preferred model to a more complex model or models (i.e., those with more partitions) as this is the opposite of the intent of the AICc.
 #'
 #' \bold{High versus low rates}
 #'
@@ -129,6 +129,10 @@
 #' \item{CharacterPartitionResults}{List of character partition results (corresponding to \code{CharacterPartitionsToTest}. NULL if not requested.}
 #' \item{CladePartitionResults}{List of clade partition results (corresponding to \code{CladePartitionsToTest}. NULL if not requested.}
 #' \item{TimeBinResults}{List of time bin partition results (corresponding to \code{TimeBinPartitionsToTest}. NULL if not requested.}
+#' \item{BranchRates}{Matrix showing calculated rates for each branch. NULL if \code{BranchPartitionsToTest} is not requested.}
+#' \item{CharacterRates}{Matrix showing calculated rates for each character. NULL if \code{CharacterPartitionsToTest} is not requested.}
+#' \item{CladeRates}{Matrix showing calculated rates for each clade. NULL if \code{CladePartitionsToTest} is not requested.}
+#' \item{TimeRates}{Matrix showing calculated rates for each time bin. NULL if \code{TimeBinPartitionsToTest} is not requested.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Steve C. Wang \email{scwang@@swarthmore.edu}
 #'
@@ -184,7 +188,6 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
   
   # AICc BREAKS IF MORE THAN N-2 PARAMETERS (INFINITY OR WRONGLY NEGATIVE OUTPUT CAN OCCUR THIS WAY)
   # GLOBAL RATE NEEDS TO GO INTO LRT OPTION IF NOT USED IN AIC
-  # NEED TO OUTPUT RATE FOR EACH MAXIMUM PARTITION, E.G., EACH TIME BIN, CHARACTER, CLADE AND EDGE AS THIS WILL BE KEY FOR VISUALISING "CLUMPING" OF OPTIMAL PARTITIONS.
   # SOMEHOW NEED TO ALLOW MULTIPLE VERSIONS OF MAIN PIEPLINE IF DOING RANDOM ASSIGNMENTS OF CHANGE TIMES
   # NEED TO ADD PARTITIONS USED TO OUTPUT SOMEHOW...
   
@@ -193,7 +196,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
   # NEED TO CHECK FOR FULLY BIFURCATING IF IMPLEMENTING WANG STUDENTS APPROACH? OR IS THAT DONE ANYWAY?
   # IF USING AIC NEED TO CHECK FOR EACH TEST TYPE AT LEAST TWO PARTITIONS ARE SUPPLIED OR ELSE THE RESULTS ARE MEANINGLESS
   # ADD CHECK TO INCLUDE ALL LESS COMPLEX SUBPARTITIONS OF ANY 3 OR MORE SIZE PARTITOINING OF THE DATA
-  # ADD SAMPLE-SIZE CORRECTED AIC (AICc)
+  # ADD TIME BISN TO OUTPUT FOR LATER HANDLING BY VISUALISATION FUNCTIONS
   
   # DESIDERATA (STUFF IT WOULD BE NICE TO ADD IN FUTURE):
   #
@@ -205,9 +208,8 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
   # ADD CONTRIVED EXAMPLES (UNIT TESTS) TO SHOW HOW FUNCTION WORKS, E.G. RATE OF ONE CHANGES PER MILLION YEARS THEN DUPLICATED BLOCK WITH CHARACTER PARTITION TEST.
   # PROBABLY NEED MORE CAREFUL CHECKS FOR ZERO VALUES GENERALLY, E.G., CHARACTER WITH ALL MISSING DATA
   # ALLOW REWEIGHTING OF INAPPLICABLES ZERO AS AN OPTION FOR THEM?
-  # HOW TO FORMAT OUTPUT? GET CIS FOR EACH PARTITION FOR VISUALISATION (E.G., BARPLOT OF PARTITION VALUES WITH DASHED LINE FOR MEAN AND ERROR BARS FOR CIS)? STICK WITH LIST OR COLLAPSE TO A MATRIX SOMEHOW? PARTITION LIKE THIS: 1 2 | 3 4, 3.658 | 1.254 ETC.?
+  # HOW TO FORMAT OUTPUT? GET CIS FOR EACH PARTITION FOR VISUALISATION (E.G., BARPLOT OF PARTITION VALUES WITH DASHED LINE FOR MEAN AND ERROR BARS FOR CIS)? STICK WITH LIST OR COLLAPSE TO A MATRIX SOMEHOW? PARTITION LIKE THIS: 1 2 | 3 4, 3.658 | 1.254, 1:52 | 53:87 ETC.?
   # TIME BINS WITH NOTHING IN WILL CAUSE ISSUES AS DIVIDE BY ZEROES WILL OCCUR - ADD CHECK FOR THIS.
-  # GET CLADE NUMBERS BACK FOR OUTPUTTING?
   # WHAT IS SIGNIFICANTLY HIGH OR LOW IF THERE ARE THREE OR MORE PARTITIONS? THIS IS NOT EVEN IN OUTPUT YET. PROLLY CANNOT DO FULL STOP NOW PARTITIONS ARE MORE COMPLEX
 
   # Check for step matrices and stop and warn user if found:
@@ -674,6 +676,9 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
   
   # Remove silly rownames from all changes:
   rownames(AllChanges) <- NULL
+  
+  # Create NULL output variables (to be overwritten if called):
+  BranchRates <- CladeRates <- TimeRates <- CharacterRates <- NULL
 
   # If doing some kind of edge test (branch or clade):
   if(!is.null(BranchPartitionsToTest) || !is.null(CladePartitionsToTest)) {
@@ -692,6 +697,12 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     
     # If performing branch partition tests:
     if(!is.null(BranchPartitionsToTest)) {
+      
+      # Create branch rates for output:
+      BranchRates <- lapply(list(as.list(1:nrow(tree$edge))), function(x) matrix(unlist(lapply(x, function(y) c(sum(EdgeChanges[y]), sum(EdgeCompleteness[y] * EdgeDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))[[1]]
+      
+      # Add edge numbers and rates:
+      BranchRates <- cbind(Edge = 1:nrow(tree$edge), Rate = as.numeric(gsub(NaN, 0, BranchRates[, "Changes"] / BranchRates[, "Completeness"])), BranchRates)
       
       # If using Likelihood Ratio Test:
       if(LikelihoodTest == "LRT") {
@@ -728,6 +739,12 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     
     # If performing clade partition tests:
     if(!is.null(CladePartitionsToTest)) {
+      
+      # Create clade rates for output:
+      CladeRates <- do.call(rbind, lapply(lapply(as.list(ape::Ntip(tree) + c(1:tree$Nnode)), function(x) GetDescendantEdges(x, tree = tree)), function(y) c(Changes = sum(EdgeChanges[y]), Completeness = sum(EdgeCompleteness[y] * EdgeDurations[y]), Duration = 1)))
+      
+      # Add rates and node numbers:
+      CladeRates <- cbind(Node = ape::Ntip(tree) + c(1:tree$Nnode), Rate = as.numeric(gsub(NaN, 0, CladeRates[, "Changes"] / CladeRates[, "Completeness"])), CladeRates)
       
       # If using Likelihood Ratio Test:
       if(LikelihoodTest == "LRT") {
@@ -773,7 +790,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
 
   }
 
-  # If performing branch partition tests:
+  # If performing character partition tests:
   if(!is.null(CharacterPartitionsToTest)) {
     
     # Get vector of (weighted) changes for each character:
@@ -787,6 +804,12 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     
     # Set global rate:
     GlobalRate <- sum(CharacterChanges) / sum(CharacterCompleteness * CharacterDurations)
+    
+    # Create character rates for output:
+    CharacterRates <- lapply(list(as.list(1:max(CharacterNumbers))), function(x) matrix(unlist(lapply(x, function(y) c(sum(CharacterChanges[y]), sum(CharacterCompleteness[y] * CharacterDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))[[1]]
+    
+    # Add character numbers and rates:
+    CharacterRates <- cbind(Character = 1:max(CharacterNumbers), Rate = as.numeric(gsub(NaN, 0, CharacterRates[, "Changes"] / CharacterRates[, "Completeness"])), CharacterRates)
     
     # If using likelihood ratio test:
     if(LikelihoodTest== "LRT") {
@@ -838,6 +861,12 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     
     # Set global rate (NB: will differ between Close and Lloyd approaches, but Lloyd approach will match edge or character global rate):
     GlobalRate <- sum(TimeBinChanges) / sum(TimeBinCompleteness * TimeBinDurations)
+    
+    # Create time rates for output:
+    TimeRates <- lapply(list(as.list(1:(length(TimeBins) - 1))), function(x) matrix(unlist(lapply(x, function(y) c(sum(TimeBinChanges[y]), sum(TimeBinCompleteness[y] * TimeBinDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))[[1]]
+    
+    # Add bin numbers and rates:
+    TimeRates <- cbind(Bin = 1:(length(TimeBins) - 1), Rate = as.numeric(gsub(NaN, 0, TimeRates[, "Changes"] / TimeRates[, "Completeness"])), TimeRates)
     
     # If using Likelihood Ratio Test to compare partitions:
     if(LikelihoodTest == "LRT") {
@@ -924,14 +953,14 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
   }
 
   # Compile output:
-  Output <- list(InferredCharacterChanges = AllChanges, IntrinsicCharacterRate = GlobalRate, ContinuousCharactersConvertedToDiscrete = ContinuousCharactersConverted, BranchPartitionResults = BranchPartitionTestResults, CharacterPartitionResults = CharacterPartitionTestResults, CladePartitionResults = CladePartitionTestResults, TimeBinResults = TimeBinTestResults)
+  Output <- list(InferredCharacterChanges = AllChanges, IntrinsicCharacterRate = GlobalRate, ContinuousCharactersConvertedToDiscrete = ContinuousCharactersConverted, BranchPartitionResults = BranchPartitionTestResults, CharacterPartitionResults = CharacterPartitionTestResults, CladePartitionResults = CladePartitionTestResults, TimeBinResults = TimeBinTestResults, BranchRates = BranchRates, CharacterRates = CharacterRates, CladeRates = CladeRates, TimeRates = TimeRates)
   
   # Return output:
   return(Output)
 
 }
 
-#Ages <- read.table("~/Documents/Packages/Claddis/LungfishTest/ages.txt", sep =",")
+#Ages <- read.table("~/Documents/Packages/Claddis/LungfishTest/ages.txt", sep = ",")
 #Matrix <- Claddis::ReadMorphNexus("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.nex")
 #Tree <- ape::read.tree("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.tre")
 #TimeBins <- c(443.8, 419.2, 358.9, 298.9, 251.9, 201.3, 145.0, 0.0)
@@ -940,14 +969,13 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
 #Tree <- lapply(Tree, function(x) strap::DatePhylo(x, Ages, rlen = 2, method = "equal"))
 #class(Tree) <- "multiPhylo"
 
-
 #tree <- Tree[[1]]
 #CladisticMatrix <- Matrix
 #TimeBins <- TimeBins
 #BranchPartitionsToTest <- lapply(as.list(1:nrow(tree$edge)), as.list)
 #CharacterPartitionsToTest <- list(list(1:91), list(Cranial = 1:81, Postcranial = 82:91))
-#CladePartitionsToTest = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)
-#TimeBinPartitionsToTest = TimeBinPartitioner(7)
+#CladePartitionsToTest <- lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)
+#TimeBinPartitionsToTest <- TimeBinPartitioner(7)
 #ChangeTimes = "random"
 #LikelihoodTest = "AIC"
 #Alpha = 0.01
