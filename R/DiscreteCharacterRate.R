@@ -122,6 +122,7 @@
 #'
 #' @return
 #'
+#' \item{TimeBinsUsed}{The time binning used (NB: May be slightly altered from the input values).}
 #' \item{InferredCharacterChanges}{Matrix of inferred character changes.}
 #' \item{IntrinsicCharacterRate}{The intrinsic (global) character rate in changes per million years.}
 #' \item{ContinuousCharactersConvertedToDiscrete}{Whether or not continuous characters were converted to discrete characters (important for handling the data in downstream analys(es)).}
@@ -993,7 +994,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
   }
 
   # Compile output:
-  Output <- list(InferredCharacterChanges = AllChanges, IntrinsicCharacterRate = GlobalRate, ContinuousCharactersConvertedToDiscrete = ContinuousCharactersConverted, BranchPartitionResults = BranchPartitionTestResults, CharacterPartitionResults = CharacterPartitionTestResults, CladePartitionResults = CladePartitionTestResults, TimeBinResults = TimeBinTestResults, BranchRates = BranchRates, CharacterRates = CharacterRates, CladeRates = CladeRates, TimeRates = TimeRates)
+  Output <- list(TimeBinsUsed = TimeBins, InferredCharacterChanges = AllChanges, IntrinsicCharacterRate = GlobalRate, ContinuousCharactersConvertedToDiscrete = ContinuousCharactersConverted, BranchPartitionResults = BranchPartitionTestResults, CharacterPartitionResults = CharacterPartitionTestResults, CladePartitionResults = CladePartitionTestResults, TimeBinResults = TimeBinTestResults, BranchRates = BranchRates, CharacterRates = CharacterRates, CladeRates = CladeRates, TimeRates = TimeRates)
   
   # Return output:
   return(Output)

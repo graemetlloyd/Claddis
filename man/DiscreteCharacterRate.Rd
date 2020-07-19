@@ -75,6 +75,7 @@ DiscreteCharacterRate(
 \item{Threshold}{Option passed to internal use of \link{AncStateEstMatrix}.}
 }
 \value{
+\item{TimeBinsUsed}{The time binning used (NB: May be slightly altered from the input values).}
 \item{InferredCharacterChanges}{Matrix of inferred character changes.}
 \item{IntrinsicCharacterRate}{The intrinsic (global) character rate in changes per million years.}
 \item{ContinuousCharactersConvertedToDiscrete}{Whether or not continuous characters were converted to discrete characters (important for handling the data in downstream analys(es)).}
