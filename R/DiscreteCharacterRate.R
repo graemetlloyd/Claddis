@@ -202,13 +202,13 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
   #
   # WRITE SEARCH VERSION FOR FINDING RATE SHIFTS? SHOULD THIS EVEN BE AN OPTION? DOES THIS REQUIRE MODIFYING LRT TO COMPARE E.G. 2-RATE DIRECTLY WITH 3-RATE MODEL? WOULD NEED TO PERMUTE ALL POSSIBLE COMBOS AND NOT SURE HOW LARGE THESE MIGHT GET (VERY FOR EDGES).
   # MAYBE MAKE ANCESTRAL STATE UNCERTAINTY DIFFERENT FOR TIPS THAN NODES? I.E., HOW IT GETS RESOLVED CAN BE DIFFERENT (MORE OPTIONS TO FUNCTION)
-  # THESE TWO ARE RELATED: 1. ADD TERMINAL VERSUS INTERNAL OPTION SOMEHOW/SOMEWHERE, 2. ALLOW OPTION TO IGNORE SOME PARTS OF THE TREE FOR PARTITION TESTS? MAKES CALCULATING THE MEAN RATE TRICKIER BUT MIGHT MAKE SENSE E.G. FOR INGROUP ONLY TESTS. EXCLUDE EDGES AFTER DOING ANCESTRAL STATES? OR SET THESE TO ALL NAS TO ENSURE OTHER THINGS WORK FINE? FOR EXAMPLE< USE OUTGROUPS TO SET ANCESTOR THEN EXCLUDE THEM FROM THE PROCESS.
+  # THESE TWO ARE RELATED: 1. ADD TERMINAL VERSUS INTERNAL OPTION SOMEHOW/SOMEWHERE, 2. ALLOW OPTION TO IGNORE SOME PARTS OF THE TREE FOR PARTITION TESTS? MAKES CALCULATING THE MEAN RATE TRICKIER BUT MIGHT MAKE SENSE E.G. FOR INGROUP ONLY TESTS. EXCLUDE EDGES AFTER DOING ANCESTRAL STATES? OR SET THESE TO ALL NAS TO ENSURE OTHER THINGS WORK FINE? FOR EXAMPLE, USE OUTGROUPS TO SET ANCESTOR THEN EXCLUDE THEM FROM THE PROCESS.
   # EXTRA FUNCTION(S) TO VISUALISE RESULTS MOST LIKELY. DEFO NEEDED! HEAT MAP WITH EDGE BLOCKS?
   # CHECK FOR AUTAPOMORPHIES AND INFORM USER IF FOUND?
   # ADD CONTRIVED EXAMPLES (UNIT TESTS) TO SHOW HOW FUNCTION WORKS, E.G. RATE OF ONE CHANGES PER MILLION YEARS THEN DUPLICATED BLOCK WITH CHARACTER PARTITION TEST.
   # PROBABLY NEED MORE CAREFUL CHECKS FOR ZERO VALUES GENERALLY, E.G., CHARACTER WITH ALL MISSING DATA
   # ALLOW REWEIGHTING OF INAPPLICABLES ZERO AS AN OPTION FOR THEM?
-  # HOW TO FORMAT OUTPUT? GET CIS FOR EACH PARTITION FOR VISUALISATION (E.G., BARPLOT OF PARTITION VALUES WITH DASHED LINE FOR MEAN AND ERROR BARS FOR CIS)? STICK WITH LIST OR COLLAPSE TO A MATRIX SOMEHOW? PARTITION LIKE THIS: 1 2 | 3 4, 3.658 | 1.254, 1:52 | 53:87 ETC.?
+  # HOW TO FORMAT OUTPUT? GET CIS FOR EACH PARTITION FOR VISUALISATION (E.G., BARPLOT OF PARTITION VALUES WITH DASHED LINE FOR MEAN AND ERROR BARS FOR CIS)? STICK WITH LIST OR COLLAPSE TO A MATRIX SOMEHOW?
   # TIME BINS WITH NOTHING IN WILL CAUSE ISSUES AS DIVIDE BY ZEROES WILL OCCUR - ADD CHECK FOR THIS.
   # WHAT IS SIGNIFICANTLY HIGH OR LOW IF THERE ARE THREE OR MORE PARTITIONS? THIS IS NOT EVEN IN OUTPUT YET. PROLLY CANNOT DO FULL STOP NOW PARTITIONS ARE MORE COMPLEX
 
@@ -299,7 +299,21 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     return(PartitionsToTest)
 
   }
-
+  
+  # Subfunction to pack partitions to short format for output:
+  PartitionPacker <- function(FormattedPartitions) unlist(lapply(FormattedPartitions, function(x) paste(sort(unlist(lapply(x, function(y) {
+    
+    # First make sure y is sorted:
+    y <- sort(y)
+    
+    # Covnvert y to a list (splitting if gaps greater than 1 are found):
+    y <- unname(split(y, cumsum(c(TRUE, diff(y) > 1))))
+    
+    # Collapse gaps of one with hyphens:
+    paste0(unlist(lapply(y, function(z) {res <- as.character(z); if(length(z) > 1) {r <- rle(c(1, pmin(diff(z), 2))); res <- paste0(z[c(1, cumsum(r$lengths))], c("-", " ")[r$values], collapse = ""); res <- substr(res, 1, nchar(res) - 1)}; res})), collapse = " ")
+    
+  }))), collapse = " | ")))
+  
   # If performing branch partition test(s) check and reformat branch partitions:
   if(!is.null(BranchPartitionsToTest)) BranchPartitionsToTest <- PartitionFormatter(PartitionsToTest = BranchPartitionsToTest, ValidValues = EdgeNumbers, PartitionName = "BranchPartitionsToTest")
   
@@ -728,6 +742,12 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
         BranchPartitionTestResults <- lapply(PartitionedData, function(x) list(Rates = unname(unlist(lapply(as.list(unique(x[, "Partition"])), function(y) x[x[, "Partition"] == y, "Rate"][1]))), AIC = GetAICFromPartition(x), AICc = GetAICFromPartition(x, AICc = TRUE)))
         
       }
+      
+      # Pack branch partitions to test into single strings for output:
+      PackedBranchPartitions <- PartitionPacker(BranchPartitionsToTest)
+      
+      # Add packed partitions to results:
+      for(i in 1:length(BranchPartitionTestResults)) BranchPartitionTestResults[[i]]$Partition <- PackedBranchPartitions[i]
     
     # If not performing branch partition tests:
     } else {
@@ -771,6 +791,13 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
         
       }
       
+      # Pack clade partitions to test into single strings for output:
+      PackedCladePartitions <- PartitionPacker(CladePartitionsToTest)
+      
+      # Add packed partitions to results:
+      for(i in 1:length(CladePartitionTestResults)) CladePartitionTestResults[[i]]$Partition <- PackedCladePartitions[i]
+
+
     # If not performing clade partition tests:
     } else {
       
@@ -836,6 +863,13 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
       
     }
     
+    # Pack character partitions to test into single strings for output:
+    PackedCharacterPartitions <- PartitionPacker(CharacterPartitionsToTest)
+    
+    # Add packed partitions to results:
+    for(i in 1:length(CharacterPartitionTestResults)) CharacterPartitionTestResults[[i]]$Partition <- PackedCharacterPartitions[i]
+
+
   # If performing branch partition tests:
   } else {
     
@@ -893,6 +927,12 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
       
     }
     
+    # Pack time bin partitions to test into single strings for output:
+    PackedTimeBinPartitions <- PartitionPacker(TimeBinPartitionsToTest)
+    
+    # Add packed partitions to results:
+    for(i in 1:length(TimeBinTestResults)) TimeBinTestResults[[i]]$Partition <- PackedTimeBinPartitions[i]
+
   # If not performing time bin partition tests:
   } else {
     
@@ -960,36 +1000,35 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
 
 }
 
-#Ages <- read.table("~/Documents/Packages/Claddis/LungfishTest/ages.txt", sep = ",")
-#Matrix <- Claddis::ReadMorphNexus("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.nex")
-#Tree <- ape::read.tree("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.tre")
-#TimeBins <- c(443.8, 419.2, 358.9, 298.9, 251.9, 201.3, 145.0, 0.0)
-
-#Tree <- Tree[sample(1:100000, 100)]
-#Tree <- lapply(Tree, function(x) strap::DatePhylo(x, Ages, rlen = 2, method = "equal"))
-#class(Tree) <- "multiPhylo"
-
-#tree <- Tree[[1]]
-#CladisticMatrix <- Matrix
-#TimeBins <- TimeBins
-#BranchPartitionsToTest <- lapply(as.list(1:nrow(tree$edge)), as.list)
-#CharacterPartitionsToTest <- list(list(1:91), list(Cranial = 1:81, Postcranial = 82:91))
-#CladePartitionsToTest <- lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)
-#TimeBinPartitionsToTest <- TimeBinPartitioner(7)
-#ChangeTimes = "random"
-#LikelihoodTest = "AIC"
-#Alpha = 0.01
-#MultipleComparisonCorrection = "BenjaminiHochberg"
-#PolymorphismState = "missing"
-#UncertaintyState = "missing"
-#InapplicableState = "missing"
-#TimeBinApproach = "Lloyd"
-#EnsureAllWeightsAreIntegers = FALSE
-#EstimateAllNodes = FALSE
-#EstimateTipValues = FALSE
-#InapplicablesAsMissing = FALSE
-#PolymorphismBehaviour = "equalp"
-#UncertaintyBehaviour = "equalp"
-#Threshold = 0.01
-
+# Ages <- read.table("~/Documents/Packages/Claddis/LungfishTest/ages.txt", sep = ",")
+# Matrix <- Claddis::ReadMorphNexus("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.nex")
+# Tree <- ape::read.tree("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.tre")
+# TimeBins <- c(443.8, 419.2, 358.9, 298.9, 251.9, 201.3, 145.0, 0.0)
+# 
+# Tree <- Tree[sample(1:100000, 100)]
+# Tree <- lapply(Tree, function(x) strap::DatePhylo(x, Ages, rlen = 2, method = "equal"))
+# class(Tree) <- "multiPhylo"
+# 
+# tree <- Tree[[1]]
+# CladisticMatrix <- Matrix
+# TimeBins <- TimeBins
+# BranchPartitionsToTest <- lapply(as.list(1:nrow(tree$edge)), as.list)
+# CharacterPartitionsToTest <- list(list(1:91), list(Cranial = 1:81, Postcranial = 82:91))
+# CladePartitionsToTest <- lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)
+# TimeBinPartitionsToTest <- TimeBinPartitioner(7)
+# ChangeTimes = "random"
+# LikelihoodTest = "AIC"
+# Alpha = 0.01
+# MultipleComparisonCorrection = "BenjaminiHochberg"
+# PolymorphismState = "missing"
+# UncertaintyState = "missing"
+# InapplicableState = "missing"
+# TimeBinApproach = "Lloyd"
+# EnsureAllWeightsAreIntegers = FALSE
+# EstimateAllNodes = FALSE
+# EstimateTipValues = FALSE
+# InapplicablesAsMissing = FALSE
+# PolymorphismBehaviour = "equalp"
+# UncertaintyBehaviour = "equalp"
+# Threshold = 0.01
 
