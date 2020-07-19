@@ -302,7 +302,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
   }
   
   # Subfunction to pack partitions to short format for output:
-  PartitionPacker <- function(FormattedPartitions) unlist(lapply(FormattedPartitions, function(x) paste(sort(unlist(lapply(x, function(y) {
+  PartitionPacker <- function(FormattedPartitions) unlist(lapply(FormattedPartitions, function(x) paste(unlist(lapply(x, function(y) {
     
     # First make sure y is sorted:
     y <- sort(y)
@@ -313,7 +313,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
     # Collapse gaps of one with hyphens:
     paste0(unlist(lapply(y, function(z) {res <- as.character(z); if(length(z) > 1) {r <- rle(c(1, pmin(diff(z), 2))); res <- paste0(z[c(1, cumsum(r$lengths))], c("-", " ")[r$values], collapse = ""); res <- substr(res, 1, nchar(res) - 1)}; res})), collapse = " ")
     
-  }))), collapse = " | ")))
+  })), collapse = " | ")))
   
   # If performing branch partition test(s) check and reformat branch partitions:
   if(!is.null(BranchPartitionsToTest)) BranchPartitionsToTest <- PartitionFormatter(PartitionsToTest = BranchPartitionsToTest, ValidValues = EdgeNumbers, PartitionName = "BranchPartitionsToTest")
