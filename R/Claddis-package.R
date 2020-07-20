@@ -36,7 +36,8 @@
 
 #' @importFrom clipr write_clip
 #' @importFrom gdata trim
-#' @importFrom graphics layout lines par plot points polygon text 
+#' @importFrom geoscale geoscalePlot
+#' @importFrom graphics layout lines par plot points polygon text
 #' @importFrom grDevices adjustcolor chull 
 #' @importFrom stats as.dist dist dpois pchisq runif var 
 #' @importFrom utils combn 
