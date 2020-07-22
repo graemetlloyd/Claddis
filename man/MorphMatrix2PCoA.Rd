@@ -73,10 +73,6 @@ MorphMatrix2PCoA(
 \item{vectors}{See \link{pcoa}.}
 
 \item{trace}{See \link{pcoa}.}
-
-\item{vectors.cor}{See \link{pcoa}.}
-
-\item{trace.cor}{See \link{pcoa}.}
 }
 \description{
 Performs Principal Coordinates Analysis (PCoA) on a cladistic matrix.

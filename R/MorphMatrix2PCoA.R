@@ -41,8 +41,6 @@
 #' @return \item{values}{See \link{pcoa}.}
 #' @return \item{vectors}{See \link{pcoa}.}
 #' @return \item{trace}{See \link{pcoa}.}
-#' @return \item{vectors.cor}{See \link{pcoa}.}
-#' @return \item{trace.cor}{See \link{pcoa}.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -79,7 +77,6 @@
 MorphMatrix2PCoA <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills", TransformDistances = "arcsine_sqrt", DistPolymorphismBehaviour = "min.difference", DistUncertaintyBehaviour = "min.difference", DistInapplicableBehaviour = "missing", CharacterDependencies = NULL, Alpha = 0.5, correction = "cailliez", Tree = NULL, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, AncestralPolymorphismBehaviour = "equalp", AncestralUncertaintyBehaviour = "equalp", Threshold = 0.01) {
     
 # Add some top level conditionsl here to check input is valid.
-# NEED TO PERMUTE THROUGH ISSUE WITH WHAT VECTORS TO USE FROM ape::pcoa() AS HAS RAW AND CORRECTED VERSIONS. (E.G., PLOTTING FUNCTIONS NEED THIS
   
   # If no tree is supplied:
   if(is.null(Tree)) {
@@ -117,6 +114,28 @@ MorphMatrix2PCoA <- function(CladisticMatrix, Distance = "MORD", GEDType = "Will
     # Perform Principal Coordinates Analysis on the data:
     pcoa_results <- ape::pcoa(trimmed_distances$DistMatrix, correction = correction, rn = rownames(trimmed_distances$DistMatrix))
 
+  }
+  
+  # If corrected vectors exist:
+  if(!is.null(pcoa_results$vectors.cor)) {
+    
+    # Overwrite uncorrected with corrected:
+    pcoa_results$vectors <- pcoa_results$vectors.cor
+    
+    # Remove corrected from output:
+    pcoa_results$vectors.cor <- NULL
+    
+  }
+  
+  # If corrected trace exists:
+  if(!is.null(pcoa_results$trace.cor)) {
+    
+    # Overwite uncorrected with corrected:
+    pcoa_results$trace <- pcoa_results$trace.cor
+    
+    # Remove corrected from output:
+    pcoa_results$trace.cor <- NULL
+    
   }
   
   # Compile output:
