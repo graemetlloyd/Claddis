@@ -134,6 +134,7 @@
 #' \item{CharacterRates}{Matrix showing calculated rates for each character. NULL if \code{CharacterPartitionsToTest} is not requested.}
 #' \item{CladeRates}{Matrix showing calculated rates for each clade. NULL if \code{CladePartitionsToTest} is not requested.}
 #' \item{TimeRates}{Matrix showing calculated rates for each time bin. NULL if \code{TimeBinPartitionsToTest} is not requested.}
+#' \item{Tree}{The time-scaled input tree used as input (provided as output for use with visualisation functions).}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Steve C. Wang \email{scwang@@swarthmore.edu}
 #'
@@ -993,7 +994,7 @@ DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartiti
   }
 
   # Compile output:
-  Output <- list(TimeBinsUsed = TimeBins, InferredCharacterChanges = AllChanges, IntrinsicCharacterRate = GlobalRate, ContinuousCharactersConvertedToDiscrete = ContinuousCharactersConverted, BranchPartitionResults = BranchPartitionTestResults, CharacterPartitionResults = CharacterPartitionTestResults, CladePartitionResults = CladePartitionTestResults, TimeBinResults = TimeBinTestResults, BranchRates = BranchRates, CharacterRates = CharacterRates, CladeRates = CladeRates, TimeRates = TimeRates)
+  Output <- list(TimeBinsUsed = TimeBins, InferredCharacterChanges = AllChanges, IntrinsicCharacterRate = GlobalRate, ContinuousCharactersConvertedToDiscrete = ContinuousCharactersConverted, BranchPartitionResults = BranchPartitionTestResults, CharacterPartitionResults = CharacterPartitionTestResults, CladePartitionResults = CladePartitionTestResults, TimeBinResults = TimeBinTestResults, BranchRates = BranchRates, CharacterRates = CharacterRates, CladeRates = CladeRates, TimeRates = TimeRates, Tree = tree)
   
   # Return output:
   return(Output)
