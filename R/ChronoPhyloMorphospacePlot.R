@@ -48,6 +48,9 @@
 
 #' @export ChronoPhyloMorphospacePlot
 ChronoPhyloMorphospacePlot <- function(pcoa_data, x_axis = 1, y_axis = 2, shadow = TRUE) {
+  
+  # RGL CONTINUES TO CAUSE PROBLEMS, MAYBE MOVE THIS TO PLOT3D INSTEAD?
+  
 
    if (! requireNamespace("rgl", quietly = TRUE)) {
       stop(paste0(
