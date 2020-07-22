@@ -728,10 +728,7 @@ MorphDistMatrix <- function(CladisticMatrix, Distance = "MORD", GEDType = "Wills
   }
   
   # Compile results as a list:
-  result <- list(Distance, dist.matrix, comp.char.matrix)
-  
-  # Add names to list:
-  names(result) <- c("DistanceMetric", "DistanceMatrix", "ComparableCharacterMatrix")
+  result <- list(DistanceMetric = Distance, DistanceMatrix = dist.matrix, ComparableCharacterMatrix = comp.char.matrix)
   
   # Output result:
   return(result)

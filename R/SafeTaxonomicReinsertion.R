@@ -204,10 +204,7 @@ SafeTaxonomicReinsertion <- function(treefile.in, treefile.out, str.list, multi.
   write(text, treefile.out)
   
   # Compile output:
-  output <- list(uninserted)
-  
-  # Name output:
-  names(output) <- "unreinserted.taxa"
+  output <- list(unreinserted.taxa = uninserted)
   
   # Return output:
   return(output)

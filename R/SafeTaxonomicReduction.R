@@ -211,10 +211,7 @@ SafeTaxonomicReduction <- function(CladisticMatrix) {
   }
   
   # Compile output into single list:
-  output <- list(SafeToRemove, ReducedMatrix, RemovedMatrix)
-  
-  # Add names to output:
-  names(output) <- c("str.list", "reduced.matrix", "removed.matrix")
+  output <- list(str.list = SafeToRemove, reduced.matrix = ReducedMatrix, removed.matrix = RemovedMatrix)
   
   # Return output inviisibly:
   return(invisible(output))

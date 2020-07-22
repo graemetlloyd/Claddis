@@ -181,28 +181,16 @@ MakeMorphMatrix <- function(CharacterTaxonMatrix, header = "", Weights = NULL, o
   }
   
   # Build matrix topper:
-  Topper <- list(header, step.matrices)
-  
-  # Add names to topper:
-  names(Topper) <- c("Header", "StepMatrices")
+  Topper <- list(Header = header, StepMatrices = step.matrices)
   
   # Build characters list:
-  Characters <- list(symbols, "?", "-")
-  
-  # Add names to characters list:
-  names(Characters) <- c("Symbols", "Missing", "Gap")
+  Characters <- list(Symbols = symbols, Missing = "?", Gap = "-")
   
   # Build Matrix_1 list:
-  Matrix_1 <- list(NA, "STANDARD", CharacterTaxonMatrix, ordering, Weights, min.vals, max.vals, Characters)
+  Matrix_1 <- list(BlockName = NA, Datatype = "STANDARD", Matrix = CharacterTaxonMatrix, Ordering = ordering, Weights = Weights, MinVals = min.vals, MaxVals = max.vals, Characters = Characters)
   
-  # Add names to Matrix_1:
-  names(Matrix_1) <- c("BlockName", "Datatype", "Matrix", "Ordering", "Weights", "MinVals", "MaxVals", "Characters")
-
   # Assimilate into output:
-  result <- list(Topper, Matrix_1)
-
-  # Add names to output:
-  names(result) <- c("Topper", "Matrix_1")
+  result <- list(Topper = Topper, Matrix_1 = Matrix_1)
 
   # Return output:
   return(result)

@@ -345,10 +345,7 @@ DolloSCM <- function(tree, tip.states) {
   rownames(changes.matrix) <- NULL
   
   # Build output:
-  output <- list(changes.matrix, SCM)
-  
-  # Add names to output:
-  names(output) <- c("Changes", "SCM")
+  output <- list(Changes = changes.matrix, SCM = SCM)
   
   # Return output:
   return(output)

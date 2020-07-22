@@ -132,11 +132,8 @@ EdgeLengthsInBins <- function(tree, time.bins, pruned.tree=NULL) {
 	names(terminal.edge.length.in.bin) <- names(internal.edge.length.in.bin) <- names(edge.length.in.bin) <- apply(cbind(time.bins[1:(length(time.bins) - 1)], time.bins[2:length(time.bins)]), 1, paste, collapse = "-")
 	
 	# Compile output:
-	output <- list(edge.length.in.bin, terminal.edge.length.in.bin, internal.edge.length.in.bin)
+	output <- list(edge.length.in.bin = edge.length.in.bin, terminal.edge.length.in.bin = terminal.edge.length.in.bin, internal.edge.length.in.bin = internal.edge.length.in.bin)
 
-	# Add names to output:
-	names(output) <- c("edge.length.in.bin", "terminal.edge.length.in.bin", "internal.edge.length.in.bin")
-	
 	# Return output:
 	return(output)
 	

@@ -35,14 +35,10 @@
 TrimMorphDistMatrix <- function(dist.matrix, Tree = NULL) {
   
   # If input is of class "dist" first convert to a regular matrix:
-  if(inherits(dist.matrix, what = "dist")){
-    dist.matrix <- as.matrix(dist.matrix)
-    }
+  if(inherits(dist.matrix, what = "dist")) dist.matrix <- as.matrix(dist.matrix)
   
   # Check the input is a distance matrix:
-  if(!is.matrix(dist.matrix)){
-    stop("ERROR: Input must be a distance matrix (i.e., either an object of class \"dist\" or a square matrix).")
-    }
+  if(!is.matrix(dist.matrix)) stop("ERROR: Input must be a distance matrix (i.e., either an object of class \"dist\" or a square matrix).")
   
   # Case if there is no tree:
   if(is.null(Tree)) {
@@ -57,10 +53,7 @@ TrimMorphDistMatrix <- function(dist.matrix, Tree = NULL) {
       removed.taxa <- NULL
       
       # Compile data in single variable:
-      out <- list(dist.matrix, Tree, removed.taxa)
-      
-      # Add names:
-      names(out) <- c("DistMatrix", "Tree", "RemovedTaxa")
+      out <- list(DistMatrix = dist.matrix, Tree = Tree, RemovedTaxa = removed.taxa)
       
       # Output:
       return(out)
@@ -95,10 +88,7 @@ TrimMorphDistMatrix <- function(dist.matrix, Tree = NULL) {
       }
       
       # Compile data in single variable:
-      out <- list(dist.matrix, Tree, removes)
-      
-      # Add names:
-      names(out) <- c("DistMatrix", "Tree", "RemovedTaxa")
+      out <- list(DistMatrix = dist.matrix, Tree = Tree, RemovedTaxa = removes)
       
       # Output:
       return(out)
@@ -118,10 +108,7 @@ TrimMorphDistMatrix <- function(dist.matrix, Tree = NULL) {
       removed.taxa <- NULL
       
       # Compile data in single variable:
-      out <- list(dist.matrix, Tree, removed.taxa)
-      
-      # Add names:
-      names(out) <- c("DistMatrix", "Tree", "RemovedTaxa")
+      out <- list(DistMatrix = dist.matrix, Tree = Tree, RemovedTaxa = removed.taxa)
       
       # Return unmodified matrix and tree:
       return(out)
@@ -284,10 +271,7 @@ TrimMorphDistMatrix <- function(dist.matrix, Tree = NULL) {
       colnames(dist.matrix)[match(node.names, colnames(dist.matrix))] <- rownames(dist.matrix)[match(node.names, rownames(dist.matrix))] <- names(node.names)
       
       # Compile data in single variable:
-      out <- list(dist.matrix, Tree, removes)
-      
-      # Add names:
-      names(out) <- c("DistMatrix", "Tree", "RemovedTaxa")
+      out <- list(DistMatrix = dist.matrix, Tree = Tree, RemovedTaxa = removes)
       
       # Return answer:
       return(out)

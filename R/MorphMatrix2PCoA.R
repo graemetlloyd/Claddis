@@ -120,16 +120,7 @@ MorphMatrix2PCoA <- function(CladisticMatrix, Distance = "MORD", GEDType = "Will
   }
   
   # Compile output:
-  output <- c(list(Tree), list(trimmed_distances$DistMatrix), list(trimmed_distances$RemovedTaxa), pcoa_results)
-
-  # Add variable name for tree:
-  names(output)[[1]] <- "Tree"
-
-  # Add variable name for distaance matrix:
-  names(output)[[2]] <- "DistMatrix"
-  
-  # Add variable name for removed taxa and nodes:
-  names(output)[[3]] <- "RemovedTaxa"
+  output <- c(Tree = list(Tree), DistMatrix = list(trimmed_distances$DistMatrix), RemovedTaxa = list(trimmed_distances$RemovedTaxa), pcoa_results)
 
   # Return output invisibly:
   invisible(output)

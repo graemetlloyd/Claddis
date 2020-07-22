@@ -167,10 +167,7 @@ PhyloCharCompletenessInBins <- function(CladisticMatrix, TimeTree, TimeBins, plo
   names(MeanProportionalCompletenessInBins) <- names(Upper95ProportionalCompletenessInBins) <- names(Lower95ProportionalCompletenessInBins) <- colnames(ProportionalCompletenessInBinsByCharacter) <- TimeBinNames
   
   # Compile output variables:
-  output <- list(MeanProportionalCompletenessInBins, Upper95ProportionalCompletenessInBins, Lower95ProportionalCompletenessInBins, ProportionalCompletenessInBinsByCharacter)
-  
-  # Add names to output:
-  names(output) <- c("MeanProportionalCharacterCompletenessPerTimeBin", "Upper95PercentCIProportionalCharacterCompletenessPerTimeBin", "Lower95PercentCIProportionalCharacterCompletenessPerTimeBin", "ProportionalCharacterCompletenessPerTimeBinByCharacter")
+  output <- list(MeanProportionalCharacterCompletenessPerTimeBin = MeanProportionalCompletenessInBins, Upper95PercentCIProportionalCharacterCompletenessPerTimeBin = Upper95ProportionalCompletenessInBins, Lower95PercentCIProportionalCharacterCompletenessPerTimeBin = Lower95ProportionalCompletenessInBins, ProportionalCharacterCompletenessPerTimeBinByCharacter = ProportionalCompletenessInBinsByCharacter)
   
   # Return output:
   return(output)

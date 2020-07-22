@@ -963,10 +963,7 @@ GetAllStateChanges <- function(CladisticMatrix, Tree, TimeBins, NSimulations = 1
   InternalEdgeLengthsPerBin <- do.call(rbind, lapply(CharacterList, function(x) x$EdgeLengthsInBins$internal.edge.length.in.bin))
   
   # Compile output as list:
-  output <- list(AllStateChanges, CharacterTimes, EdgeLengthsPerBin, TerminalEdgeLengthsPerBin, InternalEdgeLengthsPerBin)
-  
-  # Add names to output:
-  names(output) <- c("AllStateChanges", "CharacterTimes", "EdgeLengthsPerBin", "TerminalEdgeLengthsPerBin", "InternalEdgeLengthsPerBin")
+  output <- list(AllStateChanges = AllStateChanges, CharacterTimes = CharacterTimes, EdgeLengthsPerBin = EdgeLengthsPerBin, TerminalEdgeLengthsPerBin = TerminalEdgeLengthsPerBin, InternalEdgeLengthsPerBin = InternalEdgeLengthsPerBin)
   
   # Return output:
   return(invisible(output))

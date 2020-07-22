@@ -1190,31 +1190,19 @@ ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
   }
   
   # Create top list:
-  TopList <- list(textlines, StepMatrices)
-  
-  # Add names to top list:
-  names(TopList) <- c("Header", "StepMatrices")
+  TopList <- list(Header = textlines, StepMatrices = StepMatrices)
   
   # Start to compile output starting with top list:
-  Output <- list(TopList)
-  
-  # Add name to top list:
-  names(Output) <- "Topper"
+  Output <- list(Topper = TopList)
   
   # For each matrix block:
   for(i in 1:length(MatrixBlockList)) {
     
     # Create sublist for character information:
-    Characters <- list(Symbols[[i]], Missing[[i]], Gap[[i]])
-    
-    # Add names to characters sublist:
-    names(Characters) <- c("Symbols", "Missing", "Gap")
+    Characters <- list(Symbols = Symbols[[i]], Missing = Missing[[i]], Gap = Gap[[i]])
     
     # Build list for current block:
-    Block <- list(BlockNames[[i]], names(MatrixBlockList)[i], MatrixBlockList[[i]], Ordering[[i]], Weights[[i]], MinMaxMatrixList[[i]][, "Min"], MinMaxMatrixList[[i]][, "Max"], Characters)
-    
-    # Add names to list:
-    names(Block) <- c("BlockName", "Datatype", "Matrix", "Ordering", "Weights", "MinVals", "MaxVals", "Characters")
+    Block <- list(BlockName = BlockNames[[i]], Datatype = names(MatrixBlockList)[i], Matrix = MatrixBlockList[[i]], Ordering = Ordering[[i]], Weights = Weights[[i]], MinVals = MinMaxMatrixList[[i]][, "Min"], MaxVals = MinMaxMatrixList[[i]][, "Max"], Characters = Characters)
     
     # Store current block in output:
     Output[[(i + 1)]] <- Block
