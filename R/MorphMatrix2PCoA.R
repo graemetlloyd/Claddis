@@ -94,7 +94,7 @@ MorphMatrix2PCoA <- function(CladisticMatrix, Distance = "MORD", GEDType = "Will
     if(!is.null(trimmed_distances$removed.taxa)) message(paste("The following taxa had to be removed to produce a complete distance matrix:", paste(trimmed_distances$removed.taxa, collapse = ", ")))
     
     # Perform Principal Coordinates Analysis on the data:
-    pcoa_results <- pcoa(trimmed_distances$DistMatrix, correction = correction, rn = rownames(trimmed_distances$DistMatrix))
+    pcoa_results <- ape::pcoa(trimmed_distances$DistMatrix, correction = correction, rn = rownames(trimmed_distances$DistMatrix))
     
   # Case if a tree is included (and a phylomorphospace is requested):
   } else {
@@ -115,7 +115,7 @@ MorphMatrix2PCoA <- function(CladisticMatrix, Distance = "MORD", GEDType = "Will
     Tree <- trimmed_distances$Tree
 
     # Perform Principal Coordinates Analysis on the data:
-    pcoa_results <- pcoa(trimmed_distances$DistMatrix, correction = correction, rn = rownames(trimmed_distances$DistMatrix))
+    pcoa_results <- ape::pcoa(trimmed_distances$DistMatrix, correction = correction, rn = rownames(trimmed_distances$DistMatrix))
 
   }
   
