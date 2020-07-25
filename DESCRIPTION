@@ -1,7 +1,7 @@
 Package: Claddis
 Type: Package
 Title: Measuring Morphological Diversity and Evolutionary Tempo
-Version: 0.4.8
+Version: 0.4.9
 Date: 2020-25-07
 Authors@R: c(
     person(given = "Graeme T.", family = "Lloyd",
