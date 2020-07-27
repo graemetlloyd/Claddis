@@ -90,7 +90,7 @@ DiscreteCharacterRate(
 \item{Tree}{The time-scaled input tree used as input (provided as output for use with visualisation functions).}
 }
 \description{
-Given a tree and a cladistic-type matrix uses either likelihood ratio tests or the Akiake Information Criterion to compare rate models across branches, clades, time bins, or character partitions.
+Given a tree and a cladistic-type matrix uses either likelihood ratio tests or the Akaike Information Criterion to compare rate models across branches, clades, time bins, or character partitions.
 }
 \details{
 \bold{Introduction}
