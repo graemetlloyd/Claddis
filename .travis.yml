@@ -10,6 +10,9 @@ addons:
 language: r
 sudo: required
 
+before_install:
+  - apt-get install libglu1-mesa-dev
+
 ##because of phangorn
 #bioc_packages: 
 #   - Biostrings
