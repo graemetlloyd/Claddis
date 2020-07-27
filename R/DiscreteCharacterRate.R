@@ -2,7 +2,7 @@
 #'
 #' @description
 #'
-#' Given a tree and a cladistic-type matrix uses either likelihood ratio tests or the Akiake Information Criterion to compare rate models across branches, clades, time bins, or character partitions.
+#' Given a tree and a cladistic-type matrix uses either likelihood ratio tests or the Akaike Information Criterion to compare rate models across branches, clades, time bins, or character partitions.
 #'
 #' @param tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{CladisticMatrix}.
 #' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
@@ -187,6 +187,8 @@
 #'
 #' @export DiscreteCharacterRate
 DiscreteCharacterRate <- function(tree, CladisticMatrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", LikelihoodTest = "AIC", Alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, EstimateAllNodes = FALSE, EstimateTipValues = FALSE, InapplicablesAsMissing = FALSE, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", Threshold = 0.01) {
+  
+  # ADD EXAMPLES OF VISUALISED OUTPUT
   
   # AICc BREAKS IF MORE THAN N-2 PARAMETERS (INFINITY OR WRONGLY NEGATIVE OUTPUT CAN OCCUR THIS WAY)
   # GLOBAL RATE NEEDS TO GO INTO LRT OPTION IF NOT USED IN AIC
