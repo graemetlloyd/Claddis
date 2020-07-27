@@ -1,21 +1,26 @@
-#
-addons:
-  apt:
-    packages:
-      - libgsl2
-      - gsl-bin
-      - libgsl-dev
-      - libmagick++-dev
-
+# Set language to R:
 language: r
+
+# Make sudo required (I guess this helps with some issues):
 sudo: required
 
+# Make sure dependencies are available:
 before_install:
-  - apt-get install libglu1-mesa-dev
+  - sudo apt-get libgsl2
+  - sudo apt-get gsl-bin
+  - sudo apt-get libgsl-dev
+  - sudo apt-get libmagick++-dev
+  - sudo apt-get -y install  libglu1-mesa-dev
 
-##because of phangorn
-#bioc_packages: 
-#   - Biostrings
+# Seeing if above does this bit better
+#addons:
+#  apt:
+#    packages:
+#      - libgsl2
+#      - gsl-bin
+#      - libgsl-dev
+#      - libmagick++-dev
+#      - libglu1-mesa-dev
 
 # Be strict when checking our package
 warnings_are_errors: true
