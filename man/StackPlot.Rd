@@ -97,7 +97,7 @@ StackPlot(ordination_axes, ages, groups, time_slices)
 
 }
 \references{
-Foote, M., 1993. Discordance and concordance between morphological and taxonomic diversity. \emph{Paleobiology}, \bold{19], 185-204.
+Foote, M., 1993. Discordance and concordance between morphological and taxonomic diversity. \emph{Paleobiology}, \bold{19}, 185-204.
 
 Foote, M., 1994. Morphological disparity in Ordovician-Devonian crinoids and the early saturation of morphological space. \emph{Paleobiology}, \bold{20}, 320-344.
 
@@ -105,7 +105,7 @@ Foote, M., 1995. Morphological diversification of Paleozoic crinoids. \emph{Pale
 
 Foote, M., 1999. Morphological diversity in the evolutionary radiation of Paleozoic and post-Paleozoic crinoids. \emph{Paleobiology}, \bold{25}, 1-115.
 
-Friedman, M. and Coates, M. I., 2006. A newly recognized fossil coelacanth highlights the early morphological diversification of the clade. \emph{Proceedings of the Royal Society of London B}, \bold{273}, 245-250.}
+Friedman, M. and Coates, M. I., 2006. A newly recognized fossil coelacanth highlights the early morphological diversification of the clade. \emph{Proceedings of the Royal Society of London B}, \bold{273}, 245-250.
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Emma Sherratt \email{emma.sherratt@gmail.com}
