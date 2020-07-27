@@ -6,21 +6,16 @@ sudo: required
 
 # Make sure dependencies are available:
 before_install:
-  - sudo apt-get libgsl2
-  - sudo apt-get gsl-bin
-  - sudo apt-get libgsl-dev
-  - sudo apt-get libmagick++-dev
   - sudo apt-get -y install  libglu1-mesa-dev
 
-# Seeing if above does this bit better
-#addons:
-#  apt:
-#    packages:
-#      - libgsl2
-#      - gsl-bin
-#      - libgsl-dev
-#      - libmagick++-dev
-#      - libglu1-mesa-dev
+# Addons
+addons:
+  apt:
+    packages:
+      - libgsl2
+      - gsl-bin
+      - libgsl-dev
+      - libmagick++-dev
 
 # Be strict when checking our package
 warnings_are_errors: true
