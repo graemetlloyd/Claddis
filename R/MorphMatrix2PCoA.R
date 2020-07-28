@@ -52,7 +52,7 @@
 #'
 #' @examples
 #'
-#' # Run on Michaux (189) data set with defaults:
+#' # Run on Michaux (1989) data set with defaults:
 #' x <- MorphMatrix2PCoA(Michaux1989)
 #'
 #' # Show output:
