@@ -31,13 +31,18 @@
 #'
 #' # Get proportional phylogenetic character completeness in ten equal-length
 #' # time bins:
-#' BinPhylogeneticCharacterCompleteness(CladisticMatrix = Day2016,
+#' BinCharacterCompleteness(CladisticMatrix = Day2016,
 #'   TimeTree = Day2016tree, TimeBins = seq(from =
 #'   Day2016tree$root.time, to = Day2016tree$root.time -
 #'   max(diag(vcv(Day2016tree))), length.out = 11))
 #'
-#' @export BinPhylogeneticCharacterCompleteness
-BinPhylogeneticCharacterCompleteness <- function(CladisticMatrix, TimeTree, TimeBins, plot = FALSE, CI = 0.95) {
+#' @export BinCharacterCompleteness
+BinCharacterCompleteness <- function(CladisticMatrix, TimeTree, TimeBins, plot = FALSE, CI = 0.95) {
+  
+  # TO DO:
+  #
+  # - Add an aphylogenetic option
+  # - Allow binning in other ways. E.g., by character grouping.
   
   # Subfunction for getting missing and inapplicable characters:
   MissingAndInapplicables <- function(x) {
