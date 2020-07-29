@@ -446,7 +446,7 @@ GetAllStateChanges <- function(CladisticMatrix, Tree, TimeBins, NSimulations = 1
     }
     
     # If more than two tips simply use function normally:
-    if(NumberOfTips > 2) x$PrunedToFullTreeEdgeMatches <- EdgeMatch(Tree, x$PrunedTree)$matching.edges
+    if(NumberOfTips > 2) x$PrunedToFullTreeEdgeMatches <- TreeSubtreeEdgeMatch(Tree, x$PrunedTree)$matching.edges
     
     # Return full output:
     return(x)
@@ -469,7 +469,7 @@ GetAllStateChanges <- function(CladisticMatrix, Tree, TimeBins, NSimulations = 1
     if(length(BranchesToSetAsZeroes) > 0) TemporaryTree$edge.length[BranchesToSetAsZeroes] <- 0
     
     # Get edge lengths in bins:
-    x$EdgeLengthsInBins <- EdgeLengthsInBins(tree = TemporaryTree, time.bins = TimeBins)
+    x$EdgeLengthsInBins <- BinEdgeLengths(tree = TemporaryTree, time.bins = TimeBins)
     
     # Return full output:
     return(x)
