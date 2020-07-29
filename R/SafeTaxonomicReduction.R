@@ -4,7 +4,7 @@
 #'
 #' Performs Safe Taxonomic Reduction (STR) on a character-taxon matrix.
 #'
-#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMatrixNEXUS}.
 #'
 #' @details
 #'

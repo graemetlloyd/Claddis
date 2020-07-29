@@ -6,7 +6,7 @@
 \title{Character-taxon matrix from Michaux 1989}
 \format{
 A character-taxon matrix in the format imported by
-\link{ReadMorphNexus}.
+\link{ReadMatrixNEXUS}.
 }
 \description{
 The character-taxon matrix from Michaux (1989).

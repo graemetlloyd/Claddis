@@ -25,7 +25,7 @@
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
-#' @seealso \link{ReadMorphNexus}
+#' @seealso \link{ReadMatrixNEXUS}
 #'
 #' @examples
 #'

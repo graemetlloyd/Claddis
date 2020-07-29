@@ -41,7 +41,7 @@
 #' WTSET * UNTITLED  = 1: 2, 2: 1 3-5;\nEND;", file = "morphmatrix.nex")
 #' 
 #' # Read in example matrix:
-#' morph.matrix <- ReadMorphNexus("morphmatrix.nex")
+#' morph.matrix <- ReadMatrixNEXUS("morphmatrix.nex")
 #' 
 #' # View example matrix in R:
 #' morph.matrix
@@ -49,8 +49,8 @@
 #' # Remove the generated data set:
 #' file.remove("morphmatrix.nex")
 #' 
-#' @export ReadMorphNexus
-ReadMorphNexus <- function(File, EqualiseWeights = FALSE) {
+#' @export ReadMatrixNEXUS
+ReadMatrixNEXUS <- function(File, EqualiseWeights = FALSE) {
   
   # ADD ABILITY TO READ CHARSET LINES
   # COULD BE MULTIPLE TYPESET OR WTSET LINES, NEED TO CHECK FOR THIS!

@@ -24,7 +24,7 @@
 #'
 #' @details
 #'
-#' Takes a cladistic matrix in the format imported by \link{ReadMorphNexus} and performs Principal Coordinates (Gower 1966) analysis on it.
+#' Takes a cladistic matrix in the format imported by \link{ReadMatrixNEXUS} and performs Principal Coordinates (Gower 1966) analysis on it.
 #'
 #' This function is effectively a wrapper for \link{pcoa} from the \link{ape} package and the user is referred there for some of the options (e.g., using the Caillez 1983 approach to avoiding negative eigenvalues).
 #'

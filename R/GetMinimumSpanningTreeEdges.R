@@ -24,16 +24,16 @@
 #' # distances:
 #' dist.matrix
 #' 
-#' # Use MinSpanTreeEdges to get the edges for the minimum spanning
+#' # Use GetMinimumSpanningTreeEdges to get the edges for the minimum spanning
 #' # tree:
-#' MinSpanTreeEdges(dist.matrix)
+#' GetMinimumSpanningTreeEdges(dist.matrix)
 #' 
-#' # Use sum of MinSpanTreeEdges to get the length of the minimum
+#' # Use sum of GetMinimumSpanningTreeEdges to get the length of the minimum
 #' # spanning tree:
-#' sum(MinSpanTreeEdges(dist.matrix))
+#' sum(GetMinimumSpanningTreeEdges(dist.matrix))
 #' 
-#' @export MinSpanTreeEdges
-MinSpanTreeEdges <- function(dist.matrix) {
+#' @export GetMinimumSpanningTreeEdges
+GetMinimumSpanningTreeEdges <- function(dist.matrix) {
 	
 	# Convert to matrix and set up links matrix:
 	dist.matrix <- as.matrix(dist.matrix)

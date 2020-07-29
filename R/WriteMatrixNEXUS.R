@@ -4,16 +4,16 @@
 #'
 #' Writes out a morphological data file in #NEXUS format.
 #'
-#' @param CladisticMatrix The cladistic matrix in the format imported by \link{ReadMorphNexus}.
+#' @param CladisticMatrix The cladistic matrix in the format imported by \link{ReadMatrixNEXUS}.
 #' @param filename The file name to write to. Should end in \code{.nex}.
 #'
 #' @details
 #'
-#' Writes out a #NEXUS (Maddison et al. 1997) data file representing the distribution of characters in a set of taxa. Data must be in the format created by importing data with \link{ReadMorphNexus}.
+#' Writes out a #NEXUS (Maddison et al. 1997) data file representing the distribution of characters in a set of taxa. Data must be in the format created by importing data with \link{ReadMatrixNEXUS}.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
-#' @seealso \link{WriteMorphTNT}
+#' @seealso \link{WriteMatrixTNT}
 #'
 #' @references
 #'
@@ -22,13 +22,13 @@
 #' @examples
 #'
 #' # Write out Michaux 1989 to current working directory:
-#' WriteMorphNexus(CladisticMatrix = Michaux1989, filename = "Michaux1989.nex")
+#' WriteMatrixNEXUS(CladisticMatrix = Michaux1989, filename = "Michaux1989.nex")
 #'
 #' # Remove file when finished:
 #' file.remove("Michaux1989.nex")
 #'
-#' @export WriteMorphNexus
-WriteMorphNexus <- function(CladisticMatrix, filename) {
+#' @export WriteMatrixNEXUS
+WriteMatrixNEXUS <- function(CladisticMatrix, filename) {
   
   # Subfunction to convert matrices back to symbols, missing and gap characters:
   MatrixConversion <- function(DataMatrix) {

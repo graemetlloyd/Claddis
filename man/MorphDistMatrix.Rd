@@ -17,7 +17,7 @@ MorphDistMatrix(
 )
 }
 \arguments{
-\item{CladisticMatrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
+\item{CladisticMatrix}{A character-taxon matrix in the format imported by \link{ReadMatrixNEXUS}.}
 
 \item{Distance}{The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).}
 

@@ -4,7 +4,7 @@
 #'
 #' Given a cladistic matrix, time-scaled tree, and set of time bin boundaries will return the proportional character completeness in each bin.
 #'
-#' @param CladisticMatrix A cladistic matrix in the form imported by \link{ReadMorphNexus}.
+#' @param CladisticMatrix A cladistic matrix in the form imported by \link{ReadMatrixNEXUS}.
 #' @param TimeTree A time-scaled phylogenetic tree containing all the taxa in \code{CladisticMatrix}.
 #' @param TimeBins A set of time bin boundaries (oldest to youngest) in millions of years.
 #' @param plot An optional choice to plot the results (default is \code{FALSE}).

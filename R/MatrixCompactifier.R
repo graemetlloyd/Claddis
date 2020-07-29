@@ -4,7 +4,7 @@
 #'
 #' Collapses a cladistic matrix to just unique character state distributions and taxon names.
 #'
-#' @param CladisticMatrix The cladistic matrix in the format imported by \link{ReadMorphNexus}.
+#' @param CladisticMatrix The cladistic matrix in the format imported by \link{ReadMatrixNEXUS}.
 #' @param Message Logical indicating whether or not a message should be printed to the screen if the matrix cannot be compactified.
 #'
 #' @details

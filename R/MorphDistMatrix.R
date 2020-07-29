@@ -4,7 +4,7 @@
 #'
 #' Takes a cladistic morphological dataset and converts it into a set of pairwise distances.
 #'
-#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMatrixNEXUS}.
 #' @param Distance The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).
 #' @param GEDType The type of GED to use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.
 #' @param TransformDistances Whether to transform the distances. Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default). (Note: this is only really appropriate for the proportional distances, i.e., "GC" and "MORD".)

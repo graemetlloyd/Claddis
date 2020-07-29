@@ -49,7 +49,7 @@
 #' names(tip.states) <- tree$tip.label
 #'
 #' # Get a single stochastic character map:
-#' out <- DolloSCM(tree, tip.states)
+#' out <- GetStochasticChangesDollo(tree, tip.states)
 #'
 #' # View matrix of changes:
 #' out$Changes
@@ -57,8 +57,8 @@
 #' # View stochastic character map (time spent in each state on each branch):
 #' out$SCM
 #'
-#' @export DolloSCM
-DolloSCM <- function(tree, tip.states) {
+#' @export GetStochasticChangesDollo
+GetStochasticChangesDollo <- function(tree, tip.states) {
   
   # Check tree has branch lengths:
   if(is.null(tree$edge.length)) stop("Tree must have branch lengths.")

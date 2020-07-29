@@ -4,7 +4,7 @@
 #'
 #' Given a tree and a cladistic matrix uses likelihood to estimate the ancestral states for every character.
 #'
-#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMatrixNEXUS}.
 #' @param Tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{CladisticMatrix}.
 #' @param EstimateAllNodes Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).
 #' @param EstimateTipValues Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).

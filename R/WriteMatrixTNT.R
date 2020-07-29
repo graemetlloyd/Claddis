@@ -4,13 +4,13 @@
 #'
 #' Writes out a morphological data file in Hennig86/TNT format.
 #'
-#' @param CladisticMatrix A cladistic matrix in the format imported by \link{ReadMorphNexus}.
+#' @param CladisticMatrix A cladistic matrix in the format imported by \link{ReadMatrixNEXUS}.
 #' @param filename The file name to write to. Should end in \code{.tnt}.
 #' @param add.analysis.block Whether or not to add analysis block (i.e., tree search commands).
 #'
 #' @details
 #'
-#' Writes out a TNT (Goloboff et al. 2008; Goloboff and Catalano 2016) data file representing the distribution of discrete morphological characters in a set of taxa. Data must be in the format created by importing data with \link{ReadMorphNexus}.
+#' Writes out a TNT (Goloboff et al. 2008; Goloboff and Catalano 2016) data file representing the distribution of discrete morphological characters in a set of taxa. Data must be in the format created by importing data with \link{ReadMatrixNEXUS}.
 #'
 #' Note that the format can currently deal with continuous characters, sequence (DNA) data, and combinations of these and discrete morphology, but not yet the morphometric format introduced in Goloboff and Catalano (2016).
 #'
@@ -18,7 +18,7 @@
 #'
 #' @seealso
 #'
-#' \link{WriteMorphNexus}
+#' \link{WriteMatrixNEXUS}
 #'
 #' @references
 #'
@@ -29,13 +29,13 @@
 #' @examples
 #'
 #' # Write out Michaux 1989 to current working directory:
-#' WriteMorphTNT(CladisticMatrix = Michaux1989, filename = "Michaux1989.tnt")
+#' WriteMatrixTNT(CladisticMatrix = Michaux1989, filename = "Michaux1989.tnt")
 #'
 #' # Remove file when finished:
 #' file.remove("Michaux1989.tnt")
 #'
-#' @export WriteMorphTNT
-WriteMorphTNT <- function(CladisticMatrix, filename, add.analysis.block = FALSE) {
+#' @export WriteMatrixTNT
+WriteMatrixTNT <- function(CladisticMatrix, filename, add.analysis.block = FALSE) {
   
   # Subfunction to convert matrices back to symbols, missing and gap characters:
   MatrixConversion <- function(DataMatrix) {

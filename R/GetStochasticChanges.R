@@ -4,7 +4,7 @@
 #'
 #' Takes a cladistic matrix and time-scaled tree and makes point estimates for every character change using stochastic character mapping.
 #'
-#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMorphNexus}.
+#' @param CladisticMatrix A character-taxon matrix in the format imported by \link{ReadMatrixNEXUS}.
 #' @param Tree A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{CladisticMatrix}.
 #' @param TimeBins A vector of ages representing the boundaries of a series of time bins.
 #' @param NSimulations The number of simulations to perform (passed to \code{make.simmap}.
@@ -59,7 +59,7 @@
 #'
 #' # Get all state changes for two simulations:
 #' StateChanges <-
-#'   GetAllStateChanges(CladisticMatrix = CladisticMatrix,
+#'   GetStochasticChanges(CladisticMatrix = CladisticMatrix,
 #'   Tree = Tree, TimeBins = seq(Tree$root.time, 0,
 #'   length.out = 3), NSimulations = 2)
 #'
@@ -79,8 +79,8 @@
 #' # View matrix of internal edge lengths in each time bin:
 #' StateChanges$InternalEdgeLengthsPerBin
 #'
-#' @export GetAllStateChanges
-GetAllStateChanges <- function(CladisticMatrix, Tree, TimeBins, NSimulations = 10, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", InapplicableBehaviour = "missing") {
+#' @export GetStochasticChanges
+GetStochasticChanges <- function(CladisticMatrix, Tree, TimeBins, NSimulations = 10, PolymorphismBehaviour = "equalp", UncertaintyBehaviour = "equalp", InapplicableBehaviour = "missing") {
   
   # IMPROVE CUSTOMISATION OF MAKE.SIMMAP WITH OPTIONS FOR PI, Q ETC. (FLAT PRIOR ON ROOT MAY BE PARTICULARLY BAD? ALLOW MAYBE SKEWING TOWARDS OUTGROUP STATE AS SOME KIND OF SLIDING VALUE?).
   # AND ONLY PERFORM SCM ON UNIQUE STATE DISTRIBUTON-CHARACTER TYPE COMBOS
@@ -446,7 +446,7 @@ GetAllStateChanges <- function(CladisticMatrix, Tree, TimeBins, NSimulations = 1
     }
     
     # If more than two tips simply use function normally:
-    if(NumberOfTips > 2) x$PrunedToFullTreeEdgeMatches <- TreeSubtreeEdgeMatch(Tree, x$PrunedTree)$matching.edges
+    if(NumberOfTips > 2) x$PrunedToFullTreeEdgeMatches <- MatchEdges(Tree, x$PrunedTree)$matching.edges
     
     # Return full output:
     return(x)

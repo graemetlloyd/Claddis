@@ -55,7 +55,7 @@ MatrixBuilder(CharacterTaxonMatrix)
 
 }
 \seealso{
-\link{ReadMorphNexus}
+\link{ReadMatrixNEXUS}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

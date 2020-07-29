@@ -32,7 +32,7 @@
 #' Ages <- read.table("~/Documents/Packages/Claddis/LungfishTest/ages.txt",
 #'   sep =",")
 #' Matrix <-
-#'   Claddis::ReadMorphNexus("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.nex")
+#'   Claddis::ReadMatrixNEXUS("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.nex")
 #' Tree <-
 #'   ape::read.tree("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.tre")
 #' Tree <- Tree[sample(1:100000, 100)]
@@ -40,7 +40,7 @@
 #' class(Tree) <- "multiPhylo"
 #' TimeBins <- c(443.8, 358.9, 298.9, 251.9, 201.3, 145.0, 66.0, 0.0)
 #' LungfishResults <- Claddis::DiscreteCharacterRate(Tree[[1]], Matrix, TimeBins,
-#'   TimeBinPartitionsToTest = TimeBinPartitioner(7),
+#'   TimeBinPartitionsToTest = PartitionTimeBins(7),
 #'   CharacterPartitionsToTest = list(list(1:91), list(Cranial = 1:81,
 #'   Postcranial = 82:91)))
 #' PlotRatesTime(LungfishResults,

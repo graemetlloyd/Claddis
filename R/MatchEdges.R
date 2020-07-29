@@ -28,7 +28,7 @@
 #' pruned.tree <- drop.tip(original.tree, c("t1", "t3", "t8"))
 #' 
 #' # Find matching edges:
-#' X <- TreeSubtreeEdgeMatch(original.tree, pruned.tree)
+#' X <- MatchEdges(original.tree, pruned.tree)
 #' 
 #' # Show matching edges:
 #' X$matching.edges
@@ -36,8 +36,8 @@
 #' # Show removed edges:
 #' X$removed.edges
 #' 
-#' @export TreeSubtreeEdgeMatch
-TreeSubtreeEdgeMatch <- function(original.tree, pruned.tree) {
+#' @export MatchEdges
+MatchEdges <- function(original.tree, pruned.tree) {
 	
 	# Conditional if pruned tree too small:
 	if(ape::Ntip(pruned.tree) < 3) stop("ERROR: pruned.tree includes too few (<3) taxa to be used.")

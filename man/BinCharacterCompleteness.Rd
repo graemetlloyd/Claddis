@@ -13,7 +13,7 @@ BinCharacterCompleteness(
 )
 }
 \arguments{
-\item{CladisticMatrix}{A cladistic matrix in the form imported by \link{ReadMorphNexus}.}
+\item{CladisticMatrix}{A cladistic matrix in the form imported by \link{ReadMatrixNEXUS}.}
 
 \item{TimeTree}{A time-scaled phylogenetic tree containing all the taxa in \code{CladisticMatrix}.}
 

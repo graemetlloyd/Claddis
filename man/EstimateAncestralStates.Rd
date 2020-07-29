@@ -17,7 +17,7 @@ EstimateAncestralStates(
 )
 }
 \arguments{
-\item{CladisticMatrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
+\item{CladisticMatrix}{A character-taxon matrix in the format imported by \link{ReadMatrixNEXUS}.}
 
 \item{Tree}{A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{CladisticMatrix}.}
 

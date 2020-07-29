@@ -7,7 +7,7 @@
 SafeTaxonomicReduction(CladisticMatrix)
 }
 \arguments{
-\item{CladisticMatrix}{A character-taxon matrix in the format imported by \link{ReadMorphNexus}.}
+\item{CladisticMatrix}{A character-taxon matrix in the format imported by \link{ReadMatrixNEXUS}.}
 }
 \value{
 \item{str.list}{A matrix listing the taxa that can be removed (\code{Junior}), the taxa which they are equivalent to (\code{Senior}) and the rule under which they can be safely removed (\code{Rule}).}

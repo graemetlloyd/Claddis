@@ -7,7 +7,7 @@
 MatrixCompactifier(CladisticMatrix, Message = TRUE)
 }
 \arguments{
-\item{CladisticMatrix}{The cladistic matrix in the format imported by \link{ReadMorphNexus}.}
+\item{CladisticMatrix}{The cladistic matrix in the format imported by \link{ReadMatrixNEXUS}.}
 
 \item{Message}{Logical indicating whether or not a message should be printed to the screen if the matrix cannot be compactified.}
 }

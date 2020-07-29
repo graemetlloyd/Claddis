@@ -24,10 +24,10 @@
 #' @examples
 #'
 #' # Get all partitions for four time bins:
-#' TimeBinPartitioner(4)
+#' PartitionTimeBins(4)
 #'
-#' @export TimeBinPartitioner
-TimeBinPartitioner <- function(NTimeBins, NPartitonsToInclude = "All") {
+#' @export PartitionTimeBins
+PartitionTimeBins <- function(NTimeBins, NPartitonsToInclude = "All") {
   
   # Build time bins vector:
   TimeBins <- 1:NTimeBins
