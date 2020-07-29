@@ -47,17 +47,17 @@ MorphMatrix2PCoA(
 
 \item{Tree}{If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.}
 
-\item{EstimateAllNodes}{If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{AncStateEstMatrix} for more details.}
+\item{EstimateAllNodes}{If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{EstimateAncestralStates} for more details.}
 
-\item{EstimateTipValues}{If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link{AncStateEstMatrix} for more details.}
+\item{EstimateTipValues}{If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link{EstimateAncestralStates} for more details.}
 
-\item{InapplicablesAsMissing}{See \link{AncStateEstMatrix}.}
+\item{InapplicablesAsMissing}{See \link{EstimateAncestralStates}.}
 
-\item{AncestralPolymorphismBehaviour}{Behaviour for dealing with polymorphisms when producing ancestral state estimates - see \link{AncStateEstMatrix}.}
+\item{AncestralPolymorphismBehaviour}{Behaviour for dealing with polymorphisms when producing ancestral state estimates - see \link{EstimateAncestralStates}.}
 
-\item{AncestralUncertaintyBehaviour}{Behaviour for dealing with uncertainties when producing ancestral state estimates - see \link{AncStateEstMatrix}.}
+\item{AncestralUncertaintyBehaviour}{Behaviour for dealing with uncertainties when producing ancestral state estimates - see \link{EstimateAncestralStates}.}
 
-\item{Threshold}{Threshold for ancestral state estimation of discrete characters - see \link{AncStateEstMatrix} for details.}
+\item{Threshold}{Threshold for ancestral state estimation of discrete characters - see \link{EstimateAncestralStates} for details.}
 }
 \value{
 \item{Tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{TrimMorphDistMatrix}.}
@@ -82,7 +82,7 @@ Takes a cladistic matrix in the format imported by \link{ReadMorphNexus} and per
 
 This function is effectively a wrapper for \link{pcoa} from the \link{ape} package and the user is referred there for some of the options (e.g., using the Caillez 1983 approach to avoiding negative eigenvalues).
 
-If providing a tree and inferring ancestral states then options to also infer missing or uncertain tips and whether to infer values for all characters at all internal nodes are provided (via \link{AncStateEstMatrix}).
+If providing a tree and inferring ancestral states then options to also infer missing or uncertain tips and whether to infer values for all characters at all internal nodes are provided (via \link{EstimateAncestralStates}).
 
 Other options within the function concern the distance metric to use and the transformation to be used if selecting a propotional distance (see \link{MorphDistMatrix}).
 
