@@ -28,7 +28,7 @@ Suggests:
 Description: Measures morphological diversity from discrete character data and
     estimates evolutionary tempo on phylogenetic trees. Imports morphological
     data from #NEXUS (Maddison et al. (1997) <doi:10.1093/sysbio/46.4.590>)
-    format with ReadMorphNexus(), and writes to both #NEXUS and TNT format 
+    format with ReadMatrixNEXUS(), and writes to both #NEXUS and TNT format 
     (Goloboff et al. (2008) <doi:10.1111/j.1096-0031.2008.00217.x>). Main
     functions are DiscreteCharacterRate(), which implements AIC and likelihood
     ratio tests for discrete character rates introduced across Lloyd et al.
@@ -46,8 +46,8 @@ Description: Measures morphological diversity from discrete character data and
     Lloyd (2016) <doi:10.1098/rspb.2016.0214>, and PlotDisparityStack()
     implements Foote (1993) <doi:10.1017/S0094837300015864>. Other functions
     include SafeTaxonomicReduction(), which implements Wilkinson (1995)
-    <doi:10.1093/sysbio/44.4.501>, and DolloSCM() implements the Dollo
-    stochastic character mapping of Tarver et al. (2018)
+    <doi:10.1093/sysbio/44.4.501>, and GetStochasticChangesDollo() implements
+    the Dollo stochastic character mapping of Tarver et al. (2018)
     <doi:10.1093/gbe/evy096>.
 Encoding: UTF-8
 License: GPL (>=2)
