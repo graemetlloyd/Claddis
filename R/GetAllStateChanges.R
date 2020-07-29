@@ -324,7 +324,7 @@ GetAllStateChanges <- function(CladisticMatrix, Tree, TimeBins, NSimulations = 1
         x$PrunedTree <- drop.tip(x$FullTree, TipsToDrop)
         
         # Ensure pruned trees $root.time value is correct:
-        x$PrunedTree <- CorrectRootTime(Tree, x$PrunedTree)
+        x$PrunedTree <- FixRootTime(Tree, x$PrunedTree)
         
       }
       

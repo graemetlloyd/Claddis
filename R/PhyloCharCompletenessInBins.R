@@ -93,7 +93,7 @@ PhyloCharCompletenessInBins <- function(CladisticMatrix, TimeTree, TimeBins, plo
         PrunedTree <- drop.tip(TimeTree, TaxaToPrune)
         
         # Need to correct root time to make sure time binning makes sense:
-        PrunedTree <- CorrectRootTime(TimeTree, PrunedTree)
+        PrunedTree <- FixRootTime(TimeTree, PrunedTree)
         
       # If there is one or fewer taxa:
       } else {

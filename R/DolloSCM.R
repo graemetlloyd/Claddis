@@ -211,7 +211,7 @@ DolloSCM <- function(tree, tip.states) {
         new.tree <- drop.tip(tree, nonclade.members)
         
         # Ensure root time is correct:
-        new.tree <- CorrectRootTime(tree, new.tree)
+        new.tree <- FixRootTime(tree, new.tree)
         
         # Update tip states for new pruned tree:
         new.tips <- tip.states[clade.members]
