@@ -17,6 +17,10 @@ addons:
       - libgsl-dev
       - libmagick++-dev
 
+# Adding lintr to checks:
+r_github_packages:
+  - jimhester/lintr
+
 # Be strict when checking our package
 warnings_are_errors: true
 
