@@ -98,7 +98,7 @@ BinCharacterCompleteness <- function(CladisticMatrix, TimeTree, TimeBins, plot =
         PrunedTree <- drop.tip(TimeTree, TaxaToPrune)
         
         # Need to correct root time to make sure time binning makes sense:
-        PrunedTree <- FixRootTime(TimeTree, PrunedTree)
+        PrunedTree <- TreeFixRootTime(TimeTree, PrunedTree)
         
       # If there is one or fewer taxa:
       } else {

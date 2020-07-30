@@ -4,7 +4,7 @@
 #'
 #' Plots a three-dimensional chronophylomorphospace.
 #'
-#' @param pcoa_data Principal coordinate data in the format output by  \link{MorphMatrix2PCoA} that includes a tree and ancestral states.
+#' @param pcoa_data Principal coordinate data in the format output by  \link{Matrix2PCoA} that includes a tree and ancestral states.
 #' @param x_axis Which ordination axis to plot as the x-axis.
 #' @param y_axis Which ordination axis to plot as the y-axis.
 #' @param shadow Whether or not to plot a shadow (2D plot) on the bottom face of the 3D plot (defaults to TRUE).
@@ -39,7 +39,7 @@
 #' Tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
 #' 
 #' # Perform a phylogenetic Principal Coordinates Analysis:
-#' pcoa_data <- MorphMatrix2PCoA(Michaux1989, Tree = Tree)
+#' pcoa_data <- Matrix2PCoA(Michaux1989, Tree = Tree)
 #' 
 #' # Plot a chronophylomorphospace:
 #' PlotDisparityChronophylomorphospace(pcoa_data)
@@ -101,7 +101,7 @@ PlotDisparityChronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 
   }
 
   # Get node ages for z-axis in plotting:
-  z_axis <- GetNodeAges(Tree)
+  z_axis <- TreeNodeAges(Tree)
 
   # Make x label for plot:
   xlab <- paste("PC", x_axis, sep = "")

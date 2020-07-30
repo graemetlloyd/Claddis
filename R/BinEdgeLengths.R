@@ -86,7 +86,7 @@ BinEdgeLengths <- function(tree, time.bins, pruned.tree=NULL) {
 	internal.edge.length.in.bin <- terminal.edge.length.in.bin <- edge.length.in.bin <- rep(0, length(time.bins) - 1)
 	
 	# Date nodes in tree:
-	node.ages <- GetNodeAges(tree)
+	node.ages <- TreeNodeAges(tree)
 	
 	# Get maximum age for each edge:
 	tree.edge.maxs <- node.ages[tree$edge[, 1]]

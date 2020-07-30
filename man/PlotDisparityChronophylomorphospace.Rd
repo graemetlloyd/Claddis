@@ -12,7 +12,7 @@ PlotDisparityChronophylomorphospace(
 )
 }
 \arguments{
-\item{pcoa_data}{Principal coordinate data in the format output by  \link{MorphMatrix2PCoA} that includes a tree and ancestral states.}
+\item{pcoa_data}{Principal coordinate data in the format output by  \link{Matrix2PCoA} that includes a tree and ancestral states.}
 
 \item{x_axis}{Which ordination axis to plot as the x-axis.}
 
@@ -46,7 +46,7 @@ Tree$root.time <- max(diag(vcv(Tree)))
 Tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
 
 # Perform a phylogenetic Principal Coordinates Analysis:
-pcoa_data <- MorphMatrix2PCoA(Michaux1989, Tree = Tree)
+pcoa_data <- Matrix2PCoA(Michaux1989, Tree = Tree)
 
 # Plot a chronophylomorphospace:
 PlotDisparityChronophylomorphospace(pcoa_data)

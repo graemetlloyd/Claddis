@@ -7,7 +7,7 @@
 PlotRatesTime(RateOutput, ModelNumber, ...)
 }
 \arguments{
-\item{RateOutput}{Rate output from \link{DiscreteCharacterRate}.}
+\item{RateOutput}{Rate output from \link{TreeRates}.}
 
 \item{ModelNumber}{The number of the model you wish to visualise from the rate output.}
 
@@ -20,7 +20,7 @@ Nothing is returned, but a plot is produced.
 Given the results from a rates test produces a time series visualization for a specific model.
 }
 \details{
-The raw output from \link{DiscreteCharacterRate} can be difficult to interpret without visualization and this function provides a means for doing that when the desired output is a time series (other functions will be added for other types of rate test).
+The raw output from \link{TreeRates} can be difficult to interpret without visualization and this function provides a means for doing that when the desired output is a time series (other functions will be added for other types of rate test).
 
 The function will only work for a single model, but in practice the user may wish to produce multiple plots in which case they simply need to rn the function multiple times or setup a multipanel window first with \link{layout}, or similar.
 
@@ -41,7 +41,7 @@ Tree <- Tree[sample(1:100000, 100)]
 Tree <- lapply(Tree, function(x) strap::DatePhylo(x, Ages, rlen = 2, method = "equal"))
 class(Tree) <- "multiPhylo"
 TimeBins <- c(443.8, 358.9, 298.9, 251.9, 201.3, 145.0, 66.0, 0.0)
-LungfishResults <- Claddis::DiscreteCharacterRate(Tree[[1]], Matrix, TimeBins,
+LungfishResults <- Claddis::TreeRates(Tree[[1]], Matrix, TimeBins,
   TimeBinPartitionsToTest = PartitionTimeBins(7),
   CharacterPartitionsToTest = list(list(1:91), list(Cranial = 1:81,
   Postcranial = 82:91)))

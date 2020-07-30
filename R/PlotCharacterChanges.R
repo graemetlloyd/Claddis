@@ -9,7 +9,7 @@
 #'
 #' @details
 #'
-#' Takes the \code{character.changes} output from \link{DiscreteCharacterRate} and plots it on the tree used to generate it.
+#' Takes the \code{character.changes} output from \link{TreeRates} and plots it on the tree used to generate it.
 #'
 #' @return A plot of character changes on a tree.
 #'
@@ -30,7 +30,7 @@
 #' tree$root.time <- max(diag(vcv(tree)))
 #'
 #' # Get discrete character rates (includes changes):
-#' out <- DiscreteCharacterRate(tree, Michaux1989,
+#' out <- TreeRates(tree, Michaux1989,
 #'   seq(tree$root.time, 0, length.out = 3),
 #'   BranchPartitionsToTest = list(list(1)), Alpha = 0.01)
 #'

@@ -7,7 +7,7 @@
 PlotRatesTree(RateOutput, ModelType, ModelNumber, ...)
 }
 \arguments{
-\item{RateOutput}{Rate output from \link{DiscreteCharacterRate}.}
+\item{RateOutput}{Rate output from \link{TreeRates}.}
 
 \item{ModelType}{The type of model to plot. Must be one of "branch" or "clade".}
 
@@ -22,7 +22,7 @@ Nothing is returned, but a plot is produced.
 Given the results from a rates test produces a time series visualization for a specific model.
 }
 \details{
-The raw output from \link{DiscreteCharacterRate} can be difficult to interpret without visualization and this function provides a means for doing that when the desired output is a time series (other functions will be added for other types of rate test).
+The raw output from \link{TreeRates} can be difficult to interpret without visualization and this function provides a means for doing that when the desired output is a time series (other functions will be added for other types of rate test).
 
 The function will only work for a single model, but in practice the user may wish to produce multiple plots in which case they simply need to rn the function multiple times or setup a multipanel window first with \link{layout}, or similar.
 

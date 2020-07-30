@@ -18,7 +18,7 @@ A plot of character changes on a tree.
 Plots character changes in boxes on branches.
 }
 \details{
-Takes the \code{character.changes} output from \link{DiscreteCharacterRate} and plots it on the tree used to generate it.
+Takes the \code{character.changes} output from \link{TreeRates} and plots it on the tree used to generate it.
 }
 \examples{
 
@@ -35,7 +35,7 @@ tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
 tree$root.time <- max(diag(vcv(tree)))
 
 # Get discrete character rates (includes changes):
-out <- DiscreteCharacterRate(tree, Michaux1989,
+out <- TreeRates(tree, Michaux1989,
   seq(tree$root.time, 0, length.out = 3),
   BranchPartitionsToTest = list(list(1)), Alpha = 0.01)
 

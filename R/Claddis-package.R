@@ -19,7 +19,7 @@
 #' @examples
 #' 
 #' # Get morphological distances for Michaux (1989) data set:
-#' distances <- MorphDistMatrix(Michaux1989)
+#' distances <- MatrixDistances(Michaux1989)
 #' 
 #' # Show distances:
 #' distances

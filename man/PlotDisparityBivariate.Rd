@@ -16,7 +16,7 @@ PlotDisparityBivariate(
 )
 }
 \arguments{
-\item{pcoa_input}{The main input in the format output from \link{MorphMatrix2PCoA}.}
+\item{pcoa_input}{The main input in the format output from \link{Matrix2PCoA}.}
 
 \item{x_axis}{Which ordination axis to plot as the x-axis (defaults to 1).}
 
@@ -33,10 +33,10 @@ PlotDisparityBivariate(
 \item{root_colour}{If plotting the root separately (previous option) sets the root colour.}
 }
 \description{
-Plots a morphospace using the output from MorphMatrix2PCoA.
+Plots a morphospace using the output from Matrix2PCoA.
 }
 \details{
-Uses output from \link{MorphMatrix2PCoA} as input.
+Uses output from \link{Matrix2PCoA} as input.
 
 Allows plotting of a third axis using the technique of Matthew Wills (Wills et al. 1994; their Figures 4 and 8; Wills 1998; his Figure 4), where black and white indicate positive and negative values respectovely, and the size of points there magnitudes.
 }
@@ -52,7 +52,7 @@ tree <- rtree(length(rownames(Michaux1989$Matrix_1$Matrix)))
 tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
 
 # Perform a phylogenetic Principal Coordinates Analysis:
-pcoa_input <- MorphMatrix2PCoA(Michaux1989, Tree = tree)
+pcoa_input <- Matrix2PCoA(Michaux1989, Tree = tree)
 
 # Plot the results:
 PlotDisparityBivariate(pcoa_input, plot_taxon_names = TRUE)
