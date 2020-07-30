@@ -2,7 +2,7 @@ Package: Claddis
 Type: Package
 Title: Measuring Morphological Diversity and Evolutionary Tempo
 Version: 0.5.0
-Date: 2020-29-07
+Date: 2020-30-07
 Authors@R: c(
     person(given = "Graeme T.", family = "Lloyd",
     email = "graemetlloyd@gmail.com", role = c("aut", "cre", "cph")),
@@ -30,12 +30,12 @@ Description: Measures morphological diversity from discrete character data and
     data from #NEXUS (Maddison et al. (1997) <doi:10.1093/sysbio/46.4.590>)
     format with ReadMatrixNEXUS(), and writes to both #NEXUS and TNT format 
     (Goloboff et al. (2008) <doi:10.1111/j.1096-0031.2008.00217.x>). Main
-    functions are DiscreteCharacterRate(), which implements AIC and likelihood
+    functions are TreeRates(), which implements AIC and likelihood
     ratio tests for discrete character rates introduced across Lloyd et al.
     (2012) <doi:10.1111/j.1558-5646.2011.01460.x>, Brusatte et al. (2014)
     <doi:10.1016/j.cub.2014.08.034>, Close et al. (2015)
     <doi:10.1016/j.cub.2015.06.047>, and Lloyd (2016) <doi:10.1111/bij.12746>,
-    and MorphDistMatrix(), which implements multiple discrete character
+    and MatrixDistances(), which implements multiple discrete character
     distance metrics from Gower (1971) <doi:10.2307/2528823>, Wills (1998)
     <doi:10.1006/bijl.1998.0255>, Lloyd (2016) <doi:10.1111/bij.12746>, and
     Hopkins and St John (2018) <doi:10.1098/rspb.2018.1784>. Multiple functions
@@ -46,7 +46,7 @@ Description: Measures morphological diversity from discrete character data and
     Lloyd (2016) <doi:10.1098/rspb.2016.0214>, and PlotDisparityStack()
     implements Foote (1993) <doi:10.1017/S0094837300015864>. Other functions
     include SafeTaxonomicReduction(), which implements Wilkinson (1995)
-    <doi:10.1093/sysbio/44.4.501>, and GetStochasticChangesDollo() implements
+    <doi:10.1093/sysbio/44.4.501>, and TreeStochasticChangesDollo() implements
     the Dollo stochastic character mapping of Tarver et al. (2018)
     <doi:10.1093/gbe/evy096>.
 Encoding: UTF-8
