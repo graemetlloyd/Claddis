@@ -61,22 +61,22 @@
 map_dollo_changes <- function(tree, tip.states) {
   
   # Check tree has branch lengths:
-  if(is.null(tree$edge.length)) stop("Tree must have branch lengths.")
+  if (is.null(tree$edge.length)) stop("Tree must have branch lengths.")
   
   # Check tree has a root time:
-  if(is.null(tree$root.time)) stop("Tree must have a $root.time value.")
+  if (is.null(tree$root.time)) stop("Tree must have a $root.time value.")
   
   # Record non-matching names:
   non.matches <- c(setdiff(names(tip.states), tree$tip.label), setdiff(tree$tip.label, names(tip.states)))
   
   # If there are any non-matching names stop and notify user:
-  if(length(non.matches) > 0) stop(paste("Non-matching names between tree and tips states found:", paste(non.matches, collapse = ", ")))
+  if (length(non.matches) > 0) stop(paste("Non-matching names between tree and tips states found:", paste(non.matches, collapse = ", ")))
   
   # Check for states other than zero or one:
   non.binary.states <- setdiff(unique(tip.states), c(0, 1))
   
   # If states other than zero or one found warn user:
-  if(length(non.binary.states) > 0) stop("States other than 0 or 1 found. All states must be 0 or 1.")
+  if (length(non.binary.states) > 0) stop("States other than 0 or 1 found. All states must be 0 or 1.")
   
   # Make Dollo-like model where only losses (1 -> 0) are allowed (will later force root state to be one):
   Dollo.model <- matrix(c(0, 1, 0, 0), nrow = 2, ncol = 2, dimnames = list(c("0", "1"), c("0", "1")))
@@ -85,7 +85,7 @@ map_dollo_changes <- function(tree, tip.states) {
   new.root <- find_mrca(names(which(tip.states == 1)), tree)
   
   # If new root is really the old root:
-  if((ape::Ntip(tree) + 1) == new.root && sum(tip.states == 1) > 1) {
+  if ((ape::Ntip(tree) + 1) == new.root && sum(tip.states == 1) > 1) {
     
     # Set acqusition branch to zero as precedes root:
     acquisition.branch <- 0
@@ -94,7 +94,7 @@ map_dollo_changes <- function(tree, tip.states) {
     acquisition.time <- tree$root.time
     
     # If tip states vary:
-    if(length(unique(tip.states)) > 1) {
+    if (length(unique(tip.states)) > 1) {
       
       # Get stochastic character map for full tree using Dollo model and a strong root prior of one:
       SCM <- make.simmap(tree, tip.states[tree$tip.label], model = Dollo.model, pi = c(0, 1), message = FALSE)$maps
@@ -114,7 +114,7 @@ map_dollo_changes <- function(tree, tip.states) {
   } else {
     
     # Case if character is an autapomorphy:
-    if(sum(tip.states == 1) == 1) {
+    if (sum(tip.states == 1) == 1) {
       
       # Create base stochastic character map (SCM:
       SCM <- as.list(c(1:nrow(tree$edge)))
@@ -161,7 +161,7 @@ map_dollo_changes <- function(tree, tip.states) {
       nonclade.members <- setdiff(tree$tip.label, clade.members)
       
       # Case if only two members in clade:
-      if(length(clade.members) == 2) {
+      if (length(clade.members) == 2) {
         
         # Get branch along which (single) acqusition of derived state occurs:
         acquisition.branch <- match(new.root, tree$edge[, 2])
@@ -252,7 +252,7 @@ map_dollo_changes <- function(tree, tip.states) {
         SCM[[acquisition.branch]] <- acquisition.branch.SCM
         
         # If tip states vary:
-        if(length(unique(new.tips)) > 1) {
+        if (length(unique(new.tips)) > 1) {
           
           # Now do real SCM on pruned tree using Dollo model and a strong root prior of one:
           SCM_real <- make.simmap(new.tree, new.tips[new.tree$tip.label], model = Dollo.model, pi = c(0, 1), message = FALSE)$maps
@@ -314,10 +314,10 @@ map_dollo_changes <- function(tree, tip.states) {
   change.branches <- which(lapply(SCM, length) > 1)
   
   # Special case of acquisition occurring prior to root (add extra line to changes matrix):
-  if(acquisition.branch == 0) changes.matrix <- rbind(changes.matrix, c(acquisition.branch, 0, 1, acquisition.time))
+  if (acquisition.branch == 0) changes.matrix <- rbind(changes.matrix, c(acquisition.branch, 0, 1, acquisition.time))
   
   # As long as there are changes to record (i.e., it is not a constant character):
-  if(length(change.branches) > 0) {
+  if (length(change.branches) > 0) {
     
     # For each change branch:
     for(i in change.branches) {

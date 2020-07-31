@@ -43,22 +43,22 @@ plot_rates_tree <- function(RateOutput, ModelType, ModelNumber, ...) {
   # - Work out how to not round rates to 1dp (0.005 -> 0 which is useless)
   
   # Check model type is a valid option:
-  if(!ModelType %in% c("branch", "clade")) stop("ModelType must be one of \"branch\" or \"clade\".")
+  if (!ModelType %in% c("branch", "clade")) stop("ModelType must be one of \"branch\" or \"clade\".")
   
   # Set resolution fro plotting (discretisation of continuous rates):
   Resolution <- 100
   
   # If requesting branch partitions extract these from rate output:
-  if(ModelType == "branch") EdgePartitions <- lapply(RateOutput$BranchPartitionResults, function(x) lapply(strsplit(x$Partition, " \\| ")[[1]], function(y) unlist(lapply(y, function(z) {z <- as.list(strsplit(z, split = " ")[[1]]); unlist(lapply(z, function(p) if(length(grep("-", p)) > 0) {p <- strsplit(p, split = "-")[[1]]; as.numeric(p[1]:as.numeric(p[2]))} else {as.numeric(p)}))}))))
+  if (ModelType == "branch") EdgePartitions <- lapply(RateOutput$BranchPartitionResults, function(x) lapply(strsplit(x$Partition, " \\| ")[[1]], function(y) unlist(lapply(y, function(z) {z <- as.list(strsplit(z, split = " ")[[1]]); unlist(lapply(z, function(p) if (length(grep("-", p)) > 0) {p <- strsplit(p, split = "-")[[1]]; as.numeric(p[1]:as.numeric(p[2]))} else {as.numeric(p)}))}))))
   
   # If requesting clade partitions extract these from rate output:
-  if(ModelType == "clade") EdgePartitions <- lapply(RateOutput$CladePartitionResults, function(x) lapply(strsplit(x$Partition, " \\| ")[[1]], function(y) unlist(lapply(y, function(z) {z <- as.list(strsplit(z, split = " ")[[1]]); unlist(lapply(z, function(p) if(length(grep("-", p)) > 0) {p <- strsplit(p, split = "-")[[1]]; as.numeric(p[1]:as.numeric(p[2]))} else {as.numeric(p)}))}))))
+  if (ModelType == "clade") EdgePartitions <- lapply(RateOutput$CladePartitionResults, function(x) lapply(strsplit(x$Partition, " \\| ")[[1]], function(y) unlist(lapply(y, function(z) {z <- as.list(strsplit(z, split = " ")[[1]]); unlist(lapply(z, function(p) if (length(grep("-", p)) > 0) {p <- strsplit(p, split = "-")[[1]]; as.numeric(p[1]:as.numeric(p[2]))} else {as.numeric(p)}))}))))
   
   # If requesting branch rates extract these from output:
-  if(ModelType == "branch") EdgeRates <- lapply(RateOutput$BranchPartitionResults, function(x) x$Rates)
+  if (ModelType == "branch") EdgeRates <- lapply(RateOutput$BranchPartitionResults, function(x) x$Rates)
   
   # If requesting clade rates extract these from output:
-  if(ModelType == "clade") EdgeRates <- lapply(RateOutput$CladePartitionResults, function(x) x$Rates)
+  if (ModelType == "clade") EdgeRates <- lapply(RateOutput$CladePartitionResults, function(x) x$Rates)
   
   # Get discretized vector of edge rates (needed for choosing plot colours):
   DiscretizedRateValues <- seq(from = 0, to = max(EdgeRates[[ModelNumber]]), length.out = Resolution)

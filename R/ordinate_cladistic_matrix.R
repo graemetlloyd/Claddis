@@ -81,7 +81,7 @@ ordinate_cladistic_matrix <- function(cladistic.matrix, distance.metric = "MORD"
   # Allow other ordination types such as NMDS
   
   # If no tree is supplied:
-  if(is.null(time.tree)) {
+  if (is.null(time.tree)) {
     
     # Get morphological distances from the cladistic matrix:
     morph_distances <- calculate_morphological_distances(cladistic.matrix, distance.metric = distance.metric, distance.transformation = distance.transformation, polymorphism.behaviour = distance.polymorphism.behaviour, uncertainty.behaviour = distance.uncertainty.behaviour, inapplicable.behaviour = distance.inapplicable.behaviour, character.dependencies = character.dependencies, alpha = alpha)
@@ -90,7 +90,7 @@ ordinate_cladistic_matrix <- function(cladistic.matrix, distance.metric = "MORD"
     trimmed.distances <- trim_matrix(morph_distances$DistanceMatrix)
 
     # If trimming of matrix lead to taxa being removed warn user:
-    if(!is.null(trimmed.distances$removed.taxa)) message(paste("The following taxa had to be removed to produce a complete distance matrix:", paste(trimmed.distances$removed.taxa, collapse = ", ")))
+    if (!is.null(trimmed.distances$removed.taxa)) message(paste("The following taxa had to be removed to produce a complete distance matrix:", paste(trimmed.distances$removed.taxa, collapse = ", ")))
     
     # Perform Principal Coordinates Analysis on the data:
     pcoa.results <- ape::pcoa(trimmed.distances$DistMatrix, correction = correction, rn = rownames(trimmed.distances$DistMatrix))
@@ -108,7 +108,7 @@ ordinate_cladistic_matrix <- function(cladistic.matrix, distance.metric = "MORD"
     trimmed.distances <- trim_matrix(morph_distances$DistanceMatrix, Tree = time.tree)
 
     # If trimming of matrix lead to taxa or nodes being removed warn user:
-    if(!is.null(trimmed.distances$removed.taxa)) message(paste("The following taxa or nodes had to be removed to produce a complete distance matrix:", paste(trimmed.distances$removed.taxa, collapse = ", ")))
+    if (!is.null(trimmed.distances$removed.taxa)) message(paste("The following taxa or nodes had to be removed to produce a complete distance matrix:", paste(trimmed.distances$removed.taxa, collapse = ", ")))
 
     # Store (possibly trimmed) tree ready to be output:
     time.tree <- trimmed.distances$Tree
@@ -119,7 +119,7 @@ ordinate_cladistic_matrix <- function(cladistic.matrix, distance.metric = "MORD"
   }
   
   # If corrected vectors exist:
-  if(!is.null(pcoa.results$vectors.cor)) {
+  if (!is.null(pcoa.results$vectors.cor)) {
     
     # Overwrite uncorrected with corrected:
     pcoa.results$vectors <- pcoa.results$vectors.cor
@@ -130,7 +130,7 @@ ordinate_cladistic_matrix <- function(cladistic.matrix, distance.metric = "MORD"
   }
   
   # If corrected trace exists:
-  if(!is.null(pcoa.results$trace.cor)) {
+  if (!is.null(pcoa.results$trace.cor)) {
     
     # Overwite uncorrected with corrected:
     pcoa.results$trace <- pcoa.results$trace.cor

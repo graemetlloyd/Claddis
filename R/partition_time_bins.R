@@ -33,10 +33,10 @@ partition_time_bins <- function(NTimeBins, NPartitonsToInclude = "All") {
   TimeBins <- 1:NTimeBins
   
   # Check there are multiple time bins:
-  if(length(TimeBins) < 2) stop("There must be at least two time bins.")
+  if (length(TimeBins) < 2) stop("There must be at least two time bins.")
   
   # Format NPartitonsToInclude as a vector of all possible numbers if input is "All":
-  if(any(NPartitonsToInclude == "All")) NPartitonsToInclude <- 0:(length(TimeBins) - 1)
+  if (any(NPartitonsToInclude == "All")) NPartitonsToInclude <- 0:(length(TimeBins) - 1)
   
   # Get number of possible "switches", i.e., positions where a partition can (1) or cannot (0) be:
   NSwitches <- length(TimeBins) - 1
@@ -45,7 +45,7 @@ partition_time_bins <- function(NTimeBins, NPartitonsToInclude = "All") {
   NPartitions <- sum(unlist(lapply(as.list(NPartitonsToInclude), function(x) ncol(combn(NSwitches, x)))))
   
   # Small correction if zero is included (no partitions or rather a partition of one):
-  if(any(NPartitonsToInclude == 0)) NPartitions<- NPartitions + 1
+  if (any(NPartitonsToInclude == 0)) NPartitions<- NPartitions + 1
   
   # Generate starting splitsiwtches vector:
   SplitSwitches <- as.character(0:1)

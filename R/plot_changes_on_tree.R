@@ -54,7 +54,7 @@ plot_changes_on_tree <- function(character.changes, tree) {
     change.rows <- which(character.changes[, "Edge"] == i)
     
     # If there are changes on edge:
-    if(length(change.rows) > 0) {
+    if (length(change.rows) > 0) {
       
       # Compile all changes into edge label:
       edge.labels[i] <- paste(paste(character.changes[change.rows, "Character"], ": ", character.changes[change.rows, "From"], " -> ", character.changes[change.rows, "To"], sep = ""), collapse = "\n")

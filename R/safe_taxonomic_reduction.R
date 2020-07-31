@@ -49,7 +49,7 @@ safe_taxonomic_reduction <- function(cladistic.matrix) {
   Unaltered <- cladistic.matrix
   
   # If there is more than one matrix block (will need to temporarily combine into single matrix):
-  if(length(cladistic.matrix) > 2) {
+  if (length(cladistic.matrix) > 2) {
     
     # Get list of just the matrix blocks:
     MatrixBlocks <- lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix")
@@ -78,7 +78,7 @@ safe_taxonomic_reduction <- function(cladistic.matrix) {
   }
   
   # Prune out any zero weight characters, if they exist:
-  if(any(cladistic.matrix[[2]]$weights == 0)) cladistic.matrix <- prune_cladistic_matrix(cladistic.matrix = cladistic.matrix, characters2prune = which(cladistic.matrix[[2]]$weights == 0))
+  if (any(cladistic.matrix[[2]]$weights == 0)) cladistic.matrix <- prune_cladistic_matrix(cladistic.matrix = cladistic.matrix, characters2prune = which(cladistic.matrix[[2]]$weights == 0))
   
   # Order matrix from least to most complete taxon (as least is most likely to be removed):
   cladistic.matrix[[2]]$Matrix <- cladistic.matrix[[2]]$Matrix[order(apply(apply(cladistic.matrix[[2]]$Matrix, 1, is.na), 2, sum), decreasing = TRUE), ]
@@ -96,7 +96,7 @@ safe_taxonomic_reduction <- function(cladistic.matrix) {
     TaxaWithMissingCharacters <- names(which(apply(apply(MatrixBlockToCheck, 1, is.na), 2, any)))
     
     # If any taxa have missing characters inside the block (can not be true parents) remove them from the block:
-    if(length(TaxaWithMissingCharacters) > 0) MatrixBlockToCheck <- MatrixBlockToCheck[-match(TaxaWithMissingCharacters, rownames(MatrixBlockToCheck)), , drop = FALSE]
+    if (length(TaxaWithMissingCharacters) > 0) MatrixBlockToCheck <- MatrixBlockToCheck[-match(TaxaWithMissingCharacters, rownames(MatrixBlockToCheck)), , drop = FALSE]
     
     # Set start column (first character in matrix block):
     StartColumn <- 1
@@ -114,7 +114,7 @@ safe_taxonomic_reduction <- function(cladistic.matrix) {
       UnsafeTaxa <- names(which(MatrixBlockToCheck[(NonMissingRows + 1), StartColumn] != MatrixBlockToCheck[1, StartColumn]))
       
       # Reduce the matrix block to just potential safe taxon parents (and the current taxon):
-      if(length(UnsafeTaxa) > 0) MatrixBlockToCheck <- MatrixBlockToCheck[-match(UnsafeTaxa, rownames(MatrixBlockToCheck)), , drop = FALSE]
+      if (length(UnsafeTaxa) > 0) MatrixBlockToCheck <- MatrixBlockToCheck[-match(UnsafeTaxa, rownames(MatrixBlockToCheck)), , drop = FALSE]
       
       # Iterate to next colum:
       StartColumn <- StartColumn + 1
@@ -122,7 +122,7 @@ safe_taxonomic_reduction <- function(cladistic.matrix) {
     }
     
     # If safe taxonomic reduction is possible store junior and senior(s):
-    if(nrow(MatrixBlockToCheck) > 1) return(cbind(rep(x = rownames(MatrixBlockToCheck)[1], times = nrow(MatrixBlockToCheck) - 1), rownames(MatrixBlockToCheck)[2:nrow(MatrixBlockToCheck)]))
+    if (nrow(MatrixBlockToCheck) > 1) return(cbind(rep(x = rownames(MatrixBlockToCheck)[1], times = nrow(MatrixBlockToCheck) - 1), rownames(MatrixBlockToCheck)[2:nrow(MatrixBlockToCheck)]))
     
   }
   
@@ -130,7 +130,7 @@ safe_taxonomic_reduction <- function(cladistic.matrix) {
   SafeToRemove <- lapply(as.list(1:(nrow(cladistic.matrix[[2]]$Matrix) - 1)), CheckDownwardForMatches, cladistic.matrix = cladistic.matrix)
   
   # If no taxa can be safely deleted:
-  if(all(unlist(lapply(SafeToRemove, is.null)))) {
+  if (all(unlist(lapply(SafeToRemove, is.null)))) {
     
     # Warn user:
     print("No taxa can be safely removed")
@@ -163,10 +163,10 @@ safe_taxonomic_reduction <- function(cladistic.matrix) {
     for(i in 1:nrow(SafeToRemove)) {
       
       # Check for rule 1 (symmetrical coding):
-      if(paste(cladistic.matrix$Matrix_1$Matrix[SafeToRemove[i, 1], ], collapse = "") == paste(cladistic.matrix$Matrix_1$Matrix[SafeToRemove[i, 2], ], collapse = "")) {
+      if (paste(cladistic.matrix$Matrix_1$Matrix[SafeToRemove[i, 1], ], collapse = "") == paste(cladistic.matrix$Matrix_1$Matrix[SafeToRemove[i, 2], ], collapse = "")) {
         
         # Check for any missing data:
-        if(any(is.na(cladistic.matrix$Matrix_1$Matrix[SafeToRemove[i, 1], ]))) {
+        if (any(is.na(cladistic.matrix$Matrix_1$Matrix[SafeToRemove[i, 1], ]))) {
           
           # Is rule 1b:
           STRRule <- c(STRRule, "Rule 1B")
@@ -183,7 +183,7 @@ safe_taxonomic_reduction <- function(cladistic.matrix) {
       } else {
         
         # Check for any missing data:
-        if(any(is.na(cladistic.matrix$Matrix_1$Matrix[SafeToRemove[i, 1], ]))) {
+        if (any(is.na(cladistic.matrix$Matrix_1$Matrix[SafeToRemove[i, 1], ]))) {
           
           # Is rule 2B:
           STRRule <- c(STRRule, "Rule 2B")

@@ -38,26 +38,26 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
   MatrixConversion <- function(DataMatrix) {
     
     # If there are missing characters replace with missing symbol:
-    if(any(is.na(DataMatrix$Matrix))) DataMatrix$Matrix[is.na(DataMatrix$Matrix)] <- DataMatrix$Characters$Missing
+    if (any(is.na(DataMatrix$Matrix))) DataMatrix$Matrix[is.na(DataMatrix$Matrix)] <- DataMatrix$Characters$Missing
     
     # If there are gap characters replace with gap symbol:
-    if(sum(as.vector(DataMatrix$Matrix) == "") > 0) DataMatrix$Matrix[DataMatrix$Matrix == ""] <- DataMatrix$Characters$Gap
+    if (sum(as.vector(DataMatrix$Matrix) == "") > 0) DataMatrix$Matrix[DataMatrix$Matrix == ""] <- DataMatrix$Characters$Gap
     
     # If there are symbols (i.e., non-continuous data):
-    if(length(DataMatrix$Characters$Symbols) > 0) {
+    if (length(DataMatrix$Characters$Symbols) > 0) {
       
       # In reverse order go through numbers:
       for(i in rev(DataMatrix$Characters$Symbols)) {
         
         # Replace current number with appropriate symbol:
-        if(length(grep(as.character(which(DataMatrix$Characters$Symbols == i) - 1), DataMatrix$Matrix)) > 0) DataMatrix$Matrix <- gsub(as.character(which(DataMatrix$Characters$Symbols == i) - 1), i, DataMatrix$Matrix)
+        if (length(grep(as.character(which(DataMatrix$Characters$Symbols == i) - 1), DataMatrix$Matrix)) > 0) DataMatrix$Matrix <- gsub(as.character(which(DataMatrix$Characters$Symbols == i) - 1), i, DataMatrix$Matrix)
         
       }
       
     }
     
     # If there are uncertainties:
-    if(length(grep("/", DataMatrix$Matrix)) > 0) {
+    if (length(grep("/", DataMatrix$Matrix)) > 0) {
       
       # Find cells that haev uncertainties:
       Uncertainties <- grep("/", DataMatrix$Matrix)
@@ -68,7 +68,7 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
     }
     
     # If there are polymorphisms:
-    if(length(grep("&", DataMatrix$Matrix)) > 0) {
+    if (length(grep("&", DataMatrix$Matrix)) > 0) {
       
       # Find cells with polymorphsims:
       Polymorphisms <- grep("&", DataMatrix$Matrix)
@@ -82,7 +82,7 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
     TaxonNamesWithTrailingSpaces <- paste(rownames(DataMatrix$Matrix), unlist(lapply(lapply(as.list((max(nchar(rownames(DataMatrix$Matrix))) + 2) - nchar(rownames(DataMatrix$Matrix))), rep, x = " "), paste, collapse = "")), sep = "")
     
     # If block is continuous:
-    if(DataMatrix$Datatype == "CONTINUOUS") {
+    if (DataMatrix$Datatype == "CONTINUOUS") {
       
       # Format rows with spaces between values:
       DataMatrix$Matrix <- paste(TaxonNamesWithTrailingSpaces, (apply(DataMatrix$Matrix, 1, paste, collapse = " ")), sep = "")
@@ -127,7 +127,7 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
     }
     
     # If there are characters left (or there are no zippable parts):
-    if(length(x) > 0) ZippedString <- c(ZippedString, x)
+    if (length(x) > 0) ZippedString <- c(ZippedString, x)
     
     # Collapse to a single string with spaces:
     ZippedString <- paste(ZippedString, collapse = " ")
@@ -180,7 +180,7 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
   MatrixBlock <- paste(paste(CharacterBlock, unlist(lapply(DataBlocksAsTextStrings, paste, collapse = "\n")), "\n;\nEND;\n\n", sep = ""), collapse = "")
   
   # Make sure step matrices are a list if null:
-  if(!is.list(cladistic.matrix$Topper$StepMatrices)) cladistic.matrix$Topper$StepMatrices <- list(NULL)
+  if (!is.list(cladistic.matrix$Topper$StepMatrices)) cladistic.matrix$Topper$StepMatrices <- list(NULL)
   
   # Create step matrix block:
   StepMatrixBlock <- paste(ifelse(!unlist(lapply(cladistic.matrix$Topper$StepMatrices, is.null)), paste(paste("\tUSERTYPE '", names(cladistic.matrix$Topper$StepMatrices), "' (STEPMATRIX) = ", unlist(lapply(cladistic.matrix$Topper$StepMatrices, ncol)), "\n", sep = ""), paste("\t", unlist(lapply(lapply(cladistic.matrix$Topper$StepMatrices, colnames), paste, collapse = " ")), "\n\t", sep = ""), unlist(lapply(lapply(lapply(cladistic.matrix$Topper$StepMatrices, function(x) { diag(x) <- "."; return(x) }), apply, 1, paste, collapse = " "), paste, collapse = "\n\t")), "\n\t;\n", sep = ""), ""), collapse = "")
@@ -192,22 +192,22 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
   weights <- unlist(lapply(DataBlocks, '[[', "weights"))
 
   # Create options block (if no block names):
-  if(all(is.na(BlockNames))) OptionsBlock <- paste(ifelse(all(Ordering == "unord"), "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n", ifelse(all(Ordering == "ord"), "\tOPTIONS  DEFTYPE=ord PolyTcount=MINSTEPS ;\n", "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n")), ifelse(length(unique(Ordering)) == 1 && length(setdiff(unique(Ordering), c("ord", "unord"))) == 0, "", paste("\tTYPESET * UNTITLED  = ", paste(paste(sort(unique(Ordering)), unlist(lapply(lapply(lapply(as.list(sort(unique(Ordering))), '==', Ordering), which), Zipper)), sep = ": "), collapse = ", "), ";\n", sep = "")), collapse = "")
+  if (all(is.na(BlockNames))) OptionsBlock <- paste(ifelse(all(Ordering == "unord"), "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n", ifelse(all(Ordering == "ord"), "\tOPTIONS  DEFTYPE=ord PolyTcount=MINSTEPS ;\n", "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n")), ifelse(length(unique(Ordering)) == 1 && length(setdiff(unique(Ordering), c("ord", "unord"))) == 0, "", paste("\tTYPESET * UNTITLED  = ", paste(paste(sort(unique(Ordering)), unlist(lapply(lapply(lapply(as.list(sort(unique(Ordering))), '==', Ordering), which), Zipper)), sep = ": "), collapse = ", "), ";\n", sep = "")), collapse = "")
   
   # Create options block (if there are block names):
-  if(!all(is.na(unlist(BlockNames)))) OptionsBlock <- paste(paste("\tTYPESET * UNTITLED  (CHARACTERS = ", BlockNames, ")  =  ", unlist(lapply(lapply(DataBlocks, '[[', "Ordering"), function(x) paste(paste(paste(sort(unique(x)), unlist(lapply(lapply(lapply(as.list(sort(unique(x))), '==', x), which), Zipper)), sep = ": "), collapse = ", "), sep = ""))), ";\n", sep = ""), collapse = "")
+  if (!all(is.na(unlist(BlockNames)))) OptionsBlock <- paste(paste("\tTYPESET * UNTITLED  (CHARACTERS = ", BlockNames, ")  =  ", unlist(lapply(lapply(DataBlocks, '[[', "Ordering"), function(x) paste(paste(paste(sort(unique(x)), unlist(lapply(lapply(lapply(as.list(sort(unique(x))), '==', x), which), Zipper)), sep = ": "), collapse = ", "), sep = ""))), ";\n", sep = ""), collapse = "")
   
   # Replace cont with Squared if continuous characters present:
-  if(length(grep(" cont: ", OptionsBlock)) > 0) OptionsBlock <- gsub(" cont: ", " Squared: ", OptionsBlock)
+  if (length(grep(" cont: ", OptionsBlock)) > 0) OptionsBlock <- gsub(" cont: ", " Squared: ", OptionsBlock)
   
   # Convert continuosu character weights to one before making weights block:
   weights[Ordering == "cont"] <- 1
   
   # Create weights block (if no block names):
-  if(all(is.na(BlockNames))) weightsBlock <- ifelse(all(weights == 1), "", paste("\tWTSET * UNTITLED  = ", paste(paste(sort(unique(weights)), unlist(lapply(lapply(lapply(as.list(sort(unique(weights))), '==', weights), which), Zipper)), sep = ": "), collapse = ", "), ";\n", sep = ""))
+  if (all(is.na(BlockNames))) weightsBlock <- ifelse(all(weights == 1), "", paste("\tWTSET * UNTITLED  = ", paste(paste(sort(unique(weights)), unlist(lapply(lapply(lapply(as.list(sort(unique(weights))), '==', weights), which), Zipper)), sep = ": "), collapse = ", "), ";\n", sep = ""))
   
   # Create weights block (if there are block names):
-  if(!all(is.na(unlist(BlockNames)))) weightsBlock <- paste(paste("\tWTSET * UNTITLED  (CHARACTERS = ", BlockNames, ")  =  ", unlist(lapply(lapply(DataBlocks, '[[', "weights"), function(x) paste(paste(paste(sort(unique(x)), unlist(lapply(lapply(lapply(as.list(sort(unique(x))), '==', x), which), Zipper)), sep = ": "), collapse = ", "), sep = ""))), ";\n", sep = ""), collapse = "")
+  if (!all(is.na(unlist(BlockNames)))) weightsBlock <- paste(paste("\tWTSET * UNTITLED  (CHARACTERS = ", BlockNames, ")  =  ", unlist(lapply(lapply(DataBlocks, '[[', "weights"), function(x) paste(paste(paste(sort(unique(x)), unlist(lapply(lapply(lapply(as.list(sort(unique(x))), '==', x), which), Zipper)), sep = ": "), collapse = ", "), sep = ""))), ";\n", sep = ""), collapse = "")
   
   # Build assumptions block:
   AssumptionBlock <- paste("BEGIN ASSUMPTIONS;\n", StepMatrixBlock, OptionsBlock, weightsBlock, "END;\n", sep = "")

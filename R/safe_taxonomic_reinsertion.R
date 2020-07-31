@@ -59,7 +59,7 @@ safe_taxonomic_reinsertion <- function(treefile.in, treefile.out, str.list, mult
   single.replacements <- single.replacements[is.na(match(single.replacements, str.list[, "Senior"]))]
   
   # For taxa that have a single replacement:
-  if(length(single.replacements) > 0) {
+  if (length(single.replacements) > 0) {
     
     # For each single replacement taxon:
     for(i in 1:length(single.replacements)) {
@@ -78,7 +78,7 @@ safe_taxonomic_reinsertion <- function(treefile.in, treefile.out, str.list, mult
   }
   
   # Only worth contuning if there are names still to reinsert:
-  if(length(names.and.numbers$values) > 0) {
+  if (length(names.and.numbers$values) > 0) {
     
     # Vector to store taxa that only occur in a single polytomy:
     polytomy.taxa <- vector(mode = "character")
@@ -93,12 +93,12 @@ safe_taxonomic_reinsertion <- function(treefile.in, treefile.out, str.list, mult
       seniors <- str.list[grep(TRUE, str.list[, "Junior"] == taxon.name), "Senior"]
       
       # If its seniors, except for one, are all also juniors then record it (this finds taxa that only exist in a single polytomy in the original tree):
-      if(length(grep(TRUE, is.na(match(seniors, str.list[, "Junior"])))) <= 1) polytomy.taxa <- c(polytomy.taxa, taxon.name)
+      if (length(grep(TRUE, is.na(match(seniors, str.list[, "Junior"])))) <= 1) polytomy.taxa <- c(polytomy.taxa, taxon.name)
       
     }
     
     # If there are taxa that only occur in a single polytomy:
-    if(length(polytomy.taxa) > 0) {
+    if (length(polytomy.taxa) > 0) {
       
       # Reorder from most seniors to least:
       taxa.to.delete <- polytomy.taxa <- polytomy.taxa[order(names.and.numbers$lengths[match(polytomy.taxa, names.and.numbers$values)], decreasing=TRUE)]
@@ -131,10 +131,10 @@ safe_taxonomic_reinsertion <- function(treefile.in, treefile.out, str.list, mult
   }
   
   # Only keep going if there are taxa still to reinsert:
-  if(length(str.list[, 1]) > 0) {
+  if (length(str.list[, 1]) > 0) {
     
     # If the user wishes to reinsert remaining taxa at random:
-    if(multi.placements == "random") {
+    if (multi.placements == "random") {
       
       # List unique juniors:
       unique.juniors <- rle(str.list[, "Junior"])$values[order(rle(str.list[, "Junior"])$lengths)]
@@ -161,7 +161,7 @@ safe_taxonomic_reinsertion <- function(treefile.in, treefile.out, str.list, mult
           tree.text <- text[j]
           
           # Case if senior ends in a parenthesis:
-          if(length(grep(paste(seniors[j], ")", sep = ""), tree.text)) > 0) {
+          if (length(grep(paste(seniors[j], ")", sep = ""), tree.text)) > 0) {
             
             # Replace senior with combination of junior and senior:
             tree.text <- gsub(paste(seniors[j], ")", sep = ""), paste(replacements[j], ")", sep = ""), tree.text)
@@ -169,7 +169,7 @@ safe_taxonomic_reinsertion <- function(treefile.in, treefile.out, str.list, mult
           }
           
           # Case if senior ends in a comma:
-          if(length(grep(paste(seniors[j], ",", sep = ""), tree.text)) > 0) {
+          if (length(grep(paste(seniors[j], ",", sep = ""), tree.text)) > 0) {
             
             # Replace senior with combination of junior and senior:
             tree.text <- gsub(paste(seniors[j], ",", sep = ""), paste(replacements[j], ",", sep = ""), tree.text)
@@ -189,7 +189,7 @@ safe_taxonomic_reinsertion <- function(treefile.in, treefile.out, str.list, mult
     }
     
     # If the user wishes to exclude remaining taxa:
-    if(multi.placements == "exclude") {
+    if (multi.placements == "exclude") {
       
       # Set uninserted list to remaining juniors:
       uninserted <- unique(str.list[, "Junior"])

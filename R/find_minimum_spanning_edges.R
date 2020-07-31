@@ -56,7 +56,7 @@ find_minimum_spanning_edges <- function(dist.matrix) {
 		for(j in (i + 1):ncol(links.matrix)) {
 			
 			# If there is a link then record it:
-			if(links.matrix[i, j] == 1){
+			if (links.matrix[i, j] == 1){
 			  min.span.tree.edges <- rbind(
 			     min.span.tree.edges, 
 			     c(rownames(links.matrix)[i], 

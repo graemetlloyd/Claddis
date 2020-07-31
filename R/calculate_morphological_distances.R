@@ -151,7 +151,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
     secondrow <- comparisons[[2]]
     
     # If there are any inapplicables:
-    if(any(c(firstrow, secondrow) == "")) {
+    if (any(c(firstrow, secondrow) == "")) {
       
       # Find inapplicable positions:
       InapplicablePositions <- sort(unique(c(which(firstrow == ""), which(secondrow == ""))))
@@ -160,7 +160,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
       PolymorphismAndUncertaintyPositions <- sort(unique(c(grep("/|&", firstrow), grep("/|&", secondrow))))
       
       # If there are polymorphisms or uncertianties that match up with inapplicables:
-      if(length(intersect(InapplicablePositions, PolymorphismAndUncertaintyPositions)) > 0) {
+      if (length(intersect(InapplicablePositions, PolymorphismAndUncertaintyPositions)) > 0) {
         
         # Find positions where collapsing to a single value is required:
         CollapsePositions <- intersect(InapplicablePositions, PolymorphismAndUncertaintyPositions)
@@ -182,7 +182,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
     charordering <- ordering[compchar]
     
     # Only if there are polymorphisms or uncertainties:
-    if(length(c(grep("&", unique(c(firstrow, secondrow))), grep("/", unique(c(firstrow, secondrow))))) > 0) {
+    if (length(c(grep("&", unique(c(firstrow, secondrow))), grep("/", unique(c(firstrow, secondrow))))) > 0) {
       
       # Find ampersands (polymorphisms):
       ampersand.elements <- sort(c(grep("&", firstrow), grep("&", secondrow)))
@@ -197,7 +197,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
       behaviour <- unlist(lapply(lapply(lapply(lapply(lapply(lapply(lapply(apply(apply(rbind(firstrow[characters.to.check], secondrow[characters.to.check]), 2, gsub, pattern = "[:0-9:]", replacement = ""), 2, list), unlist), function(x) x[nchar(x) > 0]), function(x) ifelse(nchar(x) > 0, strsplit(x, split = "")[[1]][1], x)), function(x) gsub(x, pattern = "&", replacement = polymorphism.behaviour)), function(x) gsub(x, pattern = "/", replacement = uncertainty.behaviour)), unique), function(x) ifelse(length(x) > 1, "min.difference", x)))
       
       # If behaviour is to find minimum differences:
-      if(any(behaviour == "min.difference")) {
+      if (any(behaviour == "min.difference")) {
         
         # Set up minimum difference characters to check:
         min.characters.to.check <- characters.to.check[behaviour == "min.difference"]
@@ -206,7 +206,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
         IntersectionCharacter <- lapply(lapply(lapply(lapply(apply(rbind(firstrow[min.characters.to.check], secondrow[min.characters.to.check]), 2, strsplit, split = "&|/"), unlist), sort), rle), function(x) x$values[x$lengths > 1][1])
         
         # If at least one intersecting character state was found:
-        if(any(!is.na(unlist(IntersectionCharacter)))) {
+        if (any(!is.na(unlist(IntersectionCharacter)))) {
           
           # Record rows to update:
           rows.to.update <- which(!is.na(unlist(IntersectionCharacter)))
@@ -220,7 +220,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
         }
         
         # Only continue if there are still characters that need to be fixed:
-        if(length(min.characters.to.check) > 0) {
+        if (length(min.characters.to.check) > 0) {
           
           # Build two option matrices for every comparison:
           TwoOptionMatrices <- lapply(apply(rbind(firstrow[min.characters.to.check], secondrow[min.characters.to.check]), 2, strsplit, split = "&|/"), function(x) rbind(c(min(as.numeric(x[[1]])), max(as.numeric(x[[2]]))), c(max(as.numeric(x[[1]])), min(as.numeric(x[[2]])))))
@@ -239,7 +239,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
       }
       
       # If any behaviour is to find mean differences:
-      if(any(behaviour == "mean.difference")) {
+      if (any(behaviour == "mean.difference")) {
         
         # Set up minimum difference characters to check:
         mean.characters.to.check <- characters.to.check[behaviour == "mean.difference"]
@@ -251,7 +251,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
         StateMatrices <- lapply(StateMatrices, function(x) { for(i in 1:ncol(x)) for(j in 1:nrow(x)) x[j, i] <- abs(as.numeric(colnames(x)[i]) - as.numeric(rownames(x)[j])) ; return(x) })
         
         # If there are unordered characters present convert maximum distances to one:
-        if(any(charordering[mean.characters.to.check] == "unord")) StateMatrices[which(charordering[mean.characters.to.check] == "unord")] <- lapply(StateMatrices[which(charordering[mean.characters.to.check] == "unord")], function(x) { x[x > 1] <- 1; return(x) })
+        if (any(charordering[mean.characters.to.check] == "unord")) StateMatrices[which(charordering[mean.characters.to.check] == "unord")] <- lapply(StateMatrices[which(charordering[mean.characters.to.check] == "unord")], function(x) { x[x > 1] <- 1; return(x) })
         
         # Extract minimum and maximum states from each matrix with maximum being the mean distance:
         MinMaxStates <- lapply(lapply(lapply(StateMatrices, as.vector), mean), function(x) c(0, x))
@@ -289,7 +289,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   CorrectForUnordered <- function(differences, compchar, ordering) {
     
     # If unordered and distance greater than one replace with one:
-    if(length(which(differences > 1)) > 0) differences[which(differences > 1)[which(ordering[compchar[which(differences > 1)]] == "unord")]] <- 1
+    if (length(which(differences > 1)) > 0) differences[which(differences > 1)[which(ordering[compchar[which(differences > 1)]] == "unord")]] <- 1
     
     # Return corrected unordered distances:
     return(list(differences))
@@ -324,7 +324,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
     mat.out <- as.matrix(as.dist(mat.out))
     
     # If no diagonal is supplied:
-    if(is.null(diag)) {
+    if (is.null(diag)) {
       
       # Set diagonal as zero:
       diag(mat.out) <- 0
@@ -385,7 +385,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
         CharactersPresent <- intersect(ComparableCharacters, DependentCharacters)
         
         # If characters are present:
-        if(length(CharactersPresent) > 0) {
+        if (length(CharactersPresent) > 0) {
           
           # Set positions of dependent characters in current differences vector:
           DependentPositions <- match(CharactersPresent, ComparableCharacters)
@@ -394,7 +394,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
           IndependentPosition <- which(ComparableCharacters == j)
           
           # Stop and warn user if matrix contains an impossible coding (i.e., dependent character coded when independent character is missing):
-          if(length(IndependentPosition) == 0) stop("Found a dependent character coded when character it depends on is missing. Check matrix codings.")
+          if (length(IndependentPosition) == 0) stop("Found a dependent character coded when character it depends on is missing. Check matrix codings.")
           
           # Overwrite independent position with alpha-weighted value:
           diffs[IndependentPosition] <- 1 - (alpha * (1 - (sum(diffs[DependentPositions] * weights[DependentPositions]) / sum(weights[DependentPositions]))) + (1 - alpha))
@@ -414,55 +414,55 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   }
 
   # Check for step matrices and stop and warn user if found:
-  if(is.list(cladistic.matrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
+  if (is.list(cladistic.matrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
   
   # Check input of distance.transformation is valid and stop and warn if not:
-  if(length(setdiff(distance.transformation, c("arcsine_sqrt", "none", "sqrt"))) > 0) stop("distance.transformation must be one of \"none\", \"sqrt\", or \"arcsine_sqrt\".")
+  if (length(setdiff(distance.transformation, c("arcsine_sqrt", "none", "sqrt"))) > 0) stop("distance.transformation must be one of \"none\", \"sqrt\", or \"arcsine_sqrt\".")
   
   # Check input of distance is valid and stop and warn if not:
-  if(length(setdiff(distance.metric, c("RED", "GED", "GC", "MORD"))) > 0) stop("distance.metric must be one or more of \"RED\", \"GED\", \"GC\", or \"MORD\".")
+  if (length(setdiff(distance.metric, c("RED", "GED", "GC", "MORD"))) > 0) stop("distance.metric must be one or more of \"RED\", \"GED\", \"GC\", or \"MORD\".")
   
   # Check input of GED type is valid and stop and warn if not:
-  if(length(setdiff(ged.type, c("Legacy", "Hybrid", "Wills"))) > 0) stop("ged.type must be one or more of \"Legacy\", \"Hybrid\", or \"Wills\".")
+  if (length(setdiff(ged.type, c("Legacy", "Hybrid", "Wills"))) > 0) stop("ged.type must be one or more of \"Legacy\", \"Hybrid\", or \"Wills\".")
   
   # Check input for polymorphism.behaviour is valid and stop and warn if not:
-  if(length(setdiff(polymorphism.behaviour, c("mean.difference", "min.difference", "random"))) > 0) stop("polymorphism.behaviour must be one or more of \"mean.difference\", \"min.difference\", or \"random\".")
+  if (length(setdiff(polymorphism.behaviour, c("mean.difference", "min.difference", "random"))) > 0) stop("polymorphism.behaviour must be one or more of \"mean.difference\", \"min.difference\", or \"random\".")
   
   # Check input for uncertainty.behaviour is valid and stop and warn if not:
-  if(length(setdiff(uncertainty.behaviour, c("mean.difference", "min.difference", "random"))) > 0) stop("uncertainty.behaviour must be one or more of \"mean.difference\", \"min.difference\", or \"random\".")
+  if (length(setdiff(uncertainty.behaviour, c("mean.difference", "min.difference", "random"))) > 0) stop("uncertainty.behaviour must be one or more of \"mean.difference\", \"min.difference\", or \"random\".")
   
   # Check input for inapplicable.behaviour is valid and stop and warn if not:
-  if(length(setdiff(inapplicable.behaviour, c("missing", "HSJ"))) > 0) stop("inapplicable.behaviour must be one or more of \"missing\", or \"HSJ\".")
+  if (length(setdiff(inapplicable.behaviour, c("missing", "HSJ"))) > 0) stop("inapplicable.behaviour must be one or more of \"missing\", or \"HSJ\".")
   
   # Check that if using HSJ character dependencies have been specified:
-  if(inapplicable.behaviour == "HSJ" && is.null(character.dependencies)) stop("If using the \"HSJ\" inapplicable.behaviour then character.dependencies must be specified.")
+  if (inapplicable.behaviour == "HSJ" && is.null(character.dependencies)) stop("If using the \"HSJ\" inapplicable.behaviour then character.dependencies must be specified.")
   
   # If using HSJ and character.dependencies is set (will check data are formatted correctly):
-  if(inapplicable.behaviour == "HSJ" && !is.null(character.dependencies)) {
+  if (inapplicable.behaviour == "HSJ" && !is.null(character.dependencies)) {
     
     # Check character.dependencies is a matrix and stop and warn user if not:
-    if(!is.matrix(character.dependencies)) stop("character.dependencies must be in the form of a two-column matrix.")
+    if (!is.matrix(character.dependencies)) stop("character.dependencies must be in the form of a two-column matrix.")
     
     # Check character.dependencies has two columns and stop and warn user if not:
-    if(ncol(character.dependencies) != 2) stop("character.dependencies must be in the form of a two-column matrix.")
+    if (ncol(character.dependencies) != 2) stop("character.dependencies must be in the form of a two-column matrix.")
     
     # Check character.dependencies column names are correct and stop and warn user if not:
-    if(length(setdiff(c("DependentCharacter", "IndependentCharacter"), colnames(character.dependencies))) > 0) stop("character.dependencies column names must be exactly \"DependentCharacter\" and \"IndependentCharacter\".")
+    if (length(setdiff(c("DependentCharacter", "IndependentCharacter"), colnames(character.dependencies))) > 0) stop("character.dependencies column names must be exactly \"DependentCharacter\" and \"IndependentCharacter\".")
     
     # Check character.dependencies are numeric values and stop and warn user if not:
-    if(!is.numeric(character.dependencies)) stop("character.dependencies values must be numeric.")
+    if (!is.numeric(character.dependencies)) stop("character.dependencies values must be numeric.")
     
     # Check character.dependencies values are within range of matrix dimensions and stop and warn user if not:
-    if(length(setdiff(as.vector(character.dependencies), 1:sum(unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) ncol(x$Matrix))))))) > 0) stop("character.dependencies can only contain character numbers within the dimensions of the cladistic.matrix specified.")
+    if (length(setdiff(as.vector(character.dependencies), 1:sum(unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) ncol(x$Matrix))))))) > 0) stop("character.dependencies can only contain character numbers within the dimensions of the cladistic.matrix specified.")
     
     # Check character.dependencies values do not lead to duplicated parent characters and stop and warn user if not:
-    if(any(duplicated(character.dependencies[, "DependentCharacter"]))) stop("character.dependencies characters can not be dependent on two or more different independent characters.")
+    if (any(duplicated(character.dependencies[, "DependentCharacter"]))) stop("character.dependencies characters can not be dependent on two or more different independent characters.")
     
     # Find any characters that are both dependent and independent (and hence may lead to circularity issues):
     CharactersToCheckForCircularDependency <- intersect(character.dependencies[, "DependentCharacter"], character.dependencies[, "IndependentCharacter"])
     
     # If there is the possibility for circularity:
-    if(length(CharactersToCheckForCircularDependency) > 0) {
+    if (length(CharactersToCheckForCircularDependency) > 0) {
       
       # For the ith independent character:
       for(i in unique(character.dependencies[, "IndependentCharacter"])) {
@@ -480,7 +480,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
           DependentCharacter <- unlist(lapply(as.list(CurrentCharacter), function(x) unname(character.dependencies[character.dependencies[, "IndependentCharacter"] == x, "DependentCharacter"])))
           
           # Check character was not already found (creating a circularity) and stop and wanr user if true:
-          if(length(intersect(DependentCharacter, FoundCharacters)) > 0) stop("Circularity found in character.dependencies.")
+          if (length(intersect(DependentCharacter, FoundCharacters)) > 0) stop("Circularity found in character.dependencies.")
           
           # Update found characters:
           FoundCharacters <- c(FoundCharacters, DependentCharacter)
@@ -495,7 +495,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
     }
     
     # Check alpha is a value between zero and one and stop and warn user if not:
-    if(alpha > 1 || alpha < 0) stop("alpha must be a value between zero and one")
+    if (alpha > 1 || alpha < 0) stop("alpha must be a value between zero and one")
 
   }
   
@@ -515,13 +515,13 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   cladistic.matrix <- do.call(cbind, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"))
   
   # If polymorphism.behaviour is to randomly sample one state:
-  if(polymorphism.behaviour == "random") {
+  if (polymorphism.behaviour == "random") {
     
     # Find cells with polymorphisms:
     PolymorphismCells <- grep("&", cladistic.matrix)
     
     # If there are polymorphisms randomly sample one value and store:
-    if(length(PolymorphismCells) > 0) cladistic.matrix[PolymorphismCells] <- unlist(lapply(as.list(cladistic.matrix[PolymorphismCells]), function(x) sample(strsplit(x, split = "&")[[1]], size = 1)))
+    if (length(PolymorphismCells) > 0) cladistic.matrix[PolymorphismCells] <- unlist(lapply(as.list(cladistic.matrix[PolymorphismCells]), function(x) sample(strsplit(x, split = "&")[[1]], size = 1)))
     
     # Reset behaviour as mean difference to allow it to interact correctly with uncertainty.behaviour later:
     polymorphism.behaviour <- "mean.difference"
@@ -529,13 +529,13 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   }
   
   # If uncertainty.behaviour is to randomly sample one state:
-  if(uncertainty.behaviour == "random") {
+  if (uncertainty.behaviour == "random") {
     
     # Find cells with uncertainties:
     UncertaintyCells <- grep("/", cladistic.matrix)
     
     # If there are uncertainties randomly sample one value and store:
-    if(length(UncertaintyCells) > 0) cladistic.matrix[UncertaintyCells] <- unlist(lapply(as.list(cladistic.matrix[UncertaintyCells]), function(x) sample(strsplit(x, split = "/")[[1]], size = 1)))
+    if (length(UncertaintyCells) > 0) cladistic.matrix[UncertaintyCells] <- unlist(lapply(as.list(cladistic.matrix[UncertaintyCells]), function(x) sample(strsplit(x, split = "/")[[1]], size = 1)))
     
     # Reset behaviour as mean difference to allow it to interact correctly with polymorphism.behaviour later:
     uncertainty.behaviour <- "mean.difference"
@@ -543,7 +543,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   }
   
   # If there are inapplicables and using the missing option then convert these to NAs:
-  if(any(sort(cladistic.matrix == "")) && inapplicable.behaviour == "missing") cladistic.matrix[cladistic.matrix == ""] <- NA
+  if (any(sort(cladistic.matrix == "")) && inapplicable.behaviour == "missing") cladistic.matrix[cladistic.matrix == ""] <- NA
   
   # Find all possible (symmetric) pairwise comparisons for the N taxa in the matrix (excluding self-comparisons):
   comparisons <- combn(1:nrow(cladistic.matrix), 2)
@@ -567,7 +567,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   diffs <- mapply(CorrectForUnordered, diffs, list.of.compchar, MoreArgs = list(ordering))
   
   # If applying the Hopkins and St John alpha approach:
-  if(inapplicable.behaviour == "HSJ") {
+  if (inapplicable.behaviour == "HSJ") {
     
     # Set primary-level characters in a list (where secondary etc. level characters will be added in turn):
     CharactersByLevel <- list(unname(setdiff(unique(character.dependencies[, "IndependentCharacter"]), unique(character.dependencies[, "DependentCharacter"]))))
@@ -604,10 +604,10 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   diffs <- mapply(WeightDifferences, diffs, list.of.compchar, MoreArgs = list(weights))
   
   # Get raw Euclidean distance (if using it):
-  if(distance.metric == "RED") raw.dist <- lapply(diffs, RawEuclideanDistance)
+  if (distance.metric == "RED") raw.dist <- lapply(diffs, RawEuclideanDistance)
   
   # Only calculate the max differences for "GED" or "MORD" matrices:
-  if(distance.metric == "GED" || distance.metric == "MORD") {
+  if (distance.metric == "GED" || distance.metric == "MORD") {
     
     # Find maximum possible differences for the comparable characters:
     maxdiffs <- lapply(list.of.compchar, MaximumDIfferences, max.vals, min.vals)
@@ -618,16 +618,16 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   }
   
   # If calculating Raw Euclidean Distances build the distance matrix:
-  if(distance.metric == "RED") dist.matrix <- ConvertListToMatrix(raw.dist, cladistic.matrix)
+  if (distance.metric == "RED") dist.matrix <- ConvertListToMatrix(raw.dist, cladistic.matrix)
 
   # If calculating the Gower Coefficient build the distance matrix:
-  if(distance.metric == "GC") dist.matrix <- ConvertListToMatrix(as.list(mapply(CalculateGowerCoefficient, diffs, list.of.compchar, MoreArgs = list(weights))), cladistic.matrix)
+  if (distance.metric == "GC") dist.matrix <- ConvertListToMatrix(as.list(mapply(CalculateGowerCoefficient, diffs, list.of.compchar, MoreArgs = list(weights))), cladistic.matrix)
   
   # If calculating the MORD build the distance matrix:
-  if(distance.metric == "MORD") dist.matrix <- ConvertListToMatrix(mapply(CalculateMORD, diffs, maxdiffs), cladistic.matrix)
+  if (distance.metric == "MORD") dist.matrix <- ConvertListToMatrix(mapply(CalculateMORD, diffs, maxdiffs), cladistic.matrix)
   
   # If calculating the GED:
-  if(distance.metric == "GED") {
+  if (distance.metric == "GED") {
     
     # Build starting GED data:
     GED.data <- mapply(BuildStartingGEDData, diffs, list.of.compchar, MoreArgs = list(cladistic.matrix, weights), SIMPLIFY = FALSE)
@@ -639,10 +639,10 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
     GED.data <- matrix(data = (unlist(GED.data)), ncol = ncol(cladistic.matrix), byrow = TRUE)
     
     # Calculate single weighted mean univariate distance for calculating GED Legacy or Hybrid (after equation 2 in Wills 2001):
-    if(ged.type != "Wills") NonWills_S_ijk_bar <- rep(sum(unlist(diffs)) / sum(unlist(maxdiffs)), length.out = length(diffs))
+    if (ged.type != "Wills") NonWills_S_ijk_bar <- rep(sum(unlist(diffs)) / sum(unlist(maxdiffs)), length.out = length(diffs))
     
     # Calculate individual pairwise weighted mean univariate distance for calculating GED Hybrid or Wills (after equation 2 in Wills 2001):
-    if(ged.type != "Legacy") {
+    if (ged.type != "Legacy") {
       
       # Generate individual mean pairwise distance for each comparison:
       NonLegacy_S_ijk_bar <- unlist(lapply(diffs, sum)) / unlist(lapply(maxdiffs, sum))
@@ -651,10 +651,10 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
       NaNs <- which(is.nan(NonLegacy_S_ijk_bar))
       
       # If usings WIlls version replace NaNs with NA:
-      if(ged.type == "Wills" && length(NaNs) > 0) NonLegacy_S_ijk_bar[NaNs] <- NA
+      if (ged.type == "Wills" && length(NaNs) > 0) NonLegacy_S_ijk_bar[NaNs] <- NA
       
       # If using Hybrid replace NaNs with single global mean distance value:
-      if(ged.type == "Hybrid" && length(NaNs) > 0) NonLegacy_S_ijk_bar[NaNs] <- NonWills_S_ijk_bar[NaNs]
+      if (ged.type == "Hybrid" && length(NaNs) > 0) NonLegacy_S_ijk_bar[NaNs] <- NonWills_S_ijk_bar[NaNs]
       
       # Set modified non-Legacy S_ijk_bar as main S_ijk_bar:
       S_ijk_bar <- NonLegacy_S_ijk_bar
@@ -662,7 +662,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
     }
     
     # If using Legacy set NonWills_S_ijk_bar as main S_ijk_bar:
-    if(ged.type == "Legacy") S_ijk_bar <- NonWills_S_ijk_bar
+    if (ged.type == "Legacy") S_ijk_bar <- NonWills_S_ijk_bar
     
     # For each set of differences:
     for(i in seq(from = 1, to = nrow(GED.data) - 1, length.out = length(diffs))) {
@@ -671,7 +671,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
       MissingDistances <- which(is.na(GED.data[i, ]))
       
       # Replace missing distances with S_ijk_bar (i.e., results of equation 2 in Wills 2001 into equation 1 of Wills 2001):
-      if(length(MissingDistances) > 0) GED.data[i, MissingDistances] <- S_ijk_bar[ceiling(i / 2)]
+      if (length(MissingDistances) > 0) GED.data[i, MissingDistances] <- S_ijk_bar[ceiling(i / 2)]
       
     }
 
@@ -696,19 +696,19 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   rownames(dist.matrix) <- colnames(dist.matrix) <- rownames(comp.char.matrix) <- colnames(comp.char.matrix) <- rownames(cladistic.matrix)
   
   # If there are any NaNs replace with NAs:
-  if(any(is.nan(dist.matrix))) dist.matrix[is.nan(dist.matrix)] <- NA
+  if (any(is.nan(dist.matrix))) dist.matrix[is.nan(dist.matrix)] <- NA
   
   # If using a proportional distance:
-  if(distance.metric == "MORD" || distance.metric == "GC") {
+  if (distance.metric == "MORD" || distance.metric == "GC") {
     
     # If transforming distance matrix by taking the square root - take the square root:
-    if(distance.transformation == "sqrt") dist.matrix <- sqrt(dist.matrix)
+    if (distance.transformation == "sqrt") dist.matrix <- sqrt(dist.matrix)
     
     # If transforming distance matrix by taking the arcsine square root:
-    if(distance.transformation == "arcsine_sqrt") {
+    if (distance.transformation == "arcsine_sqrt") {
       
       # Check for squared distances greater than 1:
-      if(any(sort(sqrt(dist.matrix)) > 1)) {
+      if (any(sort(sqrt(dist.matrix)) > 1)) {
         
         # Warn user that distances were rescaled:
         print("Squared distances found of greater than 1 so matrix was rescaled prior to taking arcsine.")

@@ -62,17 +62,17 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
 
   # Default plotting parameters for a 2D morphospace. Need to change node colour for 3D using rgl
   p.p <- list()
-  if(is.null(p.p$t.bg)) p.p$t.bg <- "black"
-  if(is.null(p.p$t.pch)) p.p$t.pch <- 21
-  if(is.null(p.p$t.cex)) p.p$t.cex <- 2
-  if(is.null(p.p$n.bg)) p.p$n.bg <- "white"
-  if(is.null(p.p$n.pch)) p.p$n.pch <- 21
-  if(is.null(p.p$n.cex)) p.p$n.cex <- 1.25
-  if(is.null(p.p$l.col)) p.p$l.col <- "black"
-  if(is.null(p.p$lwd)) p.p$lwd <- 3
-  if(is.null(p.p$txt.adj)) p.p$txt.adj <- c(-.1, -.1)
-  if(is.null(p.p$txt.col)) p.p$txt.col <- "black"
-  if(is.null(p.p$txt.cex)) p.p$txt.cex <- 1
+  if (is.null(p.p$t.bg)) p.p$t.bg <- "black"
+  if (is.null(p.p$t.pch)) p.p$t.pch <- 21
+  if (is.null(p.p$t.cex)) p.p$t.cex <- 2
+  if (is.null(p.p$n.bg)) p.p$n.bg <- "white"
+  if (is.null(p.p$n.pch)) p.p$n.pch <- 21
+  if (is.null(p.p$n.cex)) p.p$n.cex <- 1.25
+  if (is.null(p.p$l.col)) p.p$l.col <- "black"
+  if (is.null(p.p$lwd)) p.p$lwd <- 3
+  if (is.null(p.p$txt.adj)) p.p$txt.adj <- c(-.1, -.1)
+  if (is.null(p.p$txt.col)) p.p$txt.col <- "black"
+  if (is.null(p.p$txt.cex)) p.p$txt.cex <- 1
 
   # Isolate Tree:
   Tree <- pcoa_data$Tree
@@ -152,7 +152,7 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
 	adj = p.p$txt.adj)
 
   # If plotting the shadow of x and y axes at the base of the plot:
-  if(shadow == TRUE){
+  if (shadow == TRUE){
       
     # Plot branches:
     for (i in 1:nrow(Tree$edge)) {

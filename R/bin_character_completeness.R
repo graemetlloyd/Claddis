@@ -77,7 +77,7 @@ bin_character_completeness <- function(cladistic.matrix, time.tree, time.bins, p
   missing.values <- rep("", n.characters)
   
   # If there are missing or inapplicable values collapse row numbers for them with double percentage:
-  if(any(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), is.na))) || any(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), '==', "")))) missing.values <- unname(unlist(lapply(lapply(lapply(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), MissingAndInapplicables), apply, 2, '==', 1), apply, 2, which), lapply, paste, collapse = "%%")))
+  if (any(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), is.na))) || any(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), '==', "")))) missing.values <- unname(unlist(lapply(lapply(lapply(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), MissingAndInapplicables), apply, 2, '==', 1), apply, 2, which), lapply, paste, collapse = "%%")))
   
   # Set up matrix to store edge lengths in each character bin (columns) per character (rows):
   edge.lengths.in.bins.by.character <- matrix(0, ncol = length(time.bins) - 1, nrow = n.characters)
@@ -86,13 +86,13 @@ bin_character_completeness <- function(cladistic.matrix, time.tree, time.bins, p
   for(i in unique(missing.values)) {
     
     # If there is missing data:
-    if(nchar(i) > 0) {
+    if (nchar(i) > 0) {
       
       # List taxa to prune:
       taxa.to.prune <- rownames(cladistic.matrix$Matrix_1$Matrix)[as.numeric(strsplit(i, "%%")[[1]])]
       
       # Check that there are still enough taxa left for a tree to exist:
-      if(length(setdiff(time.tree$tip.label, taxa.to.prune)) > 1) {
+      if (length(setdiff(time.tree$tip.label, taxa.to.prune)) > 1) {
         
         # Remove tips with missing data from tree:
         pruned.tree <- drop.tip(time.tree, taxa.to.prune)
@@ -117,7 +117,7 @@ bin_character_completeness <- function(cladistic.matrix, time.tree, time.bins, p
     }
     
     # As long as the tree exists (i.e., it is not pruend down to one or zero taxa) store edge lengths in bin:
-    if(!is.na(pruned.tree)[1]) edge.lengths.in.bins.by.character[which(missing.values == i), ] <- matrix(rep(bin_edge_lengths(time.tree = pruned.tree, time.bins = time.bins)$edge.length.in.bin, length(which(missing.values == i))), ncol = ncol(edge.lengths.in.bins.by.character), byrow = TRUE)
+    if (!is.na(pruned.tree)[1]) edge.lengths.in.bins.by.character[which(missing.values == i), ] <- matrix(rep(bin_edge_lengths(time.tree = pruned.tree, time.bins = time.bins)$edge.length.in.bin, length(which(missing.values == i))), ncol = ncol(edge.lengths.in.bins.by.character), byrow = TRUE)
     
   }
   
@@ -134,7 +134,7 @@ bin_character_completeness <- function(cladistic.matrix, time.tree, time.bins, p
   lower.proportional.completeness.in.bins <- apply(proportional.completeness.in.bins.by.character, 2, sort)[max(c(1, floor(((1 - confidence.interval) / 2) * n.characters))), ]
   
   # If plotting output:
-  if(plot) {
+  if (plot) {
     
     # Set plot environment for two plots (one on top of the other):
     par(mfrow = c(2, 1))

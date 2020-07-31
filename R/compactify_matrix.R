@@ -47,7 +47,7 @@ compactify_matrix <- function(cladistic.matrix, Message = TRUE) {
   ZeroWeightCharacters <- which(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "weights")) == 0)
   
   # If there are zero weight characters then prune them:
-  if(length(ZeroWeightCharacters) > 0) cladistic.matrix <- prune_cladistic_matrix(cladistic.matrix, characters2prune = ZeroWeightCharacters)
+  if (length(ZeroWeightCharacters) > 0) cladistic.matrix <- prune_cladistic_matrix(cladistic.matrix, characters2prune = ZeroWeightCharacters)
   
   # For each matrix block:
   for(i in 2:length(cladistic.matrix)) {
@@ -56,10 +56,10 @@ compactify_matrix <- function(cladistic.matrix, Message = TRUE) {
     char.distrib.strings <- paste(apply(cladistic.matrix[[i]]$Matrix, 2, paste, collapse = ""), cladistic.matrix[[i]]$Ordering, sep = " ")
     
     # Case if matrix can be compactified:
-    if(length(unique(char.distrib.strings)) < length(char.distrib.strings) || any(duplicated(rownames(cladistic.matrix[[i]]$Matrix)))) {
+    if (length(unique(char.distrib.strings)) < length(char.distrib.strings) || any(duplicated(rownames(cladistic.matrix[[i]]$Matrix)))) {
       
       # If collapsing characters because they are duplicated:
-      if(length(unique(char.distrib.strings)) < length(char.distrib.strings)) {
+      if (length(unique(char.distrib.strings)) < length(char.distrib.strings)) {
         
         # Get rle of character distribution strings:
         rle.char.distrib.strings <- rle(sort(char.distrib.strings, decreasing = TRUE))
@@ -85,7 +85,7 @@ compactify_matrix <- function(cladistic.matrix, Message = TRUE) {
       }
       
       # If collapsing matrix because taxa are duplicated:
-      if(any(duplicated(rownames(cladistic.matrix[[i]]$Matrix)))) {
+      if (any(duplicated(rownames(cladistic.matrix[[i]]$Matrix)))) {
         
         # Find duplicated taxa:
         DuplicatedTaxa <- unique(rownames(cladistic.matrix[[i]]$Matrix)[duplicated(rownames(cladistic.matrix[[i]]$Matrix))])
@@ -97,7 +97,7 @@ compactify_matrix <- function(cladistic.matrix, Message = TRUE) {
           DuplicateRows <- which(rownames(cladistic.matrix[[i]]$Matrix) == j)
           
           # Only continue if the duplicated rows are actually variable:
-          if(length(unique(apply(cladistic.matrix[[i]]$Matrix[DuplicateRows, ], 1, paste, collapse = ""))) > 1) {
+          if (length(unique(apply(cladistic.matrix[[i]]$Matrix[DuplicateRows, ], 1, paste, collapse = ""))) > 1) {
             
             # Build duplicated matrix from other taxa:
             TemporaryMatrix <- matrix(rep(cladistic.matrix[[i]]$Matrix[-DuplicateRows, ], length(DuplicateRows)), ncol = ncol(cladistic.matrix[[i]]$Matrix) * length(DuplicateRows), dimnames = list(rownames(cladistic.matrix[[i]]$Matrix)[-DuplicateRows], c()))
@@ -123,7 +123,7 @@ compactify_matrix <- function(cladistic.matrix, Message = TRUE) {
             CharacterDistributionStrings <- paste(apply(cladistic.matrix[[i]]$Matrix, 2, paste, collapse = ""), cladistic.matrix[[i]]$Ordering, sep = " ")
             
             # If need to collapse characters because they are duplicated:
-            if(length(unique(CharacterDistributionStrings)) < length(CharacterDistributionStrings)) {
+            if (length(unique(CharacterDistributionStrings)) < length(CharacterDistributionStrings)) {
               
               # Get rle of character distribution strings:
               RLECharacterDistributionStrings <- rle(sort(CharacterDistributionStrings, decreasing = TRUE))
@@ -164,7 +164,7 @@ compactify_matrix <- function(cladistic.matrix, Message = TRUE) {
     } else {
       
       # Print message to user:
-      if(Message) print("Matrix cannot be compactified. All character distributions are unique and weights are greater than zero.")
+      if (Message) print("Matrix cannot be compactified. All character distributions are unique and weights are greater than zero.")
       
     }
     

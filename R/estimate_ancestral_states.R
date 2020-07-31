@@ -72,34 +72,34 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   # Add Lloyd citation
   
   # Catch problem with trees with no branch lengths:
-  if(is.null(time.tree$edge.length)) stop("time.tree must have branch lengths.")
+  if (is.null(time.tree$edge.length)) stop("time.tree must have branch lengths.")
   
   # Catch problem with polytomies:
-  if(time.tree$Nnode < (ape::Ntip(time.tree) - 1)) stop("time.tree must be fully bifurcating.")
+  if (time.tree$Nnode < (ape::Ntip(time.tree) - 1)) stop("time.tree must be fully bifurcating.")
   
   # Catch problem with zero-length branches:
-  if(any(time.tree$edge.length == 0)) stop("time.tree must not have zero-length branches.")
+  if (any(time.tree$edge.length == 0)) stop("time.tree must not have zero-length branches.")
   
   # Check for step matrices and stop and warn if found:
-  if(length(cladistic.matrix$Topper$StepMatrices) > 0) stop("Function can not currently deal with step matrices.")
+  if (length(cladistic.matrix$Topper$StepMatrices) > 0) stop("Function can not currently deal with step matrices.")
   
   # Check estimate.all.nodes is a logical:
-  if(!is.logical(estimate.all.nodes)) stop("estimate.all.nodes must be a logical (TRUE or FALSE).")
+  if (!is.logical(estimate.all.nodes)) stop("estimate.all.nodes must be a logical (TRUE or FALSE).")
   
   # Check estimate.tip.values is a logical:
-  if(!is.logical(estimate.tip.values)) stop("estimate.tip.values must be a logical (TRUE or FALSE).")
+  if (!is.logical(estimate.tip.values)) stop("estimate.tip.values must be a logical (TRUE or FALSE).")
   
   # Check inapplicables.as.missing is a logical:
-  if(!is.logical(inapplicables.as.missing)) stop("inapplicables.as.missing must be a logical (TRUE or FALSE).")
+  if (!is.logical(inapplicables.as.missing)) stop("inapplicables.as.missing must be a logical (TRUE or FALSE).")
   
   # Check polymorphism.behaviour is a single allowable value:
-  if(length(polymorphism.behaviour) != 1 || !any(c("equalp", "treatasmissing") == polymorphism.behaviour)) stop("polymorphism.behaviour must be a single value of either, \"equalp\" or \"treatasmissing\".")
+  if (length(polymorphism.behaviour) != 1 || !any(c("equalp", "treatasmissing") == polymorphism.behaviour)) stop("polymorphism.behaviour must be a single value of either, \"equalp\" or \"treatasmissing\".")
   
   # Check uncertainty.behaviour is a single allowable value:
-  if(length(uncertainty.behaviour) != 1 || !any(c("equalp", "treatasmissing") == uncertainty.behaviour)) stop("uncertainty.behaviour must be a single value of either, \"equalp\" or \"treatasmissing\".")
+  if (length(uncertainty.behaviour) != 1 || !any(c("equalp", "treatasmissing") == uncertainty.behaviour)) stop("uncertainty.behaviour must be a single value of either, \"equalp\" or \"treatasmissing\".")
   
   # Check threshold is a numeric value between the limits of zero and one:
-  if(!is.numeric(threshold) || threshold > 0.5 || threshold < 0) stop("threshold must be a numeric value between 0 and 0.5.")
+  if (!is.numeric(threshold) || threshold > 0.5 || threshold < 0) stop("threshold must be a numeric value between 0 and 0.5.")
   
   # Collapse matrix to vectors for each character (state and ordering combination):
   collapse.matrix <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) apply(rbind(x$Matrix, x$Ordering), 2, paste, collapse = ""))))
@@ -123,22 +123,22 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   FailedNameMatches <- c(setdiff(rownames(cladistic.matrix), time.tree$tip.label), setdiff(time.tree$tip.label, rownames(cladistic.matrix)))
   
   # Check there are no failed name matches and stop and report if found:
-  if(length(FailedNameMatches) > 0) stop(paste("The following names do not match between the tree and matrix: ", paste(sort(FailedNameMatches), collapse = ", "), ". Check spelling and try again.", sep = ""))
+  if (length(FailedNameMatches) > 0) stop(paste("The following names do not match between the tree and matrix: ", paste(sort(FailedNameMatches), collapse = ", "), ". Check spelling and try again.", sep = ""))
   
   # If treating inapplicables as missing (and there is at least one inapplicable) replace with NA:
-  if(inapplicables.as.missing && length(which(cladistic.matrix == "")) > 0) cladistic.matrix[which(cladistic.matrix == "")] <- NA
+  if (inapplicables.as.missing && length(which(cladistic.matrix == "")) > 0) cladistic.matrix[which(cladistic.matrix == "")] <- NA
   
   # If treating polymorphisms as missing:
-  if(polymorphism.behaviour == "treatasmissing" && length(grep("&", cladistic.matrix)) > 0) cladistic.matrix[grep("&", cladistic.matrix)] <- NA
+  if (polymorphism.behaviour == "treatasmissing" && length(grep("&", cladistic.matrix)) > 0) cladistic.matrix[grep("&", cladistic.matrix)] <- NA
   
   # If treating uncertainties as missing:
-  if(uncertainty.behaviour == "treatasmissing" && length(grep("/", cladistic.matrix)) > 0) cladistic.matrix[grep("/", cladistic.matrix)] <- NA
+  if (uncertainty.behaviour == "treatasmissing" && length(grep("/", cladistic.matrix)) > 0) cladistic.matrix[grep("/", cladistic.matrix)] <- NA
   
   # Get vector of character numbers where all values are NA:
   AllMissingCharacters <- which(apply(cladistic.matrix, 2, function(x) all(is.na(x))))
   
   # Look for all missing characters and stop and wanr user if found:
-  if(!allow.all.missing && length(AllMissingCharacters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(AllMissingCharacters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using Claddis::prune_cladistic_matrix) or because of the chosen options for inapplicables.as.missing, polymorphism.behaviour, and/or uncertainty.behaviour (in which case the user may wish to chose different values for these)."))
+  if (!allow.all.missing && length(AllMissingCharacters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(AllMissingCharacters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using Claddis::prune_cladistic_matrix) or because of the chosen options for inapplicables.as.missing, polymorphism.behaviour, and/or uncertainty.behaviour (in which case the user may wish to chose different values for these)."))
   
   # Convert tip states into a list:
   DataAsList <- apply(cladistic.matrix, 2, function(x) list(TipStates = x))
@@ -161,7 +161,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   }
   
   # If estimating values for all characters (need to set dummy tip states for missing values):
-  if(estimate.all.nodes) {
+  if (estimate.all.nodes) {
     
     # Subfunction to fill missing values (and inapplicables if desired):
     FillMissing <- function(TipStates) {
@@ -170,7 +170,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
       MissingRows <- which(is.na(TipStates$TipStates))
       
       # If missing states found:
-      if(length(MissingRows) > 0) {
+      if (length(MissingRows) > 0) {
         
         # Build missing state by either forming a polymorphism of all possible tip states, or if continuous the midpoint value:
         FillStates <- ifelse(TipStates$Ordering == "cont", (TipStates$MinVal + TipStates$MaxVal) / 2, paste(TipStates$MinVal:TipStates$MaxVal, collapse = "/"))
@@ -200,13 +200,13 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
     NTipsRemaining <- length(setdiff(names(x$TipStates), Missing))
     
     # If there is at least one missing value:
-    if(length(Missing) > 0) {
+    if (length(Missing) > 0) {
       
       # If less than two tips will remain then set tree as NULL:
-      if(NTipsRemaining < 2) x$Tree <- NULL
+      if (NTipsRemaining < 2) x$Tree <- NULL
 
       # If at least two tips will remain prune missing values from tree:
-      if(NTipsRemaining > 1) x$Tree <- drop.tip(phy = x$Tree, tip = Missing)
+      if (NTipsRemaining > 1) x$Tree <- drop.tip(phy = x$Tree, tip = Missing)
       
       # Collapse tip states:
       x$TipStates <- x$TipStates[setdiff(names(x$TipStates), Missing)]
@@ -225,10 +225,10 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   TipStateVectorToMatrix <- function(x) {
     
     # As long asthere is at least one tip state:
-    if(length(x$TipStates) > 0) {
+    if (length(x$TipStates) > 0) {
       
       # If the character is not continuous (i.e., it is some form of discrete character):
-      if(x$Ordering != "cont") {
+      if (x$Ordering != "cont") {
         
         # Temporarily store tip states so matrix format can overwrite the stored version below:
         TipStates <- x$TipStates
@@ -240,7 +240,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
         for(i in colnames(x$TipStates)) x$TipStates[TipStates == i, i] <- 1
         
         # If there are polymorphisms and/or uncertainties:
-        if(length(grep("&|/", TipStates)) > 0) {
+        if (length(grep("&|/", TipStates)) > 0) {
           
           # Get polymorphism locations:
           Polymorphisms <- grep("&", TipStates)
@@ -249,7 +249,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
           Uncertainties <- grep("/", TipStates)
           
           # If there are polymorphisms and using the "equalp" (equal probability of each state) option:
-          if(length(Polymorphisms) > 0 && polymorphism.behaviour == "equalp") {
+          if (length(Polymorphisms) > 0 && polymorphism.behaviour == "equalp") {
             
             # For each polymorphisms set each state as equally probable:
             for(i in Polymorphisms) x$TipStates[i, strsplit(TipStates[i], split = "&")[[1]]] <- 1 / length(strsplit(TipStates[i], split = "&")[[1]])
@@ -257,7 +257,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
           }
           
           # If there are uncertainties and using the "equalp" (equal probability of each state) option:
-          if(length(Uncertainties) > 0 && uncertainty.behaviour == "equalp") {
+          if (length(Uncertainties) > 0 && uncertainty.behaviour == "equalp") {
             
             # For each uncertainty set each state as equally probable:
             for(i in Uncertainties) x$TipStates[i, strsplit(TipStates[i], split = "/")[[1]]] <- 1 / length(strsplit(TipStates[i], split = "/")[[1]])
@@ -297,7 +297,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
     x$Model <- "ER"
     
     # If a character is both ordered and has at least three states:
-    if((x$MaxVal - x$MinVal) > 1 && x$Ordering == "ord") {
+    if ((x$MaxVal - x$MinVal) > 1 && x$Ordering == "ord") {
       
       # Get number of states:
       NStates <- (x$MaxVal - x$MinVal) + 1
@@ -322,10 +322,10 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   GetAncStates <- function(x, estimate.tip.values, threshold) {
     
     # As long as there is a tree:
-    if(!is.null(x$Tree)) {
+    if (!is.null(x$Tree)) {
       
       # If character is continuous:
-      if(x$Ordering == "cont") {
+      if (x$Ordering == "cont") {
         
         # Get ancestral states using ace:
         x$AncestralStates <- ace(x = x$TipStates, phy = x$Tree)$ace
@@ -334,7 +334,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
       } else {
         
         # If invariant character:
-        if(ncol(x$TipStates) == 1) {
+        if (ncol(x$TipStates) == 1) {
           
           # Get number of tips:
           NTreeTips <- ape::Ntip(x$Tree)
@@ -345,13 +345,13 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
         }
         
         # If variant character then get ancestral states using rerooting method:
-        if(ncol(x$TipStates) > 1) x$AncestralStates <- rerootingMethod(tree = x$Tree, x = x$TipStates, model = x$Model)$marginal.anc
+        if (ncol(x$TipStates) > 1) x$AncestralStates <- rerootingMethod(tree = x$Tree, x = x$TipStates, model = x$Model)$marginal.anc
         
         # Reformat to most likely state
         x$AncestralStates <- unlist(lapply(lapply(apply(x$AncestralStates, 1, list), unlist), function(x) {paste(names(x[x > (max(x) - threshold)]), collapse = "/")}))
         
         # If not estimating tip values then prune these:
-        if(!estimate.tip.values) x$AncestralStates <- x$AncestralStates[-match(x$Tree$tip.label, names(x$AncestralStates))]
+        if (!estimate.tip.values) x$AncestralStates <- x$AncestralStates[-match(x$Tree$tip.label, names(x$AncestralStates))]
         
       }
      
@@ -381,7 +381,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   UniqueTrees <- read.tree(text = UniqueNewickStrings)
   
   # If only a single tree reformat as a list:
-  if(inherits(UniqueTrees, what = "phylo")) UniqueTrees <- list(UniqueTrees)
+  if (inherits(UniqueTrees, what = "phylo")) UniqueTrees <- list(UniqueTrees)
   
   # Subfunction map nodes from pruned tree to full tree:
   MapPrunedTreeNodesToFullTreeNodes <- function(tree, fulltree) {
@@ -396,7 +396,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
     NodeNumbers <- (NTips + 1):(NTips + NNodes)
     
     # If the pruned tree is different to the full tree:
-    if(write.tree(tree) != write.tree(fulltree)) {
+    if (write.tree(tree) != write.tree(fulltree)) {
       
       # Get descendants of each node in pruned tree:
       Descendants <- lapply(as.list(NodeNumbers), function(x) tree$tip.label[strap::FindDescendants(x, tree = tree)])
@@ -464,7 +464,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   TipMatrix <- AncestralStateMatrix[rownames(OriginalMatrix), ]
   
   # If there are any missing values:
-  if(any(is.na(TipMatrix))) {
+  if (any(is.na(TipMatrix))) {
     
     # Isolate missing values:
     MissingTipStates <- which(is.na(TipMatrix))

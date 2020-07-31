@@ -61,7 +61,7 @@ plot_rates_time <- function(RateOutput, ModelNumber, ...) {
   TimeBinMidpoints <- (RateOutput$TimeBinsUsed[2:length(RateOutput$TimeBinsUsed)] + RateOutput$TimeBinsUsed[1:(length(RateOutput$TimeBinsUsed) - 1)]) / 2
   
   # Get partitions used from results output:
-  TimeBinPartitions <- lapply(RateOutput$TimeBinResults, function(x) lapply(strsplit(x$Partition, " \\| ")[[1]], function(y) {if(length(grep("-", y)) > 0) {z <- strsplit(y, split = "-")[[1]]; y <- paste0(z[1]:z[2])}; as.numeric(y)} ))
+  TimeBinPartitions <- lapply(RateOutput$TimeBinResults, function(x) lapply(strsplit(x$Partition, " \\| ")[[1]], function(y) {if (length(grep("-", y)) > 0) {z <- strsplit(y, split = "-")[[1]]; y <- paste0(z[1]:z[2])}; as.numeric(y)} ))
   
   # Get sampled rates for model:
   TimeRates <- cbind(lapply(TimeBinPartitions[ModelNumber], function(x) do.call(rbind, lapply(x, function(y) {xs <- c(RateOutput$TimeBinsUsed[y[1]], RateOutput$TimeBinsUsed[(y[length(y)] + 1)])})))[[1]], RateOutput$TimeBinResults[[ModelNumber]]$Rates, RateOutput$TimeBinResults[[ModelNumber]]$Rates)

@@ -45,22 +45,22 @@ prune_cladistic_matrix <- function(cladistic.matrix, blocks2prune = c(), charact
   }
   
   # Check that something to prune has been specified:
-  if(is.null(blocks2prune) && is.null(characters2prune) && is.null(taxa2prune) && removeinvariant == FALSE) stop("No blocks, taxa, or characters to prune specified.")
+  if (is.null(blocks2prune) && is.null(characters2prune) && is.null(taxa2prune) && removeinvariant == FALSE) stop("No blocks, taxa, or characters to prune specified.")
   
   # Check blocks specified exist and stop and warn :
-  if(length(setdiff(blocks2prune, 1:(length(cladistic.matrix) - 1))) > 0) stop("Block numbers specified that are not present in data.")
+  if (length(setdiff(blocks2prune, 1:(length(cladistic.matrix) - 1))) > 0) stop("Block numbers specified that are not present in data.")
   
   # Check characters specified exist and stop and warn user if not:
-  if(length(setdiff(characters2prune, 1:sum(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), ncol))))) > 0) stop("Characters specified that are outside the scope of the matrix. Check and retry.")
+  if (length(setdiff(characters2prune, 1:sum(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), ncol))))) > 0) stop("Characters specified that are outside the scope of the matrix. Check and retry.")
   
   # Check taxa specified exist and stop and warn user if not:
-  if(length(setdiff(taxa2prune, rownames(cladistic.matrix$Matrix_1$Matrix))) > 0) stop("Taxa specified that are not found in the matrix. Check and retry.")
+  if (length(setdiff(taxa2prune, rownames(cladistic.matrix$Matrix_1$Matrix))) > 0) stop("Taxa specified that are not found in the matrix. Check and retry.")
   
   # Get number of characters:
   NChars <- sum(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), ncol)))
   
   # If there are characters to prune:
-  if(!is.null(characters2prune)) {
+  if (!is.null(characters2prune)) {
     
     # Get character blocks for each character in descendng order (as want to work backwards so things match up properly):
     CharacterBlocks <- unlist(lapply(lapply(lapply(as.list(sort(characters2prune, decreasing = TRUE)), '>', cumsum(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), ncol)))), which), length)) + 1
@@ -69,7 +69,7 @@ prune_cladistic_matrix <- function(cladistic.matrix, blocks2prune = c(), charact
     CharactersAsList <- lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), function(x) 1:ncol(x))
     
     # Actually form list of character numbers (i.e., renumber characters in second or higher blocks):
-    if(length(CharactersAsList) > 1) for(i in 2:length(CharactersAsList)) CharactersAsList[[i]] <- CharactersAsList[[i]] + max(CharactersAsList[[(i - 1)]])
+    if (length(CharactersAsList) > 1) for(i in 2:length(CharactersAsList)) CharactersAsList[[i]] <- CharactersAsList[[i]] + max(CharactersAsList[[(i - 1)]])
     
     # For each unique character block:
     for(i in unique(CharacterBlocks)) {
@@ -97,7 +97,7 @@ prune_cladistic_matrix <- function(cladistic.matrix, blocks2prune = c(), charact
   }
   
   # If there are taxa to prune:
-  if(!is.null(taxa2prune)) {
+  if (!is.null(taxa2prune)) {
     
     # Remove pruned taxa from each block:
     for(i in 2:length(cladistic.matrix)) cladistic.matrix[[i]]$Matrix <- cladistic.matrix[[i]]$Matrix[-match(taxa2prune, rownames(cladistic.matrix[[i]]$Matrix)), , drop = FALSE]
@@ -105,7 +105,7 @@ prune_cladistic_matrix <- function(cladistic.matrix, blocks2prune = c(), charact
   }
   
   # If there are blocks to prune:
-  if(!is.null(blocks2prune)) {
+  if (!is.null(blocks2prune)) {
     
     # Remove blocks to be rpuned:
     cladistic.matrix <- cladistic.matrix[-(blocks2prune + 1)]
@@ -116,19 +116,19 @@ prune_cladistic_matrix <- function(cladistic.matrix, blocks2prune = c(), charact
   }
   
   # If there are invariant characters:
-  if(removeinvariant) {
+  if (removeinvariant) {
     
     # Find any invariant characters:
     InvariantsAsList <- lapply(lapply(lapply(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), LengthFinder), unlist), '<', 1), which)
     
     # If there are invariant characters:
-    if(length(unlist(InvariantsAsList)) > 0) {
+    if (length(unlist(InvariantsAsList)) > 0) {
       
       # For each matrix block:
       for(i in 1:length(InvariantsAsList)) {
         
         # Only if there are invraints for this block:
-        if(length(InvariantsAsList[[i]]) > 0) {
+        if (length(InvariantsAsList[[i]]) > 0) {
           
           # Remove characters from matrix:
           cladistic.matrix[[(i + 1)]]$Matrix <- cladistic.matrix[[(i + 1)]]$Matrix[, -InvariantsAsList[[i]], drop = FALSE]
@@ -157,7 +157,7 @@ prune_cladistic_matrix <- function(cladistic.matrix, blocks2prune = c(), charact
   NewBlocksToDelete <- which(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), ncol)) == 0)
   
   # If there are new blocks to prune:
-  if(length(NewBlocksToDelete) > 0) {
+  if (length(NewBlocksToDelete) > 0) {
     
     # Remove blocks to be rpuned:
     cladistic.matrix <- cladistic.matrix[-(NewBlocksToDelete + 1)]

@@ -31,7 +31,7 @@ date_nodes <- function(tree) {
   rootnode <- ape::Ntip(tree) + 1
   
   # If tree is a complete polytomy:
-  if(tree$Nnode == 1) {
+  if (tree$Nnode == 1) {
       
     # Create paths for just tips:
     paths <- as.list(1:ape::Ntip(tree))

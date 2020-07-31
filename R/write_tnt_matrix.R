@@ -45,32 +45,32 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
   MatrixConversion <- function(DataMatrix) {
     
     # If there are missing characters replace with missing symbol:
-    if(any(is.na(DataMatrix$Matrix))) DataMatrix$Matrix[is.na(DataMatrix$Matrix)] <- "?"
+    if (any(is.na(DataMatrix$Matrix))) DataMatrix$Matrix[is.na(DataMatrix$Matrix)] <- "?"
     
     # If there are gap characters replace with gap symbol:
-    if(sum(as.vector(DataMatrix$Matrix) == "") > 0) DataMatrix$Matrix[DataMatrix$Matrix == ""] <- "-"
+    if (sum(as.vector(DataMatrix$Matrix) == "") > 0) DataMatrix$Matrix[DataMatrix$Matrix == ""] <- "-"
     
     # If there are symbols (i.e., non-continuous data):
-    if(length(DataMatrix$Characters$Symbols) > 0) {
+    if (length(DataMatrix$Characters$Symbols) > 0) {
       
       # If datatype is STANDARD set TNT symbols:
-      if(DataMatrix$Datatype == "STANDARD") TNTSymbols <- c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V")
+      if (DataMatrix$Datatype == "STANDARD") TNTSymbols <- c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V")
       
       # If datatype is non-STANDARD (but still discrete):
-      if(DataMatrix$Datatype != "STANDARD") TNTSymbols <- DataMatrix$Characters$Symbols
+      if (DataMatrix$Datatype != "STANDARD") TNTSymbols <- DataMatrix$Characters$Symbols
       
       # In reverse order go through numbers:
       for(i in rev(TNTSymbols)) {
         
         # Replace current number with appropriate symbol:
-        if(length(grep(as.character(which(TNTSymbols == i) - 1), DataMatrix$Matrix)) > 0) DataMatrix$Matrix <- gsub(as.character(which(TNTSymbols == i) - 1), i, DataMatrix$Matrix)
+        if (length(grep(as.character(which(TNTSymbols == i) - 1), DataMatrix$Matrix)) > 0) DataMatrix$Matrix <- gsub(as.character(which(TNTSymbols == i) - 1), i, DataMatrix$Matrix)
         
       }
       
     }
     
     # If there are uncertainties:
-    if(length(grep("/", DataMatrix$Matrix)) > 0) {
+    if (length(grep("/", DataMatrix$Matrix)) > 0) {
       
       # Find cells that have uncertainties:
       Uncertainties <- grep("/", DataMatrix$Matrix)
@@ -81,7 +81,7 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
     }
     
     # If there are polymorphisms:
-    if(length(grep("&", DataMatrix$Matrix)) > 0) {
+    if (length(grep("&", DataMatrix$Matrix)) > 0) {
       
       # Find cells with polymorphsims:
       Polymorphisms <- grep("&", DataMatrix$Matrix)
@@ -95,7 +95,7 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
     TaxonNamesWithTrailingSpaces <- paste(rownames(DataMatrix$Matrix), unlist(lapply(lapply(as.list((max(nchar(rownames(DataMatrix$Matrix))) + 2) - nchar(rownames(DataMatrix$Matrix))), rep, x = " "), paste, collapse = "")), sep = "")
     
     # If block is continuous:
-    if(DataMatrix$Datatype == "CONTINUOUS") {
+    if (DataMatrix$Datatype == "CONTINUOUS") {
       
       # Format rows with spaces between values:
       DataMatrix$Matrix <- paste(TaxonNamesWithTrailingSpaces, (apply(DataMatrix$Matrix, 1, paste, collapse = " ")), sep = "")
@@ -165,10 +165,10 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
   weights <- unname(unlist(lapply(DataBlocks, '[[', "weights")))
 
   # Make sure step matrices are a list if null:
-  if(!is.list(cladistic.matrix$Topper$StepMatrices)) cladistic.matrix$Topper$StepMatrices <- list(NULL)
+  if (!is.list(cladistic.matrix$Topper$StepMatrices)) cladistic.matrix$Topper$StepMatrices <- list(NULL)
   
   # If there are step matrices:
-  if(any(!unlist(lapply(cladistic.matrix$Topper$StepMatrices, is.null)))) {
+  if (any(!unlist(lapply(cladistic.matrix$Topper$StepMatrices, is.null)))) {
     
     # Empty vector to store hits (characters assigned to a step matrix):
     global_hits <- vector(mode = "numeric")
@@ -177,7 +177,7 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
     all_step_matrix_lines <- vector(mode = "character")
     
     # Check there are not too many step matrices:
-    if(length(cladistic.matrix$Topper$StepMatrices) > 32) stop("Too many (>32) step matrices for TNT!")
+    if (length(cladistic.matrix$Topper$StepMatrices) > 32) stop("Too many (>32) step matrices for TNT!")
     
     # For each step matrix:
     for(i in 1:length(cladistic.matrix$Topper$StepMatrices)) {
@@ -208,7 +208,7 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
       global_hits <- c(global_hits, hits)
       
       # Stop if no hits!:
-      if(length(hits) == 0) stop(paste("No characters assigned to step matrix: ", names(cladistic.matrix$Topper$StepMatrices)[i], ".", sep = ""))
+      if (length(hits) == 0) stop(paste("No characters assigned to step matrix: ", names(cladistic.matrix$Topper$StepMatrices)[i], ".", sep = ""))
       
       # Build step matrix lines:
       step_matrix_lines <- paste(c(step_matrix_top, costs, ";", paste("smatrix + ", names(cladistic.matrix$Topper$StepMatrices)[i], " ", paste(hits - 1, collapse = " "), ";", sep = "")), collapse = "\n")
@@ -236,10 +236,10 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
   FullString <- paste("taxname=;\nmxram 4096;\ntaxname +", max(nchar(rownames(cladistic.matrix$Matrix_1$Matrix))), ";\nnstates num 32;\nxread\n", HeaderBlock, sum(NCharacters), " ", NTaxa, "\n", MatrixBlock, ";\n", CCodeBlock, StepMatrixBlock, "proc/;\n", sep = "")
   
   # If adding analysis block:
-  if(add.analysis.block) {
+  if (add.analysis.block) {
     
     # If there are few enough taxa for an exact solution:
-    if(NTaxa <= 24) {
+    if (NTaxa <= 24) {
       
       # Use implicit enumeration:
       AnalysisBlock <- c("collapse [;", "ienum;")

@@ -39,16 +39,16 @@
 trim_matrix <- function(dist.matrix, Tree = NULL) {
   
   # If input is of class "dist" first convert to a regular matrix:
-  if(inherits(dist.matrix, what = "dist")) dist.matrix <- as.matrix(dist.matrix)
+  if (inherits(dist.matrix, what = "dist")) dist.matrix <- as.matrix(dist.matrix)
   
   # Check the input is a distance matrix:
-  if(!is.matrix(dist.matrix)) stop("ERROR: Input must be a distance matrix (i.e., either an object of class \"dist\" or a square matrix).")
+  if (!is.matrix(dist.matrix)) stop("ERROR: Input must be a distance matrix (i.e., either an object of class \"dist\" or a square matrix).")
   
   # Case if there is no tree:
-  if(is.null(Tree)) {
+  if (is.null(Tree)) {
     
     # Case if distance matrix is already complete:
-    if(length(which(is.na(dist.matrix))) == 0) {
+    if (length(which(is.na(dist.matrix))) == 0) {
       
       # Warn user:
       print("There are no gaps in the distance matrix")
@@ -103,7 +103,7 @@ trim_matrix <- function(dist.matrix, Tree = NULL) {
   } else {
     
     # Case if distance matrix is already complete:
-    if(length(which(is.na(dist.matrix))) == 0) {
+    if (length(which(is.na(dist.matrix))) == 0) {
       
       # Warn user:
       print("There are no gaps in the distance matrix")
@@ -182,7 +182,7 @@ trim_matrix <- function(dist.matrix, Tree = NULL) {
       }
       
       # Check if nodes need to be deleted that are not related to tips to be deleted:
-      if(length(setdiff(nodes.to.remove, tip.name.nodes.to.remove)) > 0) {
+      if (length(setdiff(nodes.to.remove, tip.name.nodes.to.remove)) > 0) {
         
         # Identify nodes left to remove:
         nodes.left.to.remove <- setdiff(nodes.to.remove, tip.name.nodes.to.remove)
@@ -197,7 +197,7 @@ trim_matrix <- function(dist.matrix, Tree = NULL) {
           descendant.nodes <- Tree$edge[which(Tree$edge[, 1] == originating.node), 2]
           
           # Case if one of the descendants is a tip:
-          if(length(which(descendant.nodes <= ape::Ntip(Tree))) > 0) {
+          if (length(which(descendant.nodes <= ape::Ntip(Tree))) > 0) {
             
             # Get taxon to exclude:
             taxon.to.exclude <- Tree$tip.label[min(descendant.nodes)]
@@ -206,7 +206,7 @@ trim_matrix <- function(dist.matrix, Tree = NULL) {
           } else {
             
             # If first descendant node has more taxa:
-            if(length(FindDescendants(descendant.nodes[1], Tree)) >= length(FindDescendants(descendant.nodes[2], Tree))) {
+            if (length(FindDescendants(descendant.nodes[1], Tree)) >= length(FindDescendants(descendant.nodes[2], Tree))) {
               
               # Get taxon to exclude:
               taxon.to.exclude <- Tree$tip.label[FindDescendants(descendant.nodes[2], Tree)]
@@ -249,7 +249,7 @@ trim_matrix <- function(dist.matrix, Tree = NULL) {
       redundant.rows <- c(which(duplicated(rownames(dist.matrix))), which(rownames(dist.matrix) == ""))
       
       # If there are any redundant rows:
-      if(length(redundant.rows) > 0) {
+      if (length(redundant.rows) > 0) {
         
         # Remove them from the distance matrix:
         dist.matrix <- dist.matrix[-redundant.rows, -redundant.rows]

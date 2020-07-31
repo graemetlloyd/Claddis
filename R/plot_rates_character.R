@@ -39,7 +39,7 @@ plot_rates_character <- function(RateOutput, ModelNumber, ...) {
   # - Add checks that data are present (characters were tested for)
   
   # Reconstruct character partitions list:
-  CharacterPartitions <- lapply(RateOutput$CharacterPartitionResults, function(x) lapply(strsplit(x$Partition, " \\| ")[[1]], function(y) unlist(lapply(y, function(z) {z <- as.list(strsplit(z, split = " ")[[1]]); unlist(lapply(z, function(p) if(length(grep("-", p)) > 0) {p <- strsplit(p, split = "-")[[1]]; as.numeric(p[1]:as.numeric(p[2]))} else {as.numeric(p)}))}))))
+  CharacterPartitions <- lapply(RateOutput$CharacterPartitionResults, function(x) lapply(strsplit(x$Partition, " \\| ")[[1]], function(y) unlist(lapply(y, function(z) {z <- as.list(strsplit(z, split = " ")[[1]]); unlist(lapply(z, function(p) if (length(grep("-", p)) > 0) {p <- strsplit(p, split = "-")[[1]]; as.numeric(p[1]:as.numeric(p[2]))} else {as.numeric(p)}))}))))
   
   # Get x values for plotting partitions of model:
   ModelXValues <- lapply(apply(matrix(c(1, cumsum(unlist(lapply(CharacterPartitions[[ModelNumber]], function(x) range(1:length(x))))[-1])), ncol = 2), 2, list), unlist)

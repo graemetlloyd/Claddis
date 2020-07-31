@@ -98,25 +98,25 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   # IF ADDING TREES TO OUTPUT CONVERT THEM TO CLASS MULTIPHYLO, E.G. STOCHASTIC CHARACTER MAPS WITH NAS - NOTE THIS IN MANUAL TOO AS AN EXTENSION OF WHAT PHTTOOLS DOES.
   
   # Check for continuous and step matrices and stop and warn user if found:
-  if(length(setdiff(unique(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) x$Ordering))), c("unord", "ord"))) > 0) stop("cladistic.matrix can only contain characters of type \"ord\" or \"unord\" (i.e., no step matrices or continuous characters).")
+  if (length(setdiff(unique(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) x$Ordering))), c("unord", "ord"))) > 0) stop("cladistic.matrix can only contain characters of type \"ord\" or \"unord\" (i.e., no step matrices or continuous characters).")
   
   # Check tree has branch lengths:
-  if(is.null(Tree$edge.length)) stop("Tree does not have branch lengths (durations). Try timescaling the Tree, e.g., with DatePhylo.")
+  if (is.null(Tree$edge.length)) stop("Tree does not have branch lengths (durations). Try timescaling the Tree, e.g., with DatePhylo.")
   
   # Check branches all have positive length:
-  if(any(Tree$edge.length == 0)) stop("All branch lengths must be positive (no zero-length branches).")
+  if (any(Tree$edge.length == 0)) stop("All branch lengths must be positive (no zero-length branches).")
   
   # Check Tree has root age:
-  if(is.null(Tree$root.time)) stop("Tree is missing $root.time. Try setting this before continuing, e.g., Tree$root.time <- 104.2.")
+  if (is.null(Tree$root.time)) stop("Tree is missing $root.time. Try setting this before continuing, e.g., Tree$root.time <- 104.2.")
   
   # Check polymorphism.behaviour is correctly formatted or stop and warn user:
-  if(length(setdiff(polymorphism.behaviour, c("equalp", "missing", "random"))) > 0) stop("polymorphism.behaviour must be one of must be one of \"equalp\", \"missing\" or \"random\".")
+  if (length(setdiff(polymorphism.behaviour, c("equalp", "missing", "random"))) > 0) stop("polymorphism.behaviour must be one of must be one of \"equalp\", \"missing\" or \"random\".")
   
   # Check uncertainty.behaviour is correctly formatted or stop and warn user:
-  if(length(setdiff(uncertainty.behaviour, c("equalp", "missing", "random"))) > 0) stop("uncertainty.behaviour must be one of \"equalp\", \"missing\" or \"random\".")
+  if (length(setdiff(uncertainty.behaviour, c("equalp", "missing", "random"))) > 0) stop("uncertainty.behaviour must be one of \"equalp\", \"missing\" or \"random\".")
   
   # Check inapplicable.behaviour is correctly formatted or stop and warn user:
-  if(length(setdiff(inapplicable.behaviour, c("missing"))) > 0) stop("inapplicable.behaviour must be \"missing\".")
+  if (length(setdiff(inapplicable.behaviour, c("missing"))) > 0) stop("inapplicable.behaviour must be \"missing\".")
   
   # Ensure time bins are in correct order:
   TimeBins <- sort(unique(TimeBins), decreasing = TRUE)
@@ -128,7 +128,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   MatrixBlock <- do.call(cbind, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"))
   
   # If inapplicable.behaviour is missing replace inaplicables with NAs:
-  if(inapplicable.behaviour == "missing" && any(MatrixBlock[!is.na(MatrixBlock)] == "")) MatrixBlock[which(MatrixBlock == "")] <- NA
+  if (inapplicable.behaviour == "missing" && any(MatrixBlock[!is.na(MatrixBlock)] == "")) MatrixBlock[which(MatrixBlock == "")] <- NA
   
   # Assemble all ordering values into a single vector:
   Ordering <- unname(do.call(c, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Ordering")))
@@ -161,19 +161,19 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     TipStateList <- x$TipStates
     
     # If polymorphism.behaviour is missing replace all polymorphisms with NAs:
-    if(polymorphism.behaviour == "missing") TipStateList <- lapply(TipStateList, function(x) {CellsToAlter <- grep("&", x); if(length(CellsToAlter) > 0) x[CellsToAlter] <- NA; return(x)})
+    if (polymorphism.behaviour == "missing") TipStateList <- lapply(TipStateList, function(x) {CellsToAlter <- grep("&", x); if (length(CellsToAlter) > 0) x[CellsToAlter] <- NA; return(x)})
     
     # If uncertainty.behaviour is missing replace all uncertainties with NAs:
-    if(uncertainty.behaviour == "missing") TipStateList <- lapply(TipStateList, function(x) {CellsToAlter <- grep("/", x); if(length(CellsToAlter) > 0) x[CellsToAlter] <- NA; return(x)})
+    if (uncertainty.behaviour == "missing") TipStateList <- lapply(TipStateList, function(x) {CellsToAlter <- grep("/", x); if (length(CellsToAlter) > 0) x[CellsToAlter] <- NA; return(x)})
     
     # If polymorphism.behaviour is random replace all polymorphisms with one included state at random:
-    if(polymorphism.behaviour == "random") TipStateList <- lapply(TipStateList, function(x) {CellsToAlter <- grep("&", x); if(length(CellsToAlter) > 0) for(i in 1:length(CellsToAlter)) x[CellsToAlter[i]] <- sample(strsplit(x[CellsToAlter[i]], split = "&")[[1]], size = 1); return(x)})
+    if (polymorphism.behaviour == "random") TipStateList <- lapply(TipStateList, function(x) {CellsToAlter <- grep("&", x); if (length(CellsToAlter) > 0) for(i in 1:length(CellsToAlter)) x[CellsToAlter[i]] <- sample(strsplit(x[CellsToAlter[i]], split = "&")[[1]], size = 1); return(x)})
     
     # If uncertainty.behaviour is random replace all uncertainties with one included state at random:
-    if(uncertainty.behaviour == "random") TipStateList <- lapply(TipStateList, function(x) {CellsToAlter <- grep("/", x); if(length(CellsToAlter) > 0) for(i in 1:length(CellsToAlter)) x[CellsToAlter[i]] <- sample(strsplit(x[CellsToAlter[i]], split = "/")[[1]], size = 1); return(x)})
+    if (uncertainty.behaviour == "random") TipStateList <- lapply(TipStateList, function(x) {CellsToAlter <- grep("/", x); if (length(CellsToAlter) > 0) for(i in 1:length(CellsToAlter)) x[CellsToAlter[i]] <- sample(strsplit(x[CellsToAlter[i]], split = "/")[[1]], size = 1); return(x)})
     
     # If uncertainty.behaviour is equalp replace all uncertainties withpolymorphism equivalent (makes grep simpler later):
-    if(uncertainty.behaviour == "equalp") TipStateList <- lapply(TipStateList, function(x) gsub("/", "&", x))
+    if (uncertainty.behaviour == "equalp") TipStateList <- lapply(TipStateList, function(x) gsub("/", "&", x))
 
     # Reinsert modified tip states:
     x$TipStates <- TipStateList
@@ -217,7 +217,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
       for(i in 1:length(Rows)) TipStateMatrix[Rows[i], Columns[i]] <- 1
       
       # Convert each row to a probability (unnecessary if only one column):
-      if(ncol(TipStateMatrix) > 1) TipStateMatrix <- t(apply(TipStateMatrix, 1, function(x) x / sum(x)))
+      if (ncol(TipStateMatrix) > 1) TipStateMatrix <- t(apply(TipStateMatrix, 1, function(x) x / sum(x)))
       
       # Return tip state matrix:
       return(TipStateMatrix)
@@ -242,18 +242,18 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   BuildCharacterModel <- function(x) {
     
     # If character is ordered:
-    if(x$Ordering == "ord") {
+    if (x$Ordering == "ord") {
       
       # Create character model with all transitions impossible:
       CharacterModel <- matrix(0, ncol = length(x$MinVal:x$MaxVal), nrow = length(x$MinVal:x$MaxVal), dimnames = list(x$MinVal:x$MaxVal, x$MinVal:x$MaxVal))
       
       # Create character matrix with only off-diagonal (adjacent) states possible:
-      if(ncol(CharacterModel) > 1) for(i in 2:ncol(CharacterModel)) CharacterModel[i, (i - 1)] <- CharacterModel[(i - 1), i] <- 1
+      if (ncol(CharacterModel) > 1) for(i in 2:ncol(CharacterModel)) CharacterModel[i, (i - 1)] <- CharacterModel[(i - 1), i] <- 1
       
     }
     
     # If character is unordered:
-    if(x$Ordering == "unord") {
+    if (x$Ordering == "unord") {
       
       # Create character model with all transitions possible:
       CharacterModel <- matrix(1, ncol = length(x$MinVal:x$MaxVal), nrow = length(x$MinVal:x$MaxVal), dimnames = list(x$MinVal:x$MaxVal, x$MinVal:x$MaxVal))
@@ -284,10 +284,10 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     TipsToDrop <- setdiff(x$FullTree$tip.label, rownames(x$PrunedTipStates[[1]]))
     
     # If there are tips to drop:
-    if(length(TipsToDrop) > 0) {
+    if (length(TipsToDrop) > 0) {
       
       # If exactly one tip will remain:
-      if((TipsInTree - length(TipsToDrop)) == 1) {
+      if ((TipsInTree - length(TipsToDrop)) == 1) {
         
         # Set pruned tree initially as full tree:
         x$PrunedTree <- x$FullTree
@@ -307,7 +307,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
       }
       
       # If exactly two tips will remain:
-      if((TipsInTree - length(TipsToDrop)) == 2) {
+      if ((TipsInTree - length(TipsToDrop)) == 2) {
         
         # Prune tree and store:
         x$PrunedTree <- drop.tip(x$FullTree, TipsToDrop)
@@ -318,7 +318,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
       }
       
       # If at least three tips will remain:
-      if((TipsInTree - length(TipsToDrop)) > 2) {
+      if ((TipsInTree - length(TipsToDrop)) > 2) {
         
         # Prune tree and store:
         x$PrunedTree <- drop.tip(x$FullTree, TipsToDrop)
@@ -351,7 +351,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     NumberOfTips <- lapply(x$PrunedTipStates, nrow)[[1]]
     
     # If exactly one tip:
-    if(NumberOfTips == 1) {
+    if (NumberOfTips == 1) {
       
       # Set pruned node ages as beginning and end of single branch:
       x$Pruneddate_nodes <- c(x$PrunedTree$root.time - sum(x$PrunedTree$edge.length), x$PrunedTree$root.time)
@@ -362,7 +362,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     }
     
     # If exactly two tips:
-    if(NumberOfTips == 2) {
+    if (NumberOfTips == 2) {
       
       # Set node ages by subtracting two branch lengths from root time and adding root time at end:
       x$Pruneddate_nodes <- c(x$PrunedTree$root.time - x$PrunedTree$edge.length[order(x$PrunedTree$edge[, 2])], x$PrunedTree$root.time)
@@ -373,7 +373,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     }
     
     # If more than two tips just apply get node ages function:
-    if(NumberOfTips > 2) x$Pruneddate_nodes <- date_nodes(x$PrunedTree)
+    if (NumberOfTips > 2) x$Pruneddate_nodes <- date_nodes(x$PrunedTree)
     
     # Return full output:
     return(x)
@@ -390,7 +390,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     NumberOfTips <- lapply(x$PrunedTipStates, nrow)[[1]]
     
     # If exactly one tip:
-    if(NumberOfTips == 1) {
+    if (NumberOfTips == 1) {
       
       # Compile single branch output (i.e., single branch of tree with positive length):
       x$PrunedToFullTreeEdgeMatches <- list(which(x$PrunedTree$edge.length > 0))
@@ -401,7 +401,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     }
     
     # If exactly two tips:
-    if(NumberOfTips == 2) {
+    if (NumberOfTips == 2) {
       
       # Get two tip names (in order):
       TipNames <- x$PrunedTree$tip.label
@@ -446,7 +446,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     }
     
     # If more than two tips simply use function normally:
-    if(NumberOfTips > 2) x$PrunedToFullTreeEdgeMatches <- match_tree_edges(Tree, x$PrunedTree)$matching.edges
+    if (NumberOfTips > 2) x$PrunedToFullTreeEdgeMatches <- match_tree_edges(Tree, x$PrunedTree)$matching.edges
     
     # Return full output:
     return(x)
@@ -466,7 +466,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     BranchesToSetAsZeroes <- setdiff(1:nrow(TemporaryTree$edge), unname(unlist(x$PrunedToFullTreeEdgeMatches)))
     
     # If there are nranches to set lengtsh to zero then do so and store:
-    if(length(BranchesToSetAsZeroes) > 0) TemporaryTree$edge.length[BranchesToSetAsZeroes] <- 0
+    if (length(BranchesToSetAsZeroes) > 0) TemporaryTree$edge.length[BranchesToSetAsZeroes] <- 0
     
     # Get edge lengths in bins:
     x$EdgeLengthsInBins <- bin_edge_lengths(time.tree = TemporaryTree, time.bins = TimeBins)
@@ -486,7 +486,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     NumberOfTips <- lapply(x$PrunedTipStates, nrow)[[1]]
     
     # If exactly one tip:
-    if(NumberOfTips == 1) {
+    if (NumberOfTips == 1) {
       
       # Subfunction to generate stochastic character map like output but for the single taon case:
       BuildOneTaxonStochasticCharacterMap <- function(y, tree) {
@@ -511,7 +511,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     }
     
     # If exactly two tips:
-    if(NumberOfTips == 2) {
+    if (NumberOfTips == 2) {
       
       # Subfunction to generate stochastic character map like output but for the two taxon case:
       BuildTwoTaxonStochasticCharacterMap <- function(y, tree) {
@@ -523,10 +523,10 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
         Output$maps <- as.list(unname(tree$edge.length))
         
         # If only one state (character is constant) add state name to maps:
-        if(ncol(y) == 1) Output$maps <- lapply(Output$maps, function(z) {names(z) <- colnames(y); z})
+        if (ncol(y) == 1) Output$maps <- lapply(Output$maps, function(z) {names(z) <- colnames(y); z})
         
         # If character is variant:
-        if(ncol(y) == 2) {
+        if (ncol(y) == 2) {
           
           # Get raw data for calculating root state probabiity (incorporates tip sattes and reciprocal of branch lengths):
           RootStateRawData <- apply(sweep(y[tree$tip.label, ], MARGIN = 1, matrix(1 / (tree$edge.length / sum(tree$edge.length))), '*'), 2, sum)
@@ -547,7 +547,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
           TipsWithTerminalChanges <- names(which(apply(PrunedRootTipStates, 1, '==', 1)))
           
           # If there is a tip with a change to record:
-          if(length(TipsWithTerminalChanges) > 0) {
+          if (length(TipsWithTerminalChanges) > 0) {
             
             # Get the tip number:
             TipNumber <- which(tree$tip.label == TipsWithTerminalChanges)
@@ -585,13 +585,13 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     }
     
     # If more than two tips:
-    if(NumberOfTips > 2) {
+    if (NumberOfTips > 2) {
       
       # Subfunction to perform stochastic character mapping:
       GetStochasticCharacterMapTree <- function(y, tree, model) {
         
         # If character is constant (invariant):
-        if(ncol(y) == 1) {
+        if (ncol(y) == 1) {
           
           # Set initial output as tree:
           Output <- tree
@@ -605,7 +605,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
         }
         
         # If character is variable, perform regular stochastic character mapping:
-        if(ncol(y) > 1) Output <- make.simmap(y, tree = tree, nsim = 1, model = model, pi = "estimated", message = FALSE)
+        if (ncol(y) > 1) Output <- make.simmap(y, tree = tree, nsim = 1, model = model, pi = "estimated", message = FALSE)
         
         # Return output:
         return(Output)
@@ -629,7 +629,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   MapStochasticCharactersToFullTree <- function(x) {
     
     # Only proceed if pruned tree is actually smaller than full tree (otherwise data are fine as is):
-    if(lapply(x$PrunedTipStates, nrow)[[1]] < ape::Ntip(x$FullTree)) {
+    if (lapply(x$PrunedTipStates, nrow)[[1]] < ape::Ntip(x$FullTree)) {
       
       # Create empty list to store stochastic character maps for full trees:
       y <- list()
@@ -653,10 +653,10 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
       MultipleEdgeMatches <- unname(which(unlist(lapply(x$PrunedToFullTreeEdgeMatches, length)) > 1))
       
       # If there is at least one single edge match then map pruned edges to full tree for them:
-      if(length(SingleEdgeMatches) > 0) for(i in 1:length(y)) y[[i]]$maps[unname(unlist(x$PrunedToFullTreeEdgeMatches[SingleEdgeMatches]))] <- x$StochasticCharacterMapTrees[[i]]$maps[SingleEdgeMatches]
+      if (length(SingleEdgeMatches) > 0) for(i in 1:length(y)) y[[i]]$maps[unname(unlist(x$PrunedToFullTreeEdgeMatches[SingleEdgeMatches]))] <- x$StochasticCharacterMapTrees[[i]]$maps[SingleEdgeMatches]
       
       # If there is at least one multiple edge match:
-      if(length(MultipleEdgeMatches) > 0) {
+      if (length(MultipleEdgeMatches) > 0) {
         
         # For each simulation:
         for(i in 1:length(y)) {
@@ -668,7 +668,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
           MultipleEdgeMultipleStateMatches <- MultipleEdgeMatches[which(lapply(x$StochasticCharacterMapTrees[[i]]$maps[MultipleEdgeMatches], length) > 1)]
           
           # If there are multiple edge but single state matches:
-          if(length(MultipleEdgeSingleStateMatches) > 0) {
+          if (length(MultipleEdgeSingleStateMatches) > 0) {
             
             # For each match simply replace NA with the single character state:
             for(j in MultipleEdgeSingleStateMatches) y[[i]]$maps[unname(unlist(x$PrunedToFullTreeEdgeMatches[j]))] <- lapply(y[[i]]$maps[unname(unlist(x$PrunedToFullTreeEdgeMatches[j]))], function(z) {names(z) <- names(x$StochasticCharacterMapTrees[[i]]$maps[j][[1]]); z})
@@ -676,7 +676,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
           }
           
           # If there are multiple edge multiple state matches:
-          if(length(MultipleEdgeMultipleStateMatches) > 0) {
+          if (length(MultipleEdgeMultipleStateMatches) > 0) {
             
             # For each multiple state multiple edge match:
             for(j in MultipleEdgeMultipleStateMatches) {
@@ -727,7 +727,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
                 NextEvent <- max(c(EdgeSwitchTimes, ChangeTimes))
                 
                 # If next event is to switch edges:
-                if(EdgeSwitchTimes[1] == NextEvent) {
+                if (EdgeSwitchTimes[1] == NextEvent) {
                   
                   # Find current position on stochastic map:
                   CurrentPosition <- which(FullStochasticMaps[[CurrentEdge]] == 0)[1]
@@ -760,7 +760,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
                   names(FullStochasticMaps[[CurrentEdge]])[CurrentPosition] <- CurrentState
                   
                   # As long as the from-to matrix still exists:
-                  if(nrow(FromToChanges) > 0) {
+                  if (nrow(FromToChanges) > 0) {
                     
                     # Update current state:
                     CurrentState <- FromToChanges[1, 2]
@@ -820,7 +820,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
       EdgesWithChanges <- which(unlist(lapply(y$maps, length)) > 1)
       
       # As long as there is at least one change:
-      if(length(EdgesWithChanges) > 0) {
+      if (length(EdgesWithChanges) > 0) {
         
         # Get ages at start of edges with changes (subtracting from this will give change times later:
         AgeAtStartOfEdgesWithChanges <- Treedate_nodes[x$FullTree$edge[EdgesWithChanges, 1]]
@@ -867,7 +867,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
       for(i in PrecedingChanges[!duplicated(Tree$edge[PrecedingChanges, 1])]) {
         
         # If simply the root state:
-        if(ape::Ntip(Tree) + 1 == Tree$edge[i, 1]) {
+        if (ape::Ntip(Tree) + 1 == Tree$edge[i, 1]) {
           
           # Add root change to matrix as edge zero:
           ChangesMatrix <- rbind(ChangesMatrix, c(NA, EdgeFromTo[i, 1], 0, Tree$root.time))
@@ -883,7 +883,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
       }
       
       # If there are any following changes (i.e., is there at least one missing value at the tips):
-      if(length(FollowingChanges) > 0) {
+      if (length(FollowingChanges) > 0) {
         
         # Add following changes to changes matrix:
         ChangesMatrix <- rbind(ChangesMatrix, cbind(EdgeFromTo[FollowingChanges, 2], FollowingState[FollowingChanges], unlist(lapply(as.list(Tree$edge[FollowingChanges, 2]), function(z) {FollowingEdges <- which(Tree$edge[, 1] == z); FollowingEdges[is.na(EdgeFromTo[FollowingEdges, 1])]})), unname(Treedate_nodes[Tree$edge[FollowingChanges, 2]])))

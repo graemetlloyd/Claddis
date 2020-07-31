@@ -40,13 +40,13 @@
 bin_edge_lengths <- function(time.tree, time.bins, pruned.tree = NULL) {
 	
 	# Tree must have $root.time:
-	if(is.null(time.tree$root.time)) stop("ERROR: time.tree must have $root.time or function can not work.")
+	if (is.null(time.tree$root.time)) stop("ERROR: time.tree must have $root.time or function can not work.")
 	
 	# If tree is pruned from a larger version (where the terminal-internal dichotomy really applies):
-	if(!is.null(pruned.tree)) {
+	if (!is.null(pruned.tree)) {
 		
 		# Check pruned tree is subset of tree:
-		if(!all(drop.tip(time.tree, setdiff(time.tree$tip.label, pruned.tree$tip.label))$edge == pruned.tree$edge)) stop("ERROR: pruned.tree must be subtree of time.tree.")
+		if (!all(drop.tip(time.tree, setdiff(time.tree$tip.label, pruned.tree$tip.label))$edge == pruned.tree$edge)) stop("ERROR: pruned.tree must be subtree of time.tree.")
 		
 		# Get dropped taxa:
 		dropped.tips <- setdiff(time.tree$tip.label, pruned.tree$tip.label)
@@ -55,7 +55,7 @@ bin_edge_lengths <- function(time.tree, time.bins, pruned.tree = NULL) {
 		time.tree$edge.length[match(match(dropped.tips, time.tree$tip.label), time.tree$edge[, 2])] <- 0
 		
 		# Only continue if there are more branch lengths to collapse:
-		if(sum(pruned.tree$edge.length) < sum(time.tree$edge.length)) {
+		if (sum(pruned.tree$edge.length) < sum(time.tree$edge.length)) {
 			
 			# Find descendant tips of each node:
 			descendant.tips <- lapply(as.list((ape::Ntip(time.tree) + 1):(ape::Ntip(time.tree) + ape::Nnode(time.tree))), FindDescendants, tree = time.tree)
@@ -101,7 +101,7 @@ bin_edge_lengths <- function(time.tree, time.bins, pruned.tree = NULL) {
 		edges.in.bin <- intersect(which(tree.edge.maxs > time.bins[i]), which(tree.edge.mins < time.bins[(i - 1)]))
 		
 		# If there is at least one edge in bin:
-		if(length(edges.in.bin) > 0) {
+		if (length(edges.in.bin) > 0) {
 			
 			# Get maximum age for each edge in bin:
 			in.bin.edge.maxs <- tree.edge.maxs[edges.in.bin]
@@ -110,10 +110,10 @@ bin_edge_lengths <- function(time.tree, time.bins, pruned.tree = NULL) {
 			in.bin.edge.mins <- tree.edge.mins[edges.in.bin]
 			
 			# Remove any part of edge that is found before the bin:
-			if(sum(in.bin.edge.maxs > time.bins[(i - 1)]) > 0) in.bin.edge.maxs[in.bin.edge.maxs > time.bins[(i - 1)]] <- time.bins[(i - 1)]
+			if (sum(in.bin.edge.maxs > time.bins[(i - 1)]) > 0) in.bin.edge.maxs[in.bin.edge.maxs > time.bins[(i - 1)]] <- time.bins[(i - 1)]
 			
 			# Remove any part of edge that is found after the bin:
-			if(sum(in.bin.edge.mins < time.bins[i]) > 0) in.bin.edge.mins[in.bin.edge.mins < time.bins[i]] <- time.bins[i]
+			if (sum(in.bin.edge.mins < time.bins[i]) > 0) in.bin.edge.mins[in.bin.edge.mins < time.bins[i]] <- time.bins[i]
 			
 			# Get sum of edge lengths found in the bin:
 			edge.length.in.bin[(i - 1)] <- sum(in.bin.edge.maxs - in.bin.edge.mins)

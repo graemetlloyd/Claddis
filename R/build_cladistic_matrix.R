@@ -45,16 +45,16 @@
 build_cladistic_matrix <- function(CharacterTaxonMatrix, header = "", weights = NULL, ordering = NULL, symbols = NULL, equalise.weights = FALSE, ignore.duplicate.taxa = FALSE) {
   
   # Check input is a matrix:
-  if(!is.matrix(CharacterTaxonMatrix)) stop("CharacterTaxonMatrix must be a matrix.")
+  if (!is.matrix(CharacterTaxonMatrix)) stop("CharacterTaxonMatrix must be a matrix.")
   
   # Check taxon names are supplied:
-  if(is.null(rownames(CharacterTaxonMatrix))) stop("CharacterTaxonMatrix must have rownames indicating taxa.")
+  if (is.null(rownames(CharacterTaxonMatrix))) stop("CharacterTaxonMatrix must have rownames indicating taxa.")
   
   # Check taxon names are unique (could cause downstream issues if not):
-  if(!ignore.duplicate.taxa) if(any(duplicated(rownames(CharacterTaxonMatrix)))) stop("Taxon names must be unique.")
+  if (!ignore.duplicate.taxa) if (any(duplicated(rownames(CharacterTaxonMatrix)))) stop("Taxon names must be unique.")
   
   # Delete any column names (could cause downstream issues otherwise):
-  if(!is.null(colnames(CharacterTaxonMatrix))) colnames(CharacterTaxonMatrix) <- NULL
+  if (!is.null(colnames(CharacterTaxonMatrix))) colnames(CharacterTaxonMatrix) <- NULL
   
   
   
@@ -73,37 +73,37 @@ build_cladistic_matrix <- function(CharacterTaxonMatrix, header = "", weights = 
   
   
   # If mystery character types are present warn user:
-  if(length(mystery.characters) > 0) stop("Characters must either be the integers 0 to 31, NA for missing, & for polymorphisms, or / for uncertainties.")
+  if (length(mystery.characters) > 0) stop("Characters must either be the integers 0 to 31, NA for missing, & for polymorphisms, or / for uncertainties.")
 
   # Check supplied weights are correct length:
-  if(!is.null(weights) && length(weights) != ncol(CharacterTaxonMatrix)) stop("weights must have same length as number of characters in CharacterTaxonMatrix.")
+  if (!is.null(weights) && length(weights) != ncol(CharacterTaxonMatrix)) stop("weights must have same length as number of characters in CharacterTaxonMatrix.")
   
   # Check supplied weights are numeric:
-  if(!is.null(weights) && !is.numeric(weights)) stop("weights must be numeric.")
+  if (!is.null(weights) && !is.numeric(weights)) stop("weights must be numeric.")
   
   # Check supplied weights are non-negative:
-  if(!is.null(weights) && any(weights < 0)) stop("weights must not be negative.")
+  if (!is.null(weights) && any(weights < 0)) stop("weights must not be negative.")
   
   # Check supplied ordering is the correct length:
-  if(!is.null(ordering) && length(ordering) != ncol(CharacterTaxonMatrix)) stop("Ordering must have same length as number of characters in CharacterTaxonMatrix.")
+  if (!is.null(ordering) && length(ordering) != ncol(CharacterTaxonMatrix)) stop("Ordering must have same length as number of characters in CharacterTaxonMatrix.")
   
   # Check ordering is of unord or ord type only:
-  if(!is.null(ordering) && length(setdiff(ordering, c("unord", "ord"))) > 0) stop("Ordering must be unord or ord only.")
+  if (!is.null(ordering) && length(setdiff(ordering, c("unord", "ord"))) > 0) stop("Ordering must be unord or ord only.")
   
   # Check symbols are of correct length:
-  if(!is.null(symbols) && length(symbols) >= (diff(range(as.numeric(unique(sort(unlist(strsplit(as.vector(CharacterTaxonMatrix), split = "&|/"))))))) + 1)) stop("Symbols must be at least as long as the range of character values in CharacterTaxonMatrix.")
+  if (!is.null(symbols) && length(symbols) >= (diff(range(as.numeric(unique(sort(unlist(strsplit(as.vector(CharacterTaxonMatrix), split = "&|/"))))))) + 1)) stop("Symbols must be at least as long as the range of character values in CharacterTaxonMatrix.")
 
   # Check symbols are single characters only:
-  if(!is.null(symbols) && any(nchar(symbols) != 1)) stop("Symbols must be single characters only.")
+  if (!is.null(symbols) && any(nchar(symbols) != 1)) stop("Symbols must be single characters only.")
 
   # Check header is a single value:
-  if(length(header) != 1)  stop("Header text must be a single value.")
+  if (length(header) != 1)  stop("Header text must be a single value.")
   
   # If no ordering set default to ordered.
-  if(is.null(ordering)) ordering <- rep("ord", ncol(CharacterTaxonMatrix))
+  if (is.null(ordering)) ordering <- rep("ord", ncol(CharacterTaxonMatrix))
 
   # If no weights are set:
-  if(is.null(weights)) weights <- rep(1, ncol(CharacterTaxonMatrix))
+  if (is.null(weights)) weights <- rep(1, ncol(CharacterTaxonMatrix))
 
   # Calculate minimum values:
   min.vals <- apply(CharacterTaxonMatrix, 2, function(x) sort(as.numeric(unlist(strsplit(x, split = "&|/"))), decreasing = FALSE)[1])
@@ -112,19 +112,19 @@ build_cladistic_matrix <- function(CharacterTaxonMatrix, header = "", weights = 
   max.vals <- apply(CharacterTaxonMatrix, 2, function(x) sort(as.numeric(unlist(strsplit(x, split = "&|/"))), decreasing = TRUE)[1])
   
   # If any NAs in min.vals replace with zero:
-  if(any(is.na(min.vals))) min.vals[is.na(min.vals)] <- 0
+  if (any(is.na(min.vals))) min.vals[is.na(min.vals)] <- 0
   
   # If any NAs in max.vals replace with zero:
-  if(any(is.na(max.vals))) max.vals[is.na(max.vals)] <- 0
+  if (any(is.na(max.vals))) max.vals[is.na(max.vals)] <- 0
 
   # Default step matrices to NULL for now (may add this option in future):
   step.matrices <- NULL
 
   # If symbols were not set:
-  if(is.null(symbols)) symbols <- c(c(0:9), LETTERS[1:22])[c(min(min.vals):max(max.vals)) + 1]
+  if (is.null(symbols)) symbols <- c(c(0:9), LETTERS[1:22])[c(min(min.vals):max(max.vals)) + 1]
 
   # If wanting to equalise weights:
-  if(equalise.weights) {
+  if (equalise.weights) {
     
     # Get starting weights:
     weights <- apply(rbind(c(max.vals - min.vals), rep(1, nchar)), 2, max)
@@ -136,7 +136,7 @@ build_cladistic_matrix <- function(CharacterTaxonMatrix, header = "", weights = 
     weights[ordering == "ord"] <- 1 / weights[ordering == "ord"]
     
     # If there are step matrices (not technically using these yet, but I guess this will have to exist eventually):
-    if(!is.null(step.matrices)) {
+    if (!is.null(step.matrices)) {
         
       # Get maximum distances for each step matrix:
       step.maxes <- unlist(lapply(lapply(step.matrices, as.numeric), max))

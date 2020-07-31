@@ -78,7 +78,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
   plot(pcoa_input$vectors[, x_axis], pcoa_input$vectors[, y_axis], type="n", bg = "black", xlab = x_lab, ylab = y_lab, asp = TRUE)
 
   # Case if no z-axis chosen:
-  if(is.null(z_axis)) {
+  if (is.null(z_axis)) {
 
     # Make all z-axis colours black:
     z_colours <- rep("black", nrow(pcoa_input$vectors))
@@ -101,7 +101,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
   }
 
   # Case if tree supplied:
-  if(!is.null(pcoa_input$Tree)) {
+  if (!is.null(pcoa_input$Tree)) {
 
     # Sort axes by node number in tree:
     pcoa_input$vectors <- pcoa_input$vectors[c(pcoa_input$Tree$tip.label, setdiff(rownames(pcoa_input$vectors), pcoa_input$Tree$tip.label)), ]
@@ -119,16 +119,16 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
     root_number <- ape::Ntip(pcoa_input$Tree) + 1
 
     # If plotting internal nodes, plot internal nodes:
-    if(plot_internal_nodes) points(pcoa_input$vectors[node_numbers, x_axis], pcoa_input$vectors[node_numbers, y_axis], pch = 21, bg = z_colours[node_numbers], cex = z_sizes[node_numbers])
+    if (plot_internal_nodes) points(pcoa_input$vectors[node_numbers, x_axis], pcoa_input$vectors[node_numbers, y_axis], pch = 21, bg = z_colours[node_numbers], cex = z_sizes[node_numbers])
 
     # If plotting root separately, plot root:
-    if(plot_root) points(pcoa_input$vectors[root_number, x_axis], pcoa_input$vectors[root_number, y_axis], pch = 21, col = root_colour, bg = root_colour, cex = z_sizes[root_number])
+    if (plot_root) points(pcoa_input$vectors[root_number, x_axis], pcoa_input$vectors[root_number, y_axis], pch = 21, col = root_colour, bg = root_colour, cex = z_sizes[root_number])
 
     # Plot tip data:
     points(pcoa_input$vectors[tip_numbers, x_axis], pcoa_input$vectors[tip_numbers, y_axis], pch = 21, bg = z_colours[tip_numbers], cex = z_sizes[tip_numbers])
 
     # If plotting taxon names:
-    if(plot_taxon_names) {
+    if (plot_taxon_names) {
     
       # First establish a default position for names (to the left of the point):
       x_positions <- rep(2, nrow(pcoa_input$vectors))
@@ -148,7 +148,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
     points(pcoa_input$vectors[, x_axis], pcoa_input$vectors[, y_axis], pch = 21, bg = z_colours, cex = z_sizes)
 
     # If plotting taxon names:
-    if(plot_taxon_names) {
+    if (plot_taxon_names) {
     
       # First establish a default position for names (to the left of the point):
       x_positions <- rep(2, nrow(pcoa_input$vectors))

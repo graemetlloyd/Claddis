@@ -171,7 +171,7 @@ plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_sl
     # Tick marks?
     
     # Case if groups are specified:
-    if(!is.null(groups)) {
+    if (!is.null(groups)) {
       
       # For each group:
       for(j in unique(groups)) {
