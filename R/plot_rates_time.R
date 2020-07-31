@@ -33,13 +33,13 @@
 #'   sep =",")
 #' Matrix <-
 #'   Claddis::read_nexus_matrix("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.nex")
-#' Tree <-
+#' time_tree <-
 #'   ape::read.tree("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.tre")
-#' Tree <- Tree[sample(1:100000, 100)]
-#' Tree <- lapply(Tree, function(x) strap::DatePhylo(x, Ages, rlen = 2, method = "equal"))
-#' class(Tree) <- "multiPhylo"
-#' TimeBins <- c(443.8, 358.9, 298.9, 251.9, 201.3, 145.0, 66.0, 0.0)
-#' LungfishResults <- Claddis::test_rates(Tree[[1]], Matrix, TimeBins,
+#' time_tree <- time_tree[sample(1:100000, 100)]
+#' time_tree <- lapply(time_tree, function(x) strap::DatePhylo(x, Ages, rlen = 2, method = "equal"))
+#' class(time_tree) <- "multiPhylo"
+#' time_bins <- c(443.8, 358.9, 298.9, 251.9, 201.3, 145.0, 66.0, 0.0)
+#' LungfishResults <- Claddis::test_rates(time_tree[[1]], Matrix, time_bins,
 #'   TimeBinPartitionsToTest = partition_time_bins(7),
 #'   CharacterPartitionsToTest = list(list(1:91), list(Cranial = 1:81,
 #'   Postcranial = 82:91)))
@@ -58,16 +58,16 @@ plot_rates_time <- function(RateOutput, ModelNumber, ...) {
   # - Add better example that runs.
   
   # Build vector of time bin midpoints for plotting:
-  TimeBinMidpoints <- (RateOutput$TimeBinsUsed[2:length(RateOutput$TimeBinsUsed)] + RateOutput$TimeBinsUsed[1:(length(RateOutput$TimeBinsUsed) - 1)]) / 2
+  TimeBinMidpoints <- (RateOutput$time_binsUsed[2:length(RateOutput$time_binsUsed)] + RateOutput$time_binsUsed[1:(length(RateOutput$time_binsUsed) - 1)]) / 2
   
   # Get partitions used from results output:
   TimeBinPartitions <- lapply(RateOutput$TimeBinResults, function(x) lapply(strsplit(x$Partition, " \\| ")[[1]], function(y) {if (length(grep("-", y)) > 0) {z <- strsplit(y, split = "-")[[1]]; y <- paste0(z[1]:z[2])}; as.numeric(y)} ))
   
   # Get sampled rates for model:
-  TimeRates <- cbind(lapply(TimeBinPartitions[ModelNumber], function(x) do.call(rbind, lapply(x, function(y) {xs <- c(RateOutput$TimeBinsUsed[y[1]], RateOutput$TimeBinsUsed[(y[length(y)] + 1)])})))[[1]], RateOutput$TimeBinResults[[ModelNumber]]$Rates, RateOutput$TimeBinResults[[ModelNumber]]$Rates)
+  TimeRates <- cbind(lapply(TimeBinPartitions[ModelNumber], function(x) do.call(rbind, lapply(x, function(y) {xs <- c(RateOutput$time_binsUsed[y[1]], RateOutput$time_binsUsed[(y[length(y)] + 1)])})))[[1]], RateOutput$TimeBinResults[[ModelNumber]]$Rates, RateOutput$TimeBinResults[[ModelNumber]]$Rates)
   
   # Create base plot of rates in each time bin with any other requested options paseed as ...:
-  geoscale::geoscalePlot(ages = TimeBinMidpoints, data = RateOutput$TimeRates[, "Rate"], age.lim = c(max(RateOutput$TimeBinsUsed), min(RateOutput$TimeBinsUsed)), data.lim = c(0, max(RateOutput$TimeRates[, "Rate"]) * 1.1), pch = 20, cex.pt = 2, label = "Character changes per lineage million years", ...)
+  geoscale::geoscalePlot(ages = TimeBinMidpoints, data = RateOutput$TimeRates[, "Rate"], age.lim = c(max(RateOutput$time_binsUsed), min(RateOutput$time_binsUsed)), data.lim = c(0, max(RateOutput$TimeRates[, "Rate"]) * 1.1), pch = 20, cex.pt = 2, label = "Character changes per lineage million years", ...)
   
   # Add lines representing clustering of requested model to plot:
   for(i in 1:nrow(TimeRates)) lines(x = TimeRates[i, 1:2], y = TimeRates[i, 3:4])

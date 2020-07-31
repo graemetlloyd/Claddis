@@ -5,7 +5,7 @@
 #' Given a tree and a cladistic matrix uses likelihood to estimate the ancestral states for every character.
 #'
 #' @param cladistic.matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
-#' @param time.tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{cladistic.matrix}.
+#' @param time_tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{cladistic.matrix}.
 #' @param estimate.all.nodes Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).
 #' @param estimate.tip.values Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).
 #' @param inapplicables.as.missing Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).
@@ -38,13 +38,13 @@
 #' set.seed(4)
 #' 
 #' # Generate a random tree for the Day data set:
-#' time.tree <- rtree(n = nrow(Day2016$matrix_1$matrix))
+#' time_tree <- rtree(n = nrow(Day2016$matrix_1$matrix))
 #' 
 #' # Update taxon names to match those in the data matrix:
-#' time.tree$tip.label <- rownames(Day2016$matrix_1$matrix)
+#' time_tree$tip.label <- rownames(Day2016$matrix_1$matrix)
 #' 
 #' # Set root time by making youngest taxon extant:
-#' time.tree$root.time <- max(diag(vcv(time.tree)))
+#' time_tree$root.time <- max(diag(vcv(time_tree)))
 #'
 #' # Use Day matrix as cladistic matrix:
 #' cladistic.matrix <- Day2016
@@ -55,10 +55,10 @@
 #'
 #' # Estimate ancestral states:
 #' estimate_ancestral_states(cladistic.matrix = cladistic.matrix,
-#'   time.tree = time.tree)
+#'   time_tree = time_tree)
 #' 
 #' @export estimate_ancestral_states
-estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.nodes = FALSE, estimate.tip.values = FALSE, inapplicables.as.missing = FALSE, polymorphism.behaviour = "equalp", uncertainty.behaviour = "equalp", threshold = 0.01, allow.all.missing = FALSE) {
+estimate_ancestral_states <- function(cladistic.matrix, time_tree, estimate.all.nodes = FALSE, estimate.tip.values = FALSE, inapplicables.as.missing = FALSE, polymorphism.behaviour = "equalp", uncertainty.behaviour = "equalp", threshold = 0.01, allow.all.missing = FALSE) {
   
   # How to get tip states for a continuous character? (Phytools answer: http://blog.phytools.org/2013/11/reconstructed-ancestral-tip-states-for.html)
   #   - So basically under ML just inherit state from ancestral node (really this is mean of distribution where sd would grow with duration of branch so to allow the possibility of variance this could also be sampled stochastically
@@ -72,13 +72,13 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   # Add Lloyd citation
   
   # Catch problem with trees with no branch lengths:
-  if (is.null(time.tree$edge.length)) stop("time.tree must have branch lengths.")
+  if (is.null(time_tree$edge.length)) stop("time_tree must have branch lengths.")
   
   # Catch problem with polytomies:
-  if (time.tree$Nnode < (ape::Ntip(time.tree) - 1)) stop("time.tree must be fully bifurcating.")
+  if (time_tree$Nnode < (ape::Ntip(time_tree) - 1)) stop("time_tree must be fully bifurcating.")
   
   # Catch problem with zero-length branches:
-  if (any(time.tree$edge.length == 0)) stop("time.tree must not have zero-length branches.")
+  if (any(time_tree$edge.length == 0)) stop("time_tree must not have zero-length branches.")
   
   # Check for step matrices and stop and warn if found:
   if (length(cladistic.matrix$topper$step_matrices) > 0) stop("Function can not currently deal with step matrices.")
@@ -120,7 +120,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   cladistic.matrix <- OriginalMatrix <- do.call(cbind, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"))
   
   # Find any failed name matches:
-  FailedNameMatches <- c(setdiff(rownames(cladistic.matrix), time.tree$tip.label), setdiff(time.tree$tip.label, rownames(cladistic.matrix)))
+  FailedNameMatches <- c(setdiff(rownames(cladistic.matrix), time_tree$tip.label), setdiff(time_tree$tip.label, rownames(cladistic.matrix)))
   
   # Check there are no failed name matches and stop and report if found:
   if (length(FailedNameMatches) > 0) stop(paste("The following names do not match between the tree and matrix: ", paste(sort(FailedNameMatches), collapse = ", "), ". Check spelling and try again.", sep = ""))
@@ -156,7 +156,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
     DataAsList[[i]]$ordering <- unname(ordering[i])
     
     # Add tree to list:
-    DataAsList[[i]]$Tree <- time.tree
+    DataAsList[[i]]$Tree <- time_tree
     
   }
   
@@ -418,7 +418,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   }
   
   # Get pruned node to full node for each unique tree:
-  NodeMapsList <- lapply(UniqueTrees, map_to_full_tree, fulltree = time.tree)
+  NodeMapsList <- lapply(UniqueTrees, map_to_full_tree, fulltree = time_tree)
   
   # Build out for all trees (adds in any duplicated trees):
   NodeMapsList <- NodeMapsList[match(NewickStrings, UniqueNewickStrings)]
@@ -427,10 +427,10 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   for(i in 1:length(DataAsList)) DataAsList[[i]]$NodeMaps <- NodeMapsList[[i]]
   
   # Get number of tips in tree:
-  NTips <- ape::Ntip(time.tree)
+  NTips <- ape::Ntip(time_tree)
   
   # Get number of nodes in tree:
-  NNodes <- ape::Nnode(time.tree)
+  NNodes <- ape::Nnode(time_tree)
   
   # Get all node names and numbers:
   Nodes <- c(rownames(OriginalMatrix), (NTips + 1):(NTips + NNodes))
@@ -495,7 +495,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   AncestralStateMatrix <- Rawcladistic.matrix
   
   # Add tree to output:
-  AncestralStateMatrix$topper$Tree <- time.tree
+  AncestralStateMatrix$topper$Tree <- time_tree
   
   # Return ancestral state matrix:
   return(AncestralStateMatrix)

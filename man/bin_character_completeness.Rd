@@ -6,8 +6,8 @@
 \usage{
 bin_character_completeness(
   cladistic.matrix,
-  time.tree,
-  time.bins,
+  time_tree,
+  time_bins,
   plot = FALSE,
   confidence.interval = 0.95
 )
@@ -15,9 +15,9 @@ bin_character_completeness(
 \arguments{
 \item{cladistic.matrix}{A cladistic matrix in the form imported by \link{read_nexus_matrix}.}
 
-\item{time.tree}{A time-scaled phylogenetic tree containing all the taxa in \code{cladistic.matrix}.}
+\item{time_tree}{A time-scaled phylogenetic tree containing all the taxa in \code{cladistic.matrix}.}
 
-\item{time.bins}{A set of time bin boundaries (oldest to youngest) in millions of years.}
+\item{time_bins}{A set of time bin boundaries (oldest to youngest) in millions of years.}
 
 \item{plot}{An optional choice to plot the results (default is \code{FALSE}).}
 
@@ -44,7 +44,7 @@ Day2016tree$root.time <- max(diag(vcv(Day2016tree)))
 # Get proportional phylogenetic character completeness in ten equal-length
 # time bins:
 bin_character_completeness(cladistic.matrix = Day2016,
-  time.tree = Day2016tree, time.bins = seq(from =
+  time_tree = Day2016tree, time_bins = seq(from =
   Day2016tree$root.time, to = Day2016tree$root.time -
   max(diag(vcv(Day2016tree))), length.out = 11))
 

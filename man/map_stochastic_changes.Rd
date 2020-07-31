@@ -6,8 +6,8 @@
 \usage{
 map_stochastic_changes(
   cladistic.matrix,
-  Tree,
-  TimeBins,
+  time_tree,
+  time_bins,
   NSimulations = 10,
   polymorphism.behaviour = "equalp",
   uncertainty.behaviour = "equalp",
@@ -17,9 +17,9 @@ map_stochastic_changes(
 \arguments{
 \item{cladistic.matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}.}
 
-\item{Tree}{A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{cladistic.matrix}.}
+\item{time_tree}{A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{cladistic.matrix}.}
 
-\item{TimeBins}{A vector of ages representing the boundaries of a series of time bins.}
+\item{time_bins}{A vector of ages representing the boundaries of a series of time bins.}
 
 \item{NSimulations}{The number of simulations to perform (passed to \code{make.simmap}.}
 
@@ -65,18 +65,18 @@ cladistic.matrix <- prune_cladistic_matrix(cladistic.matrix =
   cladistic.matrix, characters2prune = 1:32)
 
 # Generete random tree for matrix taxa:
-Tree <- rtree(nrow(Day2016$matrix_1$matrix))
+time_tree <- rtree(nrow(Day2016$matrix_1$matrix))
 
 # Add taxon names to tree:
-Tree$tip.label <- rownames(Day2016$matrix_1$matrix)
+time_tree$tip.label <- rownames(Day2016$matrix_1$matrix)
 
 # Add root age to tree:
-Tree$root.time <- max(diag(vcv(Tree)))
+time_tree$root.time <- max(diag(vcv(time_tree)))
 
 # Get all state changes for two simulations:
 StateChanges <-
   map_stochastic_changes(cladistic.matrix = cladistic.matrix,
-  Tree = Tree, TimeBins = seq(Tree$root.time, 0,
+  time_tree = time_tree, time_bins = seq(time_tree$root.time, 0,
   length.out = 3), NSimulations = 2)
 
 # View matrix of all stochstic character changes:

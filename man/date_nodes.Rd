@@ -4,10 +4,10 @@
 \alias{date_nodes}
 \title{Returns node ages for a time-scaled tree}
 \usage{
-date_nodes(tree)
+date_nodes(time_tree)
 }
 \arguments{
-\item{tree}{A tree (phylo object) with branch lengths representing time and a value for \code{$root.time}.}
+\item{time_tree}{A tree (phylo object) with branch lengths representing time and a value for \code{$root.time}.}
 }
 \description{
 Given a tree with branch-lengths scaled to time and a value for \code{$root.time} will return a vector of node ages.

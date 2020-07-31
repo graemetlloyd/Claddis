@@ -67,21 +67,21 @@ plot_rates_tree <- function(RateOutput, ModelType, ModelNumber, ...) {
   DiscretizedEdgeRates <- lapply(EdgeRates, function(x) unlist(lapply(as.list(x), function(y) DiscretizedRateValues[max(which(y >= DiscretizedRateValues))])))
   
   # Create vector of edge rate values to use in plotting:
-  EdgeRateValues <- rep(0, nrow(RateOutput$Tree$edge))
+  EdgeRateValues <- rep(0, nrow(RateOutput$time_tree$edge))
   
   # Fill vector of edge rate values to use in plotting:
   for(i in 1:length(EdgePartitions[[ModelNumber]])) EdgeRateValues[EdgePartitions[[ModelNumber]][[i]]] <- DiscretizedRateValues[DiscretizedRateValues == DiscretizedEdgeRates[[ModelNumber]][i]]
   
   # Plot tree with branches colour coded by rate:
-  phytools::plotBranchbyTrait(tree = RateOutput$Tree, x = EdgeRateValues, mode = "edge", xlims = c(0, max(EdgeRateValues)), title = "Changes per lineage myr", leg = max(nodeHeights(RateOutput$Tree)), ...)
+  phytools::plotBranchbyTrait(tree = RateOutput$time_tree, x = EdgeRateValues, mode = "edge", xlims = c(0, max(EdgeRateValues)), title = "Changes per lineage myr", leg = max(nodeHeights(RateOutput$time_tree)), ...)
   
   # Dead code attempting to basically do what phytools::plotBranchbyTrait does without calling phytools:
   #names(DiscretizedRateValues) <- hcl.colors(n = Resolution, palette = "viridis")
-  #EdgeColours <- rep("white", nrow(RateOutput$Tree$edge))
+  #EdgeColours <- rep("white", nrow(RateOutput$time_tree$edge))
   #for(i in 1:length(EdgePartitions[[ModelNumber]])) EdgeColours[EdgePartitions[[ModelNumber]][[i]]] <- names(DiscretizedRateValues[DiscretizedRateValues == DiscretizedEdgeRates[[ModelNumber]][i]])
-  #ape::plot.phylo(x = RateOutput$Tree, edge.color = EdgeColours, show.tip.label = FALSE, edge.width = 3)
+  #ape::plot.phylo(x = RateOutput$time_tree, edge.color = EdgeColours, show.tip.label = FALSE, edge.width = 3)
   #cols = names(DiscretizedRateValues)
-  #tree = RateOutput$Tree
+  #tree = RateOutput$time_tree
   #lwd = 4
   #lims = c(0, max(DiscretizedRateValues))
   #Rounder <- (-1 * (min(c(1, ceiling(log(lims[2], base = 10)))) - 1) + 1)

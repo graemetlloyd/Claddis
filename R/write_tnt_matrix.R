@@ -5,7 +5,7 @@
 #' Writes out a morphological data file in Hennig86/TNT format.
 #'
 #' @param cladistic.matrix A cladistic matrix in the format imported by \link{read_nexus_matrix}.
-#' @param filename The file name to write to. Should end in \code{.tnt}.
+#' @param file_name The file name to write to. Should end in \code{.tnt}.
 #' @param add.analysis.block Whether or not to add analysis block (i.e., tree search commands).
 #'
 #' @details
@@ -33,13 +33,13 @@
 #' @examples
 #'
 #' # Write out Michaux 1989 to current working directory:
-#' write_tnt_matrix(cladistic.matrix = Michaux1989, filename = "Michaux1989.tnt")
+#' write_tnt_matrix(cladistic.matrix = Michaux1989, file_name = "Michaux1989.tnt")
 #'
 #' # Remove file when finished:
 #' file.remove("Michaux1989.tnt")
 #'
 #' @export write_tnt_matrix
-write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FALSE) {
+write_tnt_matrix <- function(cladistic.matrix, file_name, add.analysis.block = FALSE) {
   
   # Subfunction to convert matrices back to symbols, missing and gap characters:
   convert_matrix <- function(DataMatrix) {
@@ -259,7 +259,7 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
     }
     
     # Get stripped file name for use in export lines:
-    out.file <- strsplit(strsplit(filename, "/")[[1]][length(strsplit(filename, "/")[[1]])], "\\.")[[1]][1]
+    out.file <- strsplit(strsplit(file_name, "/")[[1]][length(strsplit(file_name, "/")[[1]])], "\\.")[[1]][1]
     
     # Make name for strict consensus and MPTs tree:
     strict.name <- paste("export -", out.file, "tntmpts_plus_strict.nex;", sep = "")
@@ -273,6 +273,6 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
   }
   
   # Write to file:
-  write(FullString, filename)
+  write(FullString, file_name)
   
 }

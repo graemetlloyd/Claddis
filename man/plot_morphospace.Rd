@@ -46,13 +46,13 @@ Allows plotting of a third axis using the technique of Matthew Wills (Wills et a
 set.seed(4)
 
 # Generate a random tree for the Michaux 1989 data set:
-time.tree <- rtree(length(rownames(Michaux1989$matrix_1$matrix)))
+time_tree <- rtree(length(rownames(Michaux1989$matrix_1$matrix)))
 
 # Add taxon names to the tree:
-time.tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
+time_tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
 
 # Perform a phylogenetic Principal Coordinates Analysis:
-pcoa_input <- ordinate_cladistic_matrix(Michaux1989, time.tree = time.tree)
+pcoa_input <- ordinate_cladistic_matrix(Michaux1989, time_tree = time_tree)
 
 # Plot the results:
 plot_morphospace(pcoa_input, plot_taxon_names = TRUE)

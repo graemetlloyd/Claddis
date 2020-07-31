@@ -6,7 +6,7 @@
 \usage{
 estimate_ancestral_states(
   cladistic.matrix,
-  time.tree,
+  time_tree,
   estimate.all.nodes = FALSE,
   estimate.tip.values = FALSE,
   inapplicables.as.missing = FALSE,
@@ -19,7 +19,7 @@ estimate_ancestral_states(
 \arguments{
 \item{cladistic.matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}.}
 
-\item{time.tree}{A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{cladistic.matrix}.}
+\item{time_tree}{A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{cladistic.matrix}.}
 
 \item{estimate.all.nodes}{Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).}
 
@@ -54,13 +54,13 @@ Ancestral state estimation is complicated where polymorphic or
 set.seed(4)
 
 # Generate a random tree for the Day data set:
-time.tree <- rtree(n = nrow(Day2016$matrix_1$matrix))
+time_tree <- rtree(n = nrow(Day2016$matrix_1$matrix))
 
 # Update taxon names to match those in the data matrix:
-time.tree$tip.label <- rownames(Day2016$matrix_1$matrix)
+time_tree$tip.label <- rownames(Day2016$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
-time.tree$root.time <- max(diag(vcv(time.tree)))
+time_tree$root.time <- max(diag(vcv(time_tree)))
 
 # Use Day matrix as cladistic matrix:
 cladistic.matrix <- Day2016
@@ -71,7 +71,7 @@ cladistic.matrix <- prune_cladistic_matrix(cladistic.matrix,
 
 # Estimate ancestral states:
 estimate_ancestral_states(cladistic.matrix = cladistic.matrix,
-  time.tree = time.tree)
+  time_tree = time_tree)
 
 }
 \references{

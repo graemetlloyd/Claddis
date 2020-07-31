@@ -5,8 +5,8 @@
 #' Given a cladistic matrix, time-scaled tree, and set of time bin boundaries will return the proportional character completeness in each bin.
 #'
 #' @param cladistic.matrix A cladistic matrix in the form imported by \link{read_nexus_matrix}.
-#' @param time.tree A time-scaled phylogenetic tree containing all the taxa in \code{cladistic.matrix}.
-#' @param time.bins A set of time bin boundaries (oldest to youngest) in millions of years.
+#' @param time_tree A time-scaled phylogenetic tree containing all the taxa in \code{cladistic.matrix}.
+#' @param time_bins A set of time bin boundaries (oldest to youngest) in millions of years.
 #' @param plot An optional choice to plot the results (default is \code{FALSE}).
 #' @param confidence.interval The confidence interval to be used as a proportion (0 to 1). Default is 0.95 (i.e., 95\%).
 #'
@@ -32,12 +32,12 @@
 #' # Get proportional phylogenetic character completeness in ten equal-length
 #' # time bins:
 #' bin_character_completeness(cladistic.matrix = Day2016,
-#'   time.tree = Day2016tree, time.bins = seq(from =
+#'   time_tree = Day2016tree, time_bins = seq(from =
 #'   Day2016tree$root.time, to = Day2016tree$root.time -
 #'   max(diag(vcv(Day2016tree))), length.out = 11))
 #'
 #' @export bin_character_completeness
-bin_character_completeness <- function(cladistic.matrix, time.tree, time.bins, plot = FALSE, confidence.interval = 0.95) {
+bin_character_completeness <- function(cladistic.matrix, time_tree, time_bins, plot = FALSE, confidence.interval = 0.95) {
   
   # TO DO:
   #
@@ -62,16 +62,16 @@ bin_character_completeness <- function(cladistic.matrix, time.tree, time.bins, p
   }
   
   # Create vector of time bin mid-points:
-  time.bin.midpoints <- time.bins[1:(length(time.bins) - 1)] + abs(diff(time.bins)) / 2
+  time.bin.midpoints <- time_bins[1:(length(time_bins) - 1)] + abs(diff(time_bins)) / 2
   
   # Create time bin names:
-  time.bin.names <- paste(round(time.bins[1:(length(time.bins) - 1)], 1), round(time.bins[2:length(time.bins)], 1), sep = "-")
+  time.bin.names <- paste(round(time_bins[1:(length(time_bins) - 1)], 1), round(time_bins[2:length(time_bins)], 1), sep = "-")
   
   # Get total number of characters:
   n.characters <- sum(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"), ncol)))
   
   # Get edge lengths in bins for complete tree (measure of a complete character):
-  complete.edges.in.bins <- bin_edge_lengths(time.tree = time.tree, time.bins = time.bins)$edge.length.in.bin
+  complete.edges.in.bins <- bin_edge_lengths(time_tree = time_tree, time_bins = time_bins)$edge.length.in.bin
   
   # Set uo missing values vector (no missing values are set as empty characters (""):
   missing.values <- rep("", n.characters)
@@ -80,7 +80,7 @@ bin_character_completeness <- function(cladistic.matrix, time.tree, time.bins, p
   if (any(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"), is.na))) || any(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"), '==', "")))) missing.values <- unname(unlist(lapply(lapply(lapply(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"), find_missing_and_inapplicable), apply, 2, '==', 1), apply, 2, which), lapply, paste, collapse = "%%")))
   
   # Set up matrix to store edge lengths in each character bin (columns) per character (rows):
-  edge.lengths.in.bins.by.character <- matrix(0, ncol = length(time.bins) - 1, nrow = n.characters)
+  edge.lengths.in.bins.by.character <- matrix(0, ncol = length(time_bins) - 1, nrow = n.characters)
   
   # For each unique missing value combination (no point repeating those that are the same):
   for(i in unique(missing.values)) {
@@ -92,13 +92,13 @@ bin_character_completeness <- function(cladistic.matrix, time.tree, time.bins, p
       taxa.to.prune <- rownames(cladistic.matrix$matrix_1$matrix)[as.numeric(strsplit(i, "%%")[[1]])]
       
       # Check that there are still enough taxa left for a tree to exist:
-      if (length(setdiff(time.tree$tip.label, taxa.to.prune)) > 1) {
+      if (length(setdiff(time_tree$tip.label, taxa.to.prune)) > 1) {
         
         # Remove tips with missing data from tree:
-        pruned.tree <- drop.tip(time.tree, taxa.to.prune)
+        pruned.tree <- drop.tip(time_tree, taxa.to.prune)
         
         # Need to correct root time to make sure time binning makes sense:
-        pruned.tree <- fix_root_time(time.tree, pruned.tree)
+        pruned.tree <- fix_root_time(time_tree, pruned.tree)
         
       # If there is one or fewer taxa:
       } else {
@@ -112,12 +112,12 @@ bin_character_completeness <- function(cladistic.matrix, time.tree, time.bins, p
     } else {
       
       # Set complete tree as pruned tree:
-      pruned.tree <- time.tree
+      pruned.tree <- time_tree
       
     }
     
     # As long as the tree exists (i.e., it is not pruend down to one or zero taxa) store edge lengths in bin:
-    if (!is.na(pruned.tree)[1]) edge.lengths.in.bins.by.character[which(missing.values == i), ] <- matrix(rep(bin_edge_lengths(time.tree = pruned.tree, time.bins = time.bins)$edge.length.in.bin, length(which(missing.values == i))), ncol = ncol(edge.lengths.in.bins.by.character), byrow = TRUE)
+    if (!is.na(pruned.tree)[1]) edge.lengths.in.bins.by.character[which(missing.values == i), ] <- matrix(rep(bin_edge_lengths(time_tree = pruned.tree, time_bins = time_bins)$edge.length.in.bin, length(which(missing.values == i))), ncol = ncol(edge.lengths.in.bins.by.character), byrow = TRUE)
     
   }
   

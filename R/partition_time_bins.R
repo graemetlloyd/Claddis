@@ -4,7 +4,7 @@
 #'
 #' Generates all possible contiguous partitions of N time bins.
 #'
-#' @param NTimeBins The number of time bins.
+#' @param Ntime_bins The number of time bins.
 #' @param NPartitonsToInclude Either "All" or a vector of requested partition sizes.
 #'
 #' @details
@@ -27,19 +27,19 @@
 #' partition_time_bins(4)
 #'
 #' @export partition_time_bins
-partition_time_bins <- function(NTimeBins, NPartitonsToInclude = "All") {
+partition_time_bins <- function(Ntime_bins, NPartitonsToInclude = "All") {
   
   # Build time bins vector:
-  TimeBins <- 1:NTimeBins
+  time_bins <- 1:Ntime_bins
   
   # Check there are multiple time bins:
-  if (length(TimeBins) < 2) stop("There must be at least two time bins.")
+  if (length(time_bins) < 2) stop("There must be at least two time bins.")
   
   # Format NPartitonsToInclude as a vector of all possible numbers if input is "All":
-  if (any(NPartitonsToInclude == "All")) NPartitonsToInclude <- 0:(length(TimeBins) - 1)
+  if (any(NPartitonsToInclude == "All")) NPartitonsToInclude <- 0:(length(time_bins) - 1)
   
   # Get number of possible "switches", i.e., positions where a partition can (1) or cannot (0) be:
-  NSwitches <- length(TimeBins) - 1
+  NSwitches <- length(time_bins) - 1
   
   # Calculate expeted number of paritions (if large can stop adn warn user):
   NPartitions <- sum(unlist(lapply(as.list(NPartitonsToInclude), function(x) ncol(combn(NSwitches, x)))))
@@ -51,7 +51,7 @@ partition_time_bins <- function(NTimeBins, NPartitonsToInclude = "All") {
   SplitSwitches <- as.character(0:1)
   
   # Generate all possible combinations of switches iteratively:
-  while(nchar(SplitSwitches[1]) < (length(TimeBins) - 1)) SplitSwitches <- apply(expand.grid(SplitSwitches, as.character(0:1)), 1, paste, collapse = "")
+  while(nchar(SplitSwitches[1]) < (length(time_bins) - 1)) SplitSwitches <- apply(expand.grid(SplitSwitches, as.character(0:1)), 1, paste, collapse = "")
   
   # Work out partition sizes for subsetting below:
   PartitionSizes <- unlist(lapply(strsplit(SplitSwitches, split = ""), function(x) sum(as.numeric(x))))

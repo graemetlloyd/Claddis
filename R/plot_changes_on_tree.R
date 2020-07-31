@@ -5,7 +5,7 @@
 #' Plots character changes in boxes on branches.
 #'
 #' @param character.changes A matrix of character changes.
-#' @param tree Tree on which character changes occur.
+#' @param time_tree Tree on which character changes occur.
 #'
 #' @details
 #'
@@ -21,34 +21,34 @@
 #' set.seed(17)
 #'
 #' # Generate a random tree for the Michaux data set:
-#' tree <- rtree(nrow(Michaux1989$matrix_1$matrix))
+#' time_tree <- rtree(nrow(Michaux1989$matrix_1$matrix))
 #'
 #' # Update taxon names to match those in the data matrix:
-#' tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
+#' time_tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
 #'
 #' # Set root time by making youngest taxon extant:
-#' tree$root.time <- max(diag(vcv(tree)))
+#' time_tree$root.time <- max(diag(vcv(time_tree)))
 #'
 #' # Get discrete character rates (includes changes):
-#' out <- test_rates(tree, Michaux1989,
-#'   seq(tree$root.time, 0, length.out = 3),
+#' out <- test_rates(time_tree, Michaux1989,
+#'   seq(time_tree$root.time, 0, length.out = 3),
 #'   BranchPartitionsToTest = list(list(1)), alpha = 0.01)
 #'
 #' # Plot character changes on the tree:
 #' plot_changes_on_tree(out$InferredCharacterChanges,
-#'   tree)
+#'   time_tree)
 #'
 #' @export plot_changes_on_tree
-plot_changes_on_tree <- function(character.changes, tree) {
+plot_changes_on_tree <- function(character.changes, time_tree) {
   
   # Update tree edge lengths to number of character changes:
-  tree$edge.length <- rle(sort(c(character.changes[, "Edge"], 1:nrow(tree$edge))))$lengths - 1
+  time_tree$edge.length <- rle(sort(c(character.changes[, "Edge"], 1:nrow(time_tree$edge))))$lengths - 1
   
   # Create empty edge labels vector:
-  edge.labels <- rep(NA, nrow(tree$edge))
+  edge.labels <- rep(NA, nrow(time_tree$edge))
   
   # For each edge:
-  for(i in 1:nrow(tree$edge)) {
+  for(i in 1:nrow(time_tree$edge)) {
     
     # Get rows for where changes occur:
     change.rows <- which(character.changes[, "Edge"] == i)
@@ -66,7 +66,7 @@ plot_changes_on_tree <- function(character.changes, tree) {
   # ADD DOT DOT DOT.....
   
   # Plot tree:
-  plot(tree, direction = "upwards")
+  plot(time_tree, direction = "upwards")
   
   # Add edge labels for changes:
   edgelabels(text = edge.labels, bg = "white", cex = 0.3)

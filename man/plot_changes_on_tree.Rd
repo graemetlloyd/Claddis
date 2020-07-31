@@ -4,12 +4,12 @@
 \alias{plot_changes_on_tree}
 \title{Plots character changes on branches}
 \usage{
-plot_changes_on_tree(character.changes, tree)
+plot_changes_on_tree(character.changes, time_tree)
 }
 \arguments{
 \item{character.changes}{A matrix of character changes.}
 
-\item{tree}{Tree on which character changes occur.}
+\item{time_tree}{Tree on which character changes occur.}
 }
 \value{
 A plot of character changes on a tree.
@@ -26,22 +26,22 @@ Takes the \code{character.changes} output from \link{test_rates} and plots it on
 set.seed(17)
 
 # Generate a random tree for the Michaux data set:
-tree <- rtree(nrow(Michaux1989$matrix_1$matrix))
+time_tree <- rtree(nrow(Michaux1989$matrix_1$matrix))
 
 # Update taxon names to match those in the data matrix:
-tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
+time_tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
-tree$root.time <- max(diag(vcv(tree)))
+time_tree$root.time <- max(diag(vcv(time_tree)))
 
 # Get discrete character rates (includes changes):
-out <- test_rates(tree, Michaux1989,
-  seq(tree$root.time, 0, length.out = 3),
+out <- test_rates(time_tree, Michaux1989,
+  seq(time_tree$root.time, 0, length.out = 3),
   BranchPartitionsToTest = list(list(1)), alpha = 0.01)
 
 # Plot character changes on the tree:
 plot_changes_on_tree(out$InferredCharacterChanges,
-  tree)
+  time_tree)
 
 }
 \author{

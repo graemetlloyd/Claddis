@@ -4,8 +4,8 @@
 #'
 #' Given a vector of dates for a series of time bins and another for the times when a character change occurred will return the total number of changes in each bin.
 #' 
-#' @param change.times A vector of ages in millions of years at which character changes are hypothesised to have occurred.
-#' @param time.bins A vector of ages in millions of years of time bin boundaries in old-to-young order.
+#' @param change_times A vector of ages in millions of years at which character changes are hypothesised to have occurred.
+#' @param time_bins A vector of ages in millions of years of time bin boundaries in old-to-young order.
 #'
 #' @details
 #'
@@ -20,37 +20,37 @@
 #' @examples
 #' 
 #' # Create a random dataset of 100 changes (between 100 and 0 Ma):
-#' change.times <- runif(100, 0, 100)
+#' change_times <- runif(100, 0, 100)
 #' 
 #' # Create 10 equal-length time bins:
-#' time.bins <- seq(100, 0, length.out = 11)
+#' time_bins <- seq(100, 0, length.out = 11)
 #' 
 #' # Get N changes for each bin:
-#' bin_changes(change.times, time.bins)
+#' bin_changes(change_times, time_bins)
 #' 
 #' @export bin_changes
-bin_changes <- function(change.times, time.bins) {
+bin_changes <- function(change_times, time_bins) {
 	
   # EXPLAIN HOW TIMES ON BOUDNARIES WORK AND CHECK TOTAL COUNTS MAKE SENSE AT THE END
   # MAYBE SWITCH TO LAPPLY INSTEAD OF FOR LOOP
   # ADD BOUNDARY TIME OPTION? I.E., WHICH BIN SHOULD THEY BE ASSIGNED TO?
   
 	# Enforce old-to-young order of time bins:
-	time.bins <- sort(time.bins, decreasing = TRUE)
+	time_bins <- sort(time_bins, decreasing = TRUE)
 	
 	# Create all-zero vector to store ouput in:
-	changes.in.bin <- rep(0, length(time.bins) - 1)
+	changes.in.bin <- rep(0, length(time_bins) - 1)
 	
 	# For each time bin:
-	for(i in 2:length(time.bins)) {
+	for(i in 2:length(time_bins)) {
 		
 		# Find out which edges (if any) are present in the bin:
-		changes.in.bin[(i - 1)] <- length(intersect(which(change.times > time.bins[i]), which(change.times <= time.bins[(i - 1)])))
+		changes.in.bin[(i - 1)] <- length(intersect(which(change_times > time_bins[i]), which(change_times <= time_bins[(i - 1)])))
 		
 	}
 	
 	# Add time bin max-mins as names:
-	names(changes.in.bin) <- apply(cbind(time.bins[1:(length(time.bins) - 1)], time.bins[2:length(time.bins)]), 1, paste, collapse = "-")
+	names(changes.in.bin) <- apply(cbind(time_bins[1:(length(time_bins) - 1)], time_bins[2:length(time_bins)]), 1, paste, collapse = "-")
 	
 	# Return edge lengths in bins:
 	return(changes.in.bin)

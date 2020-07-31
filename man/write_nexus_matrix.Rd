@@ -4,12 +4,12 @@
 \alias{write_nexus_matrix}
 \title{Writes out a morphological #NEXUS data file}
 \usage{
-write_nexus_matrix(cladistic.matrix, filename)
+write_nexus_matrix(cladistic.matrix, file_name)
 }
 \arguments{
 \item{cladistic.matrix}{The cladistic matrix in the format imported by \link{read_nexus_matrix}.}
 
-\item{filename}{The file name to write to. Should end in \code{.nex}.}
+\item{file_name}{The file name to write to. Should end in \code{.nex}.}
 }
 \description{
 Writes out a morphological data file in #NEXUS format.
@@ -20,7 +20,7 @@ Writes out a #NEXUS (Maddison et al. 1997) data file representing the distributi
 \examples{
 
 # Write out Michaux 1989 to current working directory:
-write_nexus_matrix(cladistic.matrix = Michaux1989, filename = "Michaux1989.nex")
+write_nexus_matrix(cladistic.matrix = Michaux1989, file_name = "Michaux1989.nex")
 
 # Remove file when finished:
 file.remove("Michaux1989.nex")

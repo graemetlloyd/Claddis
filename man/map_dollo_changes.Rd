@@ -4,10 +4,10 @@
 \alias{map_dollo_changes}
 \title{Stochastic Character Map For Dollo Character}
 \usage{
-map_dollo_changes(tree, tip.states)
+map_dollo_changes(time_tree, tip.states)
 }
 \arguments{
-\item{tree}{A tree in phylo format with barnch lengths and a value for \code{$root.time}.}
+\item{time_tree}{A tree in phylo format with barnch lengths and a value for \code{$root.time}.}
 
 \item{tip.states}{A vector of tip states (must be 0 or 1) with names matching \code{tree$tip.label}.}
 }
@@ -36,19 +36,19 @@ This was the method used in Tarver et al. (2018).
 \examples{
 
 # Create a random 10-taxon tree:
-tree <- rtree(10)
+time_tree <- rtree(10)
 
 # Arbitrarily add a root.time value of 100 Ma:
-tree$root.time <- 100
+time_tree$root.time <- 100
 
 # Generate random tip states (0s and 1s):
 tip.states <- sample(c(0, 1), 10, replace = TRUE)
 
 # Add labels to tip states:
-names(tip.states) <- tree$tip.label
+names(tip.states) <- time_tree$tip.label
 
 # Get a single stochastic character map:
-out <- map_dollo_changes(tree, tip.states)
+out <- map_dollo_changes(time_tree, tip.states)
 
 # View matrix of changes:
 out$Changes

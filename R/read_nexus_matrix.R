@@ -4,8 +4,8 @@
 #'
 #' Reads in a morphological data file in #NEXUS format.
 #'
-#' @param File A file name specified by either a variable of mode character, or a double-quoted string.
-#' @param Equaliseweights Optional that overrides the weights specified in the file to make all characters truly equally weighted.
+#' @param file_name The file name or path of the #NEXUS file.
+#' @param equalize_weights Optional that overrides the weights specified in the file to make all characters truly equally weighted.
 #'
 #' @details
 #'
@@ -52,7 +52,7 @@
 #' file.remove("morphmatrix.nex")
 #' 
 #' @export read_nexus_matrix
-read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
+read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   
   # ADD ABILITY TO READ CHARSET LINES
   # COULD BE MULTIPLE TYPESET OR WTSET LINES, NEED TO CHECK FOR THIS!
@@ -213,7 +213,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
   Sys.setlocale('LC_ALL','C')
 
   # Read in NEXUS file as raw text:
-  X <- readLines(File, warn = FALSE)
+  X <- readLines(file_name, warn = FALSE)
 
   # Check that this is a #NEXUS file:
   if (length(grep("#NEXUS", X, ignore.case = TRUE)) == 0) stop("This is not a #NEXUS file.")
@@ -1089,7 +1089,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
   weights <- lapply(weights, as.numeric)
   
   # If equalising weights:
-  if (Equaliseweights) {
+  if (equalize_weights) {
     
     # Get starting weights by taking differences for each character (will take reciprocal later for true weight):
     Startingweights <- lapply(lapply(MinMaxMatrixList, apply, 1, diff), function(x) x)

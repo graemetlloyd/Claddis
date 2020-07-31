@@ -5,8 +5,8 @@
 #' Takes a cladistic matrix and time-scaled tree and makes point estimates for every character change using stochastic character mapping.
 #'
 #' @param cladistic.matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
-#' @param Tree A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{cladistic.matrix}.
-#' @param TimeBins A vector of ages representing the boundaries of a series of time bins.
+#' @param time_tree A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{cladistic.matrix}.
+#' @param time_bins A vector of ages representing the boundaries of a series of time bins.
 #' @param NSimulations The number of simulations to perform (passed to \code{make.simmap}.
 #' @param polymorphism.behaviour What to do with polymorphic (&) characters. One of "equalp", "missing", or "random". See details.
 #' @param uncertainty.behaviour What to do with uncertain (/) characters. One of "equalp", "missing", or "random". See details.
@@ -49,18 +49,18 @@
 #'   cladistic.matrix, characters2prune = 1:32)
 #'
 #' # Generete random tree for matrix taxa:
-#' Tree <- rtree(nrow(Day2016$matrix_1$matrix))
+#' time_tree <- rtree(nrow(Day2016$matrix_1$matrix))
 #'
 #' # Add taxon names to tree:
-#' Tree$tip.label <- rownames(Day2016$matrix_1$matrix)
+#' time_tree$tip.label <- rownames(Day2016$matrix_1$matrix)
 #'
 #' # Add root age to tree:
-#' Tree$root.time <- max(diag(vcv(Tree)))
+#' time_tree$root.time <- max(diag(vcv(time_tree)))
 #'
 #' # Get all state changes for two simulations:
 #' StateChanges <-
 #'   map_stochastic_changes(cladistic.matrix = cladistic.matrix,
-#'   Tree = Tree, TimeBins = seq(Tree$root.time, 0,
+#'   time_tree = time_tree, time_bins = seq(time_tree$root.time, 0,
 #'   length.out = 3), NSimulations = 2)
 #'
 #' # View matrix of all stochstic character changes:
@@ -80,7 +80,7 @@
 #' StateChanges$InternalEdgeLengthsPerBin
 #'
 #' @export map_stochastic_changes
-map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulations = 10, polymorphism.behaviour = "equalp", uncertainty.behaviour = "equalp", inapplicable.behaviour = "missing") {
+map_stochastic_changes <- function(cladistic.matrix, time_tree, time_bins, NSimulations = 10, polymorphism.behaviour = "equalp", uncertainty.behaviour = "equalp", inapplicable.behaviour = "missing") {
   
   # IMPROVE CUSTOMISATION OF MAKE.SIMMAP WITH OPTIONS FOR PI, Q ETC. (FLAT PRIOR ON ROOT MAY BE PARTICULARLY BAD? ALLOW MAYBE SKEWING TOWARDS OUTGROUP STATE AS SOME KIND OF SLIDING VALUE?).
   # AND ONLY PERFORM SCM ON UNIQUE STATE DISTRIBUTON-CHARACTER TYPE COMBOS
@@ -101,13 +101,13 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   if (length(setdiff(unique(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) x$ordering))), c("unord", "ord"))) > 0) stop("cladistic.matrix can only contain characters of type \"ord\" or \"unord\" (i.e., no step matrices or continuous characters).")
   
   # Check tree has branch lengths:
-  if (is.null(Tree$edge.length)) stop("Tree does not have branch lengths (durations). Try timescaling the Tree, e.g., with DatePhylo.")
+  if (is.null(time_tree$edge.length)) stop("time_tree does not have branch lengths (durations). Try timescaling the tree, e.g., with DatePhylo.")
   
   # Check branches all have positive length:
-  if (any(Tree$edge.length == 0)) stop("All branch lengths must be positive (no zero-length branches).")
+  if (any(time_tree$edge.length == 0)) stop("All branch lengths must be positive (no zero-length branches).")
   
-  # Check Tree has root age:
-  if (is.null(Tree$root.time)) stop("Tree is missing $root.time. Try setting this before continuing, e.g., Tree$root.time <- 104.2.")
+  # Check time_tree has root age:
+  if (is.null(time_tree$root.time)) stop("time_tree is missing $root.time. Try setting this before continuing, e.g., time_tree$root.time <- 104.2.")
   
   # Check polymorphism.behaviour is correctly formatted or stop and warn user:
   if (length(setdiff(polymorphism.behaviour, c("equalp", "missing", "random"))) > 0) stop("polymorphism.behaviour must be one of must be one of \"equalp\", \"missing\" or \"random\".")
@@ -119,10 +119,10 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   if (length(setdiff(inapplicable.behaviour, c("missing"))) > 0) stop("inapplicable.behaviour must be \"missing\".")
   
   # Ensure time bins are in correct order:
-  TimeBins <- sort(unique(TimeBins), decreasing = TRUE)
+  time_bins <- sort(unique(time_bins), decreasing = TRUE)
 
   # Get tree node ages:
-  Treedate_nodes <- date_nodes(Tree)
+  node_ages <- date_nodes(time_tree)
   
   # Build all data into single matrix:
   MatrixBlock <- do.call(cbind, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"))
@@ -152,7 +152,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   for(i in 1:length(CharacterList)) CharacterList[[i]]$ordering <- ordering[i]
   
   # Add full tree to list for each character:
-  for(i in 1:length(CharacterList)) CharacterList[[i]]$FullTree <- Tree
+  for(i in 1:length(CharacterList)) CharacterList[[i]]$FullTree <- time_tree
   
   # Subfunction to perform polymorphism and uncertainty changes:
   edit_polymorphisms <- function(x, polymorphism.behaviour, uncertainty.behaviour) {
@@ -275,7 +275,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   CharacterList <- lapply(CharacterList, build_character_model)
   
   # Get total tips in tree:
-  TipsInTree <- ape::Ntip(Tree)
+  TipsInTree <- ape::Ntip(time_tree)
 
   # Subfunction to prune tree to just tips with data:
   prune_tree <- function(x) {
@@ -293,16 +293,16 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
         x$PrunedTree <- x$FullTree
         
         # Set tip number (of single coded taxon):
-        TipNumber <- which(Tree$tip.label == setdiff(Tree$tip.label, TipsToDrop))
+        TipNumber <- which(time_tree$tip.label == setdiff(time_tree$tip.label, TipsToDrop))
         
         # Find single tip edge:
-        TipEdge <- which(Tree$edge[, 2] == TipNumber)
+        TipEdge <- which(time_tree$edge[, 2] == TipNumber)
         
         # Set all other edge lengths to zero:
-        x$PrunedTree$edge.length[setdiff(1:length(Tree$edge), TipEdge)] <- 0
+        x$PrunedTree$edge.length[setdiff(1:length(time_tree$edge), TipEdge)] <- 0
         
         # Reset root time to beginning of tip edge:
-        x$PrunedTree$root.time <- unname(Treedate_nodes[Tree$edge[TipEdge, 1]])
+        x$PrunedTree$root.time <- unname(node_ages[time_tree$edge[TipEdge, 1]])
         
       }
       
@@ -313,7 +313,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
         x$PrunedTree <- drop.tip(x$FullTree, TipsToDrop)
         
         # Correct root time manually:
-        x$PrunedTree$root.time <- unname(Treedate_nodes[find_mrca(setdiff(Tree$tip.label, TipsToDrop), Tree)])
+        x$PrunedTree$root.time <- unname(node_ages[find_mrca(setdiff(time_tree$tip.label, TipsToDrop), time_tree)])
         
       }
       
@@ -324,7 +324,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
         x$PrunedTree <- drop.tip(x$FullTree, TipsToDrop)
         
         # Ensure pruned trees $root.time value is correct:
-        x$PrunedTree <- fix_root_time(Tree, x$PrunedTree)
+        x$PrunedTree <- fix_root_time(time_tree, x$PrunedTree)
         
       }
       
@@ -446,7 +446,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     }
     
     # If more than two tips simply use function normally:
-    if (NumberOfTips > 2) x$PrunedToFullTreeEdgeMatches <- match_tree_edges(Tree, x$PrunedTree)$matching.edges
+    if (NumberOfTips > 2) x$PrunedToFullTreeEdgeMatches <- match_tree_edges(tree, x$PrunedTree)$matching.edges
     
     # Return full output:
     return(x)
@@ -454,7 +454,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   }
   
   # Get edge matches between pruned and full trees (for recording true edge changes later):
-  CharacterList <- lapply(CharacterList, match_edges, tree = Tree)
+  CharacterList <- lapply(CharacterList, match_edges, tree = time_tree)
   
   # Subfunction to get edge lengths in bins (usable later for rate calculations):
   get_binned_edge_lengths <- function(x) {
@@ -469,7 +469,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     if (length(BranchesToSetAsZeroes) > 0) TemporaryTree$edge.length[BranchesToSetAsZeroes] <- 0
     
     # Get edge lengths in bins:
-    x$EdgeLengthsInBins <- bin_edge_lengths(time.tree = TemporaryTree, time.bins = TimeBins)
+    x$EdgeLengthsInBins <- bin_edge_lengths(time_tree = TemporaryTree, time_bins = time_bins)
     
     # Return full output:
     return(x)
@@ -700,10 +700,10 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
               FromToChanges <- cbind(names(PrunedStochasticMaps[1:(length(PrunedStochasticMaps) - 1)]), names(PrunedStochasticMaps[2:length(PrunedStochasticMaps)]))
               
               # Set matching edges on full tree as time bins:
-              MatchingEdgesAsTimeBins <- c(StartAgeOfPrunedEdge, StartAgeOfPrunedEdge - cumsum(MatchingEdgeLengths))
+              MatchingEdgesAstime_bins <- c(StartAgeOfPrunedEdge, StartAgeOfPrunedEdge - cumsum(MatchingEdgeLengths))
               
               # Get edge on whicb change occurs:
-              ChangeEdges <- unlist(lapply(as.list(ChangeTimes), function(z) min(which(z > MatchingEdgesAsTimeBins)) - 1))
+              ChangeEdges <- unlist(lapply(as.list(ChangeTimes), function(z) min(which(z > MatchingEdgesAstime_bins)) - 1))
               
               # Create full tree stochastic character map of correct size:
               FullStochasticMaps <- lapply(as.list(rle(sort(c(ChangeEdges, 1:length(MatchingEdges))))$lengths), function(z) rep(0, z))
@@ -718,7 +718,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
               CurrentState <- FromToChanges[1, 1]
               
               # Make vector of edge switch times:
-              EdgeSwitchTimes <- MatchingEdgesAsTimeBins[2:length(MatchingEdgesAsTimeBins)]
+              EdgeSwitchTimes <- MatchingEdgesAstime_bins[2:length(MatchingEdgesAstime_bins)]
               
               # Whilst there are still changes or edge switches left to deal with:
               while(length(c(EdgeSwitchTimes, ChangeTimes)) > 0) {
@@ -823,7 +823,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
       if (length(EdgesWithChanges) > 0) {
         
         # Get ages at start of edges with changes (subtracting from this will give change times later:
-        AgeAtStartOfEdgesWithChanges <- Treedate_nodes[x$FullTree$edge[EdgesWithChanges, 1]]
+        AgeAtStartOfEdgesWithChanges <- node_ages[x$FullTree$edge[EdgesWithChanges, 1]]
         
         # Get from and to states for each change:
         FromsAndTos <- matrix(as.numeric(unlist(strsplit(unlist(lapply(y$maps[EdgesWithChanges], function(z) paste(names(z[1:(length(z) - 1)]), names(z[2:length(z)]), sep = "%%"))), split = "%%"))), ncol = 2, byrow = TRUE)
@@ -849,13 +849,13 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
       EdgeFromTo <- cbind(as.numeric(unlist(lapply(y$maps, function(y) names(y[1])))), as.numeric(unlist(lapply(y$maps, function(y) names(y[length(y)])))))
       
       # Get preceding states for each edge (will help identify edge-to-edge changes:
-      PrecedingState <- EdgeFromTo[match(Tree$edge[, 1], Tree$edge[, 2]), 2]
+      PrecedingState <- EdgeFromTo[match(time_tree$edge[, 1], time_tree$edge[, 2]), 2]
       
       # Get following states for each edge (will help identify edge-to-edge changes:
-      FollowingState <- EdgeFromTo[match(Tree$edge[, 2], Tree$edge[, 1]), 1]
+      FollowingState <- EdgeFromTo[match(time_tree$edge[, 2], time_tree$edge[, 1]), 1]
       
       # Correct following edge to eliminate terminal changes whic do not need to be recorded:
-      FollowingState[match(1:ape::Ntip(Tree), Tree$edge[, 2])] <- EdgeFromTo[match(1:ape::Ntip(Tree), Tree$edge[, 2]), 2]
+      FollowingState[match(1:ape::Ntip(time_tree), time_tree$edge[, 2])] <- EdgeFromTo[match(1:ape::Ntip(time_tree), time_tree$edge[, 2]), 2]
       
       # Get preceding changes (will want to add to changes matrix):
       PrecedingChanges <- which(apply(cbind(is.na(PrecedingState), !is.na(EdgeFromTo[, 1])), 1, all))
@@ -864,19 +864,19 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
       FollowingChanges <- which(apply(cbind(!is.na(EdgeFromTo[, 2]), is.na(FollowingState)), 1, all))
       
       # For each unique preceding change:
-      for(i in PrecedingChanges[!duplicated(Tree$edge[PrecedingChanges, 1])]) {
+      for(i in PrecedingChanges[!duplicated(time_tree$edge[PrecedingChanges, 1])]) {
         
         # If simply the root state:
-        if (ape::Ntip(Tree) + 1 == Tree$edge[i, 1]) {
+        if (ape::Ntip(time_tree) + 1 == time_tree$edge[i, 1]) {
           
           # Add root change to matrix as edge zero:
-          ChangesMatrix <- rbind(ChangesMatrix, c(NA, EdgeFromTo[i, 1], 0, Tree$root.time))
+          ChangesMatrix <- rbind(ChangesMatrix, c(NA, EdgeFromTo[i, 1], 0, time_tree$root.time))
           
         # If some other state:
         } else {
           
           # Add NA to something state change to changes matrix:
-          ChangesMatrix <- rbind(ChangesMatrix, c(NA, EdgeFromTo[i, 1], which(Tree$edge[, 2] == Tree$edge[i, 1]), unname(Treedate_nodes[Tree$edge[i, 1]])))
+          ChangesMatrix <- rbind(ChangesMatrix, c(NA, EdgeFromTo[i, 1], which(time_tree$edge[, 2] == time_tree$edge[i, 1]), unname(node_ages[time_tree$edge[i, 1]])))
           
         }
       
@@ -886,7 +886,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
       if (length(FollowingChanges) > 0) {
         
         # Add following changes to changes matrix:
-        ChangesMatrix <- rbind(ChangesMatrix, cbind(EdgeFromTo[FollowingChanges, 2], FollowingState[FollowingChanges], unlist(lapply(as.list(Tree$edge[FollowingChanges, 2]), function(z) {FollowingEdges <- which(Tree$edge[, 1] == z); FollowingEdges[is.na(EdgeFromTo[FollowingEdges, 1])]})), unname(Treedate_nodes[Tree$edge[FollowingChanges, 2]])))
+        ChangesMatrix <- rbind(ChangesMatrix, cbind(EdgeFromTo[FollowingChanges, 2], FollowingState[FollowingChanges], unlist(lapply(as.list(time_tree$edge[FollowingChanges, 2]), function(z) {FollowingEdges <- which(time_tree$edge[, 1] == z); FollowingEdges[is.na(EdgeFromTo[FollowingEdges, 1])]})), unname(node_ages[time_tree$edge[FollowingChanges, 2]])))
         
       }
       

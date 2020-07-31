@@ -4,10 +4,10 @@
 \alias{align_matrix_block}
 \title{Aligns a phylogenetic matrix block}
 \usage{
-align_matrix_block(matrix.block)
+align_matrix_block(matrix_block)
 }
 \arguments{
-\item{matrix.block}{The matrix block as raw input text.}
+\item{matrix_block}{The matrix block as raw input text.}
 }
 \value{
 Nothing is returned, instead the aligned block is sent to the clipboard ready for pasting into a text editor.

@@ -5,9 +5,9 @@
 \title{Discrete character rates across trees, time, and character types}
 \usage{
 test_rates(
-  tree,
+  time_tree,
   cladistic.matrix,
-  TimeBins,
+  time_bins,
   BranchPartitionsToTest = NULL,
   CharacterPartitionsToTest = NULL,
   CladePartitionsToTest = NULL,
@@ -31,11 +31,11 @@ test_rates(
 )
 }
 \arguments{
-\item{tree}{A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{cladistic.matrix}.}
+\item{time_tree}{A tree (phylo object) with branch durations that represents the relationships of the taxa in \code{cladistic.matrix}.}
 
 \item{cladistic.matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}.}
 
-\item{TimeBins}{A vector of ages (in millions of years) indicating the boundaries of a series of time bins in order from oldest to youngest.}
+\item{time_bins}{A vector of ages (in millions of years) indicating the boundaries of a series of time bins in order from oldest to youngest.}
 
 \item{BranchPartitionsToTest}{A list of branch(es) (edge number) partitions to test as N-rate parameter model (where N is the total number of partitions). If NULL (the default) then no partition test(s) will be made.}
 
@@ -78,7 +78,7 @@ test_rates(
 \item{allow.all.missing}{Logical to allow all missing character values - see \link{estimate_ancestral_states} for details.}
 }
 \value{
-\item{TimeBinsUsed}{The time binning used (NB: May be slightly altered from the input values).}
+\item{time_binsUsed}{The time binning used (NB: May be slightly altered from the input values).}
 \item{InferredCharacterChanges}{Matrix of inferred character changes.}
 \item{IntrinsicCharacterRate}{The intrinsic (global) character rate in changes per million years.}
 \item{ContinuouscharactersConvertedToDiscrete}{Whether or not continuous characters were converted to discrete characters (important for handling the data in downstream analys(es)).}
@@ -90,7 +90,7 @@ test_rates(
 \item{CharacterRates}{Matrix showing calculated rates for each character. NULL if \code{CharacterPartitionsToTest} is not requested.}
 \item{CladeRates}{Matrix showing calculated rates for each clade. NULL if \code{CladePartitionsToTest} is not requested.}
 \item{TimeRates}{Matrix showing calculated rates for each time bin. NULL if \code{TimeBinPartitionsToTest} is not requested.}
-\item{Tree}{The time-scaled input tree used as input (provided as output for use with visualisation functions).}
+\item{time_tree}{The time-scaled input tree used as input (provided as output for use with visualisation functions).}
 }
 \description{
 Given a tree and a cladistic-type matrix uses either likelihood ratio tests or the Akaike Information Criterion to compare rate models across branches, clades, time bins, or character partitions.
@@ -193,22 +193,22 @@ The AIC is the Akaike Information Criterion, and is relatively meaningless on it
 set.seed(17)
 
 # Generate a random tree for the Michaux data set:
-tree <- rtree(nrow(Michaux1989$matrix_1$matrix))
+time_tree <- rtree(nrow(Michaux1989$matrix_1$matrix))
 
 # Update taxon names to match those in the data matrix:
-tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
+time_tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
-tree$root.time <- max(diag(vcv(tree)))
+time_tree$root.time <- max(diag(vcv(time_tree)))
 
 # Get discrete character rates:
-x <- test_rates(tree = tree, cladistic.matrix =
-  Michaux1989, TimeBins = seq(from = tree$root.time,
+x <- test_rates(time_tree = time_tree, cladistic.matrix =
+  Michaux1989, time_bins = seq(from = time_tree$root.time,
   to = 0, length.out = 5), BranchPartitionsToTest =
-  lapply(as.list(1:nrow(tree$edge)), as.list),
+  lapply(as.list(1:nrow(time_tree$edge)), as.list),
   CharacterPartitionsToTest = lapply(as.list(1:3),
   as.list), CladePartitionsToTest =
-  lapply(as.list(Ntip(tree) + (2:Nnode(tree))),
+  lapply(as.list(Ntip(time_tree) + (2:Nnode(time_tree))),
   as.list), TimeBinPartitionsToTest =
   lapply(as.list(1:4), as.list), ChangeTimes =
   "random", alpha = 0.01, PolymorphismState =

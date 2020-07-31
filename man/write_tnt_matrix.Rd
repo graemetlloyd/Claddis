@@ -4,12 +4,12 @@
 \alias{write_tnt_matrix}
 \title{Writes out a morphological TNT data file}
 \usage{
-write_tnt_matrix(cladistic.matrix, filename, add.analysis.block = FALSE)
+write_tnt_matrix(cladistic.matrix, file_name, add.analysis.block = FALSE)
 }
 \arguments{
 \item{cladistic.matrix}{A cladistic matrix in the format imported by \link{read_nexus_matrix}.}
 
-\item{filename}{The file name to write to. Should end in \code{.tnt}.}
+\item{file_name}{The file name to write to. Should end in \code{.tnt}.}
 
 \item{add.analysis.block}{Whether or not to add analysis block (i.e., tree search commands).}
 }
@@ -24,7 +24,7 @@ Note that the format can currently deal with continuous characters, sequence (DN
 \examples{
 
 # Write out Michaux 1989 to current working directory:
-write_tnt_matrix(cladistic.matrix = Michaux1989, filename = "Michaux1989.tnt")
+write_tnt_matrix(cladistic.matrix = Michaux1989, file_name = "Michaux1989.tnt")
 
 # Remove file when finished:
 file.remove("Michaux1989.tnt")

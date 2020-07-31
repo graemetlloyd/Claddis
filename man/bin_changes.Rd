@@ -4,12 +4,12 @@
 \alias{bin_changes}
 \title{Counts the changes in a series of time bins}
 \usage{
-bin_changes(change.times, time.bins)
+bin_changes(change_times, time_bins)
 }
 \arguments{
-\item{change.times}{A vector of ages in millions of years at which character changes are hypothesised to have occurred.}
+\item{change_times}{A vector of ages in millions of years at which character changes are hypothesised to have occurred.}
 
-\item{time.bins}{A vector of ages in millions of years of time bin boundaries in old-to-young order.}
+\item{time_bins}{A vector of ages in millions of years of time bin boundaries in old-to-young order.}
 }
 \value{
 A vector giving the number of changes for each time bin. Names indicate the maximum and minimum (bottom and top) values for each time bin.
@@ -23,13 +23,13 @@ Calculates the total number of evolutionary changes in a series of time bins. Th
 \examples{
 
 # Create a random dataset of 100 changes (between 100 and 0 Ma):
-change.times <- runif(100, 0, 100)
+change_times <- runif(100, 0, 100)
 
 # Create 10 equal-length time bins:
-time.bins <- seq(100, 0, length.out = 11)
+time_bins <- seq(100, 0, length.out = 11)
 
 # Get N changes for each bin:
-bin_changes(change.times, time.bins)
+bin_changes(change_times, time_bins)
 
 }
 \author{

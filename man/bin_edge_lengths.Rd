@@ -4,14 +4,14 @@
 \alias{bin_edge_lengths}
 \title{Edge-lengths present in time-bins}
 \usage{
-bin_edge_lengths(time.tree, time.bins, pruned.tree = NULL)
+bin_edge_lengths(time_tree, time_bins, pruned.tree = NULL)
 }
 \arguments{
-\item{time.tree}{A time-scaled tree in phylo format with a \code{$root.time} value.}
+\item{time_tree}{A time-scaled tree in phylo format with a \code{$root.time} value.}
 
-\item{time.bins}{A vector of ages in millions of years of time bin boundaries in old-to-young order.}
+\item{time_bins}{A vector of ages in millions of years of time bin boundaries in old-to-young order.}
 
-\item{pruned.tree}{A time-scaled tree in phylo format with a \code{$root.time} value that is a subset of \code{time.tree}.}
+\item{pruned.tree}{A time-scaled tree in phylo format with a \code{$root.time} value that is a subset of \code{time_tree}.}
 }
 \value{
 \item{edge.length.in.bin}{A vector giving the summed values in millions of years for each time bin. Names indicate the maximum and minimum values for each time bin.}
@@ -29,16 +29,16 @@ The option of using a \code{pruned.tree} allows the user to correctly classify i
 \examples{
 
 # Create a random 10-taxon tree:
-time.tree <- rtree(10)
+time_tree <- rtree(10)
 
 # Add root age:
-time.tree$root.time <- 100
+time_tree$root.time <- 100
 
 # Create time bins:
-time.bins <- seq(100, 0, length.out = 11)
+time_bins <- seq(100, 0, length.out = 11)
 
 # Get edge lengths for each bin:
-bin_edge_lengths(time.tree, time.bins)
+bin_edge_lengths(time_tree, time_bins)
 
 }
 \author{

@@ -5,7 +5,7 @@
 #' Writes out a morphological data file in #NEXUS format.
 #'
 #' @param cladistic.matrix The cladistic matrix in the format imported by \link{read_nexus_matrix}.
-#' @param filename The file name to write to. Should end in \code{.nex}.
+#' @param file_name The file name to write to. Should end in \code{.nex}.
 #'
 #' @details
 #'
@@ -26,13 +26,13 @@
 #' @examples
 #'
 #' # Write out Michaux 1989 to current working directory:
-#' write_nexus_matrix(cladistic.matrix = Michaux1989, filename = "Michaux1989.nex")
+#' write_nexus_matrix(cladistic.matrix = Michaux1989, file_name = "Michaux1989.nex")
 #'
 #' # Remove file when finished:
 #' file.remove("Michaux1989.nex")
 #'
 #' @export write_nexus_matrix
-write_nexus_matrix <- function(cladistic.matrix, filename) {
+write_nexus_matrix <- function(cladistic.matrix, file_name) {
   
   # Subfunction to convert matrices back to symbols, missing and gap characters:
   convert_matrix <- function(DataMatrix) {
@@ -216,6 +216,6 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
   FullString <- paste("#NEXUS\n\n", headerBlock, TaxaBlock, DataBlock, MatrixBlock, AssumptionBlock, sep = "")
 
   # Write to file:
-  write(FullString, filename)
+  write(FullString, file_name)
 
 }

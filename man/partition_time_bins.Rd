@@ -4,10 +4,10 @@
 \alias{partition_time_bins}
 \title{Time bin partitioner}
 \usage{
-partition_time_bins(NTimeBins, NPartitonsToInclude = "All")
+partition_time_bins(Ntime_bins, NPartitonsToInclude = "All")
 }
 \arguments{
-\item{NTimeBins}{The number of time bins.}
+\item{Ntime_bins}{The number of time bins.}
 
 \item{NPartitonsToInclude}{Either "All" or a vector of requested partition sizes.}
 }

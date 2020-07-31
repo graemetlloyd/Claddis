@@ -15,7 +15,7 @@ ordinate_cladistic_matrix(
   character.dependencies = NULL,
   alpha = 0.5,
   correction = "cailliez",
-  time.tree = NULL,
+  time_tree = NULL,
   estimate.all.nodes = FALSE,
   estimate.tip.values = FALSE,
   inapplicables.as.missing = FALSE,
@@ -46,7 +46,7 @@ ordinate_cladistic_matrix(
 
 \item{correction}{The negative eigenvalue correction to use (one of "lingoes", "none", or "cailliez" - the default). See \link{pcoa} for more details.}
 
-\item{time.tree}{If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.}
+\item{time_tree}{If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.}
 
 \item{estimate.all.nodes}{If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{estimate_ancestral_states} for more details.}
 
@@ -63,7 +63,7 @@ ordinate_cladistic_matrix(
 \item{allow.all.missing}{Logical to allow all missing character values - see \link{estimate_ancestral_states} for details.}
 }
 \value{
-\item{time.tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{trim_matrix}.}
+\item{time_tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{trim_matrix}.}
 
 \item{DistMatrix}{The distance matrix. Note this may be pruned by \link{trim_matrix} and thus not include all taxa.}
 
@@ -100,16 +100,16 @@ x <- ordinate_cladistic_matrix(Michaux1989)
 x
 
 # Generate a (made up) tree:
-time.tree <- rtree(length(rownames(Michaux1989$matrix_1$matrix)))
+time_tree <- rtree(length(rownames(Michaux1989$matrix_1$matrix)))
 
 # Add taxon names to it:
-time.tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
+time_tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
-time.tree$root.time <- max(diag(vcv(time.tree)))
+time_tree$root.time <- max(diag(vcv(time_tree)))
 
 # Run with tree:
-y <- ordinate_cladistic_matrix(Michaux1989, time.tree = time.tree)
+y <- ordinate_cladistic_matrix(Michaux1989, time_tree = time_tree)
 
 # Show new output:
 y

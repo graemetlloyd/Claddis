@@ -33,13 +33,13 @@
 #' set.seed(4)
 #'
 #' # Generate a random tree for the Michaux 1989 data set:
-#' time.tree <- rtree(length(rownames(Michaux1989$matrix_1$matrix)))
+#' time_tree <- rtree(length(rownames(Michaux1989$matrix_1$matrix)))
 #'
 #' # Add taxon names to the tree:
-#' time.tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
+#' time_tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
 #'
 #' # Perform a phylogenetic Principal Coordinates Analysis:
-#' pcoa_input <- ordinate_cladistic_matrix(Michaux1989, time.tree = time.tree)
+#' pcoa_input <- ordinate_cladistic_matrix(Michaux1989, time_tree = time_tree)
 #'
 #' # Plot the results:
 #' plot_morphospace(pcoa_input, plot_taxon_names = TRUE)
@@ -104,19 +104,19 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
   if (!is.null(pcoa_input$Tree)) {
 
     # Sort axes by node number in tree:
-    pcoa_input$vectors <- pcoa_input$vectors[c(pcoa_input$Tree$tip.label, setdiff(rownames(pcoa_input$vectors), pcoa_input$Tree$tip.label)), ]
+    pcoa_input$vectors <- pcoa_input$vectors[c(pcoa_input$time_tree$tip.label, setdiff(rownames(pcoa_input$vectors), pcoa_input$time_tree$tip.label)), ]
 
     # For each branch, plot branch:
-    for(i in 1:nrow(pcoa_input$Tree$edge)) lines(x = pcoa_input$vectors[pcoa_input$Tree$edge[i, ], x_axis], y = pcoa_input$vectors[pcoa_input$Tree$edge[i, ], y_axis], col = "black")
+    for(i in 1:nrow(pcoa_input$time_tree$edge)) lines(x = pcoa_input$vectors[pcoa_input$time_tree$edge[i, ], x_axis], y = pcoa_input$vectors[pcoa_input$time_tree$edge[i, ], y_axis], col = "black")
 
     # Establish tip node numbers:
-    tip_numbers <- c(1:ape::Ntip(pcoa_input$Tree))
+    tip_numbers <- c(1:ape::Ntip(pcoa_input$time_tree))
     
     # Establish internal node numbers:
     node_numbers <- setdiff(1:nrow(pcoa_input$vectors), tip_numbers)
     
     # Establish root number:
-    root_number <- ape::Ntip(pcoa_input$Tree) + 1
+    root_number <- ape::Ntip(pcoa_input$time_tree) + 1
 
     # If plotting internal nodes, plot internal nodes:
     if (plot_internal_nodes) points(pcoa_input$vectors[node_numbers, x_axis], pcoa_input$vectors[node_numbers, y_axis], pch = 21, bg = z_colours[node_numbers], cex = z_sizes[node_numbers])

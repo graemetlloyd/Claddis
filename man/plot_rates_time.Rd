@@ -35,13 +35,13 @@ Ages <- read.table("~/Documents/Packages/Claddis/LungfishTest/ages.txt",
   sep =",")
 Matrix <-
   Claddis::read_nexus_matrix("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.nex")
-Tree <-
+time_tree <-
   ape::read.tree("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.tre")
-Tree <- Tree[sample(1:100000, 100)]
-Tree <- lapply(Tree, function(x) strap::DatePhylo(x, Ages, rlen = 2, method = "equal"))
-class(Tree) <- "multiPhylo"
-TimeBins <- c(443.8, 358.9, 298.9, 251.9, 201.3, 145.0, 66.0, 0.0)
-LungfishResults <- Claddis::test_rates(Tree[[1]], Matrix, TimeBins,
+time_tree <- time_tree[sample(1:100000, 100)]
+time_tree <- lapply(time_tree, function(x) strap::DatePhylo(x, Ages, rlen = 2, method = "equal"))
+class(time_tree) <- "multiPhylo"
+time_bins <- c(443.8, 358.9, 298.9, 251.9, 201.3, 145.0, 66.0, 0.0)
+LungfishResults <- Claddis::test_rates(time_tree[[1]], Matrix, time_bins,
   TimeBinPartitionsToTest = partition_time_bins(7),
   CharacterPartitionsToTest = list(list(1:91), list(Cranial = 1:81,
   Postcranial = 82:91)))
