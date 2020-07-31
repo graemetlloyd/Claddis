@@ -14,7 +14,8 @@ Maintainer: Graeme T. Lloyd <graemetlloyd@gmail.com>
 Depends:
     ape,
     phytools,
-    strap
+    strap,
+    R (>= 3.5.0)
 Imports:
     clipr,
     gdata,
