@@ -2,18 +2,18 @@
 % Please edit documentation in R/align_matrix_block.R
 \name{align_matrix_block}
 \alias{align_matrix_block}
-\title{Align a phylogenetic matrix block}
+\title{Aligns a phylogenetic matrix block}
 \usage{
-align_matrix_block(Block)
+align_matrix_block(matrix.block)
 }
 \arguments{
-\item{Block}{The raw input text.}
+\item{matrix.block}{The matrix block as raw input text.}
 }
 \value{
 Nothing is returned, instead the aligned block is sent to the clipboard ready for pasting into a text editor.
 }
 \description{
-Given a block of taxa and characters aligns start of character block.
+Given a block of taxa and characters aligns text so each character block begins at same point.
 }
 \details{
 The function serves to help build NEXUS files by neatly aligning raw text blocks of taxa and characters. Or in simple terms it takes input that looks like this:

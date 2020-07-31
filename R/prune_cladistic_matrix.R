@@ -23,8 +23,9 @@
 #' @examples
 #'
 #' # Remove the outgroup taxon and characters 11 and 53 from Gauthier1986:
-#' prunedmatrix <- prune_cladistic_matrix(cladistic.matrix = Gauthier1986, characters2prune = c(11, 53),
-#'   taxa2prune = c("Outgroup"))
+#' prunedmatrix <- prune_cladistic_matrix(cladistic.matrix =
+#'   Gauthier1986, characters2prune = c(11, 53), taxa2prune =
+#'   c("Outgroup"))
 #'
 #' # Show priuned matrix:
 #' prunedmatrix$Matrix_1$Matrix
@@ -83,7 +84,7 @@ prune_cladistic_matrix <- function(cladistic.matrix, blocks2prune = c(), charact
       cladistic.matrix[[(i + 1)]]$Ordering <- cladistic.matrix[[(i + 1)]]$Ordering[-ColumnsToDelete]
       
       # Remove characters from weights:
-      cladistic.matrix[[(i + 1)]]$Weights <- cladistic.matrix[[(i + 1)]]$Weights[-ColumnsToDelete]
+      cladistic.matrix[[(i + 1)]]$weights <- cladistic.matrix[[(i + 1)]]$weights[-ColumnsToDelete]
       
       # Remove characters from minimum values:
       cladistic.matrix[[(i + 1)]]$MinVals <- cladistic.matrix[[(i + 1)]]$MinVals[-ColumnsToDelete]
@@ -136,7 +137,7 @@ prune_cladistic_matrix <- function(cladistic.matrix, blocks2prune = c(), charact
           cladistic.matrix[[(i + 1)]]$Ordering <- cladistic.matrix[[(i + 1)]]$Ordering[-InvariantsAsList[[i]]]
           
           # Remove characters from weights:
-          cladistic.matrix[[(i + 1)]]$Weights <- cladistic.matrix[[(i + 1)]]$Weights[-InvariantsAsList[[i]]]
+          cladistic.matrix[[(i + 1)]]$weights <- cladistic.matrix[[(i + 1)]]$weights[-InvariantsAsList[[i]]]
           
           # Remove characters from minimum values:
           cladistic.matrix[[(i + 1)]]$MinVals <- cladistic.matrix[[(i + 1)]]$MinVals[-InvariantsAsList[[i]]]

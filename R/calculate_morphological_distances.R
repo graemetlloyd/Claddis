@@ -367,7 +367,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
     CharacterOrdering <- ordering[ComparableCharacters]
     
     # Set ordering for comparable characters:
-    Weights <- weights[ComparableCharacters]
+    weights <- weights[ComparableCharacters]
     
     # Fof each character level (from most to least nested):
     for(i in length(CharactersByLevel):2) {
@@ -397,7 +397,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
           if(length(IndependentPosition) == 0) stop("Found a dependent character coded when character it depends on is missing. Check matrix codings.")
           
           # Overwrite independent position with alpha-weighted value:
-          diffs[IndependentPosition] <- 1 - (alpha * (1 - (sum(diffs[DependentPositions] * Weights[DependentPositions]) / sum(Weights[DependentPositions]))) + (1 - alpha))
+          diffs[IndependentPosition] <- 1 - (alpha * (1 - (sum(diffs[DependentPositions] * weights[DependentPositions]) / sum(weights[DependentPositions]))) + (1 - alpha))
           
           # Overwrite dependent positions with NAs:
           diffs[DependentPositions] <- NA
@@ -509,7 +509,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   max.vals <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "MaxVals")))
   
   # Isolate weights:
-  weights <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Weights")))
+  weights <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "weights")))
   
   # Combine matrix blocks into a single matrix:
   cladistic.matrix <- do.call(cbind, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"))

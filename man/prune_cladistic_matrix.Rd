@@ -32,8 +32,9 @@ Removing characters or taxa from a matrix imported using \link{read_nexus_matrix
 \examples{
 
 # Remove the outgroup taxon and characters 11 and 53 from Gauthier1986:
-prunedmatrix <- prune_cladistic_matrix(cladistic.matrix = Gauthier1986, characters2prune = c(11, 53),
-  taxa2prune = c("Outgroup"))
+prunedmatrix <- prune_cladistic_matrix(cladistic.matrix =
+  Gauthier1986, characters2prune = c(11, 53), taxa2prune =
+  c("Outgroup"))
 
 # Show priuned matrix:
 prunedmatrix$Matrix_1$Matrix

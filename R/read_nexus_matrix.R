@@ -5,7 +5,7 @@
 #' Reads in a morphological data file in #NEXUS format.
 #'
 #' @param File A file name specified by either a variable of mode character, or a double-quoted string.
-#' @param EqualiseWeights Optional that overrides the weights specified in the file to make all characters truly equally weighted.
+#' @param Equaliseweights Optional that overrides the weights specified in the file to make all characters truly equally weighted.
 #'
 #' @details
 #'
@@ -52,7 +52,7 @@
 #' file.remove("morphmatrix.nex")
 #' 
 #' @export read_nexus_matrix
-read_nexus_matrix <- function(File, EqualiseWeights = FALSE) {
+read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
   
   # ADD ABILITY TO READ CHARSET LINES
   # COULD BE MULTIPLE TYPESET OR WTSET LINES, NEED TO CHECK FOR THIS!
@@ -886,7 +886,7 @@ read_nexus_matrix <- function(File, EqualiseWeights = FALSE) {
   }
   
   # Set default weights as 1:
-  Weights <- lapply(lapply(MatrixBlockList, ncol), rep, x = 1)
+  weights <- lapply(lapply(MatrixBlockList, ncol), rep, x = 1)
   
   # Set default ordering as unordered:
   Ordering <- lapply(lapply(MatrixBlockList, ncol), rep, x = "unord")
@@ -912,7 +912,7 @@ read_nexus_matrix <- function(File, EqualiseWeights = FALSE) {
     ContinuousBlocks <- which(names(MatrixBlockList) == "CONTINUOUS")
     
     # For each continuous blocks set weights as reciprocal of difference between min and max (i.e., effectively setting all weights as one):
-    for(i in ContinuousBlocks) Weights[[i]] <- as.numeric(gsub(Inf, 1, 1 / (MinMaxMatrixList[[i]][, "Max"] - MinMaxMatrixList[[i]][, "Min"])))
+    for(i in ContinuousBlocks) weights[[i]] <- as.numeric(gsub(Inf, 1, 1 / (MinMaxMatrixList[[i]][, "Max"] - MinMaxMatrixList[[i]][, "Min"])))
     
   }
 
@@ -1019,13 +1019,13 @@ read_nexus_matrix <- function(File, EqualiseWeights = FALSE) {
   if(length(NonstandardOrdering) > 0) stop(paste("The following non-standard character ordering(s) were found: ", paste(NonstandardOrdering, collapse = ", "), ". These should be one of type \"cont\", \"ord\", \"unord\", or step matrix.", sep = ""))
   
   # Find any WTSET lines:
-  WeightsetLines <- X[lapply(lapply(strsplit(X, split = ""), '[', 1:5), paste, collapse = "") == "WTSET"]
+  weightsetLines <- X[lapply(lapply(strsplit(X, split = ""), '[', 1:5), paste, collapse = "") == "WTSET"]
   
   # If there are weightset line(s):
-  if(length(WeightsetLines) > 0) {
+  if(length(weightsetLines) > 0) {
     
     # Remove any double spaces found (fot easier strsplit later):
-    while(length(grep("  ", WeightsetLines))) WeightsetLines <- gsub("  ", " ", WeightsetLines)
+    while(length(grep("  ", weightsetLines))) weightsetLines <- gsub("  ", " ", weightsetLines)
     
     # If there are any block names (i.e., names that may be used to differentiate assumptions by character block):
     if(any(!is.na(BlockNames))) {
@@ -1040,19 +1040,19 @@ read_nexus_matrix <- function(File, EqualiseWeights = FALSE) {
         CurrentLabelText <- paste("(CHARACTERS=", BlockNames[i], ")=", sep = "")
         
         # Find line that contains label (if used):
-        LabelMatch <- grep(CurrentLabelText, WeightsetLines, fixed = TRUE)
+        LabelMatch <- grep(CurrentLabelText, weightsetLines, fixed = TRUE)
         
         # If such a line was found:
         if(length(LabelMatch) > 0) {
           
           # Isolate weights information:
-          WeightsInformation <- strsplit(WeightsetLines[LabelMatch], split = CurrentLabelText, fixed = TRUE)[[1]][2]
+          weightsInformation <- strsplit(weightsetLines[LabelMatch], split = CurrentLabelText, fixed = TRUE)[[1]][2]
           
           # Extract weights information:
-          WeightsExtracted <- AssumptionExtractor(WeightsInformation)
+          weightsExtracted <- AssumptionExtractor(weightsInformation)
           
           # Store weights information for block in weights of block (i.e., numbered from 1 in block not 1 in whole NEXUS file):
-          Weights[[i]] <- WeightsExtracted
+          weights[[i]] <- weightsExtracted
           
         }
         
@@ -1062,22 +1062,22 @@ read_nexus_matrix <- function(File, EqualiseWeights = FALSE) {
     } else {
       
       # Isolate weights information:
-      WeightsInformation <- strsplit(WeightsetLines, split = "UNTITLED=", fixed = TRUE)[[1]][2]
+      weightsInformation <- strsplit(weightsetLines, split = "UNTITLED=", fixed = TRUE)[[1]][2]
       
       # Extract weights information:
-      WeightsExtracted <- AssumptionExtractor(WeightsInformation)
+      weightsExtracted <- AssumptionExtractor(weightsInformation)
       
       # Get lengths of weights for each block:
-      WeightsLengths <- unlist(lapply(Weights, length))
+      weightsLengths <- unlist(lapply(weights, length))
       
       # For each block of the matrix list:
-      for(i in 1:length(WeightsLengths)) {
+      for(i in 1:length(weightsLengths)) {
         
         # Store part of extracted weights corresponding to ith block:
-        Weights[[i]][1:WeightsLengths[i]] <-  WeightsExtracted[1:WeightsLengths[i]]
+        weights[[i]][1:weightsLengths[i]] <-  weightsExtracted[1:weightsLengths[i]]
         
         # Remove already transferred weights from extracted ready for next block:
-        WeightsExtracted <- WeightsExtracted[-(1:WeightsLengths[i])]
+        weightsExtracted <- weightsExtracted[-(1:weightsLengths[i])]
         
       }
       
@@ -1086,22 +1086,22 @@ read_nexus_matrix <- function(File, EqualiseWeights = FALSE) {
   }
   
   # Convert weights to numeric:
-  Weights <- lapply(Weights, as.numeric)
+  weights <- lapply(weights, as.numeric)
   
   # If equalising weights:
-  if(EqualiseWeights) {
+  if(Equaliseweights) {
     
     # Get starting weights by taking differences for each character (will take reciprocal later for true weight):
-    StartingWeights <- lapply(lapply(MinMaxMatrixList, apply, 1, diff), function(x) x)
+    Startingweights <- lapply(lapply(MinMaxMatrixList, apply, 1, diff), function(x) x)
     
     # If there are continuous characters:
-    if(any(names(StartingWeights) == "CONTINUOUS")) {
+    if(any(names(Startingweights) == "CONTINUOUS")) {
       
       # Get numbers of continuous blocks:
-      ContinuousBlocks <- which(names(StartingWeights) == "CONTINUOUS")
+      ContinuousBlocks <- which(names(Startingweights) == "CONTINUOUS")
       
       # Set weights for continuous blocks to null:
-      for(i in ContinuousBlocks) StartingWeights[[i]] <- vector(mode = "numeric")
+      for(i in ContinuousBlocks) Startingweights[[i]] <- vector(mode = "numeric")
       
     }
     
@@ -1112,7 +1112,7 @@ read_nexus_matrix <- function(File, EqualiseWeights = FALSE) {
       BlocksWithUnorderedCharacters <- which(unlist(lapply(lapply(Ordering, '==', "unord"), sum)) > 0)
       
       # Convert all unordered characters to weight one:
-      for(i in BlocksWithUnorderedCharacters) StartingWeights[[i]][which(Ordering[[i]] == "unord")] <- 1
+      for(i in BlocksWithUnorderedCharacters) Startingweights[[i]][which(Ordering[[i]] == "unord")] <- 1
       
     }
     
@@ -1129,38 +1129,38 @@ read_nexus_matrix <- function(File, EqualiseWeights = FALSE) {
         StepCharacters <- grep("step_", Ordering[[i]])
         
         # Set step matrix character as maximum possible value in step matrix (again, should be reciprocal, but that will happen later:
-        for(j in StepCharacters) StartingWeights[[i]][j] <- max(as.numeric(StepMatrices[[Ordering[[i]][j]]]))
+        for(j in StepCharacters) Startingweights[[i]][j] <- max(as.numeric(StepMatrices[[Ordering[[i]][j]]]))
         
       }
       
     }
     
     # Take reciprocal of weights so they are actual weights:
-    StartingWeights <- lapply(StartingWeights, function(x) 1 / x)
+    Startingweights <- lapply(Startingweights, function(x) 1 / x)
     
     # Get product weight (to multiply all weights by):
-    ProductWeight <- prod(unique(unlist(lapply(StartingWeights, function(x) round(1 / x)))))
+    ProductWeight <- prod(unique(unlist(lapply(Startingweights, function(x) round(1 / x)))))
     
     # Multiply weighting product through all starting weights:
-    StartingWeights <- lapply(StartingWeights, function(x) x * ProductWeight)
+    Startingweights <- lapply(Startingweights, function(x) x * ProductWeight)
     
     # Get factors of every weight currently applied:
-    AllFactorsCombined <- sort(unlist(lapply(as.list(unique(unlist(StartingWeights))), GetAllFactors)))
+    AllFactorsCombined <- sort(unlist(lapply(as.list(unique(unlist(Startingweights))), GetAllFactors)))
     
     # Get largest common factor of all weights:
-    LargestCommonFactor <- max(rle(AllFactorsCombined)$values[rle(AllFactorsCombined)$lengths == length(unique(unlist(StartingWeights)))])
+    LargestCommonFactor <- max(rle(AllFactorsCombined)$values[rle(AllFactorsCombined)$lengths == length(unique(unlist(Startingweights)))])
     
     # As long as the largest common factor is greater than 1:
     while(LargestCommonFactor > 1) {
       
       # Update starting weights by dividing through by current largest facto:
-      StartingWeights <- lapply(StartingWeights, function(x) x / LargestCommonFactor)
+      Startingweights <- lapply(Startingweights, function(x) x / LargestCommonFactor)
       
       # Get factors of every weight currently applied:
-      AllFactorsCombined <- sort(unlist(lapply(as.list(unique(unlist(StartingWeights))), GetAllFactors)))
+      AllFactorsCombined <- sort(unlist(lapply(as.list(unique(unlist(Startingweights))), GetAllFactors)))
       
       # Get largest common factor of all weights:
-      LargestCommonFactor <- max(rle(AllFactorsCombined)$values[rle(AllFactorsCombined)$lengths == length(unique(unlist(StartingWeights)))])
+      LargestCommonFactor <- max(rle(AllFactorsCombined)$values[rle(AllFactorsCombined)$lengths == length(unique(unlist(Startingweights)))])
       
     }
     
@@ -1171,23 +1171,23 @@ read_nexus_matrix <- function(File, EqualiseWeights = FALSE) {
       BlocksWithConstantCharacters <- which(unlist(lapply(lapply(lapply(lapply(MinMaxMatrixList, apply, 1, diff), '==', 0), which), length)) > 0)
       
       # For each block with constant characters set weight to zero:
-      for(i in BlocksWithConstantCharacters) StartingWeights[[i]][which(apply(MinMaxMatrixList[[i]], 1, diff) == 0)] <- 0
+      for(i in BlocksWithConstantCharacters) Startingweights[[i]][which(apply(MinMaxMatrixList[[i]], 1, diff) == 0)] <- 0
       
     }
     
     # If there are continuous characters:
-    if(any(names(StartingWeights) == "CONTINUOUS")) {
+    if(any(names(Startingweights) == "CONTINUOUS")) {
       
       # Get numbers of continuous blocks:
-      ContinuousBlocks <- which(names(StartingWeights) == "CONTINUOUS")
+      ContinuousBlocks <- which(names(Startingweights) == "CONTINUOUS")
       
       # Set weights for continuous blocks as original weights:
-      for(i in ContinuousBlocks) StartingWeights[[i]] <- Weights[[i]]
+      for(i in ContinuousBlocks) Startingweights[[i]] <- weights[[i]]
       
     }
     
     # Update weights:
-    Weights <- StartingWeights
+    weights <- Startingweights
     
   }
   
@@ -1204,7 +1204,7 @@ read_nexus_matrix <- function(File, EqualiseWeights = FALSE) {
     Characters <- list(Symbols = Symbols[[i]], Missing = Missing[[i]], Gap = Gap[[i]])
     
     # Build list for current block:
-    Block <- list(BlockName = BlockNames[[i]], Datatype = names(MatrixBlockList)[i], Matrix = MatrixBlockList[[i]], Ordering = Ordering[[i]], Weights = Weights[[i]], MinVals = MinMaxMatrixList[[i]][, "Min"], MaxVals = MinMaxMatrixList[[i]][, "Max"], Characters = Characters)
+    Block <- list(BlockName = BlockNames[[i]], Datatype = names(MatrixBlockList)[i], Matrix = MatrixBlockList[[i]], Ordering = Ordering[[i]], weights = weights[[i]], MinVals = MinMaxMatrixList[[i]][, "Min"], MaxVals = MinMaxMatrixList[[i]][, "Max"], Characters = Characters)
     
     # Store current block in output:
     Output[[(i + 1)]] <- Block

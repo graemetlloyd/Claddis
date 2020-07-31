@@ -189,7 +189,7 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
   Ordering <- unlist(lapply(DataBlocks, '[[', "Ordering"))
   
   # Get weights of all characters in sequence:
-  Weights <- unlist(lapply(DataBlocks, '[[', "Weights"))
+  weights <- unlist(lapply(DataBlocks, '[[', "weights"))
 
   # Create options block (if no block names):
   if(all(is.na(BlockNames))) OptionsBlock <- paste(ifelse(all(Ordering == "unord"), "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n", ifelse(all(Ordering == "ord"), "\tOPTIONS  DEFTYPE=ord PolyTcount=MINSTEPS ;\n", "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n")), ifelse(length(unique(Ordering)) == 1 && length(setdiff(unique(Ordering), c("ord", "unord"))) == 0, "", paste("\tTYPESET * UNTITLED  = ", paste(paste(sort(unique(Ordering)), unlist(lapply(lapply(lapply(as.list(sort(unique(Ordering))), '==', Ordering), which), Zipper)), sep = ": "), collapse = ", "), ";\n", sep = "")), collapse = "")
@@ -201,16 +201,16 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
   if(length(grep(" cont: ", OptionsBlock)) > 0) OptionsBlock <- gsub(" cont: ", " Squared: ", OptionsBlock)
   
   # Convert continuosu character weights to one before making weights block:
-  Weights[Ordering == "cont"] <- 1
+  weights[Ordering == "cont"] <- 1
   
   # Create weights block (if no block names):
-  if(all(is.na(BlockNames))) WeightsBlock <- ifelse(all(Weights == 1), "", paste("\tWTSET * UNTITLED  = ", paste(paste(sort(unique(Weights)), unlist(lapply(lapply(lapply(as.list(sort(unique(Weights))), '==', Weights), which), Zipper)), sep = ": "), collapse = ", "), ";\n", sep = ""))
+  if(all(is.na(BlockNames))) weightsBlock <- ifelse(all(weights == 1), "", paste("\tWTSET * UNTITLED  = ", paste(paste(sort(unique(weights)), unlist(lapply(lapply(lapply(as.list(sort(unique(weights))), '==', weights), which), Zipper)), sep = ": "), collapse = ", "), ";\n", sep = ""))
   
   # Create weights block (if there are block names):
-  if(!all(is.na(unlist(BlockNames)))) WeightsBlock <- paste(paste("\tWTSET * UNTITLED  (CHARACTERS = ", BlockNames, ")  =  ", unlist(lapply(lapply(DataBlocks, '[[', "Weights"), function(x) paste(paste(paste(sort(unique(x)), unlist(lapply(lapply(lapply(as.list(sort(unique(x))), '==', x), which), Zipper)), sep = ": "), collapse = ", "), sep = ""))), ";\n", sep = ""), collapse = "")
+  if(!all(is.na(unlist(BlockNames)))) weightsBlock <- paste(paste("\tWTSET * UNTITLED  (CHARACTERS = ", BlockNames, ")  =  ", unlist(lapply(lapply(DataBlocks, '[[', "weights"), function(x) paste(paste(paste(sort(unique(x)), unlist(lapply(lapply(lapply(as.list(sort(unique(x))), '==', x), which), Zipper)), sep = ": "), collapse = ", "), sep = ""))), ";\n", sep = ""), collapse = "")
   
   # Build assumptions block:
-  AssumptionBlock <- paste("BEGIN ASSUMPTIONS;\n", StepMatrixBlock, OptionsBlock, WeightsBlock, "END;\n", sep = "")
+  AssumptionBlock <- paste("BEGIN ASSUMPTIONS;\n", StepMatrixBlock, OptionsBlock, weightsBlock, "END;\n", sep = "")
   
   # Build full string with all blocks together:
   FullString <- paste("#NEXUS\n\n", HeaderBlock, TaxaBlock, DataBlock, MatrixBlock, AssumptionBlock, sep = "")

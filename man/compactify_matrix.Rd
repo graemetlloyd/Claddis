@@ -27,7 +27,7 @@ The function also deletes any characters weighted zero from the matrix and will 
 Michaux1989$Matrix_1$Matrix
 
 # Examine the weights pre-compactification:
-Michaux1989$Matrix_1$Weights
+Michaux1989$Matrix_1$weights
 
 # Compactify the matrix:
 Michaux1989compact <- compactify_matrix(Michaux1989)
@@ -36,7 +36,7 @@ Michaux1989compact <- compactify_matrix(Michaux1989)
 Michaux1989compact$Matrix_1$Matrix
 
 # Examine the weights post-compactification:
-Michaux1989compact$Matrix_1$Weights
+Michaux1989compact$Matrix_1$weights
 
 }
 \seealso{

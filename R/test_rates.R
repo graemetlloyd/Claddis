@@ -19,7 +19,7 @@
 #' @param UncertaintyState One of \code{"missing"} (converts uncertain values to NA; the default) or \code{"random"} (picks one of the possible uncertain states at random).
 #' @param InapplicableState The only current option is \code{"missing"} (converts value to NA).
 #' @param TimeBinApproach One of \code{"Close"} or \code{"Lloyd"} (the default).
-#' @param EnsureAllWeightsAreIntegers Logical for whether (\code{TRUE}) to reweight non-integer weights until all weights are integers or to leave them as they are (\code{FALSE}; the default).
+#' @param EnsureAllweightsAreIntegers Logical for whether (\code{TRUE}) to reweight non-integer weights until all weights are integers or to leave them as they are (\code{FALSE}; the default).
 #' @param estimate.all.nodes Option passed to internal use of \link{estimate_ancestral_states}.
 #' @param estimate.tip.values Option passed to internal use of \link{estimate_ancestral_states}.
 #' @param inapplicables.as.missing Option passed to internal use of \link{estimate_ancestral_states}.
@@ -89,7 +89,7 @@
 #'
 #' Fifthly, there are currenty two further options for assessing rates across time bins. As noted above a complication here is that character changes (the rate numerator) and character completeness (part of the rate denominator) are typically assessed on branches. However, branches will typically span time bin boundaries and hence many bins will contain only some portion of particular branches. The exact portion can be easily calculated for branch durations (the other part of the rate denominator) and the \code{ChangeTimes} option above is used to set the rate numerator, however, completeness remains complex to deal with. The first attempt to deal with this was made by Close et al. (2015) who simply used weighted mean completeness by calculating the proportion of a branch in each bin as the weight and multiplying this by each branch's completeness (the \code{"Close"} option here). However, this may lead to unrealistic "smoothing" of the data and perhaps more importantly makes no account of which characters are known in a bin. Lloyd (2016) proposed an alternative "subtree" approach which assesses completeness by considering each character to be represented by a subtree where only branches that are complete are retained then branch durations in each bin are summed across subtrees such that the duration term automatically includes completeness (the \code{"Lloyd"} option here). Here the latter is strongly recommended, for example, because this will lead to the same global rate across the whole tree as the branch, clade or character partitions, whereas the Close approach will not.
 #'
-#' Sixthly, all character changes are weighted according to the weights provided in the input character-taxon matrix. In many cases these will simply all be one, although see the equalise weights option in \link{read_nexus_matrix}. However, when weights vary they can create some issues for the function. Specifically, changes are expected to be in the same (integer) units, but if weights vary then they have to be modelled accordingly. I.e., a character twice the weight of another may lead to a single change being counted as two changes. This is most problematic when the user has continuous characters which are automatically converted to gap-weighted (Thiele 1993) characters. However, this conversion creates drastically down-weighted characters and hence the user may wish to set the \code{EnsureAllWeightsAreIntegers} option to TRUE. Note that reweighting will affect the results and hence shifting the weights of characters up or down will necessarily lead to shifts in the relative Type I and II errors. This is an unexplored aspect of such approaches, but is something the user should be aware of. More broadly it is recommended that continuous (or gap-weighted) characters be avoided when using this function.
+#' Sixthly, all character changes are weighted according to the weights provided in the input character-taxon matrix. In many cases these will simply all be one, although see the equalise weights option in \link{read_nexus_matrix}. However, when weights vary they can create some issues for the function. Specifically, changes are expected to be in the same (integer) units, but if weights vary then they have to be modelled accordingly. I.e., a character twice the weight of another may lead to a single change being counted as two changes. This is most problematic when the user has continuous characters which are automatically converted to gap-weighted (Thiele 1993) characters. However, this conversion creates drastically down-weighted characters and hence the user may wish to set the \code{EnsureAllweightsAreIntegers} option to TRUE. Note that reweighting will affect the results and hence shifting the weights of characters up or down will necessarily lead to shifts in the relative Type I and II errors. This is an unexplored aspect of such approaches, but is something the user should be aware of. More broadly it is recommended that continuous (or gap-weighted) characters be avoided when using this function.
 #'
 #' Finally, the remaining options (\code{estimate.all.nodes}, \code{estimate.tip.values}, \code{inapplicables.as.missing}, \code{polymorphism.behaviour}, \code{uncertainty.behaviour}, and \code{threshold}) are all simply passed directly to \link{estimate_ancestral_states} for estimating the ancestral states and users should consult the help file for that function for further details.
 #'
@@ -187,7 +187,7 @@
 #'   "Lloyd")
 #'
 #' @export test_rates
-test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", LikelihoodTest = "AIC", alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllWeightsAreIntegers = FALSE, estimate.all.nodes = FALSE, estimate.tip.values = FALSE, inapplicables.as.missing = FALSE, polymorphism.behaviour = "equalp", uncertainty.behaviour = "equalp", threshold = 0.01, allow.all.missing = FALSE) {
+test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest = NULL, CharacterPartitionsToTest = NULL, CladePartitionsToTest = NULL, TimeBinPartitionsToTest = NULL, ChangeTimes = "random", LikelihoodTest = "AIC", alpha = 0.01, MultipleComparisonCorrection = "BenjaminiHochberg", PolymorphismState = "missing", UncertaintyState = "missing", InapplicableState = "missing", TimeBinApproach = "Lloyd", EnsureAllweightsAreIntegers = FALSE, estimate.all.nodes = FALSE, estimate.tip.values = FALSE, inapplicables.as.missing = FALSE, polymorphism.behaviour = "equalp", uncertainty.behaviour = "equalp", threshold = 0.01, allow.all.missing = FALSE) {
   
   # ADD EXAMPLES OF VISUALISED OUTPUT
   
@@ -435,7 +435,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
   Ordering <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Ordering")))
   
   # Make vector of weights of characters:
-  Weights <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Weights")))
+  weights <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "weights")))
   
   # Make vector of minimum values:
   MinVals <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "MinVals")))
@@ -507,7 +507,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
     Ordering[ContinuousCharactersFound] <- "ord"
     
     # Convert weights to 1/31:
-    Weights[ContinuousCharactersFound] <- 1 / 31
+    weights[ContinuousCharactersFound] <- 1 / 31
     
     # Set minimum value to zero:
     MinVals[ContinuousCharactersFound] <- 0
@@ -517,8 +517,8 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
     
   }
   
-  # If EnsureAllWeightsAreIntegers is TRUE rescale weights until they are all integers so can model appropriately with Poisson later:
-  if(EnsureAllWeightsAreIntegers) while(is.character(all.equal(sum(Weights %% 1), 0))) Weights <- (1 / (Weights %% 1)[(Weights %% 1) > 0])[1] * Weights
+  # If EnsureAllweightsAreIntegers is TRUE rescale weights until they are all integers so can model appropriately with Poisson later:
+  if(EnsureAllweightsAreIntegers) while(is.character(all.equal(sum(weights %% 1), 0))) weights <- (1 / (weights %% 1)[(weights %% 1) > 0])[1] * weights
 
   # Add from-to node states for each character to edge list:
   EdgeList <- lapply(EdgeList, function(x) {x$CharacterStatesFromTo <- matrix(AllStates[x$NodeNumberFromTo, , drop = FALSE], nrow = 2, dimnames = list(c("From", "To"))); return(x)})
@@ -533,7 +533,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
     ComparableOrdering <- Ordering[ComparableCharacters]
     
     # Isolate comparable weights:
-    ComparableWeights <- Weights[ComparableCharacters]
+    Comparableweights <- weights[ComparableCharacters]
     
     # Isolate only characters that actually differ (change):
     CharacterDifferences <- which(x$CharacterStatesFromTo["From", ComparableCharacters] != x$CharacterStatesFromTo["To", ComparableCharacters])
@@ -542,7 +542,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
     CharacterChanges <- matrix(nrow = 0, ncol = 5, dimnames = list(c(), c("Character", "From", "To", "Steps", "Weight")))
     
     # If characters change then make a matrix from them:
-    if(length(CharacterDifferences) > 0) CharacterChanges <- rbind(CharacterChanges, cbind(as.numeric(ComparableCharacters[CharacterDifferences]), as.numeric(x$CharacterStatesFromTo["From", ComparableCharacters[CharacterDifferences]]), as.numeric(x$CharacterStatesFromTo["To", ComparableCharacters[CharacterDifferences]]), ifelse(ComparableOrdering[CharacterDifferences] == "unord", 1, abs(as.numeric(x$CharacterStatesFromTo["To", ComparableCharacters[CharacterDifferences]]) - as.numeric(x$CharacterStatesFromTo["From", ComparableCharacters[CharacterDifferences]]))), ComparableWeights[CharacterDifferences]))
+    if(length(CharacterDifferences) > 0) CharacterChanges <- rbind(CharacterChanges, cbind(as.numeric(ComparableCharacters[CharacterDifferences]), as.numeric(x$CharacterStatesFromTo["From", ComparableCharacters[CharacterDifferences]]), as.numeric(x$CharacterStatesFromTo["To", ComparableCharacters[CharacterDifferences]]), ifelse(ComparableOrdering[CharacterDifferences] == "unord", 1, abs(as.numeric(x$CharacterStatesFromTo["To", ComparableCharacters[CharacterDifferences]]) - as.numeric(x$CharacterStatesFromTo["From", ComparableCharacters[CharacterDifferences]]))), Comparableweights[CharacterDifferences]))
     
     # Store character changes as new sublist for x:
     x$CharacterChanges <- CharacterChanges
@@ -705,7 +705,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
     EdgeChanges <- unlist(lapply(EdgeList, function(x) sum(x$CharacterChanges[, "Steps"] * x$CharacterChanges[, "Weight"])))
 
     # Get completeness for each edge:
-    EdgeCompleteness <- unlist(lapply(EdgeList, function(x) sum(Weights[x$ComparableCharacters]) / sum(Weights)))
+    EdgeCompleteness <- unlist(lapply(EdgeList, function(x) sum(weights[x$ComparableCharacters]) / sum(weights)))
     
     # Get duration of each edge:
     EdgeDurations <- unlist(lapply(EdgeList, function(x) x$BranchDuration))
@@ -828,7 +828,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
     CharacterChanges <- unlist(lapply(as.list(CharacterNumbers), function(x) {CharacterRows <- which(AllChanges[, "Character"] == x); sum(AllChanges[CharacterRows, "Steps"] * AllChanges[CharacterRows, "Weight"])}))
     
     # Get vector of weighted durations for each character:
-    CharacterDurations <- (Weights / sum(Weights)) * sum(tree$edge.length)
+    CharacterDurations <- (weights / sum(weights)) * sum(tree$edge.length)
     
     # Get vector of completness (opportunity to observe changes) for each character:
     CharacterCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) {CharacterPresence <- rep(0, times = length(CharacterNumbers)); CharacterPresence[x$ComparableCharacters] <- 1; CharacterPresence * x$BranchDuration})), 2, sum) / sum(tree$edge.length)
@@ -889,10 +889,10 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
     Timebin_changes <- unlist(lapply(as.list(1:(length(TimeBins) - 1)), function(x) {ChangeRows <- AllChanges[, "Bin"] == x; sum(AllChanges[ChangeRows, "Steps"] * AllChanges[ChangeRows, "Weight"])}))
     
     # If using the Close time bin completeness approach get completeness value for each time bin:
-    if(TimeBinApproach == "Close") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations * (sum(Weights[x$ComparableCharacters]) / sum(Weights)))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations)), 2, sum)
+    if(TimeBinApproach == "Close") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations * (sum(weights[x$ComparableCharacters]) / sum(weights)))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations)), 2, sum)
     
     # If using the Lloyd time bin completeness approach get completeness value for each time bin::
-    if(TimeBinApproach == "Lloyd") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(Weights[x$ComparableCharacters], ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(Weights, ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum)
+    if(TimeBinApproach == "Lloyd") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(weights[x$ComparableCharacters], ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(weights, ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum)
     
     # Get durations of edges in each time bin:
     TimeBinDurations <- apply(do.call(rbind, lapply(EdgeList, function(x) x$BinnedBranchDurations)), 2, sum)
@@ -946,7 +946,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
   }
 
   # Set global rate for output:
-  GlobalRate <- sum(unlist(lapply(EdgeList, function(x) sum(x$CharacterChanges[, "Steps"] * x$CharacterChanges[, "Weight"])))) / sum(unlist(lapply(EdgeList, function(x) sum(Weights[x$ComparableCharacters]) / sum(Weights))) * unlist(lapply(EdgeList, function(x) x$BranchDuration)))
+  GlobalRate <- sum(unlist(lapply(EdgeList, function(x) sum(x$CharacterChanges[, "Steps"] * x$CharacterChanges[, "Weight"])))) / sum(unlist(lapply(EdgeList, function(x) sum(weights[x$ComparableCharacters]) / sum(weights))) * unlist(lapply(EdgeList, function(x) x$BranchDuration)))
   
   # If performing Likelihood Ratio Test:
   if(LikelihoodTest == "LRT") {
@@ -1028,7 +1028,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
 # UncertaintyState = "missing"
 # InapplicableState = "missing"
 # TimeBinApproach = "Lloyd"
-# EnsureAllWeightsAreIntegers = FALSE
+# EnsureAllweightsAreIntegers = FALSE
 # estimate.all.nodes = FALSE
 # estimate.tip.values = FALSE
 # inapplicables.as.missing = FALSE

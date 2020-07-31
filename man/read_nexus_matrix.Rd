@@ -4,12 +4,12 @@
 \alias{read_nexus_matrix}
 \title{Reads in a morphological #NEXUS data file}
 \usage{
-read_nexus_matrix(File, EqualiseWeights = FALSE)
+read_nexus_matrix(File, Equaliseweights = FALSE)
 }
 \arguments{
 \item{File}{A file name specified by either a variable of mode character, or a double-quoted string.}
 
-\item{EqualiseWeights}{Optional that overrides the weights specified in the file to make all characters truly equally weighted.}
+\item{Equaliseweights}{Optional that overrides the weights specified in the file to make all characters truly equally weighted.}
 }
 \value{
 \item{Topper}{Contains any header text or step matrices and pertains to the entire file.}

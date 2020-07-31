@@ -1,10 +1,10 @@
-#' Align a phylogenetic matrix block
+#' Aligns a phylogenetic matrix block
 #'
 #' @description
 #'
-#' Given a block of taxa and characters aligns start of character block.
+#' Given a block of taxa and characters aligns text so each character block begins at same point.
 #'
-#' @param Block The raw input text.
+#' @param matrix.block The matrix block as raw input text.
 #'
 #' @details
 #'
@@ -52,18 +52,29 @@
 #' # contents of the clipboard.
 #'
 #' @export align_matrix_block
-align_matrix_block <- function(Block) {
+align_matrix_block <- function(matrix.block) {
   
   # Build matrix of input data:
-  Block <- lapply(as.list(strsplit(Block, "\n")[[1]]), function(y) {y <- unlist(strsplit(y, " ")); y <- y[c(1, length(y))]; y})
+  matrix.block <- lapply(as.list(strsplit(matrix.block, "\n")[[1]]), function(y) {y <- unlist(strsplit(y, " ")); y <- y[c(1, length(y))]; y})
   
   # Work out how many spaces to add:
-  BlockLength <- max(unlist(lapply(Block, function(z) nchar(z[1])))) + 2
+  block.length <- max(unlist(lapply(matrix.block, function(z) nchar(z[1])))) + 2
   
   # Add spaces to names to align block:
-  Block <- lapply(Block, function(z) {TaxonName <- strsplit(z[1], "")[[1]]; z[1] <- paste(c(TaxonName, rep(" ", BlockLength - length(TaxonName))), collapse = ""); z})
+  matrix.block <- lapply(matrix.block, function(z) {
+    
+    # Isolate taxon name:
+    taxon.name <- strsplit(z[1], "")[[1]]
+    
+    # Paste line together with correct number of spaces separating taxon name and characters:
+    z[1] <- paste(c(taxon.name, rep(" ", block.length - length(taxon.name))), collapse = "")
+    
+    # Return aligned text:
+    z
+  
+  })
   
   # Write output to clipboard ready to paste in a text (NEXUS) file:
-  clipr::write_clip(paste(unlist(lapply(Block, paste, collapse = "")), collapse = "\n"))
+  clipr::write_clip(paste(unlist(lapply(matrix.block, paste, collapse = "")), collapse = "\n"))
   
 }
