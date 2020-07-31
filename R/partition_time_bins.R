@@ -59,8 +59,8 @@ partition_time_bins <- function(NTimeBins, NPartitonsToInclude = "All") {
   # Collpase switches vector to just those of the reequired input size:
   SplitSwitches <- SplitSwitches[!is.na(match(PartitionSizes, NPartitonsToInclude))]
   
-  # Subfnction to generate parition positions:
-  PartitionPositions <- function(SwitchSequence) {
+  # Subfunction to generate partition positions:
+  set_partition_positions <- function(SwitchSequence) {
     
     # How long should the output vector be?:
     VectorLength <- nchar(SwitchSequence) + 1
@@ -91,7 +91,7 @@ partition_time_bins <- function(NTimeBins, NPartitonsToInclude = "All") {
   }
   
   # Convert split siwtch strings to lists of vectors of partition elements:
-  ParitionPositionList <- lapply(as.list(SplitSwitches), function(x) PartitionPositions(x))
+  ParitionPositionList <- lapply(as.list(SplitSwitches), function(x) set_partition_positions(x))
   
   # Return list of vectors of partition elements:
   return(ParitionPositionList)

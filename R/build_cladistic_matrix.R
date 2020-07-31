@@ -4,7 +4,7 @@
 #'
 #' Creates a morphological data file from a character-taxon matrix.
 #' 
-#' @param CharacterTaxonMatrix A Character-Taxon (columns-rows) matrix, with taxon names as rownames.
+#' @param character.taxon.matrix A Character-Taxon (columns-rows) matrix, with taxon names as rownames.
 #' @param header A scalar indicating any header text (defaults to an empty string: "").
 #' @param weights A vector specifying the weights used (if not specified defaults to 1).
 #' @param ordering A vector indicating whether characters are ordered ("ord") or unordered ("unord") (if no specified defaults to ordered).
@@ -32,29 +32,29 @@
 #' @examples
 #'
 #' # Create random 10-by-50 matrix:
-#' CharacterTaxonMatrix <- matrix(sample(c("0", "1", "0&1", NA, ""),
+#' character.taxon.matrix <- matrix(sample(c("0", "1", "0&1", NA, ""),
 #'   500, replace = TRUE), nrow = 10, dimnames =
 #'   list(apply(matrix(sample(LETTERS, 40,
 #'   replace = TRUE), nrow = 10), 1, paste,
 #'   collapse = ""), c()))
 #'
 #' # Reformat for use elsewhere in Claddis:
-#' build_cladistic_matrix(CharacterTaxonMatrix)
+#' build_cladistic_matrix(character.taxon.matrix)
 #'
 #' @export build_cladistic_matrix
-build_cladistic_matrix <- function(CharacterTaxonMatrix, header = "", weights = NULL, ordering = NULL, symbols = NULL, equalise.weights = FALSE, ignore.duplicate.taxa = FALSE) {
+build_cladistic_matrix <- function(character.taxon.matrix, header = "", weights = NULL, ordering = NULL, symbols = NULL, equalise.weights = FALSE, ignore.duplicate.taxa = FALSE) {
   
   # Check input is a matrix:
-  if (!is.matrix(CharacterTaxonMatrix)) stop("CharacterTaxonMatrix must be a matrix.")
+  if (!is.matrix(character.taxon.matrix)) stop("character.taxon.matrix must be a matrix.")
   
   # Check taxon names are supplied:
-  if (is.null(rownames(CharacterTaxonMatrix))) stop("CharacterTaxonMatrix must have rownames indicating taxa.")
+  if (is.null(rownames(character.taxon.matrix))) stop("character.taxon.matrix must have rownames indicating taxa.")
   
   # Check taxon names are unique (could cause downstream issues if not):
-  if (!ignore.duplicate.taxa) if (any(duplicated(rownames(CharacterTaxonMatrix)))) stop("Taxon names must be unique.")
+  if (!ignore.duplicate.taxa) if (any(duplicated(rownames(character.taxon.matrix)))) stop("Taxon names must be unique.")
   
   # Delete any column names (could cause downstream issues otherwise):
-  if (!is.null(colnames(CharacterTaxonMatrix))) colnames(CharacterTaxonMatrix) <- NULL
+  if (!is.null(colnames(character.taxon.matrix))) colnames(character.taxon.matrix) <- NULL
   
   
   
@@ -65,7 +65,7 @@ build_cladistic_matrix <- function(CharacterTaxonMatrix, header = "", weights = 
   
   
   # List any mystery character types:
-  mystery.characters <- setdiff(unique(unlist(strsplit(as.character(unique(as.vector(CharacterTaxonMatrix))), split = "&|/"))), c(as.character(0:31), NA))
+  mystery.characters <- setdiff(unique(unlist(strsplit(as.character(unique(as.vector(character.taxon.matrix))), split = "&|/"))), c(as.character(0:31), NA))
   
   
   
@@ -76,7 +76,7 @@ build_cladistic_matrix <- function(CharacterTaxonMatrix, header = "", weights = 
   if (length(mystery.characters) > 0) stop("Characters must either be the integers 0 to 31, NA for missing, & for polymorphisms, or / for uncertainties.")
 
   # Check supplied weights are correct length:
-  if (!is.null(weights) && length(weights) != ncol(CharacterTaxonMatrix)) stop("weights must have same length as number of characters in CharacterTaxonMatrix.")
+  if (!is.null(weights) && length(weights) != ncol(character.taxon.matrix)) stop("weights must have same length as number of characters in character.taxon.matrix.")
   
   # Check supplied weights are numeric:
   if (!is.null(weights) && !is.numeric(weights)) stop("weights must be numeric.")
@@ -85,13 +85,13 @@ build_cladistic_matrix <- function(CharacterTaxonMatrix, header = "", weights = 
   if (!is.null(weights) && any(weights < 0)) stop("weights must not be negative.")
   
   # Check supplied ordering is the correct length:
-  if (!is.null(ordering) && length(ordering) != ncol(CharacterTaxonMatrix)) stop("Ordering must have same length as number of characters in CharacterTaxonMatrix.")
+  if (!is.null(ordering) && length(ordering) != ncol(character.taxon.matrix)) stop("Ordering must have same length as number of characters in character.taxon.matrix.")
   
   # Check ordering is of unord or ord type only:
   if (!is.null(ordering) && length(setdiff(ordering, c("unord", "ord"))) > 0) stop("Ordering must be unord or ord only.")
   
   # Check symbols are of correct length:
-  if (!is.null(symbols) && length(symbols) >= (diff(range(as.numeric(unique(sort(unlist(strsplit(as.vector(CharacterTaxonMatrix), split = "&|/"))))))) + 1)) stop("Symbols must be at least as long as the range of character values in CharacterTaxonMatrix.")
+  if (!is.null(symbols) && length(symbols) >= (diff(range(as.numeric(unique(sort(unlist(strsplit(as.vector(character.taxon.matrix), split = "&|/"))))))) + 1)) stop("Symbols must be at least as long as the range of character values in character.taxon.matrix.")
 
   # Check symbols are single characters only:
   if (!is.null(symbols) && any(nchar(symbols) != 1)) stop("Symbols must be single characters only.")
@@ -100,16 +100,16 @@ build_cladistic_matrix <- function(CharacterTaxonMatrix, header = "", weights = 
   if (length(header) != 1)  stop("Header text must be a single value.")
   
   # If no ordering set default to ordered.
-  if (is.null(ordering)) ordering <- rep("ord", ncol(CharacterTaxonMatrix))
+  if (is.null(ordering)) ordering <- rep("ord", ncol(character.taxon.matrix))
 
   # If no weights are set:
-  if (is.null(weights)) weights <- rep(1, ncol(CharacterTaxonMatrix))
+  if (is.null(weights)) weights <- rep(1, ncol(character.taxon.matrix))
 
   # Calculate minimum values:
-  min.vals <- apply(CharacterTaxonMatrix, 2, function(x) sort(as.numeric(unlist(strsplit(x, split = "&|/"))), decreasing = FALSE)[1])
+  min.vals <- apply(character.taxon.matrix, 2, function(x) sort(as.numeric(unlist(strsplit(x, split = "&|/"))), decreasing = FALSE)[1])
   
   # Calculate maximum values:
-  max.vals <- apply(CharacterTaxonMatrix, 2, function(x) sort(as.numeric(unlist(strsplit(x, split = "&|/"))), decreasing = TRUE)[1])
+  max.vals <- apply(character.taxon.matrix, 2, function(x) sort(as.numeric(unlist(strsplit(x, split = "&|/"))), decreasing = TRUE)[1])
   
   # If any NAs in min.vals replace with zero:
   if (any(is.na(min.vals))) min.vals[is.na(min.vals)] <- 0
@@ -150,7 +150,7 @@ build_cladistic_matrix <- function(CharacterTaxonMatrix, header = "", weights = 
     weights <- prod(unique(round(1 / weights))) * weights
     
     # Sub function to get all factors of an integer (stolen from: "http://stackoverflow.com/questions/6424856/r-function-for-returning-all-factors"):
-    get.all.factors <- function(x) {
+    get_all_factors <- function(x) {
         
       # Ensure input is an integer:
       x <- as.integer(x)
@@ -167,7 +167,7 @@ build_cladistic_matrix <- function(CharacterTaxonMatrix, header = "", weights = 
     }
     
     # Get factors of every weight currently applied:
-    out <- sort(unlist(apply(matrix(unique(weights)), 1, get.all.factors)))
+    out <- sort(unlist(apply(matrix(unique(weights)), 1, get_all_factors)))
     
     # As long as the maximum possible factor is greater than 1:
     while(max(rle(out)$values[rle(out)$lengths == length(unique(weights))]) > 1) {
@@ -176,7 +176,7 @@ build_cladistic_matrix <- function(CharacterTaxonMatrix, header = "", weights = 
       weights <- weights / max(rle(out)$values[rle(out)$lengths == length(unique(weights))])
         
       # Update factors for new weights:
-      out <- sort(unlist(apply(matrix(unique(weights)), 1, get.all.factors)))
+      out <- sort(unlist(apply(matrix(unique(weights)), 1, get_all_factors)))
         
     }
     
@@ -189,7 +189,7 @@ build_cladistic_matrix <- function(CharacterTaxonMatrix, header = "", weights = 
   Characters <- list(Symbols = symbols, Missing = "?", Gap = "-")
   
   # Build Matrix_1 list:
-  Matrix_1 <- list(BlockName = NA, Datatype = "STANDARD", Matrix = CharacterTaxonMatrix, Ordering = ordering, weights = weights, MinVals = min.vals, MaxVals = max.vals, Characters = Characters)
+  Matrix_1 <- list(BlockName = NA, Datatype = "STANDARD", Matrix = character.taxon.matrix, Ordering = ordering, weights = weights, MinVals = min.vals, MaxVals = max.vals, Characters = Characters)
   
   # Assimilate into output:
   result <- list(Topper = Topper, Matrix_1 = Matrix_1)

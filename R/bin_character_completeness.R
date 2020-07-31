@@ -45,7 +45,7 @@ bin_character_completeness <- function(cladistic.matrix, time.tree, time.bins, p
   # - Allow binning in other ways. E.g., by character grouping.
   
   # Subfunction for getting missing and inapplicable characters:
-  MissingAndInapplicables <- function(x) {
+  find_missing_and_inapplicable <- function(x) {
     
     # Get all inapplicables:
     x.inapplicables <- apply(apply(x, 2, '==', ""), 2, as.numeric)
@@ -77,7 +77,7 @@ bin_character_completeness <- function(cladistic.matrix, time.tree, time.bins, p
   missing.values <- rep("", n.characters)
   
   # If there are missing or inapplicable values collapse row numbers for them with double percentage:
-  if (any(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), is.na))) || any(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), '==', "")))) missing.values <- unname(unlist(lapply(lapply(lapply(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), MissingAndInapplicables), apply, 2, '==', 1), apply, 2, which), lapply, paste, collapse = "%%")))
+  if (any(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), is.na))) || any(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), '==', "")))) missing.values <- unname(unlist(lapply(lapply(lapply(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), find_missing_and_inapplicable), apply, 2, '==', 1), apply, 2, which), lapply, paste, collapse = "%%")))
   
   # Set up matrix to store edge lengths in each character bin (columns) per character (rows):
   edge.lengths.in.bins.by.character <- matrix(0, ncol = length(time.bins) - 1, nrow = n.characters)

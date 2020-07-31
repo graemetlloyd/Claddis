@@ -5,7 +5,7 @@
 \title{Creates a morphological data file from a matrix}
 \usage{
 build_cladistic_matrix(
-  CharacterTaxonMatrix,
+  character.taxon.matrix,
   header = "",
   weights = NULL,
   ordering = NULL,
@@ -15,7 +15,7 @@ build_cladistic_matrix(
 )
 }
 \arguments{
-\item{CharacterTaxonMatrix}{A Character-Taxon (columns-rows) matrix, with taxon names as rownames.}
+\item{character.taxon.matrix}{A Character-Taxon (columns-rows) matrix, with taxon names as rownames.}
 
 \item{header}{A scalar indicating any header text (defaults to an empty string: "").}
 
@@ -44,14 +44,14 @@ NB: Currently the function cannot deal directly with step matrices or continuous
 \examples{
 
 # Create random 10-by-50 matrix:
-CharacterTaxonMatrix <- matrix(sample(c("0", "1", "0&1", NA, ""),
+character.taxon.matrix <- matrix(sample(c("0", "1", "0&1", NA, ""),
   500, replace = TRUE), nrow = 10, dimnames =
   list(apply(matrix(sample(LETTERS, 40,
   replace = TRUE), nrow = 10), 1, paste,
   collapse = ""), c()))
 
 # Reformat for use elsewhere in Claddis:
-build_cladistic_matrix(CharacterTaxonMatrix)
+build_cladistic_matrix(character.taxon.matrix)
 
 }
 \seealso{

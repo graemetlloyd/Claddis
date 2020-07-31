@@ -34,7 +34,7 @@
 prune_cladistic_matrix <- function(cladistic.matrix, blocks2prune = c(), characters2prune = c(), taxa2prune = c(), removeinvariant = FALSE) {
   
   # Subfunction to find length of character types for each character (i.e., unique values excluding polymorphisms but included inapplicables):
-  LengthFinder <- function(x) {
+  find_length <- function(x) {
     
     # Convert each column of matrix to a list of numeric values:
     x <- lapply(lapply(lapply(lapply(lapply(lapply(apply(x, 2, as.list), unlist), strsplit, split = "&|/"), unlist), unique), sort), length)
@@ -119,7 +119,7 @@ prune_cladistic_matrix <- function(cladistic.matrix, blocks2prune = c(), charact
   if (removeinvariant) {
     
     # Find any invariant characters:
-    InvariantsAsList <- lapply(lapply(lapply(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), LengthFinder), unlist), '<', 1), which)
+    InvariantsAsList <- lapply(lapply(lapply(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), find_length), unlist), '<', 1), which)
     
     # If there are invariant characters:
     if (length(unlist(InvariantsAsList)) > 0) {

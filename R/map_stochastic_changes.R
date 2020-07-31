@@ -155,7 +155,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   for(i in 1:length(CharacterList)) CharacterList[[i]]$FullTree <- Tree
   
   # Subfunction to perform polymorphism and uncertainty changes:
-  EditPolymorphisms <- function(x, polymorphism.behaviour, uncertainty.behaviour) {
+  edit_polymorphisms <- function(x, polymorphism.behaviour, uncertainty.behaviour) {
     
     # Isolate tip states list:
     TipStateList <- x$TipStates
@@ -184,7 +184,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   }
   
   # Alter polymorphisms and uncertainties according to polymorphism.behaviour and uncertainty.behaviour settings:
-  CharacterList <- lapply(CharacterList, EditPolymorphisms, polymorphism.behaviour = polymorphism.behaviour, uncertainty.behaviour = uncertainty.behaviour)
+  CharacterList <- lapply(CharacterList, edit_polymorphisms, polymorphism.behaviour = polymorphism.behaviour, uncertainty.behaviour = uncertainty.behaviour)
   
   # Create pruned tipstates by removing all missing values:
   CharacterList <- lapply(CharacterList, function(x) {x$PrunedTipStates <- lapply(x$TipStates, function(y) y[!is.na(y)]); x})
@@ -193,13 +193,13 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   CharacterList <- lapply(CharacterList, function(x) {Ranges <- range(as.numeric(unlist(strsplit(unlist(x$PrunedTipStates), split = "&")))); x$MinVal <- Ranges[1]; x$MaxVal <- Ranges[2]; x})
   
   # Subfunction to form tip states matrices ready for simmap function:
-  BuildTipStateMatrices <- function(x) {
+  build_tip_state_matrices <- function(x) {
     
     # Isolate pruned tip states list:
     PrunedTipStateList <- x$PrunedTipStates
     
     # Subfunction to build tip state matrix:
-    BuildTipStateMatrix <- function(y, MinVal, MaxVal) {
+    build_tip_state_matrix <- function(y, MinVal, MaxVal) {
       
       # Create empty tip state matrix:
       TipStateMatrix <- matrix(0, nrow = length(y), ncol = length(MinVal:MaxVal), dimnames = list(names(y), as.character(MinVal:MaxVal)))
@@ -225,7 +225,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     }
     
     # Build tip state matrices:
-    PrunedTipStateList <- lapply(PrunedTipStateList, BuildTipStateMatrix, MinVal = x$MinVal, MaxVal = x$MaxVal)
+    PrunedTipStateList <- lapply(PrunedTipStateList, build_tip_state_matrix, MinVal = x$MinVal, MaxVal = x$MaxVal)
     
     # Overwrite pruned tip states with tip state matrices:
     x$PrunedTipStates <- PrunedTipStateList
@@ -236,10 +236,10 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   }
   
   # Build tip state matrices:
-  CharacterList <- lapply(CharacterList, BuildTipStateMatrices)
+  CharacterList <- lapply(CharacterList, build_tip_state_matrices)
   
   # Subfunction to build character model:
-  BuildCharacterModel <- function(x) {
+  build_character_model <- function(x) {
     
     # If character is ordered:
     if (x$Ordering == "ord") {
@@ -272,13 +272,13 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   }
   
   # Build character models for each character:
-  CharacterList <- lapply(CharacterList, BuildCharacterModel)
+  CharacterList <- lapply(CharacterList, build_character_model)
   
   # Get total tips in tree:
   TipsInTree <- ape::Ntip(Tree)
 
   # Subfunction to prune tree to just tips with data:
-  PruneTree <- function(x) {
+  prune_tree <- function(x) {
     
     # Find any tips to drop:
     TipsToDrop <- setdiff(x$FullTree$tip.label, rownames(x$PrunedTipStates[[1]]))
@@ -342,10 +342,10 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   }
   
   # Get pruned trees with only tips from pruned tip states returned:
-  CharacterList <- lapply(CharacterList, PruneTree)
+  CharacterList <- lapply(CharacterList, prune_tree)
   
   # Subfunction to get node ages for pruned tree:
-  GetPruneddate_nodes <- function(x) {
+  date_pruned_nodes <- function(x) {
     
     # Get number of (scorable) tips for pruned tree:
     NumberOfTips <- lapply(x$PrunedTipStates, nrow)[[1]]
@@ -381,10 +381,10 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   }
   
   # Get node ages for pruned tree:
-  CharacterList <- lapply(CharacterList, GetPruneddate_nodes)
+  CharacterList <- lapply(CharacterList, date_pruned_nodes)
   
   # Subfunction to perform edge matches between pruned and full tree:
-  PerformEdgeMatches <- function(x, tree) {
+  match_edges <- function(x, tree) {
     
     # Get number of (scorable) tips for pruned tree:
     NumberOfTips <- lapply(x$PrunedTipStates, nrow)[[1]]
@@ -454,15 +454,15 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   }
   
   # Get edge matches between pruned and full trees (for recording true edge changes later):
-  CharacterList <- lapply(CharacterList, PerformEdgeMatches, tree = Tree)
+  CharacterList <- lapply(CharacterList, match_edges, tree = Tree)
   
   # Subfunction to get edge lengths in bins (usable later for rate calculations):
-  GetEdgeLengthsInBins <- function(x) {
+  get_binned_edge_lengths <- function(x) {
     
     # Set temporary tree as full tree (as modifying branch lengths but will rant to retain these later:
     TemporaryTree <- x$FullTree
     
-    # Find any branch lengtsh on full tree to set as zero (effectively excluding them from the edge lengths as they correspond to missing values):
+    # Find any branch lengths on full tree to set as zero (effectively excluding them from the edge lengths as they correspond to missing values):
     BranchesToSetAsZeroes <- setdiff(1:nrow(TemporaryTree$edge), unname(unlist(x$PrunedToFullTreeEdgeMatches)))
     
     # If there are nranches to set lengtsh to zero then do so and store:
@@ -477,10 +477,10 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   }
   
   # Get edge lengths in bins:
-  CharacterList <- lapply(CharacterList, GetEdgeLengthsInBins)
+  CharacterList <- lapply(CharacterList, get_binned_edge_lengths)
   
   # Subfunction to perform actual stochastic character maps:
-  BuildStochasticCharacterMapTrees <- function(x) {
+  build_character_map_trees <- function(x) {
     
     # Get number of (scorable) tips for pruned tree:
     NumberOfTips <- lapply(x$PrunedTipStates, nrow)[[1]]
@@ -488,8 +488,8 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     # If exactly one tip:
     if (NumberOfTips == 1) {
       
-      # Subfunction to generate stochastic character map like output but for the single taon case:
-      BuildOneTaxonStochasticCharacterMap <- function(y, tree) {
+      # Subfunction to generate stochastic character map like output but for the single taxon case:
+      build_single_taxon_map <- function(y, tree) {
         
         # Set output as the tree initially:
         Output <- tree
@@ -506,7 +506,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
       }
       
       # Perform stochastic character mapping and store output:
-      x$StochasticCharacterMapTrees <- lapply(x$PrunedTipStates, BuildOneTaxonStochasticCharacterMap, tree = x$PrunedTree)
+      x$StochasticCharacterMapTrees <- lapply(x$PrunedTipStates, build_single_taxon_map, tree = x$PrunedTree)
       
     }
     
@@ -514,7 +514,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     if (NumberOfTips == 2) {
       
       # Subfunction to generate stochastic character map like output but for the two taxon case:
-      BuildTwoTaxonStochasticCharacterMap <- function(y, tree) {
+      build_two_taxon_map <- function(y, tree) {
         
         # Set output as the tree initially:
         Output <- tree
@@ -580,7 +580,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
       }
       
       # Perform stochastic character mapping and store output:
-      x$StochasticCharacterMapTrees <- lapply(x$PrunedTipStates, BuildTwoTaxonStochasticCharacterMap, tree = x$PrunedTree)
+      x$StochasticCharacterMapTrees <- lapply(x$PrunedTipStates, build_two_taxon_map, tree = x$PrunedTree)
       
     }
     
@@ -588,7 +588,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     if (NumberOfTips > 2) {
       
       # Subfunction to perform stochastic character mapping:
-      GetStochasticCharacterMapTree <- function(y, tree, model) {
+      build_map_tree <- function(y, tree, model) {
         
         # If character is constant (invariant):
         if (ncol(y) == 1) {
@@ -613,7 +613,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
       }
       
       # Perform stochastic character mapping and store output:
-      x$StochasticCharacterMapTrees <- lapply(x$PrunedTipStates, GetStochasticCharacterMapTree, tree = x$PrunedTree, model = x$CharacterModel)
+      x$StochasticCharacterMapTrees <- lapply(x$PrunedTipStates, build_map_tree, tree = x$PrunedTree, model = x$CharacterModel)
       
     }
     
@@ -623,10 +623,10 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   }
   
   # Generate initial stochastic character map trees:
-  CharacterList <- lapply(CharacterList, BuildStochasticCharacterMapTrees)
+  CharacterList <- lapply(CharacterList, build_character_map_trees)
   
   # Subfunction to map stochastic chracter maps of pruned tree to full trees:
-  MapStochasticCharactersToFullTree <- function(x) {
+  map_characters_to_full_tree <- function(x) {
     
     # Only proceed if pruned tree is actually smaller than full tree (otherwise data are fine as is):
     if (lapply(x$PrunedTipStates, nrow)[[1]] < ape::Ntip(x$FullTree)) {
@@ -802,16 +802,16 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   }
   
   # Map stochastic characters to full tree in preparation for recording changes:
-  CharacterList <- lapply(CharacterList, MapStochasticCharactersToFullTree)
+  CharacterList <- lapply(CharacterList, map_characters_to_full_tree)
 
   # Subfunction to extract character changes matrix from trees:
-  ReformatCharacterChanges <- function(x) {
+  reformat_changes <- function(x) {
     
     # Find the root edge for the tree:
     RootEdge <- match(ape::Ntip(x$FullTree) + 1, x$FullTree$edge[, 1])
     
     # Subfunction to get character changes and root state:
-    ExtractCharacterChanges <- function(y) {
+    extract_changes <- function(y) {
       
       # Get root state:
       RootState <- as.numeric(names(y$maps[[RootEdge]][1]))
@@ -896,7 +896,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     }
     
     # Get root and changes for each stochastic character map and store:
-    x$StochasticCharacterChanges <- lapply(x$StochasticCharacterMapTrees, ExtractCharacterChanges)
+    x$StochasticCharacterChanges <- lapply(x$StochasticCharacterMapTrees, extract_changes)
     
     # Return output:
     return(x)
@@ -904,10 +904,10 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   }
   
   # Get root state and character changes for each stochastic character map:
-  CharacterList <- lapply(CharacterList, ReformatCharacterChanges)
+  CharacterList <- lapply(CharacterList, reformat_changes)
   
   # Subfunction to collapse changes across simulations into a single matrix:
-  CompileChangesIntoSingleMatrix <- function(x) {
+  compile_changes_as_matrix <- function(x) {
     
     # Get simulation numbers (will be new column in matrix):
     SimulationNumbers <- unlist(mapply(rep, 1:NSimulations, unlist(lapply(x$StochasticCharacterChanges, function(y) nrow(y)))))
@@ -930,7 +930,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   }
   
   # Collapse stochastic character matrices to single matrix for each character:
-  CharacterList <- lapply(CharacterList, CompileChangesIntoSingleMatrix)
+  CharacterList <- lapply(CharacterList, compile_changes_as_matrix)
   
   # Compile all state changes into a single matrix:
   AllStateChanges <- cbind(matrix(unlist(mapply(rep, 1:ncol(MatrixBlock), lapply(CharacterList, function(x) nrow(x$StochasticCharacterChanges))))), do.call(rbind, lapply(CharacterList, function(x) x$StochasticCharacterChanges)))

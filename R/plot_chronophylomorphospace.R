@@ -84,7 +84,7 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
   pcoa_data <- pcoa_data$vectors
 
   # Little function to set limits for plotting (make it cube-like):
-  limits <- function(x, s) {
+  set_plot_limits <- function(x, s) {
       
     # Get range of x:
     r <- range(x)
@@ -111,9 +111,9 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
 
   # Make empty plot:
   rgl::plot3d(pcoa_data, type = "n", 
-	xlim = limits(pcoa_data[, x_axis], 1.5), 
-	ylim = limits(pcoa_data[, y_axis], 1.5), 
-	zlim = limits(z_axis, 0), 
+	xlim = set_plot_limits(pcoa_data[, x_axis], 1.5),
+	ylim = set_plot_limits(pcoa_data[, y_axis], 1.5),
+	zlim = set_plot_limits(z_axis, 0), 
 	asp = c(1, 1, 0.5), 
 	xlab = xlab, ylab = ylab, 
 	zlab = "Time (Ma)", 

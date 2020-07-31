@@ -42,7 +42,7 @@
 write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FALSE) {
   
   # Subfunction to convert matrices back to symbols, missing and gap characters:
-  MatrixConversion <- function(DataMatrix) {
+  convert_matrix <- function(DataMatrix) {
     
     # If there are missing characters replace with missing symbol:
     if (any(is.na(DataMatrix$Matrix))) DataMatrix$Matrix[is.na(DataMatrix$Matrix)] <- "?"
@@ -147,7 +147,7 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
   Gap <- unlist(lapply(lapply(DataBlocks, '[[', "Characters"), '[[', "Gap"))
   
   # Conver matrices to vectors of text strings:
-  DataBlocksAsTextStrings <- lapply(DataBlocks, MatrixConversion)
+  DataBlocksAsTextStrings <- lapply(DataBlocks, convert_matrix)
   
   # Set up header block (returns empty string if nothing there):
   HeaderBlock <- ifelse(length(cladistic.matrix$Topper$Header) > 0, paste("'", cladistic.matrix$Topper$Header, "'\n", sep = ""), "")

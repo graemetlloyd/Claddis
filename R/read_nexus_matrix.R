@@ -60,7 +60,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
   # ADD ABILITY TO DEAL WITH RANGES FOR CONTINUOUS DATA
   
   # Line formatting function to be used in lapply below to deal with polymorphic characters:
-  LineFormatter <- function(x, direction = "in") {
+  format_lines <- function(x, direction = "in") {
     
     # Split current line by character:
     CurrentString <- strsplit(x, split = "")[[1]]
@@ -114,7 +114,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
   }
   
   # Subfunction to extract ordering information:
-  AssumptionExtractor <- function(assumptionline) {
+  extract_assumptions <- function(assumptionline) {
     
     # Reformat as a list:
     x <- lapply(lapply(as.list(gsub(";", "", strsplit(assumptionline, split = ", ")[[1]])), strsplit, split = ": "), unlist)
@@ -126,7 +126,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
     if (length(grep("-", Numbers)) > 0) {
       
       # Subfunction for unpacking ranges denoted by hyphens:
-      RangeUnpacker <- function(Numbers) {
+      unpack_ranges <- function(Numbers) {
         
         # Whilst hyphens remain in the data:
         while(length(grep("-", Numbers)) > 0) {
@@ -148,7 +148,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
       }
       
       # Apply unpacking function to data:
-      Numbers <- lapply(Numbers, RangeUnpacker)
+      Numbers <- lapply(Numbers, unpack_ranges)
       
     # If there are no hyphens:
     } else {
@@ -176,7 +176,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
   }
   
   # Subfunction to find range of states for each character:
-  RangeFinder <- function(x) {
+  find_ranges <- function(x) {
     
     # Convert each column of matrix to a list of numeric values:
     x <- lapply(lapply(lapply(lapply(lapply(apply(x, 2, as.list), unlist), strsplit, split = "&|/"), unlist), as.numeric), sort)
@@ -193,7 +193,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
   }
   
   # Sub function to get all factors of an integer (stolen from: "http://stackoverflow.com/questions/6424856/r-function-for-returning-all-factors"):
-  GetAllFactors <- function(x) {
+  get_all_factors <- function(x) {
     
     # Ensure input is an integer:
     x <- as.integer(x)
@@ -517,7 +517,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
       CurrentBlock <- as.list(matrix(unlist(strsplit(CurrentBlock, split = " ")), ncol = 2, nrow = NTax, byrow = TRUE)[, 2])
       
       # Convert data block into individual character vectors:
-      CurrentBlock <- lapply(CurrentBlock, LineFormatter, direction = "out")
+      CurrentBlock <- lapply(CurrentBlock, format_lines, direction = "out")
       
       # Add taxon names to list:
       names(CurrentBlock) <- TaxonNames
@@ -600,7 +600,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
   if (!(all(NChars > 0) && NTax > 0)) stop("One or more matrix blocks have no dimensions (i.e., zero characters or taxa).")
   
   # Function to get symbols from matrix block:
-  GetSymbols <- function(X) {
+  get_symbols <- function(X) {
     
     # If symbols are specified in the file:
     if (length(grep("symbols", X, ignore.case = TRUE)) > 0) {
@@ -663,10 +663,10 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
   }
   
   # Get symbols from each block:
-  Symbols <- lapply(MatrixBlockList, GetSymbols)
+  Symbols <- lapply(MatrixBlockList, get_symbols)
   
   # Get missing character function:
-  GetMissing <- function(X) {
+  get_missing <- function(X) {
     
     # If the missing character is specified:
     if (length(grep("missing", X, ignore.case = TRUE)) > 0) {
@@ -688,10 +688,10 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
   }
   
   # Get missing symbol(s):
-  Missing <- lapply(MatrixBlockList, GetMissing)
+  Missing <- lapply(MatrixBlockList, get_missing)
   
   # Get gap character function:
-  GetGap <- function(X) {
+  get_gap <- function(X) {
     
     # If the gap character is specified:
     if (length(grep("gap", X[1:grep("MATRIX", X)[1]], ignore.case = TRUE)) > 0) {
@@ -713,7 +713,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
   }
   
   # Get gap symbol(s):
-  Gap <- lapply(MatrixBlockList, GetGap)
+  Gap <- lapply(MatrixBlockList, get_gap)
   
   # Find first line of each matrix:
   MatrixStartLines <- lapply(lapply(lapply(MatrixBlockList, '==', "MATRIX"), which), '+', 1)
@@ -789,7 +789,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
       CurrentBlock <- as.list(CurrentBlock)
       
       # Apply line formatting function to all rows:
-      CurrentBlock <- lapply(CurrentBlock, LineFormatter, direction = "in")
+      CurrentBlock <- lapply(CurrentBlock, format_lines, direction = "in")
       
       # If any rows have too many or too few characters:
       if (any(lapply(CurrentBlock, length) != NChars[[i]])) {
@@ -903,7 +903,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
   }
   
   # Get minimum and maximum values for each character in each matrix:
-  MinMaxMatrixList <- lapply(MatrixBlockList, RangeFinder)
+  MinMaxMatrixList <- lapply(MatrixBlockList, find_ranges)
   
   # Now min-max is known need to check for continuous characters to amek sure default weights are all effectively 1:
   if (any(names(MatrixBlockList) == "CONTINUOUS")) {
@@ -970,7 +970,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
           OrderingInformation <- strsplit(TypesetLines[LabelMatch], split = CurrentLabelText, fixed = TRUE)[[1]][2]
           
           # Extract ordering information:
-          OrderingExtracted <- AssumptionExtractor(OrderingInformation)
+          OrderingExtracted <- extract_assumptions(OrderingInformation)
           
           # Store ordering information for block in ordering of block (i.e., numbered from 1 in block not 1 in whole NEXUS file):
           Ordering[[i]] <- OrderingExtracted
@@ -986,7 +986,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
       OrderingInformation <- strsplit(TypesetLines, split = "UNTITLED=", fixed = TRUE)[[1]][2]
       
       # Extract ordering information:
-      OrderingExtracted <- AssumptionExtractor(OrderingInformation)
+      OrderingExtracted <- extract_assumptions(OrderingInformation)
       
       # Get lengths of ordering for each block:
       OrderingLengths <- unlist(lapply(Ordering, length))
@@ -1049,7 +1049,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
           weightsInformation <- strsplit(weightsetLines[LabelMatch], split = CurrentLabelText, fixed = TRUE)[[1]][2]
           
           # Extract weights information:
-          weightsExtracted <- AssumptionExtractor(weightsInformation)
+          weightsExtracted <- extract_assumptions(weightsInformation)
           
           # Store weights information for block in weights of block (i.e., numbered from 1 in block not 1 in whole NEXUS file):
           weights[[i]] <- weightsExtracted
@@ -1065,7 +1065,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
       weightsInformation <- strsplit(weightsetLines, split = "UNTITLED=", fixed = TRUE)[[1]][2]
       
       # Extract weights information:
-      weightsExtracted <- AssumptionExtractor(weightsInformation)
+      weightsExtracted <- extract_assumptions(weightsInformation)
       
       # Get lengths of weights for each block:
       weightsLengths <- unlist(lapply(weights, length))
@@ -1145,7 +1145,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
     Startingweights <- lapply(Startingweights, function(x) x * ProductWeight)
     
     # Get factors of every weight currently applied:
-    AllFactorsCombined <- sort(unlist(lapply(as.list(unique(unlist(Startingweights))), GetAllFactors)))
+    AllFactorsCombined <- sort(unlist(lapply(as.list(unique(unlist(Startingweights))), get_all_factors)))
     
     # Get largest common factor of all weights:
     LargestCommonFactor <- max(rle(AllFactorsCombined)$values[rle(AllFactorsCombined)$lengths == length(unique(unlist(Startingweights)))])
@@ -1157,7 +1157,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
       Startingweights <- lapply(Startingweights, function(x) x / LargestCommonFactor)
       
       # Get factors of every weight currently applied:
-      AllFactorsCombined <- sort(unlist(lapply(as.list(unique(unlist(Startingweights))), GetAllFactors)))
+      AllFactorsCombined <- sort(unlist(lapply(as.list(unique(unlist(Startingweights))), get_all_factors)))
       
       # Get largest common factor of all weights:
       LargestCommonFactor <- max(rle(AllFactorsCombined)$values[rle(AllFactorsCombined)$lengths == length(unique(unlist(Startingweights)))])

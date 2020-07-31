@@ -164,7 +164,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   if (estimate.all.nodes) {
     
     # Subfunction to fill missing values (and inapplicables if desired):
-    FillMissing <- function(TipStates) {
+    fill_missing <- function(TipStates) {
       
       # Find which rows correspond to missing states:
       MissingRows <- which(is.na(TipStates$TipStates))
@@ -186,12 +186,12 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
     }
     
     # Apply fill missing function across all characters:
-    DataAsList <- lapply(DataAsList, FillMissing)
+    DataAsList <- lapply(DataAsList, fill_missing)
     
   }
   
   # Subfunction to prune tips with missing or inapplicable values:
-  PruneTips <- function(x) {
+  prune_tips <- function(x) {
     
     # Find all missing or inapplicable value tip names:
     Missing <- names(sort(c(which(x$TipStates == ""), which(is.na(x$TipStates)))))
@@ -219,10 +219,10 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   }
   
   # Prune out missing and inapplicable tips:
-  DataAsList <- lapply(DataAsList, PruneTips)
+  DataAsList <- lapply(DataAsList, prune_tips)
   
   # Subfunction to build tip state matrices:
-  TipStateVectorToMatrix <- function(x) {
+  convert_tip_states_to_matrix <- function(x) {
     
     # As long asthere is at least one tip state:
     if (length(x$TipStates) > 0) {
@@ -288,10 +288,10 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   }
   
   # Reformat tip states ready for ancestral estimation:
-  DataAsList <- lapply(DataAsList, TipStateVectorToMatrix)
+  DataAsList <- lapply(DataAsList, convert_tip_states_to_matrix)
   
-  # Subfunction to build tip state matrices:
-  ModelBuilder <- function(x) {
+  # Subfunction to build character model:
+  build_character_model <- function(x) {
     
     # Set default model to equal rates (works for all binary or unordered characters):
     x$Model <- "ER"
@@ -316,10 +316,10 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   }
   
   # Add ancestral state model for each character:
-  DataAsList <- lapply(DataAsList, ModelBuilder)
+  DataAsList <- lapply(DataAsList, build_character_model)
 
   # Subfunction to get ancestral states:
-  GetAncStates <- function(x, estimate.tip.values, threshold) {
+  estimate_ancestral_state <- function(x, estimate.tip.values, threshold) {
     
     # As long as there is a tree:
     if (!is.null(x$Tree)) {
@@ -369,7 +369,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   }
   
   # Get ancestral states for each character:
-  DataAsList <- lapply(DataAsList, GetAncStates, estimate.tip.values, threshold)
+  DataAsList <- lapply(DataAsList, estimate_ancestral_state, estimate.tip.values, threshold)
   
   # Get Newick strings of all sampled subtrees (to use to avoid redundancy in tree node mapping):
   NewickStrings <- unlist(lapply(DataAsList, function(x) ifelse(is.null(x$Tree), NA, ape::write.tree(x$Tree))))
@@ -384,7 +384,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   if (inherits(UniqueTrees, what = "phylo")) UniqueTrees <- list(UniqueTrees)
   
   # Subfunction map nodes from pruned tree to full tree:
-  MapPrunedTreeNodesToFullTreeNodes <- function(tree, fulltree) {
+  map_to_full_tree <- function(tree, fulltree) {
     
     # Get number of tips of pruned tree:
     NTips <- ape::Ntip(tree)
@@ -418,7 +418,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   }
   
   # Get pruned node to full node for each unique tree:
-  NodeMapsList <- lapply(UniqueTrees, MapPrunedTreeNodesToFullTreeNodes, fulltree = time.tree)
+  NodeMapsList <- lapply(UniqueTrees, map_to_full_tree, fulltree = time.tree)
   
   # Build out for all trees (adds in any duplicated trees):
   NodeMapsList <- NodeMapsList[match(NewickStrings, UniqueNewickStrings)]

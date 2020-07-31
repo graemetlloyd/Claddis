@@ -84,7 +84,7 @@ safe_taxonomic_reduction <- function(cladistic.matrix) {
   cladistic.matrix[[2]]$Matrix <- cladistic.matrix[[2]]$Matrix[order(apply(apply(cladistic.matrix[[2]]$Matrix, 1, is.na), 2, sum), decreasing = TRUE), ]
   
   # Subfunction to be used by lapply to check downwards (look at more complete taxa only) for safely removable taxa:
-  CheckDownwardForMatches <- function(rownumber, cladistic.matrix) {
+  check_downward_for_matches <- function(rownumber, cladistic.matrix) {
     
     # First find which characters are not scored as missing in current taxon:
     NonMissingCharacters <- !is.na(cladistic.matrix[[2]]$Matrix[rownumber, ])
@@ -127,7 +127,7 @@ safe_taxonomic_reduction <- function(cladistic.matrix) {
   }
   
   # Get any safely removable taxa and their senior parents:
-  SafeToRemove <- lapply(as.list(1:(nrow(cladistic.matrix[[2]]$Matrix) - 1)), CheckDownwardForMatches, cladistic.matrix = cladistic.matrix)
+  SafeToRemove <- lapply(as.list(1:(nrow(cladistic.matrix[[2]]$Matrix) - 1)), check_downward_for_matches, cladistic.matrix = cladistic.matrix)
   
   # If no taxa can be safely deleted:
   if (all(unlist(lapply(SafeToRemove, is.null)))) {
