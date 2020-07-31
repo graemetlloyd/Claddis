@@ -26,10 +26,10 @@ Takes the \code{character.changes} output from \link{test_rates} and plots it on
 set.seed(17)
 
 # Generate a random tree for the Michaux data set:
-tree <- rtree(nrow(Michaux1989$matrix_1$Matrix))
+tree <- rtree(nrow(Michaux1989$matrix_1$matrix))
 
 # Update taxon names to match those in the data matrix:
-tree$tip.label <- rownames(Michaux1989$matrix_1$Matrix)
+tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
 tree$root.time <- max(diag(vcv(tree)))

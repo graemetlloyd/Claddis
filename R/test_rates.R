@@ -163,10 +163,10 @@
 #' set.seed(17)
 #' 
 #' # Generate a random tree for the Michaux data set:
-#' tree <- rtree(nrow(Michaux1989$matrix_1$Matrix))
+#' tree <- rtree(nrow(Michaux1989$matrix_1$matrix))
 #' 
 #' # Update taxon names to match those in the data matrix:
-#' tree$tip.label <- rownames(Michaux1989$matrix_1$Matrix)
+#' tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
 #' 
 #' # Set root time by making youngest taxon extant:
 #' tree$root.time <- max(diag(vcv(tree)))
@@ -253,7 +253,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
   EdgeNumbers <- 1:nrow(tree$edge)
   
   # Get character numbers:
-  CharacterNumbers <- 1:sum(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), ncol)))
+  CharacterNumbers <- 1:sum(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"), ncol)))
   
   # Ensure time bins are in correct order:
   TimeBins <- sort(unique(TimeBins), decreasing = TRUE)
@@ -429,7 +429,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
   AncestralStates <- estimate_ancestral_states(cladistic.matrix = cladistic.matrix, time.tree = tree, estimate.all.nodes = estimate.all.nodes, estimate.tip.values = estimate.tip.values, inapplicables.as.missing = inapplicables.as.missing, polymorphism.behaviour = polymorphism.behaviour, uncertainty.behaviour = uncertainty.behaviour, threshold = threshold, allow.all.missing = allow.all.missing)
   
   # Build single matrix of all states in tip label then node number order:
-  AllStates <- do.call(cbind, lapply(lapply(AncestralStates[2:length(AncestralStates)], '[[', "Matrix"), function(x) x[c(tree$tip.label, 1:ape::Nnode(tree) + ape::Ntip(tree)), , drop = FALSE]))
+  AllStates <- do.call(cbind, lapply(lapply(AncestralStates[2:length(AncestralStates)], '[[', "matrix"), function(x) x[c(tree$tip.label, 1:ape::Nnode(tree) + ape::Ntip(tree)), , drop = FALSE]))
   
   # Make vector of ordering of characters:
   ordering <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "ordering")))
@@ -438,10 +438,10 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
   weights <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "weights")))
   
   # Make vector of minimum values:
-  MinVals <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "MinVals")))
+  minimum_values <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "minimum_values")))
   
   # Make vector of maximum values:
-  MaxVals <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "MaxVals")))
+  maximum_values <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "maximum_values")))
   
   # Find positions in matrix with polymorphisms:
   PolymorphismPositions <- grep("&", AllStates)
@@ -510,10 +510,10 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
     weights[ContinuouscharactersFound] <- 1 / 31
     
     # Set minimum value to zero:
-    MinVals[ContinuouscharactersFound] <- 0
+    minimum_values[ContinuouscharactersFound] <- 0
     
     # Set maximum value to 31:
-    MaxVals[ContinuouscharactersFound] <- 31
+    maximum_values[ContinuouscharactersFound] <- 31
     
   }
   

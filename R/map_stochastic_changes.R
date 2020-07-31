@@ -49,10 +49,10 @@
 #'   cladistic.matrix, characters2prune = 1:32)
 #'
 #' # Generete random tree for matrix taxa:
-#' Tree <- rtree(nrow(Day2016$matrix_1$Matrix))
+#' Tree <- rtree(nrow(Day2016$matrix_1$matrix))
 #'
 #' # Add taxon names to tree:
-#' Tree$tip.label <- rownames(Day2016$matrix_1$Matrix)
+#' Tree$tip.label <- rownames(Day2016$matrix_1$matrix)
 #'
 #' # Add root age to tree:
 #' Tree$root.time <- max(diag(vcv(Tree)))
@@ -125,7 +125,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   Treedate_nodes <- date_nodes(Tree)
   
   # Build all data into single matrix:
-  MatrixBlock <- do.call(cbind, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"))
+  MatrixBlock <- do.call(cbind, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"))
   
   # If inapplicable.behaviour is missing replace inaplicables with NAs:
   if (inapplicable.behaviour == "missing" && any(MatrixBlock[!is.na(MatrixBlock)] == "")) MatrixBlock[which(MatrixBlock == "")] <- NA
@@ -134,10 +134,10 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   ordering <- unname(do.call(c, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "ordering")))
   
   # Assemble all minimum values into a single vector:
-  MinVals <- unname(do.call(c, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "MinVals")))
+  minimum_values <- unname(do.call(c, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "minimum_values")))
   
   # Assemble all maximum values into a single vector:
-  MaxVals <- unname(do.call(c, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "MaxVals")))
+  maximum_values <- unname(do.call(c, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "maximum_values")))
   
   # Assemble all maximum values into a single vector:
   weights <- unname(do.call(c, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "weights")))

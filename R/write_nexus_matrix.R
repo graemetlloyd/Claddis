@@ -38,10 +38,10 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
   convert_matrix <- function(DataMatrix) {
     
     # If there are missing characters replace with missing symbol:
-    if (any(is.na(DataMatrix$Matrix))) DataMatrix$Matrix[is.na(DataMatrix$Matrix)] <- DataMatrix$characters$missing
+    if (any(is.na(DataMatrix$matrix))) DataMatrix$matrix[is.na(DataMatrix$matrix)] <- DataMatrix$characters$missing
     
     # If there are gap characters replace with gap symbol:
-    if (sum(as.vector(DataMatrix$Matrix) == "") > 0) DataMatrix$Matrix[DataMatrix$Matrix == ""] <- DataMatrix$characters$gap
+    if (sum(as.vector(DataMatrix$matrix) == "") > 0) DataMatrix$matrix[DataMatrix$matrix == ""] <- DataMatrix$characters$gap
     
     # If there are symbols (i.e., non-continuous data):
     if (length(DataMatrix$characters$symbols) > 0) {
@@ -50,53 +50,53 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
       for(i in rev(DataMatrix$characters$symbols)) {
         
         # Replace current number with appropriate symbol:
-        if (length(grep(as.character(which(DataMatrix$characters$symbols == i) - 1), DataMatrix$Matrix)) > 0) DataMatrix$Matrix <- gsub(as.character(which(DataMatrix$characters$symbols == i) - 1), i, DataMatrix$Matrix)
+        if (length(grep(as.character(which(DataMatrix$characters$symbols == i) - 1), DataMatrix$matrix)) > 0) DataMatrix$matrix <- gsub(as.character(which(DataMatrix$characters$symbols == i) - 1), i, DataMatrix$matrix)
         
       }
       
     }
     
     # If there are uncertainties:
-    if (length(grep("/", DataMatrix$Matrix)) > 0) {
+    if (length(grep("/", DataMatrix$matrix)) > 0) {
       
       # Find cells that haev uncertainties:
-      Uncertainties <- grep("/", DataMatrix$Matrix)
+      Uncertainties <- grep("/", DataMatrix$matrix)
       
       # Repalce with all possible values in curly braces:
-      DataMatrix$Matrix[Uncertainties] <- paste("{", unlist(lapply(strsplit(DataMatrix$Matrix[Uncertainties], split = "/"), paste, collapse = "")), "}", sep = "")
+      DataMatrix$matrix[Uncertainties] <- paste("{", unlist(lapply(strsplit(DataMatrix$matrix[Uncertainties], split = "/"), paste, collapse = "")), "}", sep = "")
       
     }
     
     # If there are polymorphisms:
-    if (length(grep("&", DataMatrix$Matrix)) > 0) {
+    if (length(grep("&", DataMatrix$matrix)) > 0) {
       
       # Find cells with polymorphsims:
-      Polymorphisms <- grep("&", DataMatrix$Matrix)
+      Polymorphisms <- grep("&", DataMatrix$matrix)
       
       # Repale with values inside parentheses:
-      DataMatrix$Matrix[Polymorphisms] <- paste("(", unlist(lapply(strsplit(DataMatrix$Matrix[Polymorphisms], split = "&"), paste, collapse = "")), ")", sep = "")
+      DataMatrix$matrix[Polymorphisms] <- paste("(", unlist(lapply(strsplit(DataMatrix$matrix[Polymorphisms], split = "&"), paste, collapse = "")), ")", sep = "")
       
     }
     
     # Get equal length taxon names (with added spaces):
-    TaxonNamesWithTrailingSpaces <- paste(rownames(DataMatrix$Matrix), unlist(lapply(lapply(as.list((max(nchar(rownames(DataMatrix$Matrix))) + 2) - nchar(rownames(DataMatrix$Matrix))), rep, x = " "), paste, collapse = "")), sep = "")
+    TaxonNamesWithTrailingSpaces <- paste(rownames(DataMatrix$matrix), unlist(lapply(lapply(as.list((max(nchar(rownames(DataMatrix$matrix))) + 2) - nchar(rownames(DataMatrix$matrix))), rep, x = " "), paste, collapse = "")), sep = "")
     
     # If block is continuous:
     if (DataMatrix$datatype == "CONTINUOUS") {
       
       # Format rows with spaces between values:
-      DataMatrix$Matrix <- paste(TaxonNamesWithTrailingSpaces, (apply(DataMatrix$Matrix, 1, paste, collapse = " ")), sep = "")
+      DataMatrix$matrix <- paste(TaxonNamesWithTrailingSpaces, (apply(DataMatrix$matrix, 1, paste, collapse = " ")), sep = "")
       
     # If block is non-continuous:
     } else {
       
       # Format rows without spaces between values:
-      DataMatrix$Matrix <- paste(TaxonNamesWithTrailingSpaces, (apply(DataMatrix$Matrix, 1, paste, collapse = "")), sep = "")
+      DataMatrix$matrix <- paste(TaxonNamesWithTrailingSpaces, (apply(DataMatrix$matrix, 1, paste, collapse = "")), sep = "")
       
     }
     
     # Return just the newly formatted matrix (now a vector):
-    return(DataMatrix$Matrix)
+    return(DataMatrix$matrix)
     
   }
   
@@ -147,10 +147,10 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
   datatypes <- unlist(lapply(DataBlocks, '[[', "datatype"))
   
   # Get number of taxa:
-  NTaxa <- unname(unlist(lapply(lapply(DataBlocks, '[[', "Matrix"), nrow))[1])
+  NTaxa <- unname(unlist(lapply(lapply(DataBlocks, '[[', "matrix"), nrow))[1])
   
   # Get number of characters:
-  Ncharacters <- unlist(lapply(lapply(DataBlocks, '[[', "Matrix"), ncol))
+  Ncharacters <- unlist(lapply(lapply(DataBlocks, '[[', "matrix"), ncol))
   
   # Get symbols strings:
   symbols <- unlist(lapply(lapply(lapply(DataBlocks, '[[', "characters"), '[[', "symbols"), paste, collapse = " "))
@@ -168,7 +168,7 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
   headerBlock <- ifelse(nchar(cladistic.matrix$topper$header) > 0, paste("[", cladistic.matrix$topper$header, "]\n\n", sep = ""), "")
 
   # Set up taxa block (only required if multiple matrix blocks as sets number of taxa, will be empty string otherwise):
-  TaxaBlock <- ifelse(length(DataBlocks) > 1, paste("BEGIN TAXA;\n\tDIMENSIONS NTAX=", NTaxa, ";\n\tTAXLABELS\n\t\t", paste(rownames(cladistic.matrix$matrix_1$Matrix), collapse = " "), "\n;\nEND;\n\n", sep = ""), "")
+  TaxaBlock <- ifelse(length(DataBlocks) > 1, paste("BEGIN TAXA;\n\tDIMENSIONS NTAX=", NTaxa, ";\n\tTAXLABELS\n\t\t", paste(rownames(cladistic.matrix$matrix_1$matrix), collapse = " "), "\n;\nEND;\n\n", sep = ""), "")
   
   # Set up data block (only required if a single matrix block):
   DataBlock <- ifelse(length(DataBlocks) == 1, paste("BEGIN DATA;\n\tDIMENSIONS  NTAX=", NTaxa, " NCHAR=", Ncharacters, " ;\n\tFORMAT DATATYPE=", datatypes, " SYMBOLS=\" ", symbols, "\" MISSING=", missing, " GAP=", gap, " ;\n", sep = ""), "")

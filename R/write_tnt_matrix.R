@@ -45,10 +45,10 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
   convert_matrix <- function(DataMatrix) {
     
     # If there are missing characters replace with missing symbol:
-    if (any(is.na(DataMatrix$Matrix))) DataMatrix$Matrix[is.na(DataMatrix$Matrix)] <- "?"
+    if (any(is.na(DataMatrix$matrix))) DataMatrix$matrix[is.na(DataMatrix$matrix)] <- "?"
     
     # If there are gap characters replace with gap symbol:
-    if (sum(as.vector(DataMatrix$Matrix) == "") > 0) DataMatrix$Matrix[DataMatrix$Matrix == ""] <- "-"
+    if (sum(as.vector(DataMatrix$matrix) == "") > 0) DataMatrix$matrix[DataMatrix$matrix == ""] <- "-"
     
     # If there are symbols (i.e., non-continuous data):
     if (length(DataMatrix$characters$symbols) > 0) {
@@ -63,53 +63,53 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
       for(i in rev(TNTsymbols)) {
         
         # Replace current number with appropriate symbol:
-        if (length(grep(as.character(which(TNTsymbols == i) - 1), DataMatrix$Matrix)) > 0) DataMatrix$Matrix <- gsub(as.character(which(TNTsymbols == i) - 1), i, DataMatrix$Matrix)
+        if (length(grep(as.character(which(TNTsymbols == i) - 1), DataMatrix$matrix)) > 0) DataMatrix$matrix <- gsub(as.character(which(TNTsymbols == i) - 1), i, DataMatrix$matrix)
         
       }
       
     }
     
     # If there are uncertainties:
-    if (length(grep("/", DataMatrix$Matrix)) > 0) {
+    if (length(grep("/", DataMatrix$matrix)) > 0) {
       
       # Find cells that have uncertainties:
-      Uncertainties <- grep("/", DataMatrix$Matrix)
+      Uncertainties <- grep("/", DataMatrix$matrix)
       
       # Replace with all possible values in curly braces:
-      DataMatrix$Matrix[Uncertainties] <- paste("[", unlist(lapply(strsplit(DataMatrix$Matrix[Uncertainties], split = "/"), paste, collapse = "")), "]", sep = "")
+      DataMatrix$matrix[Uncertainties] <- paste("[", unlist(lapply(strsplit(DataMatrix$matrix[Uncertainties], split = "/"), paste, collapse = "")), "]", sep = "")
       
     }
     
     # If there are polymorphisms:
-    if (length(grep("&", DataMatrix$Matrix)) > 0) {
+    if (length(grep("&", DataMatrix$matrix)) > 0) {
       
       # Find cells with polymorphsims:
-      Polymorphisms <- grep("&", DataMatrix$Matrix)
+      Polymorphisms <- grep("&", DataMatrix$matrix)
       
       # Resplae with values inside parentheses:
-      DataMatrix$Matrix[Polymorphisms] <- paste("[", unlist(lapply(strsplit(DataMatrix$Matrix[Polymorphisms], split = "&"), paste, collapse = "")), "]", sep = "")
+      DataMatrix$matrix[Polymorphisms] <- paste("[", unlist(lapply(strsplit(DataMatrix$matrix[Polymorphisms], split = "&"), paste, collapse = "")), "]", sep = "")
       
     }
     
     # Get equal length taxon names (with added spaces):
-    TaxonNamesWithTrailingSpaces <- paste(rownames(DataMatrix$Matrix), unlist(lapply(lapply(as.list((max(nchar(rownames(DataMatrix$Matrix))) + 2) - nchar(rownames(DataMatrix$Matrix))), rep, x = " "), paste, collapse = "")), sep = "")
+    TaxonNamesWithTrailingSpaces <- paste(rownames(DataMatrix$matrix), unlist(lapply(lapply(as.list((max(nchar(rownames(DataMatrix$matrix))) + 2) - nchar(rownames(DataMatrix$matrix))), rep, x = " "), paste, collapse = "")), sep = "")
     
     # If block is continuous:
     if (DataMatrix$datatype == "CONTINUOUS") {
       
       # Format rows with spaces between values:
-      DataMatrix$Matrix <- paste(TaxonNamesWithTrailingSpaces, (apply(DataMatrix$Matrix, 1, paste, collapse = " ")), sep = "")
+      DataMatrix$matrix <- paste(TaxonNamesWithTrailingSpaces, (apply(DataMatrix$matrix, 1, paste, collapse = " ")), sep = "")
       
     # If block is non-continuous:
     } else {
       
       # Format rows without spaces between values:
-      DataMatrix$Matrix <- paste(TaxonNamesWithTrailingSpaces, (apply(DataMatrix$Matrix, 1, paste, collapse = "")), sep = "")
+      DataMatrix$matrix <- paste(TaxonNamesWithTrailingSpaces, (apply(DataMatrix$matrix, 1, paste, collapse = "")), sep = "")
       
     }
     
     # Return just the newly formatted matrix (now a vector):
-    return(DataMatrix$Matrix)
+    return(DataMatrix$matrix)
     
   }
   
@@ -132,10 +132,10 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
   for(i in 1:7) datatypes <- gsub(NEXUSversion[i], TNTversion[i], datatypes)
   
   # Get number of taxa:
-  NTaxa <- unname(unlist(lapply(lapply(DataBlocks, '[[', "Matrix"), nrow))[1])
+  NTaxa <- unname(unlist(lapply(lapply(DataBlocks, '[[', "matrix"), nrow))[1])
   
   # Get number of characters:
-  Ncharacters <- unlist(lapply(lapply(DataBlocks, '[[', "Matrix"), ncol))
+  Ncharacters <- unlist(lapply(lapply(DataBlocks, '[[', "matrix"), ncol))
   
   # Get symbols strings:
   symbols <- unlist(lapply(lapply(lapply(DataBlocks, '[[', "characters"), '[[', "symbols"), paste, collapse = " "))

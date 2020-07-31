@@ -54,10 +54,10 @@ Ancestral state estimation is complicated where polymorphic or
 set.seed(4)
 
 # Generate a random tree for the Day data set:
-time.tree <- rtree(n = nrow(Day2016$matrix_1$Matrix))
+time.tree <- rtree(n = nrow(Day2016$matrix_1$matrix))
 
 # Update taxon names to match those in the data matrix:
-time.tree$tip.label <- rownames(Day2016$matrix_1$Matrix)
+time.tree$tip.label <- rownames(Day2016$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
 time.tree$root.time <- max(diag(vcv(time.tree)))

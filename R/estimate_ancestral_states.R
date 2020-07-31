@@ -38,10 +38,10 @@
 #' set.seed(4)
 #' 
 #' # Generate a random tree for the Day data set:
-#' time.tree <- rtree(n = nrow(Day2016$matrix_1$Matrix))
+#' time.tree <- rtree(n = nrow(Day2016$matrix_1$matrix))
 #' 
 #' # Update taxon names to match those in the data matrix:
-#' time.tree$tip.label <- rownames(Day2016$matrix_1$Matrix)
+#' time.tree$tip.label <- rownames(Day2016$matrix_1$matrix)
 #' 
 #' # Set root time by making youngest taxon extant:
 #' time.tree$root.time <- max(diag(vcv(time.tree)))
@@ -102,22 +102,22 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   if (!is.numeric(threshold) || threshold > 0.5 || threshold < 0) stop("threshold must be a numeric value between 0 and 0.5.")
   
   # Collapse matrix to vectors for each character (state and ordering combination):
-  collapse.matrix <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) apply(rbind(x$Matrix, x$ordering), 2, paste, collapse = ""))))
+  collapse.matrix <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) apply(rbind(x$matrix, x$ordering), 2, paste, collapse = ""))))
   
   # Isolate ordering elements:
   ordering <- unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "ordering"))
   
   # Isolate minimum values:
-  min.vals <- unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "MinVals"))
+  min.vals <- unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "minimum_values"))
   
   # Isolate maximum values:
-  max.vals <- unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "MaxVals"))
+  max.vals <- unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "maximum_values"))
   
   # Store raw original matrix:
   Rawcladistic.matrix <- cladistic.matrix
   
   # Combine matrix blocks into a single matrix:
-  cladistic.matrix <- OriginalMatrix <- do.call(cbind, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"))
+  cladistic.matrix <- OriginalMatrix <- do.call(cbind, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"))
   
   # Find any failed name matches:
   FailedNameMatches <- c(setdiff(rownames(cladistic.matrix), time.tree$tip.label), setdiff(time.tree$tip.label, rownames(cladistic.matrix)))
@@ -478,13 +478,13 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   }
   
   # Get column (character) count for each matrix block:
-  MatrixColumns <- unlist(lapply(lapply(Rawcladistic.matrix[2:length(Rawcladistic.matrix)], '[[', "Matrix"), ncol))
+  MatrixColumns <- unlist(lapply(lapply(Rawcladistic.matrix[2:length(Rawcladistic.matrix)], '[[', "matrix"), ncol))
   
   # For each matrix block:
   for(i in 1:length(MatrixColumns)) {
     
     # Insert portion of ancestral state estimate into block:
-    Rawcladistic.matrix[[(i + 1)]]$Matrix <- AncestralStateMatrix[, 1:MatrixColumns[i], drop = FALSE]
+    Rawcladistic.matrix[[(i + 1)]]$matrix <- AncestralStateMatrix[, 1:MatrixColumns[i], drop = FALSE]
     
     # Remove that portion from the block:
     AncestralStateMatrix <- AncestralStateMatrix[, -(1:MatrixColumns[i]), drop = FALSE]

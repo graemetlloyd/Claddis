@@ -25,8 +25,8 @@
 #' @examples
 #'
 #' # Create a random tree for the Day et al. 2016 data set:
-#' Day2016tree <- rtree(nrow(Day2016$matrix_1$Matrix))
-#' Day2016tree$tip.label <- rownames(Day2016$matrix_1$Matrix)
+#' Day2016tree <- rtree(nrow(Day2016$matrix_1$matrix))
+#' Day2016tree$tip.label <- rownames(Day2016$matrix_1$matrix)
 #' Day2016tree$root.time <- max(diag(vcv(Day2016tree)))
 #'
 #' # Get proportional phylogenetic character completeness in ten equal-length
@@ -68,7 +68,7 @@ bin_character_completeness <- function(cladistic.matrix, time.tree, time.bins, p
   time.bin.names <- paste(round(time.bins[1:(length(time.bins) - 1)], 1), round(time.bins[2:length(time.bins)], 1), sep = "-")
   
   # Get total number of characters:
-  n.characters <- sum(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), ncol)))
+  n.characters <- sum(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"), ncol)))
   
   # Get edge lengths in bins for complete tree (measure of a complete character):
   complete.edges.in.bins <- bin_edge_lengths(time.tree = time.tree, time.bins = time.bins)$edge.length.in.bin
@@ -77,7 +77,7 @@ bin_character_completeness <- function(cladistic.matrix, time.tree, time.bins, p
   missing.values <- rep("", n.characters)
   
   # If there are missing or inapplicable values collapse row numbers for them with double percentage:
-  if (any(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), is.na))) || any(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), '==', "")))) missing.values <- unname(unlist(lapply(lapply(lapply(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"), find_missing_and_inapplicable), apply, 2, '==', 1), apply, 2, which), lapply, paste, collapse = "%%")))
+  if (any(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"), is.na))) || any(unlist(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"), '==', "")))) missing.values <- unname(unlist(lapply(lapply(lapply(lapply(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"), find_missing_and_inapplicable), apply, 2, '==', 1), apply, 2, which), lapply, paste, collapse = "%%")))
   
   # Set up matrix to store edge lengths in each character bin (columns) per character (rows):
   edge.lengths.in.bins.by.character <- matrix(0, ncol = length(time.bins) - 1, nrow = n.characters)
@@ -89,7 +89,7 @@ bin_character_completeness <- function(cladistic.matrix, time.tree, time.bins, p
     if (nchar(i) > 0) {
       
       # List taxa to prune:
-      taxa.to.prune <- rownames(cladistic.matrix$matrix_1$Matrix)[as.numeric(strsplit(i, "%%")[[1]])]
+      taxa.to.prune <- rownames(cladistic.matrix$matrix_1$matrix)[as.numeric(strsplit(i, "%%")[[1]])]
       
       # Check that there are still enough taxa left for a tree to exist:
       if (length(setdiff(time.tree$tip.label, taxa.to.prune)) > 1) {

@@ -189,7 +189,7 @@ build_cladistic_matrix <- function(character.taxon.matrix, header = "", weights 
   characters <- list(symbols = symbols, missing = "?", gap = "-")
   
   # Build matrix_1 list:
-  matrix_1 <- list(block_name = NA, datatype = "STANDARD", Matrix = character.taxon.matrix, ordering = ordering, weights = weights, MinVals = min.vals, MaxVals = max.vals, characters = characters)
+  matrix_1 <- list(block_name = NA, datatype = "STANDARD", matrix = character.taxon.matrix, ordering = ordering, weights = weights, minimum_values = min.vals, maximum_values = max.vals, characters = characters)
   
   # Assimilate into output:
   result <- list(topper = topper, matrix_1 = matrix_1)

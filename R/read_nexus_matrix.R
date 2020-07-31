@@ -1204,7 +1204,7 @@ read_nexus_matrix <- function(File, Equaliseweights = FALSE) {
     characters <- list(symbols = symbols[[i]], missing = missing[[i]], gap = gap[[i]])
     
     # Build list for current block:
-    Block <- list(block_name = block_names[[i]], datatype = names(MatrixBlockList)[i], Matrix = MatrixBlockList[[i]], ordering = ordering[[i]], weights = weights[[i]], MinVals = MinMaxMatrixList[[i]][, "Min"], MaxVals = MinMaxMatrixList[[i]][, "Max"], characters = characters)
+    Block <- list(block_name = block_names[[i]], datatype = names(MatrixBlockList)[i], matrix = MatrixBlockList[[i]], ordering = ordering[[i]], weights = weights[[i]], minimum_values = MinMaxMatrixList[[i]][, "Min"], maximum_values = MinMaxMatrixList[[i]][, "Max"], characters = characters)
     
     # Store current block in output:
     Output[[(i + 1)]] <- Block

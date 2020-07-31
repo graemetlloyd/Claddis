@@ -37,8 +37,8 @@ This function returns the proportional phylogenetic character completeness for a
 \examples{
 
 # Create a random tree for the Day et al. 2016 data set:
-Day2016tree <- rtree(nrow(Day2016$matrix_1$Matrix))
-Day2016tree$tip.label <- rownames(Day2016$matrix_1$Matrix)
+Day2016tree <- rtree(nrow(Day2016$matrix_1$matrix))
+Day2016tree$tip.label <- rownames(Day2016$matrix_1$matrix)
 Day2016tree$root.time <- max(diag(vcv(Day2016tree)))
 
 # Get proportional phylogenetic character completeness in ten equal-length

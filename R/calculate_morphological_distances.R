@@ -453,7 +453,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
     if (!is.numeric(character.dependencies)) stop("character.dependencies values must be numeric.")
     
     # Check character.dependencies values are within range of matrix dimensions and stop and warn user if not:
-    if (length(setdiff(as.vector(character.dependencies), 1:sum(unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) ncol(x$Matrix))))))) > 0) stop("character.dependencies can only contain character numbers within the dimensions of the cladistic.matrix specified.")
+    if (length(setdiff(as.vector(character.dependencies), 1:sum(unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) ncol(x$matrix))))))) > 0) stop("character.dependencies can only contain character numbers within the dimensions of the cladistic.matrix specified.")
     
     # Check character.dependencies values do not lead to duplicated parent characters and stop and warn user if not:
     if (any(duplicated(character.dependencies[, "DependentCharacter"]))) stop("character.dependencies characters can not be dependent on two or more different independent characters.")
@@ -503,16 +503,16 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   ordering <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "ordering")))
   
   # Isolate minimum values:
-  min.vals <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "MinVals")))
+  min.vals <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "minimum_values")))
   
   # Isolate maximum values:
-  max.vals <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "MaxVals")))
+  max.vals <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "maximum_values")))
   
   # Isolate weights:
   weights <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "weights")))
   
   # Combine matrix blocks into a single matrix:
-  cladistic.matrix <- do.call(cbind, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Matrix"))
+  cladistic.matrix <- do.call(cbind, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"))
   
   # If polymorphism.behaviour is to randomly sample one state:
   if (polymorphism.behaviour == "random") {
