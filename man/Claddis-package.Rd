@@ -11,7 +11,7 @@ Measures morphological diversity from discrete character data and estimates evol
 \examples{
 
 # Get morphological distances for Michaux (1989) data set:
-distances <- MatrixDistances(Michaux1989)
+distances <- calculate_morphological_distances(Michaux1989)
 
 # Show distances:
 distances

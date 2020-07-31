@@ -5,7 +5,7 @@
 \alias{Gauthier1986}
 \title{Character-taxon matrix from Gauthier 1986}
 \format{
-A character-taxon matrix in the format imported by \link{ReadMatrixNEXUS}.
+A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
 }
 \description{
 The character-taxon matrix from Gauthier (1986).

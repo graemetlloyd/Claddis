@@ -5,7 +5,7 @@
 \alias{Day2016}
 \title{Character-taxon matrix from Day et al. 2016}
 \format{
-A character-taxon matrix in the format imported by \link{ReadMatrixNEXUS}.
+A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
 }
 \description{
 The character-taxon matrix from Day et al. (2016).
