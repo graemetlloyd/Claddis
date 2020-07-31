@@ -25,8 +25,8 @@
 #' @examples
 #'
 #' # Create a random tree for the Day et al. 2016 data set:
-#' Day2016tree <- rtree(nrow(Day2016$Matrix_1$Matrix))
-#' Day2016tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
+#' Day2016tree <- rtree(nrow(Day2016$matrix_1$Matrix))
+#' Day2016tree$tip.label <- rownames(Day2016$matrix_1$Matrix)
 #' Day2016tree$root.time <- max(diag(vcv(Day2016tree)))
 #'
 #' # Get proportional phylogenetic character completeness in ten equal-length
@@ -89,7 +89,7 @@ bin_character_completeness <- function(cladistic.matrix, time.tree, time.bins, p
     if (nchar(i) > 0) {
       
       # List taxa to prune:
-      taxa.to.prune <- rownames(cladistic.matrix$Matrix_1$Matrix)[as.numeric(strsplit(i, "%%")[[1]])]
+      taxa.to.prune <- rownames(cladistic.matrix$matrix_1$Matrix)[as.numeric(strsplit(i, "%%")[[1]])]
       
       # Check that there are still enough taxa left for a tree to exist:
       if (length(setdiff(time.tree$tip.label, taxa.to.prune)) > 1) {

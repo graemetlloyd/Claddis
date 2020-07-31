@@ -38,10 +38,10 @@
 #' set.seed(4)
 #' 
 #' # Generate a random tree for the Day data set:
-#' time.tree <- rtree(n = nrow(Day2016$Matrix_1$Matrix))
+#' time.tree <- rtree(n = nrow(Day2016$matrix_1$Matrix))
 #' 
 #' # Update taxon names to match those in the data matrix:
-#' time.tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
+#' time.tree$tip.label <- rownames(Day2016$matrix_1$Matrix)
 #' 
 #' # Set root time by making youngest taxon extant:
 #' time.tree$root.time <- max(diag(vcv(time.tree)))
@@ -81,7 +81,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   if (any(time.tree$edge.length == 0)) stop("time.tree must not have zero-length branches.")
   
   # Check for step matrices and stop and warn if found:
-  if (length(cladistic.matrix$Topper$StepMatrices) > 0) stop("Function can not currently deal with step matrices.")
+  if (length(cladistic.matrix$topper$step_matrices) > 0) stop("Function can not currently deal with step matrices.")
   
   # Check estimate.all.nodes is a logical:
   if (!is.logical(estimate.all.nodes)) stop("estimate.all.nodes must be a logical (TRUE or FALSE).")
@@ -102,10 +102,10 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   if (!is.numeric(threshold) || threshold > 0.5 || threshold < 0) stop("threshold must be a numeric value between 0 and 0.5.")
   
   # Collapse matrix to vectors for each character (state and ordering combination):
-  collapse.matrix <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) apply(rbind(x$Matrix, x$Ordering), 2, paste, collapse = ""))))
+  collapse.matrix <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) apply(rbind(x$Matrix, x$ordering), 2, paste, collapse = ""))))
   
   # Isolate ordering elements:
-  ordering <- unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Ordering"))
+  ordering <- unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "ordering"))
   
   # Isolate minimum values:
   min.vals <- unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "MinVals"))
@@ -135,10 +135,10 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   if (uncertainty.behaviour == "treatasmissing" && length(grep("/", cladistic.matrix)) > 0) cladistic.matrix[grep("/", cladistic.matrix)] <- NA
   
   # Get vector of character numbers where all values are NA:
-  AllMissingCharacters <- which(apply(cladistic.matrix, 2, function(x) all(is.na(x))))
+  Allmissingcharacters <- which(apply(cladistic.matrix, 2, function(x) all(is.na(x))))
   
   # Look for all missing characters and stop and wanr user if found:
-  if (!allow.all.missing && length(AllMissingCharacters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(AllMissingCharacters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using Claddis::prune_cladistic_matrix) or because of the chosen options for inapplicables.as.missing, polymorphism.behaviour, and/or uncertainty.behaviour (in which case the user may wish to chose different values for these)."))
+  if (!allow.all.missing && length(Allmissingcharacters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(Allmissingcharacters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using Claddis::prune_cladistic_matrix) or because of the chosen options for inapplicables.as.missing, polymorphism.behaviour, and/or uncertainty.behaviour (in which case the user may wish to chose different values for these)."))
   
   # Convert tip states into a list:
   DataAsList <- apply(cladistic.matrix, 2, function(x) list(TipStates = x))
@@ -153,7 +153,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
     DataAsList[[i]]$MaxVal <- unname(max.vals[i])
     
     # Add ordering to list:
-    DataAsList[[i]]$Ordering <- unname(ordering[i])
+    DataAsList[[i]]$ordering <- unname(ordering[i])
     
     # Add tree to list:
     DataAsList[[i]]$Tree <- time.tree
@@ -167,16 +167,16 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
     fill_missing <- function(TipStates) {
       
       # Find which rows correspond to missing states:
-      MissingRows <- which(is.na(TipStates$TipStates))
+      missingRows <- which(is.na(TipStates$TipStates))
       
       # If missing states found:
-      if (length(MissingRows) > 0) {
+      if (length(missingRows) > 0) {
         
         # Build missing state by either forming a polymorphism of all possible tip states, or if continuous the midpoint value:
-        FillStates <- ifelse(TipStates$Ordering == "cont", (TipStates$MinVal + TipStates$MaxVal) / 2, paste(TipStates$MinVal:TipStates$MaxVal, collapse = "/"))
+        FillStates <- ifelse(TipStates$ordering == "cont", (TipStates$MinVal + TipStates$MaxVal) / 2, paste(TipStates$MinVal:TipStates$MaxVal, collapse = "/"))
         
         # Insert missing values:
-        TipStates$TipStates[MissingRows] <- FillStates
+        TipStates$TipStates[missingRows] <- FillStates
         
       }
       
@@ -194,22 +194,22 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   prune_tips <- function(x) {
     
     # Find all missing or inapplicable value tip names:
-    Missing <- names(sort(c(which(x$TipStates == ""), which(is.na(x$TipStates)))))
+    missing <- names(sort(c(which(x$TipStates == ""), which(is.na(x$TipStates)))))
     
     # Work out how many tips will be left after pruning:
-    NTipsRemaining <- length(setdiff(names(x$TipStates), Missing))
+    NTipsRemaining <- length(setdiff(names(x$TipStates), missing))
     
     # If there is at least one missing value:
-    if (length(Missing) > 0) {
+    if (length(missing) > 0) {
       
       # If less than two tips will remain then set tree as NULL:
       if (NTipsRemaining < 2) x$Tree <- NULL
 
       # If at least two tips will remain prune missing values from tree:
-      if (NTipsRemaining > 1) x$Tree <- drop.tip(phy = x$Tree, tip = Missing)
+      if (NTipsRemaining > 1) x$Tree <- drop.tip(phy = x$Tree, tip = missing)
       
       # Collapse tip states:
-      x$TipStates <- x$TipStates[setdiff(names(x$TipStates), Missing)]
+      x$TipStates <- x$TipStates[setdiff(names(x$TipStates), missing)]
 
     }
 
@@ -228,7 +228,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
     if (length(x$TipStates) > 0) {
       
       # If the character is not continuous (i.e., it is some form of discrete character):
-      if (x$Ordering != "cont") {
+      if (x$ordering != "cont") {
         
         # Temporarily store tip states so matrix format can overwrite the stored version below:
         TipStates <- x$TipStates
@@ -297,7 +297,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
     x$Model <- "ER"
     
     # If a character is both ordered and has at least three states:
-    if ((x$MaxVal - x$MinVal) > 1 && x$Ordering == "ord") {
+    if ((x$MaxVal - x$MinVal) > 1 && x$ordering == "ord") {
       
       # Get number of states:
       NStates <- (x$MaxVal - x$MinVal) + 1
@@ -325,7 +325,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
     if (!is.null(x$Tree)) {
       
       # If character is continuous:
-      if (x$Ordering == "cont") {
+      if (x$ordering == "cont") {
         
         # Get ancestral states using ace:
         x$AncestralStates <- ace(x = x$TipStates, phy = x$Tree)$ace
@@ -467,10 +467,10 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   if (any(is.na(TipMatrix))) {
     
     # Isolate missing values:
-    MissingTipStates <- which(is.na(TipMatrix))
+    missingTipStates <- which(is.na(TipMatrix))
     
     # Replace missing values with original (unmodified) input values:
-    TipMatrix[MissingTipStates] <- OriginalMatrix[MissingTipStates]
+    TipMatrix[missingTipStates] <- OriginalMatrix[missingTipStates]
     
     # Add tip values back into full output:
     AncestralStateMatrix[rownames(OriginalMatrix), ] <- TipMatrix
@@ -495,7 +495,7 @@ estimate_ancestral_states <- function(cladistic.matrix, time.tree, estimate.all.
   AncestralStateMatrix <- Rawcladistic.matrix
   
   # Add tree to output:
-  AncestralStateMatrix$Topper$Tree <- time.tree
+  AncestralStateMatrix$topper$Tree <- time.tree
   
   # Return ancestral state matrix:
   return(AncestralStateMatrix)

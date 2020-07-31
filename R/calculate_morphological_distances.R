@@ -355,43 +355,43 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   build_ged_data <- function(differences, comparable.characters, cladistic.matrix, weights) return(rbind(c(differences, rep(NA, length(find_incomparable(comparable.characters, cladistic.matrix)))), c(weights[comparable.characters], weights[find_incomparable(comparable.characters, cladistic.matrix)])))
   
   # Subfunction to apply Hopkins and St John (2018) Alpha weighting of inapplicables:
-  weigh_inapplicable_alpha <- function(diffs, comparable.characters, ordering, weights, character.dependencies, CharactersByLevel, alpha) {
+  weigh_inapplicable_alpha <- function(diffs, comparable.characters, ordering, weights, character.dependencies, charactersByLevel, alpha) {
     
     # Set differences:
     Differences <- diffs
     
     # Set comparable characters:
-    ComparableCharacters <- comparable.characters
+    Comparablecharacters <- comparable.characters
     
     # Set ordering for comparable characters:
-    CharacterOrdering <- ordering[ComparableCharacters]
+    Characterordering <- ordering[Comparablecharacters]
     
     # Set ordering for comparable characters:
-    weights <- weights[ComparableCharacters]
+    weights <- weights[Comparablecharacters]
     
     # Fof each character level (from most to least nested):
-    for(i in length(CharactersByLevel):2) {
+    for(i in length(charactersByLevel):2) {
       
       # Get independent characters for current levels dependent characters:
-      IndependentCharacters <- unique(unlist(lapply(as.list(CharactersByLevel[[i]]), function(x) unname(character.dependencies[character.dependencies[, "DependentCharacter"] == x, "IndependentCharacter"]))))
+      Independentcharacters <- unique(unlist(lapply(as.list(charactersByLevel[[i]]), function(x) unname(character.dependencies[character.dependencies[, "DependentCharacter"] == x, "IndependentCharacter"]))))
       
       # For each independent character:
-      for(j in IndependentCharacters) {
+      for(j in Independentcharacters) {
         
         # Find dependent characters:
-        DependentCharacters <- unname(character.dependencies[character.dependencies[, "IndependentCharacter"] == j, "DependentCharacter"])
+        Dependentcharacters <- unname(character.dependencies[character.dependencies[, "IndependentCharacter"] == j, "DependentCharacter"])
         
         # Check characters are present in current distance:
-        CharactersPresent <- intersect(ComparableCharacters, DependentCharacters)
+        charactersPresent <- intersect(Comparablecharacters, Dependentcharacters)
         
         # If characters are present:
-        if (length(CharactersPresent) > 0) {
+        if (length(charactersPresent) > 0) {
           
           # Set positions of dependent characters in current differences vector:
-          DependentPositions <- match(CharactersPresent, ComparableCharacters)
+          DependentPositions <- match(charactersPresent, Comparablecharacters)
           
           # Get position of independent character in current differences vector:
-          IndependentPosition <- which(ComparableCharacters == j)
+          IndependentPosition <- which(Comparablecharacters == j)
           
           # Stop and warn user if matrix contains an impossible coding (i.e., dependent character coded when independent character is missing):
           if (length(IndependentPosition) == 0) stop("Found a dependent character coded when character it depends on is missing. Check matrix codings.")
@@ -414,7 +414,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   }
 
   # Check for step matrices and stop and warn user if found:
-  if (is.list(cladistic.matrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
+  if (is.list(cladistic.matrix$topper$step_matrices)) stop("Function cannot currently deal with step matrices.")
   
   # Check input of distance.transformation is valid and stop and warn if not:
   if (length(setdiff(distance.transformation, c("arcsine_sqrt", "none", "sqrt"))) > 0) stop("distance.transformation must be one of \"none\", \"sqrt\", or \"arcsine_sqrt\".")
@@ -459,10 +459,10 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
     if (any(duplicated(character.dependencies[, "DependentCharacter"]))) stop("character.dependencies characters can not be dependent on two or more different independent characters.")
     
     # Find any characters that are both dependent and independent (and hence may lead to circularity issues):
-    CharactersToCheckForCircularDependency <- intersect(character.dependencies[, "DependentCharacter"], character.dependencies[, "IndependentCharacter"])
+    charactersToCheckForCircularDependency <- intersect(character.dependencies[, "DependentCharacter"], character.dependencies[, "IndependentCharacter"])
     
     # If there is the possibility for circularity:
-    if (length(CharactersToCheckForCircularDependency) > 0) {
+    if (length(charactersToCheckForCircularDependency) > 0) {
       
       # For the ith independent character:
       for(i in unique(character.dependencies[, "IndependentCharacter"])) {
@@ -471,7 +471,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
         CurrentCharacter <- i
         
         # Ste starting found character as ith character:
-        FoundCharacters <- i
+        Foundcharacters <- i
         
         # Keep going until the current character is not an independent character:
         while(sum(unlist(lapply(as.list(CurrentCharacter), function(x) sum(character.dependencies[, "IndependentCharacter"] == x)))) > 0) {
@@ -480,10 +480,10 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
           DependentCharacter <- unlist(lapply(as.list(CurrentCharacter), function(x) unname(character.dependencies[character.dependencies[, "IndependentCharacter"] == x, "DependentCharacter"])))
           
           # Check character was not already found (creating a circularity) and stop and wanr user if true:
-          if (length(intersect(DependentCharacter, FoundCharacters)) > 0) stop("Circularity found in character.dependencies.")
+          if (length(intersect(DependentCharacter, Foundcharacters)) > 0) stop("Circularity found in character.dependencies.")
           
           # Update found characters:
-          FoundCharacters <- c(FoundCharacters, DependentCharacter)
+          Foundcharacters <- c(Foundcharacters, DependentCharacter)
           
           # Update current character(s):
           CurrentCharacter <- DependentCharacter
@@ -500,7 +500,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   }
   
   # Isolate ordering element:
-  ordering <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Ordering")))
+  ordering <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "ordering")))
   
   # Isolate minimum values:
   min.vals <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "MinVals")))
@@ -570,27 +570,27 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   if (inapplicable.behaviour == "HSJ") {
     
     # Set primary-level characters in a list (where secondary etc. level characters will be added in turn):
-    CharactersByLevel <- list(unname(setdiff(unique(character.dependencies[, "IndependentCharacter"]), unique(character.dependencies[, "DependentCharacter"]))))
+    charactersByLevel <- list(unname(setdiff(unique(character.dependencies[, "IndependentCharacter"]), unique(character.dependencies[, "DependentCharacter"]))))
     
     # Set starting more nested characters:
-    HigherLevelCharacters <- setdiff(unique(c(character.dependencies)), unlist(CharactersByLevel))
+    HigherLevelcharacters <- setdiff(unique(c(character.dependencies)), unlist(charactersByLevel))
     
     # Whilst there are still more nested levels of characters:
-    while(length(HigherLevelCharacters) > 0) {
+    while(length(HigherLevelcharacters) > 0) {
       
       # Add next level characters to characters by level list at next level:
-      CharactersByLevel[[(length(CharactersByLevel) + 1)]] <- unname(character.dependencies[unlist(lapply(as.list(CharactersByLevel[[length(CharactersByLevel)]]), function(x) which(character.dependencies[, "IndependentCharacter"] == x))), "DependentCharacter"])
+      charactersByLevel[[(length(charactersByLevel) + 1)]] <- unname(character.dependencies[unlist(lapply(as.list(charactersByLevel[[length(charactersByLevel)]]), function(x) which(character.dependencies[, "IndependentCharacter"] == x))), "DependentCharacter"])
       
       # Set new higher level characters:
-      HigherLevelCharacters <- setdiff(unique(c(character.dependencies)), unlist(CharactersByLevel))
+      HigherLevelcharacters <- setdiff(unique(c(character.dependencies)), unlist(charactersByLevel))
       
     }
     
     # Update differences with HSJ alpha weights:
-    diffs <- mapply(weigh_inapplicable_alpha, diffs, list.of.compchar, MoreArgs = list(ordering, weights, character.dependencies, CharactersByLevel, alpha))
+    diffs <- mapply(weigh_inapplicable_alpha, diffs, list.of.compchar, MoreArgs = list(ordering, weights, character.dependencies, charactersByLevel, alpha))
     
     # Reweight dependent characters zero:
-    weights[unlist(CharactersByLevel[2:length(CharactersByLevel)])] <- 0
+    weights[unlist(charactersByLevel[2:length(charactersByLevel)])] <- 0
     
     # Update comparable characters by pruning out NAs:
     list.of.compchar <- mapply(function(x, y) y[!is.na(x)], x = diffs, y = list.of.compchar, SIMPLIFY = FALSE)
@@ -668,10 +668,10 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
     for(i in seq(from = 1, to = nrow(GED.data) - 1, length.out = length(diffs))) {
       
       # Find missing distances (if any):
-      MissingDistances <- which(is.na(GED.data[i, ]))
+      missingDistances <- which(is.na(GED.data[i, ]))
       
       # Replace missing distances with S_ijk_bar (i.e., results of equation 2 in Wills 2001 into equation 1 of Wills 2001):
-      if (length(MissingDistances) > 0) GED.data[i, MissingDistances] <- S_ijk_bar[ceiling(i / 2)]
+      if (length(missingDistances) > 0) GED.data[i, missingDistances] <- S_ijk_bar[ceiling(i / 2)]
       
     }
 

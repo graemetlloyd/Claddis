@@ -100,10 +100,10 @@ x <- ordinate_cladistic_matrix(Michaux1989)
 x
 
 # Generate a (made up) tree:
-time.tree <- rtree(length(rownames(Michaux1989$Matrix_1$Matrix)))
+time.tree <- rtree(length(rownames(Michaux1989$matrix_1$Matrix)))
 
 # Add taxon names to it:
-time.tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
+time.tree$tip.label <- rownames(Michaux1989$matrix_1$Matrix)
 
 # Set root time by making youngest taxon extant:
 time.tree$root.time <- max(diag(vcv(time.tree)))

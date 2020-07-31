@@ -20,8 +20,8 @@
 #'
 #' @return
 #'
-#' \item{Topper}{Contains any header text or step matrices and pertains to the entire file.}
-#' \item{Matrix_N}{One or more matrix blocks (numbered 1 to N) with associated information pertaining only to that matrix block. This includes the block name (if specificed, NA if not), the block datatype (one of "CONTINUOUS", "DNA", "NUCLEOTIDE", "PROTEIN", "RESTRICTION", "RNA", or "STANDARD"), the actual matrix (taxa as rows, names stored as rownames and characters as columns), the ordering type of each character ("ord" = ordered, "unord" = unordered), the character weights, the minimum and maximum values (used by Claddis' distance functions), and the original characters (symbols, missing, and gap values) used for writing out the data.}
+#' \item{topper}{Contains any header text or step matrices and pertains to the entire file.}
+#' \item{matrix_N}{One or more matrix blocks (numbered 1 to N) with associated information pertaining only to that matrix block. This includes the block name (if specificed, NA if not), the block datatype (one of "CONTINUOUS", "DNA", "NUCLEOTIDE", "PROTEIN", "RESTRICTION", "RNA", or "STANDARD"), the actual matrix (taxa as rows, names stored as rownames and characters as columns), the ordering type of each character ("ord" = ordered, "unord" = unordered), the character weights, the minimum and maximum values (used by Claddis' distance functions), and the original characters (symbols, missing, and gap values) used for writing out the data.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -73,7 +73,7 @@ build_cladistic_matrix <- function(character.taxon.matrix, header = "", weights 
   
   
   # If mystery character types are present warn user:
-  if (length(mystery.characters) > 0) stop("Characters must either be the integers 0 to 31, NA for missing, & for polymorphisms, or / for uncertainties.")
+  if (length(mystery.characters) > 0) stop("characters must either be the integers 0 to 31, NA for missing, & for polymorphisms, or / for uncertainties.")
 
   # Check supplied weights are correct length:
   if (!is.null(weights) && length(weights) != ncol(character.taxon.matrix)) stop("weights must have same length as number of characters in character.taxon.matrix.")
@@ -85,19 +85,19 @@ build_cladistic_matrix <- function(character.taxon.matrix, header = "", weights 
   if (!is.null(weights) && any(weights < 0)) stop("weights must not be negative.")
   
   # Check supplied ordering is the correct length:
-  if (!is.null(ordering) && length(ordering) != ncol(character.taxon.matrix)) stop("Ordering must have same length as number of characters in character.taxon.matrix.")
+  if (!is.null(ordering) && length(ordering) != ncol(character.taxon.matrix)) stop("ordering must have same length as number of characters in character.taxon.matrix.")
   
   # Check ordering is of unord or ord type only:
-  if (!is.null(ordering) && length(setdiff(ordering, c("unord", "ord"))) > 0) stop("Ordering must be unord or ord only.")
+  if (!is.null(ordering) && length(setdiff(ordering, c("unord", "ord"))) > 0) stop("ordering must be unord or ord only.")
   
   # Check symbols are of correct length:
-  if (!is.null(symbols) && length(symbols) >= (diff(range(as.numeric(unique(sort(unlist(strsplit(as.vector(character.taxon.matrix), split = "&|/"))))))) + 1)) stop("Symbols must be at least as long as the range of character values in character.taxon.matrix.")
+  if (!is.null(symbols) && length(symbols) >= (diff(range(as.numeric(unique(sort(unlist(strsplit(as.vector(character.taxon.matrix), split = "&|/"))))))) + 1)) stop("symbols must be at least as long as the range of character values in character.taxon.matrix.")
 
   # Check symbols are single characters only:
-  if (!is.null(symbols) && any(nchar(symbols) != 1)) stop("Symbols must be single characters only.")
+  if (!is.null(symbols) && any(nchar(symbols) != 1)) stop("symbols must be single characters only.")
 
   # Check header is a single value:
-  if (length(header) != 1)  stop("Header text must be a single value.")
+  if (length(header) != 1)  stop("header text must be a single value.")
   
   # If no ordering set default to ordered.
   if (is.null(ordering)) ordering <- rep("ord", ncol(character.taxon.matrix))
@@ -183,16 +183,16 @@ build_cladistic_matrix <- function(character.taxon.matrix, header = "", weights 
   }
   
   # Build matrix topper:
-  Topper <- list(Header = header, StepMatrices = step.matrices)
+  topper <- list(header = header, step_matrices = step.matrices)
   
   # Build characters list:
-  Characters <- list(Symbols = symbols, Missing = "?", Gap = "-")
+  characters <- list(symbols = symbols, missing = "?", gap = "-")
   
-  # Build Matrix_1 list:
-  Matrix_1 <- list(BlockName = NA, Datatype = "STANDARD", Matrix = character.taxon.matrix, Ordering = ordering, weights = weights, MinVals = min.vals, MaxVals = max.vals, Characters = Characters)
+  # Build matrix_1 list:
+  matrix_1 <- list(block_name = NA, datatype = "STANDARD", Matrix = character.taxon.matrix, ordering = ordering, weights = weights, MinVals = min.vals, MaxVals = max.vals, characters = characters)
   
   # Assimilate into output:
-  result <- list(Topper = Topper, Matrix_1 = Matrix_1)
+  result <- list(topper = topper, matrix_1 = matrix_1)
 
   # Return output:
   return(result)

@@ -38,19 +38,19 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
   convert_matrix <- function(DataMatrix) {
     
     # If there are missing characters replace with missing symbol:
-    if (any(is.na(DataMatrix$Matrix))) DataMatrix$Matrix[is.na(DataMatrix$Matrix)] <- DataMatrix$Characters$Missing
+    if (any(is.na(DataMatrix$Matrix))) DataMatrix$Matrix[is.na(DataMatrix$Matrix)] <- DataMatrix$characters$missing
     
     # If there are gap characters replace with gap symbol:
-    if (sum(as.vector(DataMatrix$Matrix) == "") > 0) DataMatrix$Matrix[DataMatrix$Matrix == ""] <- DataMatrix$Characters$Gap
+    if (sum(as.vector(DataMatrix$Matrix) == "") > 0) DataMatrix$Matrix[DataMatrix$Matrix == ""] <- DataMatrix$characters$gap
     
     # If there are symbols (i.e., non-continuous data):
-    if (length(DataMatrix$Characters$Symbols) > 0) {
+    if (length(DataMatrix$characters$symbols) > 0) {
       
       # In reverse order go through numbers:
-      for(i in rev(DataMatrix$Characters$Symbols)) {
+      for(i in rev(DataMatrix$characters$symbols)) {
         
         # Replace current number with appropriate symbol:
-        if (length(grep(as.character(which(DataMatrix$Characters$Symbols == i) - 1), DataMatrix$Matrix)) > 0) DataMatrix$Matrix <- gsub(as.character(which(DataMatrix$Characters$Symbols == i) - 1), i, DataMatrix$Matrix)
+        if (length(grep(as.character(which(DataMatrix$characters$symbols == i) - 1), DataMatrix$Matrix)) > 0) DataMatrix$Matrix <- gsub(as.character(which(DataMatrix$characters$symbols == i) - 1), i, DataMatrix$Matrix)
         
       }
       
@@ -82,7 +82,7 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
     TaxonNamesWithTrailingSpaces <- paste(rownames(DataMatrix$Matrix), unlist(lapply(lapply(as.list((max(nchar(rownames(DataMatrix$Matrix))) + 2) - nchar(rownames(DataMatrix$Matrix))), rep, x = " "), paste, collapse = "")), sep = "")
     
     # If block is continuous:
-    if (DataMatrix$Datatype == "CONTINUOUS") {
+    if (DataMatrix$datatype == "CONTINUOUS") {
       
       # Format rows with spaces between values:
       DataMatrix$Matrix <- paste(TaxonNamesWithTrailingSpaces, (apply(DataMatrix$Matrix, 1, paste, collapse = " ")), sep = "")
@@ -137,83 +137,83 @@ write_nexus_matrix <- function(cladistic.matrix, filename) {
     
   }
   
-  # Isolate just data blocks (i.e., cladistic.matrix without Topper):
+  # Isolate just data blocks (i.e., cladistic.matrix without topper):
   DataBlocks <- cladistic.matrix[2:length(cladistic.matrix)]
   
   # Get block names:
-  BlockNames <- unlist(lapply(DataBlocks, '[[', "BlockName"))
+  block_names <- unlist(lapply(DataBlocks, '[[', "block_name"))
   
   # Get datatypes:
-  Datatypes <- unlist(lapply(DataBlocks, '[[', "Datatype"))
+  datatypes <- unlist(lapply(DataBlocks, '[[', "datatype"))
   
   # Get number of taxa:
   NTaxa <- unname(unlist(lapply(lapply(DataBlocks, '[[', "Matrix"), nrow))[1])
   
   # Get number of characters:
-  NCharacters <- unlist(lapply(lapply(DataBlocks, '[[', "Matrix"), ncol))
+  Ncharacters <- unlist(lapply(lapply(DataBlocks, '[[', "Matrix"), ncol))
   
   # Get symbols strings:
-  Symbols <- unlist(lapply(lapply(lapply(DataBlocks, '[[', "Characters"), '[[', "Symbols"), paste, collapse = " "))
+  symbols <- unlist(lapply(lapply(lapply(DataBlocks, '[[', "characters"), '[[', "symbols"), paste, collapse = " "))
   
   # Get missing value:
-  Missing <- unlist(lapply(lapply(DataBlocks, '[[', "Characters"), '[[', "Missing"))
+  missing <- unlist(lapply(lapply(DataBlocks, '[[', "characters"), '[[', "missing"))
   
   # Get gap symbol:
-  Gap <- unlist(lapply(lapply(DataBlocks, '[[', "Characters"), '[[', "Gap"))
+  gap <- unlist(lapply(lapply(DataBlocks, '[[', "characters"), '[[', "gap"))
   
   # Conver matrices to vectors of text strings:
   DataBlocksAsTextStrings <- lapply(DataBlocks, convert_matrix)
   
   # Set up header block (returns empty string if nothing there):
-  HeaderBlock <- ifelse(nchar(cladistic.matrix$Topper$Header) > 0, paste("[", cladistic.matrix$Topper$Header, "]\n\n", sep = ""), "")
+  headerBlock <- ifelse(nchar(cladistic.matrix$topper$header) > 0, paste("[", cladistic.matrix$topper$header, "]\n\n", sep = ""), "")
 
   # Set up taxa block (only required if multiple matrix blocks as sets number of taxa, will be empty string otherwise):
-  TaxaBlock <- ifelse(length(DataBlocks) > 1, paste("BEGIN TAXA;\n\tDIMENSIONS NTAX=", NTaxa, ";\n\tTAXLABELS\n\t\t", paste(rownames(cladistic.matrix$Matrix_1$Matrix), collapse = " "), "\n;\nEND;\n\n", sep = ""), "")
+  TaxaBlock <- ifelse(length(DataBlocks) > 1, paste("BEGIN TAXA;\n\tDIMENSIONS NTAX=", NTaxa, ";\n\tTAXLABELS\n\t\t", paste(rownames(cladistic.matrix$matrix_1$Matrix), collapse = " "), "\n;\nEND;\n\n", sep = ""), "")
   
   # Set up data block (only required if a single matrix block):
-  DataBlock <- ifelse(length(DataBlocks) == 1, paste("BEGIN DATA;\n\tDIMENSIONS  NTAX=", NTaxa, " NCHAR=", NCharacters, " ;\n\tFORMAT DATATYPE=", Datatypes, " SYMBOLS=\" ", Symbols, "\" MISSING=", Missing, " GAP=", Gap, " ;\n", sep = ""), "")
+  DataBlock <- ifelse(length(DataBlocks) == 1, paste("BEGIN DATA;\n\tDIMENSIONS  NTAX=", NTaxa, " NCHAR=", Ncharacters, " ;\n\tFORMAT DATATYPE=", datatypes, " SYMBOLS=\" ", symbols, "\" MISSING=", missing, " GAP=", gap, " ;\n", sep = ""), "")
   
   # Set up character block (including MATRIX that will begin data):
-  CharacterBlock <- ifelse(rep(length(DataBlocks), length(DataBlocks)) > 1, paste("BEGIN CHARACTERS;\n\t", ifelse(nchar(BlockNames) > 0, paste("TITLE  ", BlockNames, ";\n", sep = ""), ""), "\tDIMENSIONS  NCHAR=", NCharacters, ";\n\tFORMAT  DATATYPE=", ifelse(Datatypes == "CONTINUOUS", "CONTINUOUS ", paste(Datatypes, " SYMBOLS=\" ", Symbols, "\" ", sep = "")), "MISSING=", Missing, " GAP=", Gap, " ;\nMATRIX\n\n", sep = ""), "MATRIX\n\n")
+  CharacterBlock <- ifelse(rep(length(DataBlocks), length(DataBlocks)) > 1, paste("BEGIN CHARACTERS;\n\t", ifelse(nchar(block_names) > 0, paste("TITLE  ", block_names, ";\n", sep = ""), ""), "\tDIMENSIONS  NCHAR=", Ncharacters, ";\n\tFORMAT  DATATYPE=", ifelse(datatypes == "CONTINUOUS", "CONTINUOUS ", paste(datatypes, " SYMBOLS=\" ", symbols, "\" ", sep = "")), "MISSING=", missing, " GAP=", gap, " ;\nMATRIX\n\n", sep = ""), "MATRIX\n\n")
   
   # Take character block and meld with matri(ces) into matrix block(s):
   MatrixBlock <- paste(paste(CharacterBlock, unlist(lapply(DataBlocksAsTextStrings, paste, collapse = "\n")), "\n;\nEND;\n\n", sep = ""), collapse = "")
   
   # Make sure step matrices are a list if null:
-  if (!is.list(cladistic.matrix$Topper$StepMatrices)) cladistic.matrix$Topper$StepMatrices <- list(NULL)
+  if (!is.list(cladistic.matrix$topper$step_matrices)) cladistic.matrix$topper$step_matrices <- list(NULL)
   
   # Create step matrix block:
-  StepMatrixBlock <- paste(ifelse(!unlist(lapply(cladistic.matrix$Topper$StepMatrices, is.null)), paste(paste("\tUSERTYPE '", names(cladistic.matrix$Topper$StepMatrices), "' (STEPMATRIX) = ", unlist(lapply(cladistic.matrix$Topper$StepMatrices, ncol)), "\n", sep = ""), paste("\t", unlist(lapply(lapply(cladistic.matrix$Topper$StepMatrices, colnames), paste, collapse = " ")), "\n\t", sep = ""), unlist(lapply(lapply(lapply(cladistic.matrix$Topper$StepMatrices, function(x) { diag(x) <- "."; return(x) }), apply, 1, paste, collapse = " "), paste, collapse = "\n\t")), "\n\t;\n", sep = ""), ""), collapse = "")
+  StepMatrixBlock <- paste(ifelse(!unlist(lapply(cladistic.matrix$topper$step_matrices, is.null)), paste(paste("\tUSERTYPE '", names(cladistic.matrix$topper$step_matrices), "' (STEPMATRIX) = ", unlist(lapply(cladistic.matrix$topper$step_matrices, ncol)), "\n", sep = ""), paste("\t", unlist(lapply(lapply(cladistic.matrix$topper$step_matrices, colnames), paste, collapse = " ")), "\n\t", sep = ""), unlist(lapply(lapply(lapply(cladistic.matrix$topper$step_matrices, function(x) { diag(x) <- "."; return(x) }), apply, 1, paste, collapse = " "), paste, collapse = "\n\t")), "\n\t;\n", sep = ""), ""), collapse = "")
 
   # Get ordering of all characters in sequence:
-  Ordering <- unlist(lapply(DataBlocks, '[[', "Ordering"))
+  ordering <- unlist(lapply(DataBlocks, '[[', "ordering"))
   
   # Get weights of all characters in sequence:
   weights <- unlist(lapply(DataBlocks, '[[', "weights"))
 
   # Create options block (if no block names):
-  if (all(is.na(BlockNames))) OptionsBlock <- paste(ifelse(all(Ordering == "unord"), "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n", ifelse(all(Ordering == "ord"), "\tOPTIONS  DEFTYPE=ord PolyTcount=MINSTEPS ;\n", "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n")), ifelse(length(unique(Ordering)) == 1 && length(setdiff(unique(Ordering), c("ord", "unord"))) == 0, "", paste("\tTYPESET * UNTITLED  = ", paste(paste(sort(unique(Ordering)), unlist(lapply(lapply(lapply(as.list(sort(unique(Ordering))), '==', Ordering), which), zip_string)), sep = ": "), collapse = ", "), ";\n", sep = "")), collapse = "")
+  if (all(is.na(block_names))) OptionsBlock <- paste(ifelse(all(ordering == "unord"), "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n", ifelse(all(ordering == "ord"), "\tOPTIONS  DEFTYPE=ord PolyTcount=MINSTEPS ;\n", "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n")), ifelse(length(unique(ordering)) == 1 && length(setdiff(unique(ordering), c("ord", "unord"))) == 0, "", paste("\tTYPESET * UNTITLED  = ", paste(paste(sort(unique(ordering)), unlist(lapply(lapply(lapply(as.list(sort(unique(ordering))), '==', ordering), which), zip_string)), sep = ": "), collapse = ", "), ";\n", sep = "")), collapse = "")
   
   # Create options block (if there are block names):
-  if (!all(is.na(unlist(BlockNames)))) OptionsBlock <- paste(paste("\tTYPESET * UNTITLED  (CHARACTERS = ", BlockNames, ")  =  ", unlist(lapply(lapply(DataBlocks, '[[', "Ordering"), function(x) paste(paste(paste(sort(unique(x)), unlist(lapply(lapply(lapply(as.list(sort(unique(x))), '==', x), which), zip_string)), sep = ": "), collapse = ", "), sep = ""))), ";\n", sep = ""), collapse = "")
+  if (!all(is.na(unlist(block_names)))) OptionsBlock <- paste(paste("\tTYPESET * UNTITLED  (CHARACTERS = ", block_names, ")  =  ", unlist(lapply(lapply(DataBlocks, '[[', "ordering"), function(x) paste(paste(paste(sort(unique(x)), unlist(lapply(lapply(lapply(as.list(sort(unique(x))), '==', x), which), zip_string)), sep = ": "), collapse = ", "), sep = ""))), ";\n", sep = ""), collapse = "")
   
   # Replace cont with Squared if continuous characters present:
   if (length(grep(" cont: ", OptionsBlock)) > 0) OptionsBlock <- gsub(" cont: ", " Squared: ", OptionsBlock)
   
   # Convert continuosu character weights to one before making weights block:
-  weights[Ordering == "cont"] <- 1
+  weights[ordering == "cont"] <- 1
   
   # Create weights block (if no block names):
-  if (all(is.na(BlockNames))) weightsBlock <- ifelse(all(weights == 1), "", paste("\tWTSET * UNTITLED  = ", paste(paste(sort(unique(weights)), unlist(lapply(lapply(lapply(as.list(sort(unique(weights))), '==', weights), which), zip_string)), sep = ": "), collapse = ", "), ";\n", sep = ""))
+  if (all(is.na(block_names))) weightsBlock <- ifelse(all(weights == 1), "", paste("\tWTSET * UNTITLED  = ", paste(paste(sort(unique(weights)), unlist(lapply(lapply(lapply(as.list(sort(unique(weights))), '==', weights), which), zip_string)), sep = ": "), collapse = ", "), ";\n", sep = ""))
   
   # Create weights block (if there are block names):
-  if (!all(is.na(unlist(BlockNames)))) weightsBlock <- paste(paste("\tWTSET * UNTITLED  (CHARACTERS = ", BlockNames, ")  =  ", unlist(lapply(lapply(DataBlocks, '[[', "weights"), function(x) paste(paste(paste(sort(unique(x)), unlist(lapply(lapply(lapply(as.list(sort(unique(x))), '==', x), which), zip_string)), sep = ": "), collapse = ", "), sep = ""))), ";\n", sep = ""), collapse = "")
+  if (!all(is.na(unlist(block_names)))) weightsBlock <- paste(paste("\tWTSET * UNTITLED  (CHARACTERS = ", block_names, ")  =  ", unlist(lapply(lapply(DataBlocks, '[[', "weights"), function(x) paste(paste(paste(sort(unique(x)), unlist(lapply(lapply(lapply(as.list(sort(unique(x))), '==', x), which), zip_string)), sep = ": "), collapse = ", "), sep = ""))), ";\n", sep = ""), collapse = "")
   
   # Build assumptions block:
   AssumptionBlock <- paste("BEGIN ASSUMPTIONS;\n", StepMatrixBlock, OptionsBlock, weightsBlock, "END;\n", sep = "")
   
   # Build full string with all blocks together:
-  FullString <- paste("#NEXUS\n\n", HeaderBlock, TaxaBlock, DataBlock, MatrixBlock, AssumptionBlock, sep = "")
+  FullString <- paste("#NEXUS\n\n", headerBlock, TaxaBlock, DataBlock, MatrixBlock, AssumptionBlock, sep = "")
 
   # Write to file:
   write(FullString, filename)

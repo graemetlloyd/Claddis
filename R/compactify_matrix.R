@@ -24,19 +24,19 @@
 #' @examples
 #'
 #' # Examine the matrix pre-compactification:
-#' Michaux1989$Matrix_1$Matrix
+#' Michaux1989$matrix_1$Matrix
 #'
 #' # Examine the weights pre-compactification:
-#' Michaux1989$Matrix_1$weights
+#' Michaux1989$matrix_1$weights
 #'
 #' # Compactify the matrix:
 #' Michaux1989compact <- compactify_matrix(Michaux1989)
 #'
 #' # Examine the matrix post-compactification:
-#' Michaux1989compact$Matrix_1$Matrix
+#' Michaux1989compact$matrix_1$Matrix
 #'
 #' # Examine the weights post-compactification:
-#' Michaux1989compact$Matrix_1$weights
+#' Michaux1989compact$matrix_1$weights
 #'
 #' @export compactify_matrix
 compactify_matrix <- function(cladistic.matrix, Message = TRUE) {
@@ -44,16 +44,16 @@ compactify_matrix <- function(cladistic.matrix, Message = TRUE) {
   # FUTURE COULD CHECK FOR UNORD AND ORD WHEN BINARY AND HENCE MEANINGLESS
   
   # List any zero weight characters:
-  ZeroWeightCharacters <- which(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "weights")) == 0)
+  ZeroWeightcharacters <- which(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "weights")) == 0)
   
   # If there are zero weight characters then prune them:
-  if (length(ZeroWeightCharacters) > 0) cladistic.matrix <- prune_cladistic_matrix(cladistic.matrix, characters2prune = ZeroWeightCharacters)
+  if (length(ZeroWeightcharacters) > 0) cladistic.matrix <- prune_cladistic_matrix(cladistic.matrix, characters2prune = ZeroWeightcharacters)
   
   # For each matrix block:
   for(i in 2:length(cladistic.matrix)) {
     
     # Get strings for each character distribution, including ordering:
-    char.distrib.strings <- paste(apply(cladistic.matrix[[i]]$Matrix, 2, paste, collapse = ""), cladistic.matrix[[i]]$Ordering, sep = " ")
+    char.distrib.strings <- paste(apply(cladistic.matrix[[i]]$Matrix, 2, paste, collapse = ""), cladistic.matrix[[i]]$ordering, sep = " ")
     
     # Case if matrix can be compactified:
     if (length(unique(char.distrib.strings)) < length(char.distrib.strings) || any(duplicated(rownames(cladistic.matrix[[i]]$Matrix)))) {
@@ -65,7 +65,7 @@ compactify_matrix <- function(cladistic.matrix, Message = TRUE) {
         rle.char.distrib.strings <- rle(sort(char.distrib.strings, decreasing = TRUE))
         
         # Set ordering of newly collapsed characters:
-        cladistic.matrix[[i]]$Ordering <- unlist(lapply(strsplit(rle.char.distrib.strings$values, " "), '[', 2))
+        cladistic.matrix[[i]]$ordering <- unlist(lapply(strsplit(rle.char.distrib.strings$values, " "), '[', 2))
         
         # Set weights of newly collapsed characters by aggregating weights of source characters:
         cladistic.matrix[[i]]$weights <- unlist(lapply(lapply(lapply(lapply(as.list(rle.char.distrib.strings$values), '==', char.distrib.strings), which), function(x) cladistic.matrix[[i]]$weights[x]), sum))
@@ -112,7 +112,7 @@ compactify_matrix <- function(cladistic.matrix, Message = TRUE) {
             cladistic.matrix[[i]]$Matrix <- TemporaryMatrix
             
             # Update other parts of matrix:
-            cladistic.matrix[[i]]$Ordering <- rep(cladistic.matrix[[i]]$Ordering, length(DuplicateRows))
+            cladistic.matrix[[i]]$ordering <- rep(cladistic.matrix[[i]]$ordering, length(DuplicateRows))
             cladistic.matrix[[i]]$weights <- rep(cladistic.matrix[[i]]$weights, length(DuplicateRows))
             cladistic.matrix[[i]]$MinVals <- rep(cladistic.matrix[[i]]$MinVals, length(DuplicateRows))
             cladistic.matrix[[i]]$MaxVals <- rep(cladistic.matrix[[i]]$MaxVals, length(DuplicateRows))
@@ -120,7 +120,7 @@ compactify_matrix <- function(cladistic.matrix, Message = TRUE) {
             # BELOW IS EEFCTIVELY A RECURSION OF THIS FUNCTION!
             
             # Get strings for each character distribution, including ordering:
-            CharacterDistributionStrings <- paste(apply(cladistic.matrix[[i]]$Matrix, 2, paste, collapse = ""), cladistic.matrix[[i]]$Ordering, sep = " ")
+            CharacterDistributionStrings <- paste(apply(cladistic.matrix[[i]]$Matrix, 2, paste, collapse = ""), cladistic.matrix[[i]]$ordering, sep = " ")
             
             # If need to collapse characters because they are duplicated:
             if (length(unique(CharacterDistributionStrings)) < length(CharacterDistributionStrings)) {
@@ -129,7 +129,7 @@ compactify_matrix <- function(cladistic.matrix, Message = TRUE) {
               RLECharacterDistributionStrings <- rle(sort(CharacterDistributionStrings, decreasing = TRUE))
               
               # Set ordering of newly collapsed characters:
-              cladistic.matrix[[i]]$Ordering <- unlist(lapply(strsplit(RLECharacterDistributionStrings$values, " "), '[', 2))
+              cladistic.matrix[[i]]$ordering <- unlist(lapply(strsplit(RLECharacterDistributionStrings$values, " "), '[', 2))
               
               # Set weights of newly collapsed characters by aggregating weights of source characters:
               cladistic.matrix[[i]]$weights <- unlist(lapply(lapply(lapply(lapply(as.list(RLECharacterDistributionStrings$values), '==', CharacterDistributionStrings), which), function(x) cladistic.matrix[[i]]$weights[x]), sum))

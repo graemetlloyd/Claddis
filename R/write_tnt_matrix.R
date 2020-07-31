@@ -51,19 +51,19 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
     if (sum(as.vector(DataMatrix$Matrix) == "") > 0) DataMatrix$Matrix[DataMatrix$Matrix == ""] <- "-"
     
     # If there are symbols (i.e., non-continuous data):
-    if (length(DataMatrix$Characters$Symbols) > 0) {
+    if (length(DataMatrix$characters$symbols) > 0) {
       
       # If datatype is STANDARD set TNT symbols:
-      if (DataMatrix$Datatype == "STANDARD") TNTSymbols <- c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V")
+      if (DataMatrix$datatype == "STANDARD") TNTsymbols <- c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V")
       
       # If datatype is non-STANDARD (but still discrete):
-      if (DataMatrix$Datatype != "STANDARD") TNTSymbols <- DataMatrix$Characters$Symbols
+      if (DataMatrix$datatype != "STANDARD") TNTsymbols <- DataMatrix$characters$symbols
       
       # In reverse order go through numbers:
-      for(i in rev(TNTSymbols)) {
+      for(i in rev(TNTsymbols)) {
         
         # Replace current number with appropriate symbol:
-        if (length(grep(as.character(which(TNTSymbols == i) - 1), DataMatrix$Matrix)) > 0) DataMatrix$Matrix <- gsub(as.character(which(TNTSymbols == i) - 1), i, DataMatrix$Matrix)
+        if (length(grep(as.character(which(TNTsymbols == i) - 1), DataMatrix$Matrix)) > 0) DataMatrix$Matrix <- gsub(as.character(which(TNTsymbols == i) - 1), i, DataMatrix$Matrix)
         
       }
       
@@ -95,7 +95,7 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
     TaxonNamesWithTrailingSpaces <- paste(rownames(DataMatrix$Matrix), unlist(lapply(lapply(as.list((max(nchar(rownames(DataMatrix$Matrix))) + 2) - nchar(rownames(DataMatrix$Matrix))), rep, x = " "), paste, collapse = "")), sep = "")
     
     # If block is continuous:
-    if (DataMatrix$Datatype == "CONTINUOUS") {
+    if (DataMatrix$datatype == "CONTINUOUS") {
       
       # Format rows with spaces between values:
       DataMatrix$Matrix <- paste(TaxonNamesWithTrailingSpaces, (apply(DataMatrix$Matrix, 1, paste, collapse = " ")), sep = "")
@@ -113,14 +113,14 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
     
   }
   
-  # Isolate just data blocks (i.e., cladistic.matrix without Topper):
+  # Isolate just data blocks (i.e., cladistic.matrix without topper):
   DataBlocks <- cladistic.matrix[2:length(cladistic.matrix)]
   
   # Get block names:
-  BlockNames <- unlist(lapply(DataBlocks, '[[', "BlockName"))
+  block_names <- unlist(lapply(DataBlocks, '[[', "block_name"))
   
   # Get datatypes:
-  Datatypes <- unlist(lapply(DataBlocks, '[[', "Datatype"))
+  datatypes <- unlist(lapply(DataBlocks, '[[', "datatype"))
   
   # NEXUS versions of datatypes:
   NEXUSversion <- c("CONTINUOUS", "DNA", "NUCLEOTIDE", "PROTEIN", "RESTRICTION", "RNA", "STANDARD")
@@ -129,46 +129,46 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
   TNTversion <- c("continuous", "dna", "dna", "proteins", "numeric", "dna", "numeric")
   
   # Replace NEXUS versions of datatypes with TNT version (as best as I can guess!):
-  for(i in 1:7) Datatypes <- gsub(NEXUSversion[i], TNTversion[i], Datatypes)
+  for(i in 1:7) datatypes <- gsub(NEXUSversion[i], TNTversion[i], datatypes)
   
   # Get number of taxa:
   NTaxa <- unname(unlist(lapply(lapply(DataBlocks, '[[', "Matrix"), nrow))[1])
   
   # Get number of characters:
-  NCharacters <- unlist(lapply(lapply(DataBlocks, '[[', "Matrix"), ncol))
+  Ncharacters <- unlist(lapply(lapply(DataBlocks, '[[', "Matrix"), ncol))
   
   # Get symbols strings:
-  Symbols <- unlist(lapply(lapply(lapply(DataBlocks, '[[', "Characters"), '[[', "Symbols"), paste, collapse = " "))
+  symbols <- unlist(lapply(lapply(lapply(DataBlocks, '[[', "characters"), '[[', "symbols"), paste, collapse = " "))
   
   # Get missing value:
-  Missing <- unlist(lapply(lapply(DataBlocks, '[[', "Characters"), '[[', "Missing"))
+  missing <- unlist(lapply(lapply(DataBlocks, '[[', "characters"), '[[', "missing"))
   
   # Get gap symbol:
-  Gap <- unlist(lapply(lapply(DataBlocks, '[[', "Characters"), '[[', "Gap"))
+  gap <- unlist(lapply(lapply(DataBlocks, '[[', "characters"), '[[', "gap"))
   
   # Conver matrices to vectors of text strings:
   DataBlocksAsTextStrings <- lapply(DataBlocks, convert_matrix)
   
   # Set up header block (returns empty string if nothing there):
-  HeaderBlock <- ifelse(length(cladistic.matrix$Topper$Header) > 0, paste("'", cladistic.matrix$Topper$Header, "'\n", sep = ""), "")
+  headerBlock <- ifelse(length(cladistic.matrix$topper$header) > 0, paste("'", cladistic.matrix$topper$header, "'\n", sep = ""), "")
   
   # Set up character block (including MATRIX that will begin data):
-  CharacterBlock <- paste("& [", Datatypes, "]\n", sep = "")
+  CharacterBlock <- paste("& [", datatypes, "]\n", sep = "")
   
   # Take character block and meld with matri(ces) into matrix block(s):
   MatrixBlock <- paste(paste(CharacterBlock, unlist(lapply(DataBlocksAsTextStrings, paste, collapse = "\n")), "\n", sep = ""), collapse = "")
   
   # Get ordering of all characters in sequence:
-  Ordering <- unname(unlist(lapply(DataBlocks, '[[', "Ordering")))
+  ordering <- unname(unlist(lapply(DataBlocks, '[[', "ordering")))
   
   # Get weights of all characters in sequence:
   weights <- unname(unlist(lapply(DataBlocks, '[[', "weights")))
 
   # Make sure step matrices are a list if null:
-  if (!is.list(cladistic.matrix$Topper$StepMatrices)) cladistic.matrix$Topper$StepMatrices <- list(NULL)
+  if (!is.list(cladistic.matrix$topper$step_matrices)) cladistic.matrix$topper$step_matrices <- list(NULL)
   
   # If there are step matrices:
-  if (any(!unlist(lapply(cladistic.matrix$Topper$StepMatrices, is.null)))) {
+  if (any(!unlist(lapply(cladistic.matrix$topper$step_matrices, is.null)))) {
     
     # Empty vector to store hits (characters assigned to a step matrix):
     global_hits <- vector(mode = "numeric")
@@ -177,41 +177,41 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
     all_step_matrix_lines <- vector(mode = "character")
     
     # Check there are not too many step matrices:
-    if (length(cladistic.matrix$Topper$StepMatrices) > 32) stop("Too many (>32) step matrices for TNT!")
+    if (length(cladistic.matrix$topper$step_matrices) > 32) stop("Too many (>32) step matrices for TNT!")
     
     # For each step matrix:
-    for(i in 1:length(cladistic.matrix$Topper$StepMatrices)) {
+    for(i in 1:length(cladistic.matrix$topper$step_matrices)) {
       
       # Set up costs vector:
       costs <- vector(mode = "character")
       
       # For each row state (from):
-      for(j in rownames(cladistic.matrix$Topper$StepMatrices[[i]])) {
+      for(j in rownames(cladistic.matrix$topper$step_matrices[[i]])) {
         
         # For each column state (to):
-        for(k in colnames(cladistic.matrix$Topper$StepMatrices[[i]])) {
+        for(k in colnames(cladistic.matrix$topper$step_matrices[[i]])) {
           
           # Add cost of j to k transition to costs vector:
-          costs <- c(costs, paste(j, ">", k, " ", cladistic.matrix$Topper$StepMatrices[[i]][j, k], sep = ""))
+          costs <- c(costs, paste(j, ">", k, " ", cladistic.matrix$topper$step_matrices[[i]][j, k], sep = ""))
           
         }
         
       }
       
       # Format top of step matrix code:
-      step_matrix_top <- paste("smatrix = ", i - 1, " (", names(cladistic.matrix$Topper$StepMatrices)[i], ")", sep = "")
+      step_matrix_top <- paste("smatrix = ", i - 1, " (", names(cladistic.matrix$topper$step_matrices)[i], ")", sep = "")
       
       # Get hits (characters assigned to ith step matrix):
-      hits <- which(Ordering == names(cladistic.matrix$Topper$StepMatrices)[i])
+      hits <- which(ordering == names(cladistic.matrix$topper$step_matrices)[i])
       
       # Add huts to global hits for all step matrices:
       global_hits <- c(global_hits, hits)
       
       # Stop if no hits!:
-      if (length(hits) == 0) stop(paste("No characters assigned to step matrix: ", names(cladistic.matrix$Topper$StepMatrices)[i], ".", sep = ""))
+      if (length(hits) == 0) stop(paste("No characters assigned to step matrix: ", names(cladistic.matrix$topper$step_matrices)[i], ".", sep = ""))
       
       # Build step matrix lines:
-      step_matrix_lines <- paste(c(step_matrix_top, costs, ";", paste("smatrix + ", names(cladistic.matrix$Topper$StepMatrices)[i], " ", paste(hits - 1, collapse = " "), ";", sep = "")), collapse = "\n")
+      step_matrix_lines <- paste(c(step_matrix_top, costs, ";", paste("smatrix + ", names(cladistic.matrix$topper$step_matrices)[i], " ", paste(hits - 1, collapse = " "), ";", sep = "")), collapse = "\n")
       
       # Add step matrix lines to all step matrix lines:
       all_step_matrix_lines <- c(all_step_matrix_lines, step_matrix_lines)
@@ -230,10 +230,10 @@ write_tnt_matrix <- function(cladistic.matrix, filename, add.analysis.block = FA
   }
 
   # Build ccode block:
-  CCodeBlock <- paste("ccode ", paste(paste(ifelse(ifelse(Ordering == "cont", "ord", Ordering) == "ord", "+", "-"), ifelse(weights == 0, "]", "["), "/", ifelse(Ordering == "cont", "1", ifelse(weights == 0, 1, weights)), " ", paste(1:sum(NCharacters) - 1), sep = ""), collapse = " "), " ;\n", sep = "")
+  CCodeBlock <- paste("ccode ", paste(paste(ifelse(ifelse(ordering == "cont", "ord", ordering) == "ord", "+", "-"), ifelse(weights == 0, "]", "["), "/", ifelse(ordering == "cont", "1", ifelse(weights == 0, 1, weights)), " ", paste(1:sum(Ncharacters) - 1), sep = ""), collapse = " "), " ;\n", sep = "")
   
   # Build full string with all blocks together:
-  FullString <- paste("taxname=;\nmxram 4096;\ntaxname +", max(nchar(rownames(cladistic.matrix$Matrix_1$Matrix))), ";\nnstates num 32;\nxread\n", HeaderBlock, sum(NCharacters), " ", NTaxa, "\n", MatrixBlock, ";\n", CCodeBlock, StepMatrixBlock, "proc/;\n", sep = "")
+  FullString <- paste("taxname=;\nmxram 4096;\ntaxname +", max(nchar(rownames(cladistic.matrix$matrix_1$Matrix))), ";\nnstates num 32;\nxread\n", headerBlock, sum(Ncharacters), " ", NTaxa, "\n", MatrixBlock, ";\n", CCodeBlock, StepMatrixBlock, "proc/;\n", sep = "")
   
   # If adding analysis block:
   if (add.analysis.block) {

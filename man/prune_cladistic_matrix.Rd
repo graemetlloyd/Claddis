@@ -37,7 +37,7 @@ prunedmatrix <- prune_cladistic_matrix(cladistic.matrix =
   c("Outgroup"))
 
 # Show priuned matrix:
-prunedmatrix$Matrix_1$Matrix
+prunedmatrix$matrix_1$Matrix
 
 }
 \seealso{

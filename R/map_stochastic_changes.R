@@ -49,10 +49,10 @@
 #'   cladistic.matrix, characters2prune = 1:32)
 #'
 #' # Generete random tree for matrix taxa:
-#' Tree <- rtree(nrow(Day2016$Matrix_1$Matrix))
+#' Tree <- rtree(nrow(Day2016$matrix_1$Matrix))
 #'
 #' # Add taxon names to tree:
-#' Tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
+#' Tree$tip.label <- rownames(Day2016$matrix_1$Matrix)
 #'
 #' # Add root age to tree:
 #' Tree$root.time <- max(diag(vcv(Tree)))
@@ -98,7 +98,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   # IF ADDING TREES TO OUTPUT CONVERT THEM TO CLASS MULTIPHYLO, E.G. STOCHASTIC CHARACTER MAPS WITH NAS - NOTE THIS IN MANUAL TOO AS AN EXTENSION OF WHAT PHTTOOLS DOES.
   
   # Check for continuous and step matrices and stop and warn user if found:
-  if (length(setdiff(unique(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) x$Ordering))), c("unord", "ord"))) > 0) stop("cladistic.matrix can only contain characters of type \"ord\" or \"unord\" (i.e., no step matrices or continuous characters).")
+  if (length(setdiff(unique(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) x$ordering))), c("unord", "ord"))) > 0) stop("cladistic.matrix can only contain characters of type \"ord\" or \"unord\" (i.e., no step matrices or continuous characters).")
   
   # Check tree has branch lengths:
   if (is.null(Tree$edge.length)) stop("Tree does not have branch lengths (durations). Try timescaling the Tree, e.g., with DatePhylo.")
@@ -131,7 +131,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   if (inapplicable.behaviour == "missing" && any(MatrixBlock[!is.na(MatrixBlock)] == "")) MatrixBlock[which(MatrixBlock == "")] <- NA
   
   # Assemble all ordering values into a single vector:
-  Ordering <- unname(do.call(c, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Ordering")))
+  ordering <- unname(do.call(c, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "ordering")))
   
   # Assemble all minimum values into a single vector:
   MinVals <- unname(do.call(c, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "MinVals")))
@@ -149,7 +149,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   for(i in 1:length(CharacterList)) CharacterList[[i]]$Weight <- weights[i]
   
   # Add ordering to list for each character:
-  for(i in 1:length(CharacterList)) CharacterList[[i]]$Ordering <- Ordering[i]
+  for(i in 1:length(CharacterList)) CharacterList[[i]]$ordering <- ordering[i]
   
   # Add full tree to list for each character:
   for(i in 1:length(CharacterList)) CharacterList[[i]]$FullTree <- Tree
@@ -242,7 +242,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
   build_character_model <- function(x) {
     
     # If character is ordered:
-    if (x$Ordering == "ord") {
+    if (x$ordering == "ord") {
       
       # Create character model with all transitions impossible:
       CharacterModel <- matrix(0, ncol = length(x$MinVal:x$MaxVal), nrow = length(x$MinVal:x$MaxVal), dimnames = list(x$MinVal:x$MaxVal, x$MinVal:x$MaxVal))
@@ -253,7 +253,7 @@ map_stochastic_changes <- function(cladistic.matrix, Tree, TimeBins, NSimulation
     }
     
     # If character is unordered:
-    if (x$Ordering == "unord") {
+    if (x$ordering == "unord") {
       
       # Create character model with all transitions possible:
       CharacterModel <- matrix(1, ncol = length(x$MinVal:x$MaxVal), nrow = length(x$MinVal:x$MaxVal), dimnames = list(x$MinVal:x$MaxVal, x$MinVal:x$MaxVal))

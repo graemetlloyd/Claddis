@@ -81,7 +81,7 @@ test_rates(
 \item{TimeBinsUsed}{The time binning used (NB: May be slightly altered from the input values).}
 \item{InferredCharacterChanges}{Matrix of inferred character changes.}
 \item{IntrinsicCharacterRate}{The intrinsic (global) character rate in changes per million years.}
-\item{ContinuousCharactersConvertedToDiscrete}{Whether or not continuous characters were converted to discrete characters (important for handling the data in downstream analys(es)).}
+\item{ContinuouscharactersConvertedToDiscrete}{Whether or not continuous characters were converted to discrete characters (important for handling the data in downstream analys(es)).}
 \item{BranchPartitionResults}{List of branch partition results (corresponding to \code{BranchPartitionsToTest}. NULL if not requested.}
 \item{CharacterPartitionResults}{List of character partition results (corresponding to \code{CharacterPartitionsToTest}. NULL if not requested.}
 \item{CladePartitionResults}{List of clade partition results (corresponding to \code{CladePartitionsToTest}. NULL if not requested.}
@@ -193,10 +193,10 @@ The AIC is the Akaike Information Criterion, and is relatively meaningless on it
 set.seed(17)
 
 # Generate a random tree for the Michaux data set:
-tree <- rtree(nrow(Michaux1989$Matrix_1$Matrix))
+tree <- rtree(nrow(Michaux1989$matrix_1$Matrix))
 
 # Update taxon names to match those in the data matrix:
-tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
+tree$tip.label <- rownames(Michaux1989$matrix_1$Matrix)
 
 # Set root time by making youngest taxon extant:
 tree$root.time <- max(diag(vcv(tree)))

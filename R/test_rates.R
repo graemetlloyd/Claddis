@@ -126,7 +126,7 @@
 #' \item{TimeBinsUsed}{The time binning used (NB: May be slightly altered from the input values).}
 #' \item{InferredCharacterChanges}{Matrix of inferred character changes.}
 #' \item{IntrinsicCharacterRate}{The intrinsic (global) character rate in changes per million years.}
-#' \item{ContinuousCharactersConvertedToDiscrete}{Whether or not continuous characters were converted to discrete characters (important for handling the data in downstream analys(es)).}
+#' \item{ContinuouscharactersConvertedToDiscrete}{Whether or not continuous characters were converted to discrete characters (important for handling the data in downstream analys(es)).}
 #' \item{BranchPartitionResults}{List of branch partition results (corresponding to \code{BranchPartitionsToTest}. NULL if not requested.}
 #' \item{CharacterPartitionResults}{List of character partition results (corresponding to \code{CharacterPartitionsToTest}. NULL if not requested.}
 #' \item{CladePartitionResults}{List of clade partition results (corresponding to \code{CladePartitionsToTest}. NULL if not requested.}
@@ -163,10 +163,10 @@
 #' set.seed(17)
 #' 
 #' # Generate a random tree for the Michaux data set:
-#' tree <- rtree(nrow(Michaux1989$Matrix_1$Matrix))
+#' tree <- rtree(nrow(Michaux1989$matrix_1$Matrix))
 #' 
 #' # Update taxon names to match those in the data matrix:
-#' tree$tip.label <- rownames(Michaux1989$Matrix_1$Matrix)
+#' tree$tip.label <- rownames(Michaux1989$matrix_1$Matrix)
 #' 
 #' # Set root time by making youngest taxon extant:
 #' tree$root.time <- max(diag(vcv(tree)))
@@ -217,7 +217,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
   # WHAT IS SIGNIFICANTLY HIGH OR LOW IF THERE ARE THREE OR MORE PARTITIONS? THIS IS NOT EVEN IN OUTPUT YET. PROLLY CANNOT DO FULL STOP NOW PARTITIONS ARE MORE COMPLEX
 
   # Check for step matrices and stop and warn user if found:
-  if (is.list(cladistic.matrix$Topper$StepMatrices)) stop("Function cannot currently deal with step matrices.")
+  if (is.list(cladistic.matrix$topper$step_matrices)) stop("Function cannot currently deal with step matrices.")
 
   # Check tree has branch lengths:
   if (is.null(tree$edge.length)) stop("Tree does not have branch lengths (durations). Try timescaling the tree, e.g., with DatePhylo.")
@@ -283,10 +283,10 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
     add_missing_partitions <- function(x, ValidValues) {
       
       # Define any missing values:
-      MissingValues <- setdiff(ValidValues, unlist(x))
+      missingValues <- setdiff(ValidValues, unlist(x))
       
       # If there are missing values add them to list at end:
-      if (length(MissingValues) > 0) x[[(length(x) + 1)]] <- MissingValues
+      if (length(missingValues) > 0) x[[(length(x) + 1)]] <- missingValues
       
       # Return x:
       return(x)
@@ -432,7 +432,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
   AllStates <- do.call(cbind, lapply(lapply(AncestralStates[2:length(AncestralStates)], '[[', "Matrix"), function(x) x[c(tree$tip.label, 1:ape::Nnode(tree) + ape::Ntip(tree)), , drop = FALSE]))
   
   # Make vector of ordering of characters:
-  Ordering <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "Ordering")))
+  ordering <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "ordering")))
   
   # Make vector of weights of characters:
   weights <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "weights")))
@@ -483,37 +483,37 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
   }
   
   # Set default converted continuous characters to FALSE:
-  ContinuousCharactersConverted <- FALSE
+  ContinuouscharactersConverted <- FALSE
   
   # Check for continuous characters as these will need to be modified for modelling to discrete characters:
-  if (any(Ordering == "cont")) {
+  if (any(ordering == "cont")) {
     
     # Tell user this is happening:
     cat("Continuous characters found. Converting to gap-weighted discrete characters.\n")
     
     # Set default converted continuous characters to TRUE:
-    ContinuousCharactersConverted <- TRUE
+    ContinuouscharactersConverted <- TRUE
     
     # Find out which characters are continuous:
-    ContinuousCharactersFound <- which(Ordering == "cont")
+    ContinuouscharactersFound <- which(ordering == "cont")
     
     # Rescale continous characters as zero to one values:
-    ListOfContinuousValuesRescaledZeroToOne <- lapply(lapply(lapply(apply(AllStates[, ContinuousCharactersFound, drop = FALSE], 2, list), unlist), as.numeric), function(x) {x <- x - min(sort(x)); x <- x / max(sort(x)); return(x)})
+    ListOfContinuousValuesRescaledZeroToOne <- lapply(lapply(lapply(apply(AllStates[, ContinuouscharactersFound, drop = FALSE], 2, list), unlist), as.numeric), function(x) {x <- x - min(sort(x)); x <- x / max(sort(x)); return(x)})
     
     # Now discretize and store these characters (0 to 31 scale):
-    AllStates[, ContinuousCharactersFound] <- do.call(cbind, lapply(lapply(lapply(ListOfContinuousValuesRescaledZeroToOne, function(x) as.list(x)), lapply, function(x) ifelse(is.na(x), NA, max(which(x >= (0:31) / 31)) - 1)), unlist))
+    AllStates[, ContinuouscharactersFound] <- do.call(cbind, lapply(lapply(lapply(ListOfContinuousValuesRescaledZeroToOne, function(x) as.list(x)), lapply, function(x) ifelse(is.na(x), NA, max(which(x >= (0:31) / 31)) - 1)), unlist))
     
     # Convert character type to ordered:
-    Ordering[ContinuousCharactersFound] <- "ord"
+    ordering[ContinuouscharactersFound] <- "ord"
     
     # Convert weights to 1/31:
-    weights[ContinuousCharactersFound] <- 1 / 31
+    weights[ContinuouscharactersFound] <- 1 / 31
     
     # Set minimum value to zero:
-    MinVals[ContinuousCharactersFound] <- 0
+    MinVals[ContinuouscharactersFound] <- 0
     
     # Set maximum value to 31:
-    MaxVals[ContinuousCharactersFound] <- 31
+    MaxVals[ContinuouscharactersFound] <- 31
     
   }
   
@@ -527,28 +527,28 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
   build_changes_matrix <- function(x) {
     
     # Find only comparable characters (those scored for both from and to states):
-    ComparableCharacters <- which(apply(!apply(x$CharacterStatesFromTo, 2, is.na), 2, all))
+    Comparablecharacters <- which(apply(!apply(x$CharacterStatesFromTo, 2, is.na), 2, all))
     
     # Isolate comparable ordering:
-    ComparableOrdering <- Ordering[ComparableCharacters]
+    Comparableordering <- ordering[Comparablecharacters]
     
     # Isolate comparable weights:
-    Comparableweights <- weights[ComparableCharacters]
+    Comparableweights <- weights[Comparablecharacters]
     
     # Isolate only characters that actually differ (change):
-    CharacterDifferences <- which(x$CharacterStatesFromTo["From", ComparableCharacters] != x$CharacterStatesFromTo["To", ComparableCharacters])
+    CharacterDifferences <- which(x$CharacterStatesFromTo["From", Comparablecharacters] != x$CharacterStatesFromTo["To", Comparablecharacters])
     
     # Build character change matrix:
     CharacterChanges <- matrix(nrow = 0, ncol = 5, dimnames = list(c(), c("Character", "From", "To", "Steps", "Weight")))
     
     # If characters change then make a matrix from them:
-    if (length(CharacterDifferences) > 0) CharacterChanges <- rbind(CharacterChanges, cbind(as.numeric(ComparableCharacters[CharacterDifferences]), as.numeric(x$CharacterStatesFromTo["From", ComparableCharacters[CharacterDifferences]]), as.numeric(x$CharacterStatesFromTo["To", ComparableCharacters[CharacterDifferences]]), ifelse(ComparableOrdering[CharacterDifferences] == "unord", 1, abs(as.numeric(x$CharacterStatesFromTo["To", ComparableCharacters[CharacterDifferences]]) - as.numeric(x$CharacterStatesFromTo["From", ComparableCharacters[CharacterDifferences]]))), Comparableweights[CharacterDifferences]))
+    if (length(CharacterDifferences) > 0) CharacterChanges <- rbind(CharacterChanges, cbind(as.numeric(Comparablecharacters[CharacterDifferences]), as.numeric(x$CharacterStatesFromTo["From", Comparablecharacters[CharacterDifferences]]), as.numeric(x$CharacterStatesFromTo["To", Comparablecharacters[CharacterDifferences]]), ifelse(Comparableordering[CharacterDifferences] == "unord", 1, abs(as.numeric(x$CharacterStatesFromTo["To", Comparablecharacters[CharacterDifferences]]) - as.numeric(x$CharacterStatesFromTo["From", Comparablecharacters[CharacterDifferences]]))), Comparableweights[CharacterDifferences]))
     
     # Store character changes as new sublist for x:
     x$CharacterChanges <- CharacterChanges
     
     # Store comparable characters as new sublist of x:
-    x$ComparableCharacters <- ComparableCharacters
+    x$Comparablecharacters <- Comparablecharacters
     
     # Return x:
     return(x)
@@ -571,10 +571,10 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
       if (any(CharacterChanges[, "Steps"] > 1)) {
         
         # Get multistep character changes:
-        MultiStepCharacters <- which(CharacterChanges[, "Steps"] > 1)
+        MultiStepcharacters <- which(CharacterChanges[, "Steps"] > 1)
         
         # For each multistep character change:
-        for(i in rev(MultiStepCharacters)) {
+        for(i in rev(MultiStepcharacters)) {
           
           # Isolate other rows:
           OtherRowNumbers <- setdiff(1:nrow(CharacterChanges), i)
@@ -705,7 +705,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
     EdgeChanges <- unlist(lapply(EdgeList, function(x) sum(x$CharacterChanges[, "Steps"] * x$CharacterChanges[, "Weight"])))
 
     # Get completeness for each edge:
-    EdgeCompleteness <- unlist(lapply(EdgeList, function(x) sum(weights[x$ComparableCharacters]) / sum(weights)))
+    EdgeCompleteness <- unlist(lapply(EdgeList, function(x) sum(weights[x$Comparablecharacters]) / sum(weights)))
     
     # Get duration of each edge:
     EdgeDurations <- unlist(lapply(EdgeList, function(x) x$BranchDuration))
@@ -831,7 +831,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
     CharacterDurations <- (weights / sum(weights)) * sum(tree$edge.length)
     
     # Get vector of completness (opportunity to observe changes) for each character:
-    CharacterCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) {CharacterPresence <- rep(0, times = length(CharacterNumbers)); CharacterPresence[x$ComparableCharacters] <- 1; CharacterPresence * x$BranchDuration})), 2, sum) / sum(tree$edge.length)
+    CharacterCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) {CharacterPresence <- rep(0, times = length(CharacterNumbers)); CharacterPresence[x$Comparablecharacters] <- 1; CharacterPresence * x$BranchDuration})), 2, sum) / sum(tree$edge.length)
     
     # Set global rate:
     GlobalRate <- sum(CharacterChanges) / sum(CharacterCompleteness * CharacterDurations)
@@ -889,10 +889,10 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
     Timebin_changes <- unlist(lapply(as.list(1:(length(TimeBins) - 1)), function(x) {ChangeRows <- AllChanges[, "Bin"] == x; sum(AllChanges[ChangeRows, "Steps"] * AllChanges[ChangeRows, "Weight"])}))
     
     # If using the Close time bin completeness approach get completeness value for each time bin:
-    if (TimeBinApproach == "Close") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations * (sum(weights[x$ComparableCharacters]) / sum(weights)))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations)), 2, sum)
+    if (TimeBinApproach == "Close") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations * (sum(weights[x$Comparablecharacters]) / sum(weights)))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations)), 2, sum)
     
     # If using the Lloyd time bin completeness approach get completeness value for each time bin::
-    if (TimeBinApproach == "Lloyd") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(weights[x$ComparableCharacters], ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(weights, ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum)
+    if (TimeBinApproach == "Lloyd") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(weights[x$Comparablecharacters], ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(weights, ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum)
     
     # Get durations of edges in each time bin:
     TimeBinDurations <- apply(do.call(rbind, lapply(EdgeList, function(x) x$BinnedBranchDurations)), 2, sum)
@@ -946,7 +946,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
   }
 
   # Set global rate for output:
-  GlobalRate <- sum(unlist(lapply(EdgeList, function(x) sum(x$CharacterChanges[, "Steps"] * x$CharacterChanges[, "Weight"])))) / sum(unlist(lapply(EdgeList, function(x) sum(weights[x$ComparableCharacters]) / sum(weights))) * unlist(lapply(EdgeList, function(x) x$BranchDuration)))
+  GlobalRate <- sum(unlist(lapply(EdgeList, function(x) sum(x$CharacterChanges[, "Steps"] * x$CharacterChanges[, "Weight"])))) / sum(unlist(lapply(EdgeList, function(x) sum(weights[x$Comparablecharacters]) / sum(weights))) * unlist(lapply(EdgeList, function(x) x$BranchDuration)))
   
   # If performing Likelihood Ratio Test:
   if (LikelihoodTest == "LRT") {
@@ -997,7 +997,7 @@ test_rates <- function(tree, cladistic.matrix, TimeBins, BranchPartitionsToTest 
   }
 
   # Compile output:
-  Output <- list(TimeBinsUsed = TimeBins, InferredCharacterChanges = AllChanges, IntrinsicCharacterRate = GlobalRate, ContinuousCharactersConvertedToDiscrete = ContinuousCharactersConverted, BranchPartitionResults = BranchPartitionTestResults, CharacterPartitionResults = CharacterPartitionTestResults, CladePartitionResults = CladePartitionTestResults, TimeBinResults = TimeBinTestResults, BranchRates = BranchRates, CharacterRates = CharacterRates, CladeRates = CladeRates, TimeRates = TimeRates, Tree = tree)
+  Output <- list(TimeBinsUsed = TimeBins, InferredCharacterChanges = AllChanges, IntrinsicCharacterRate = GlobalRate, ContinuouscharactersConvertedToDiscrete = ContinuouscharactersConverted, BranchPartitionResults = BranchPartitionTestResults, CharacterPartitionResults = CharacterPartitionTestResults, CladePartitionResults = CladePartitionTestResults, TimeBinResults = TimeBinTestResults, BranchRates = BranchRates, CharacterRates = CharacterRates, CladeRates = CladeRates, TimeRates = TimeRates, Tree = tree)
   
   # Return output:
   return(Output)

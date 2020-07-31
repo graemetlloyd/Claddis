@@ -65,10 +65,10 @@ cladistic.matrix <- prune_cladistic_matrix(cladistic.matrix =
   cladistic.matrix, characters2prune = 1:32)
 
 # Generete random tree for matrix taxa:
-Tree <- rtree(nrow(Day2016$Matrix_1$Matrix))
+Tree <- rtree(nrow(Day2016$matrix_1$Matrix))
 
 # Add taxon names to tree:
-Tree$tip.label <- rownames(Day2016$Matrix_1$Matrix)
+Tree$tip.label <- rownames(Day2016$matrix_1$Matrix)
 
 # Add root age to tree:
 Tree$root.time <- max(diag(vcv(Tree)))
