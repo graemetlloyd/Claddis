@@ -4,12 +4,12 @@
 \alias{plot_rates_character}
 \title{Visualize a rate test time series}
 \usage{
-plot_rates_character(RateOutput, ModelNumber, ...)
+plot_rates_character(test_rates_output, model_number, ...)
 }
 \arguments{
-\item{RateOutput}{Rate output from \link{test_rates}.}
+\item{test_rates_output}{Rate output from \link{test_rates}.}
 
-\item{ModelNumber}{The number of the model you wish to visualise from the rate output.}
+\item{model_number}{The number of the model you wish to visualise from the rate output.}
 
 \item{...}{Other options to be passed to \link{geoscalePlot}.}
 }

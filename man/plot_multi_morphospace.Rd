@@ -37,7 +37,7 @@ Plots multiple bivariate plots of ordination axes starting with 1 and up to N, s
 \examples{
 
 # Create PCOA data:
-pcoa_input <- ordinate_cladistic_matrix(Michaux1989)
+pcoa_input <- ordinate_cladistic_matrix(michaux_1989)
 
 # Plot first three axes:
 plot_multi_morphospace(pcoa_input, N_axes = 3)

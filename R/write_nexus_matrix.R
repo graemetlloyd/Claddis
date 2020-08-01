@@ -4,7 +4,7 @@
 #'
 #' Writes out a morphological data file in #NEXUS format.
 #'
-#' @param cladistic.matrix The cladistic matrix in the format imported by \link{read_nexus_matrix}.
+#' @param cladistic_matrix The cladistic matrix in the format imported by \link{read_nexus_matrix}.
 #' @param file_name The file name to write to. Should end in \code{.nex}.
 #'
 #' @details
@@ -26,13 +26,13 @@
 #' @examples
 #'
 #' # Write out Michaux 1989 to current working directory:
-#' write_nexus_matrix(cladistic.matrix = Michaux1989, file_name = "Michaux1989.nex")
+#' write_nexus_matrix(cladistic_matrix = michaux_1989, file_name = "michaux_1989.nex")
 #'
 #' # Remove file when finished:
-#' file.remove("Michaux1989.nex")
+#' file.remove("michaux_1989.nex")
 #'
 #' @export write_nexus_matrix
-write_nexus_matrix <- function(cladistic.matrix, file_name) {
+write_nexus_matrix <- function(cladistic_matrix, file_name) {
   
   # Subfunction to convert matrices back to symbols, missing and gap characters:
   convert_matrix <- function(DataMatrix) {
@@ -137,8 +137,8 @@ write_nexus_matrix <- function(cladistic.matrix, file_name) {
     
   }
   
-  # Isolate just data blocks (i.e., cladistic.matrix without topper):
-  DataBlocks <- cladistic.matrix[2:length(cladistic.matrix)]
+  # Isolate just data blocks (i.e., cladistic_matrix without topper):
+  DataBlocks <- cladistic_matrix[2:length(cladistic_matrix)]
   
   # Get block names:
   block_names <- unlist(lapply(DataBlocks, '[[', "block_name"))
@@ -165,10 +165,10 @@ write_nexus_matrix <- function(cladistic.matrix, file_name) {
   DataBlocksAsTextStrings <- lapply(DataBlocks, convert_matrix)
   
   # Set up header block (returns empty string if nothing there):
-  headerBlock <- ifelse(nchar(cladistic.matrix$topper$header) > 0, paste("[", cladistic.matrix$topper$header, "]\n\n", sep = ""), "")
+  headerBlock <- ifelse(nchar(cladistic_matrix$topper$header) > 0, paste("[", cladistic_matrix$topper$header, "]\n\n", sep = ""), "")
 
   # Set up taxa block (only required if multiple matrix blocks as sets number of taxa, will be empty string otherwise):
-  TaxaBlock <- ifelse(length(DataBlocks) > 1, paste("BEGIN TAXA;\n\tDIMENSIONS NTAX=", NTaxa, ";\n\tTAXLABELS\n\t\t", paste(rownames(cladistic.matrix$matrix_1$matrix), collapse = " "), "\n;\nEND;\n\n", sep = ""), "")
+  TaxaBlock <- ifelse(length(DataBlocks) > 1, paste("BEGIN TAXA;\n\tDIMENSIONS NTAX=", NTaxa, ";\n\tTAXLABELS\n\t\t", paste(rownames(cladistic_matrix$matrix_1$matrix), collapse = " "), "\n;\nEND;\n\n", sep = ""), "")
   
   # Set up data block (only required if a single matrix block):
   DataBlock <- ifelse(length(DataBlocks) == 1, paste("BEGIN DATA;\n\tDIMENSIONS  NTAX=", NTaxa, " NCHAR=", Ncharacters, " ;\n\tFORMAT DATATYPE=", datatypes, " SYMBOLS=\" ", symbols, "\" MISSING=", missing, " GAP=", gap, " ;\n", sep = ""), "")
@@ -180,10 +180,10 @@ write_nexus_matrix <- function(cladistic.matrix, file_name) {
   MatrixBlock <- paste(paste(CharacterBlock, unlist(lapply(DataBlocksAsTextStrings, paste, collapse = "\n")), "\n;\nEND;\n\n", sep = ""), collapse = "")
   
   # Make sure step matrices are a list if null:
-  if (!is.list(cladistic.matrix$topper$step_matrices)) cladistic.matrix$topper$step_matrices <- list(NULL)
+  if (!is.list(cladistic_matrix$topper$step_matrices)) cladistic_matrix$topper$step_matrices <- list(NULL)
   
   # Create step matrix block:
-  StepMatrixBlock <- paste(ifelse(!unlist(lapply(cladistic.matrix$topper$step_matrices, is.null)), paste(paste("\tUSERTYPE '", names(cladistic.matrix$topper$step_matrices), "' (STEPMATRIX) = ", unlist(lapply(cladistic.matrix$topper$step_matrices, ncol)), "\n", sep = ""), paste("\t", unlist(lapply(lapply(cladistic.matrix$topper$step_matrices, colnames), paste, collapse = " ")), "\n\t", sep = ""), unlist(lapply(lapply(lapply(cladistic.matrix$topper$step_matrices, function(x) { diag(x) <- "."; return(x) }), apply, 1, paste, collapse = " "), paste, collapse = "\n\t")), "\n\t;\n", sep = ""), ""), collapse = "")
+  StepMatrixBlock <- paste(ifelse(!unlist(lapply(cladistic_matrix$topper$step_matrices, is.null)), paste(paste("\tUSERTYPE '", names(cladistic_matrix$topper$step_matrices), "' (STEPMATRIX) = ", unlist(lapply(cladistic_matrix$topper$step_matrices, ncol)), "\n", sep = ""), paste("\t", unlist(lapply(lapply(cladistic_matrix$topper$step_matrices, colnames), paste, collapse = " ")), "\n\t", sep = ""), unlist(lapply(lapply(lapply(cladistic_matrix$topper$step_matrices, function(x) { diag(x) <- "."; return(x) }), apply, 1, paste, collapse = " "), paste, collapse = "\n\t")), "\n\t;\n", sep = ""), ""), collapse = "")
 
   # Get ordering of all characters in sequence:
   ordering <- unlist(lapply(DataBlocks, '[[', "ordering"))

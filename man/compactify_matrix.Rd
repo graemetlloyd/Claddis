@@ -4,10 +4,10 @@
 \alias{compactify_matrix}
 \title{Collapses matrix to unique character state distributions}
 \usage{
-compactify_matrix(cladistic.matrix, Message = TRUE)
+compactify_matrix(cladistic_matrix, Message = TRUE)
 }
 \arguments{
-\item{cladistic.matrix}{The cladistic matrix in the format imported by \link{read_nexus_matrix}.}
+\item{cladistic_matrix}{The cladistic matrix in the format imported by \link{read_nexus_matrix}.}
 
 \item{Message}{Logical indicating whether or not a message should be printed to the screen if the matrix cannot be compactified.}
 }
@@ -24,19 +24,19 @@ The function also deletes any characters weighted zero from the matrix and will 
 \examples{
 
 # Examine the matrix pre-compactification:
-Michaux1989$matrix_1$matrix
+michaux_1989$matrix_1$matrix
 
 # Examine the weights pre-compactification:
-Michaux1989$matrix_1$weights
+michaux_1989$matrix_1$weights
 
 # Compactify the matrix:
-Michaux1989compact <- compactify_matrix(Michaux1989)
+michaux_1989compact <- compactify_matrix(michaux_1989)
 
 # Examine the matrix post-compactification:
-Michaux1989compact$matrix_1$matrix
+michaux_1989compact$matrix_1$matrix
 
 # Examine the weights post-compactification:
-Michaux1989compact$matrix_1$weights
+michaux_1989compact$matrix_1$weights
 
 }
 \seealso{

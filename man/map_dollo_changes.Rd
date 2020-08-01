@@ -4,12 +4,12 @@
 \alias{map_dollo_changes}
 \title{Stochastic Character Map For Dollo Character}
 \usage{
-map_dollo_changes(time_tree, tip.states)
+map_dollo_changes(time_tree, tip_states)
 }
 \arguments{
 \item{time_tree}{A tree in phylo format with barnch lengths and a value for \code{$root.time}.}
 
-\item{tip.states}{A vector of tip states (must be 0 or 1) with names matching \code{tree$tip.label}.}
+\item{tip_states}{A vector of tip states (must be 0 or 1) with names matching \code{tree$tip.label}.}
 }
 \value{
 \item{Changes}{A matrix of all changes (gains and losses).}
@@ -42,13 +42,13 @@ time_tree <- rtree(10)
 time_tree$root.time <- 100
 
 # Generate random tip states (0s and 1s):
-tip.states <- sample(c(0, 1), 10, replace = TRUE)
+tip_states <- sample(c(0, 1), 10, replace = TRUE)
 
 # Add labels to tip states:
-names(tip.states) <- time_tree$tip.label
+names(tip_states) <- time_tree$tip.label
 
 # Get a single stochastic character map:
-out <- map_dollo_changes(time_tree, tip.states)
+out <- map_dollo_changes(time_tree, tip_states)
 
 # View matrix of changes:
 out$Changes

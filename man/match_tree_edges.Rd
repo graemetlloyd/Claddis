@@ -4,12 +4,12 @@
 \alias{match_tree_edges}
 \title{Edge matching function}
 \usage{
-match_tree_edges(original.tree, pruned.tree)
+match_tree_edges(original_tree, pruned_tree)
 }
 \arguments{
-\item{original.tree}{A tree in phylo format.}
+\item{original_tree}{A tree in phylo format.}
 
-\item{pruned.tree}{A tree in phylo format that represents a pruned version of \code{original.tree}.}
+\item{pruned_tree}{A tree in phylo format that represents a pruned version of \code{original_tree}.}
 }
 \value{
 \item{matching.edges}{A list of the matching edges.}
@@ -25,13 +25,13 @@ Finds matching edge(s) and node(s) for a pruned tree in the original tree from w
 \examples{
 
 # Create a random 10-taxon tree:
-original.tree <- rtree(10)
+original_tree <- rtree(10)
 
 # Remove three leaves:
-pruned.tree <- drop.tip(original.tree, c("t1", "t3", "t8"))
+pruned_tree <- drop.tip(original_tree, c("t1", "t3", "t8"))
 
 # Find matching edges:
-X <- match_tree_edges(original.tree, pruned.tree)
+X <- match_tree_edges(original_tree, pruned_tree)
 
 # Show matching edges:
 X$matching.edges

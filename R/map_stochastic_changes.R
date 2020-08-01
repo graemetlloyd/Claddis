@@ -4,8 +4,8 @@
 #'
 #' Takes a cladistic matrix and time-scaled tree and makes point estimates for every character change using stochastic character mapping.
 #'
-#' @param cladistic.matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
-#' @param time_tree A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{cladistic.matrix}.
+#' @param cladistic_matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
+#' @param time_tree A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{cladistic_matrix}.
 #' @param time_bins A vector of ages representing the boundaries of a series of time bins.
 #' @param NSimulations The number of simulations to perform (passed to \code{make.simmap}.
 #' @param polymorphism.behaviour What to do with polymorphic (&) characters. One of "equalp", "missing", or "random". See details.
@@ -37,29 +37,29 @@
 #' set.seed(2)
 #'
 #' # Use Day 2016 as source matrix:
-#' cladistic.matrix <- Day2016
+#' cladistic_matrix <- day_2016
 #'
 #' # Prune out continuous characters:
-#' cladistic.matrix <- prune_cladistic_matrix(cladistic.matrix =
-#'   cladistic.matrix, blocks2prune = 1)
+#' cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix =
+#'   cladistic_matrix, blocks2prune = 1)
 #'
 #' # Prune out majority of characters so
 #' # example runs quickly:
-#' cladistic.matrix <- prune_cladistic_matrix(cladistic.matrix =
-#'   cladistic.matrix, characters2prune = 1:32)
+#' cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix =
+#'   cladistic_matrix, characters2prune = 1:32)
 #'
 #' # Generete random tree for matrix taxa:
-#' time_tree <- rtree(nrow(Day2016$matrix_1$matrix))
+#' time_tree <- rtree(nrow(day_2016$matrix_1$matrix))
 #'
 #' # Add taxon names to tree:
-#' time_tree$tip.label <- rownames(Day2016$matrix_1$matrix)
+#' time_tree$tip.label <- rownames(day_2016$matrix_1$matrix)
 #'
 #' # Add root age to tree:
 #' time_tree$root.time <- max(diag(vcv(time_tree)))
 #'
 #' # Get all state changes for two simulations:
 #' StateChanges <-
-#'   map_stochastic_changes(cladistic.matrix = cladistic.matrix,
+#'   map_stochastic_changes(cladistic_matrix = cladistic_matrix,
 #'   time_tree = time_tree, time_bins = seq(time_tree$root.time, 0,
 #'   length.out = 3), NSimulations = 2)
 #'
@@ -80,7 +80,7 @@
 #' StateChanges$InternalEdgeLengthsPerBin
 #'
 #' @export map_stochastic_changes
-map_stochastic_changes <- function(cladistic.matrix, time_tree, time_bins, NSimulations = 10, polymorphism.behaviour = "equalp", uncertainty.behaviour = "equalp", inapplicable.behaviour = "missing") {
+map_stochastic_changes <- function(cladistic_matrix, time_tree, time_bins, NSimulations = 10, polymorphism.behaviour = "equalp", uncertainty.behaviour = "equalp", inapplicable.behaviour = "missing") {
   
   # IMPROVE CUSTOMISATION OF MAKE.SIMMAP WITH OPTIONS FOR PI, Q ETC. (FLAT PRIOR ON ROOT MAY BE PARTICULARLY BAD? ALLOW MAYBE SKEWING TOWARDS OUTGROUP STATE AS SOME KIND OF SLIDING VALUE?).
   # AND ONLY PERFORM SCM ON UNIQUE STATE DISTRIBUTON-CHARACTER TYPE COMBOS
@@ -98,7 +98,7 @@ map_stochastic_changes <- function(cladistic.matrix, time_tree, time_bins, NSimu
   # IF ADDING TREES TO OUTPUT CONVERT THEM TO CLASS MULTIPHYLO, E.G. STOCHASTIC CHARACTER MAPS WITH NAS - NOTE THIS IN MANUAL TOO AS AN EXTENSION OF WHAT PHTTOOLS DOES.
   
   # Check for continuous and step matrices and stop and warn user if found:
-  if (length(setdiff(unique(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) x$ordering))), c("unord", "ord"))) > 0) stop("cladistic.matrix can only contain characters of type \"ord\" or \"unord\" (i.e., no step matrices or continuous characters).")
+  if (length(setdiff(unique(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], function(x) x$ordering))), c("unord", "ord"))) > 0) stop("cladistic_matrix can only contain characters of type \"ord\" or \"unord\" (i.e., no step matrices or continuous characters).")
   
   # Check tree has branch lengths:
   if (is.null(time_tree$edge.length)) stop("time_tree does not have branch lengths (durations). Try timescaling the tree, e.g., with DatePhylo.")
@@ -122,25 +122,25 @@ map_stochastic_changes <- function(cladistic.matrix, time_tree, time_bins, NSimu
   time_bins <- sort(unique(time_bins), decreasing = TRUE)
 
   # Get tree node ages:
-  node_ages <- date_nodes(time_tree)
+  node_ages <- date_nodes(time_tree = time_tree)
   
   # Build all data into single matrix:
-  MatrixBlock <- do.call(cbind, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"))
+  MatrixBlock <- do.call(cbind, lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "matrix"))
   
   # If inapplicable.behaviour is missing replace inaplicables with NAs:
   if (inapplicable.behaviour == "missing" && any(MatrixBlock[!is.na(MatrixBlock)] == "")) MatrixBlock[which(MatrixBlock == "")] <- NA
   
   # Assemble all ordering values into a single vector:
-  ordering <- unname(do.call(c, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "ordering")))
+  ordering <- unname(do.call(c, lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "ordering")))
   
   # Assemble all minimum values into a single vector:
-  minimum_values <- unname(do.call(c, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "minimum_values")))
+  minimum_values <- unname(do.call(c, lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "minimum_values")))
   
   # Assemble all maximum values into a single vector:
-  maximum_values <- unname(do.call(c, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "maximum_values")))
+  maximum_values <- unname(do.call(c, lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "maximum_values")))
   
   # Assemble all maximum values into a single vector:
-  weights <- unname(do.call(c, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "weights")))
+  weights <- unname(do.call(c, lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "weights")))
   
   # Build each character into list values starting with tip state lists (of N Simulations in length):
   CharacterList <- lapply(lapply(apply(MatrixBlock, 2, list), unlist), function(x) {y <- list(); y$TipStates <- lapply(apply(matrix(rep(x, times = NSimulations), ncol = NSimulations, dimnames = list(names(x), c())), 2, list), unlist); return(y)})
@@ -313,7 +313,7 @@ map_stochastic_changes <- function(cladistic.matrix, time_tree, time_bins, NSimu
         x$PrunedTree <- drop.tip(x$FullTree, TipsToDrop)
         
         # Correct root time manually:
-        x$PrunedTree$root.time <- unname(node_ages[find_mrca(setdiff(time_tree$tip.label, TipsToDrop), time_tree)])
+        x$PrunedTree$root.time <- unname(node_ages[find_mrca(descendant_names = setdiff(time_tree$tip.label, TipsToDrop), tree = time_tree)])
         
       }
       
@@ -373,7 +373,7 @@ map_stochastic_changes <- function(cladistic.matrix, time_tree, time_bins, NSimu
     }
     
     # If more than two tips just apply get node ages function:
-    if (NumberOfTips > 2) x$Pruneddate_nodes <- date_nodes(x$PrunedTree)
+    if (NumberOfTips > 2) x$Pruneddate_nodes <- date_nodes(time_tree = x$PrunedTree)
     
     # Return full output:
     return(x)
@@ -407,7 +407,7 @@ map_stochastic_changes <- function(cladistic.matrix, time_tree, time_bins, NSimu
       TipNames <- x$PrunedTree$tip.label
       
       # Get shared ancestor node on full tree:
-      AncestorNode <- find_mrca(descs = TipNames, tree = tree)
+      AncestorNode <- find_mrca(descendant_names = TipNames, tree = tree)
       
       # Get two tip numbers for two tips on full tree:
       TipNumbers <- unlist(lapply(lapply(as.list(TipNames), '==', tree$tip.label), which))
@@ -694,7 +694,7 @@ map_stochastic_changes <- function(cladistic.matrix, time_tree, time_bins, NSimu
               StartAgeOfPrunedEdge <- unname(x$Pruneddate_nodes[x$PrunedTree$edge[j, 1]])
               
               # Get times at which character changes occur:
-              ChangeTimes <- unname(StartAgeOfPrunedEdge - cumsum(PrunedStochasticMaps[1:(length(PrunedStochasticMaps) - 1)]))
+              change_times <- unname(StartAgeOfPrunedEdge - cumsum(PrunedStochasticMaps[1:(length(PrunedStochasticMaps) - 1)]))
               
               # Build matrix of from-to changes:
               FromToChanges <- cbind(names(PrunedStochasticMaps[1:(length(PrunedStochasticMaps) - 1)]), names(PrunedStochasticMaps[2:length(PrunedStochasticMaps)]))
@@ -703,7 +703,7 @@ map_stochastic_changes <- function(cladistic.matrix, time_tree, time_bins, NSimu
               MatchingEdgesAstime_bins <- c(StartAgeOfPrunedEdge, StartAgeOfPrunedEdge - cumsum(MatchingEdgeLengths))
               
               # Get edge on whicb change occurs:
-              ChangeEdges <- unlist(lapply(as.list(ChangeTimes), function(z) min(which(z > MatchingEdgesAstime_bins)) - 1))
+              ChangeEdges <- unlist(lapply(as.list(change_times), function(z) min(which(z > MatchingEdgesAstime_bins)) - 1))
               
               # Create full tree stochastic character map of correct size:
               FullStochasticMaps <- lapply(as.list(rle(sort(c(ChangeEdges, 1:length(MatchingEdges))))$lengths), function(z) rep(0, z))
@@ -721,10 +721,10 @@ map_stochastic_changes <- function(cladistic.matrix, time_tree, time_bins, NSimu
               EdgeSwitchTimes <- MatchingEdgesAstime_bins[2:length(MatchingEdgesAstime_bins)]
               
               # Whilst there are still changes or edge switches left to deal with:
-              while(length(c(EdgeSwitchTimes, ChangeTimes)) > 0) {
+              while(length(c(EdgeSwitchTimes, change_times)) > 0) {
                 
                 # Set next event time:
-                NextEvent <- max(c(EdgeSwitchTimes, ChangeTimes))
+                NextEvent <- max(c(EdgeSwitchTimes, change_times))
                 
                 # If next event is to switch edges:
                 if (EdgeSwitchTimes[1] == NextEvent) {
@@ -774,7 +774,7 @@ map_stochastic_changes <- function(cladistic.matrix, time_tree, time_bins, NSimu
                   CurrentTime <- NextEvent
                   
                   # Prune change time from vector:
-                  ChangeTimes <- ChangeTimes[-1]
+                  change_times <- change_times[-1]
                   
                 }
                 
@@ -829,10 +829,10 @@ map_stochastic_changes <- function(cladistic.matrix, time_tree, time_bins, NSimu
         FromsAndTos <- matrix(as.numeric(unlist(strsplit(unlist(lapply(y$maps[EdgesWithChanges], function(z) paste(names(z[1:(length(z) - 1)]), names(z[2:length(z)]), sep = "%%"))), split = "%%"))), ncol = 2, byrow = TRUE)
         
         # Get character change times:
-        CharacterChangeTimes <- unname(unlist(mapply('-', AgeAtStartOfEdgesWithChanges, lapply(y$maps[EdgesWithChanges], function(z) cumsum(z[1:(length(z) - 1)])))))
+        Characterchange_times <- unname(unlist(mapply('-', AgeAtStartOfEdgesWithChanges, lapply(y$maps[EdgesWithChanges], function(z) cumsum(z[1:(length(z) - 1)])))))
         
         # Build changes matrix:
-        ChangesMatrix <- cbind(FromsAndTos, unlist(mapply(rep, EdgesWithChanges, unlist(lapply(y$maps[EdgesWithChanges], length)) - 1)), CharacterChangeTimes)
+        ChangesMatrix <- cbind(FromsAndTos, unlist(mapply(rep, EdgesWithChanges, unlist(lapply(y$maps[EdgesWithChanges], length)) - 1)), Characterchange_times)
         
         # Add column names to matrix:
         colnames(ChangesMatrix) <- c("From", "To", "Edge", "Time")

@@ -4,12 +4,12 @@
 \alias{fix_root_time}
 \title{Fixes root.time after taxa have been pruned from a tree}
 \usage{
-fix_root_time(original.tree, pruned.tree)
+fix_root_time(original_tree, pruned_tree)
 }
 \arguments{
-\item{original.tree}{A tree in phylo format.}
+\item{original_tree}{A tree in phylo format.}
 
-\item{pruned.tree}{A tree in phylo format that represents a pruned version of \code{original.tree}.}
+\item{pruned_tree}{A tree in phylo format that represents a pruned version of \code{original_tree}.}
 }
 \value{
 Returns a tree (phylo object) with a fixed \code{$root.time}.
@@ -33,16 +33,16 @@ tree <- read.tree(text = "(A:1,(B:1,(C:1,D:1):1):1);")
 tree$root.time <- 20
 
 # Now prune taxon A:
-pruned.tree <- drop.tip(tree, "A")
+pruned_tree <- drop.tip(tree, "A")
 
 # Show that drop.tip has not updated the tree's root time:
-pruned.tree$root.time
+pruned_tree$root.time
 
 # Use the function to fix the root time:
-pruned.tree <- fix_root_time(tree, pruned.tree)
+pruned_tree <- fix_root_time(tree, pruned_tree)
 
 # Show that the root time is now fixed (19 Ma):
-pruned.tree$root.time
+pruned_tree$root.time
 
 }
 \author{

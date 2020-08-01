@@ -4,14 +4,14 @@
 \alias{plot_rates_tree}
 \title{Visualize a rate test time series}
 \usage{
-plot_rates_tree(RateOutput, ModelType, ModelNumber, ...)
+plot_rates_tree(test_rates_output, model_type, model_number, ...)
 }
 \arguments{
-\item{RateOutput}{Rate output from \link{test_rates}.}
+\item{test_rates_output}{Rate output from \link{test_rates}.}
 
-\item{ModelType}{The type of model to plot. Must be one of "branch" or "clade".}
+\item{model_type}{The type of model to plot. Must be one of "branch" or "clade".}
 
-\item{ModelNumber}{The number of the model you wish to visualise from the rate output.}
+\item{model_number}{The number of the model you wish to visualise from the rate output.}
 
 \item{...}{Other options to be passed to \link{geoscalePlot}.}
 }

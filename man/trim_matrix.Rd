@@ -29,7 +29,7 @@ If the matrix includes reconstructed ancestors the user should also provide the 
 \examples{
 
 # Get morphological distances for Michaux (1989) data set:
-distances <- calculate_morphological_distances(Michaux1989)
+distances <- calculate_morphological_distances(michaux_1989)
 
 # Attempt to trim max.dist.matrix:
 trim_matrix(distances$DistanceMatrix)

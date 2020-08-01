@@ -4,14 +4,14 @@
 #'
 #' Finds the last common ancestor (node) of a set of two or more descendant tips.
 #'
-#' @param descs A vector of mode character representing the tip names for which an ancestor is sought.
+#' @param descendant_names A vector of mode character representing the tip names for which an ancestor is sought.
 #' @param tree The tree as a phylo object.
 #'
 #' @details
 #'
 #' Intended for use as an internal function for \link{trim_matrix}, but potentially of more general use.
 #'
-#' @return \item{anc.node}{The ancestral node number.}
+#' @return \item{ancestor_node}{The ancestral node number.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -29,32 +29,33 @@
 #' 
 #' # Use find_mrca to show that the most recent common
 #' # ancestor of B, C, and D is node 6:
-#' find_mrca(c("B", "C", "D"), tree)
+#' find_mrca(descendant_names = c("B", "C", "D"),
+#'   tree = tree)
 #' 
 #' @export find_mrca
-find_mrca <- function(descs, tree) {
+find_mrca <- function(descendant_names, tree) {
 
   # Get tip numbers:
-  tipnos <- match(descs, tree$tip.label)
+  tipnos <- match(descendant_names, tree$tip.label)
   
   # Get ancestral nodes in order:
-  anc.node <- sort(unique(tree$edge[, 1][match(tipnos, tree$edge[, 2])]))
+  ancestor_node <- sort(unique(tree$edge[, 1][match(tipnos, tree$edge[, 2])]))
   
   # Keep going until a single ancestral node is converged upon:
-  while(length(anc.node) > 1) {
+  while(length(ancestor_node) > 1) {
     
     # Get node with highest number (definitely not ancestor):
-    highestnode <- anc.node[length(anc.node)]
+    highest_node <- ancestor_node[length(ancestor_node)]
     
     # Remove this node from the list:
-    anc.node <- anc.node[-length(anc.node)]
+    ancestor_node <- ancestor_node[-length(ancestor_node)]
     
     # Find its ancestor and add to unique list:
-    anc.node <- sort(unique(c(anc.node, tree$edge[match(highestnode, tree$edge[, 2]), 1])))
+    ancestor_node <- sort(unique(c(ancestor_node, tree$edge[match(highest_node, tree$edge[, 2]), 1])))
 
   }
   
   # Return ancestral node:
-  return(anc.node)
+  return(ancestor_node)
 
 }

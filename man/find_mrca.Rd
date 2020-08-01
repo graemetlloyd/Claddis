@@ -4,15 +4,15 @@
 \alias{find_mrca}
 \title{Find ancestor}
 \usage{
-find_mrca(descs, tree)
+find_mrca(descendant_names, tree)
 }
 \arguments{
-\item{descs}{A vector of mode character representing the tip names for which an ancestor is sought.}
+\item{descendant_names}{A vector of mode character representing the tip names for which an ancestor is sought.}
 
 \item{tree}{The tree as a phylo object.}
 }
 \value{
-\item{anc.node}{The ancestral node number.}
+\item{ancestor_node}{The ancestral node number.}
 }
 \description{
 Finds the last common ancestor (node) of a set of two or more descendant tips.
@@ -34,7 +34,8 @@ nodelabels()
 
 # Use find_mrca to show that the most recent common
 # ancestor of B, C, and D is node 6:
-find_mrca(c("B", "C", "D"), tree)
+find_mrca(descendant_names = c("B", "C", "D"),
+  tree = tree)
 
 }
 \author{

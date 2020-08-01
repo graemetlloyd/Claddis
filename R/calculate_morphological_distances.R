@@ -4,9 +4,9 @@
 #'
 #' Takes a cladistic morphological dataset and converts it into a set of pairwise distances.
 #'
-#' @param cladistic.matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
-#' @param distance.metric The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).
-#' @param ged.type The type of GED to use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.
+#' @param cladistic_matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
+#' @param distance_metric The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).
+#' @param ged_type The type of GED to use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.
 #' @param distance.transformation The type of distance transformation to perform. Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default). (Note: this is only really appropriate for the proportional distances, i.e., "GC" and "MORD".)
 #' @param polymorphism.behaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}.
 #' @param uncertainty.behaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}.
@@ -20,7 +20,7 @@
 #'
 #' Claddis currently offers four different distance metrics: 1. Raw Euclidean Distance (\code{RED}) - this is only really applicable if there are no missing data, 2. The Gower Coefficient (\code{GC}; Gower 1971) - this rescales distances by the number of characters that can be coded for both taxa in each pairwise comparison thus correcting for missing data, 3. The Maximum Observable Rescaled Distance (\code{MORD}) - this was introduced by Lloyd (2016) as an extension of the \code{GC} designed to deal with the fact that multistate ordered characters can lead to \code{GC}s of greater than 1 and works by rescaling by the maximum possible distance that could be observed based on the number of characters codable in each pairwise comparison meaning all resulting distances are on a zero to one scale, and 4. The Generalised Euclidean Distance - this was introduced by Wills (1998) as a means of correcting for the fact that a \code{RED} metric will become increasingly non-Euclidean as the amount of missing data increases and works by filling in missing distances (for characters that are coded as missing in at least one taxon in the pairwise comparison) by using the mean pairwise dissimilarity for that taxon pair as a substitute. In effect then, \code{RED} makes no consideration of missing data, \code{GC} and \code{MORD} normalise by the available data (and are identical if there are no ordered multistate characters), and \code{GED} fills in missing distances by extrapolating from the available data.
 #'
-#' Note that Lloyd (2016) misidentified the substitute dissimilarity for the \code{GED} as the mean for the whole data set (Hopkins and St John 2018) and this was the way the GED implementation of Claddis operated up to version 0.2. This has now been amended (as of version 0.3) so that the function produces the \code{GED} in the form that Wills (1998) intended. However, this implementation can still be accessed as the \code{Legacy} option for \code{ged.type}, with \code{Wills} being the WIlls (1998) implementation. An advantage of this misinterpreted form of \code{GED} is that it will always return a complete pairwise distance matrix, however it is not recommended (see Lloyd 2016). Instead a third option for \code{ged.type} - (\code{Hybrid}) - offers the same outcome but only uses the mean distance from the entire matrix in the case where there are no codable characters in common in a pairwise comparison. This new hybrid option has not been used in a published study.
+#' Note that Lloyd (2016) misidentified the substitute dissimilarity for the \code{GED} as the mean for the whole data set (Hopkins and St John 2018) and this was the way the GED implementation of Claddis operated up to version 0.2. This has now been amended (as of version 0.3) so that the function produces the \code{GED} in the form that Wills (1998) intended. However, this implementation can still be accessed as the \code{Legacy} option for \code{ged_type}, with \code{Wills} being the WIlls (1998) implementation. An advantage of this misinterpreted form of \code{GED} is that it will always return a complete pairwise distance matrix, however it is not recommended (see Lloyd 2016). Instead a third option for \code{ged_type} - (\code{Hybrid}) - offers the same outcome but only uses the mean distance from the entire matrix in the case where there are no codable characters in common in a pairwise comparison. This new hybrid option has not been used in a published study.
 #'
 #' Typically the resulting distance matrix will be used in an ordination procedure such as principal coordinates (effectively classical multidimensional scaling where k, the number of axes, is maximised at N - 1, where N is the number of rows (i.e., taxa) in the matrix). As such the distance should be - or approximate - Euclidean and hence a square root transformation is typically applied (\code{distance.transformation} with the \code{sqrt} option). However, if applying pre-ordination (i.e., ordination-free) disparity metrics (e.g., weighted mean pairwise distance) you may wish to avoid any transformation (\code{none} option). In particular the \code{MORD} will only fall on a zero to one scale if this is the case. However, if transforming the \code{MORD} for ordination this zero to one property may mean the arcsine square root (\code{arcsine_sqrt} option) is preferred. (Note that if using only unordered multistate or binary characters and the \code{GC} the zero to one scale will apply too.)
 #'
@@ -32,7 +32,7 @@
 #'
 #' @return
 #'
-#' \item{distance.metric}{The distance metric used.}
+#' \item{distance_metric}{The distance metric used.}
 #' \item{DistanceMatrix}{The distance matrix returned.}
 #' \item{ComparableCharacterMatrix}{The matrix of characters that can be compared for each pairwise distance.}
 #'
@@ -54,7 +54,7 @@
 #'
 #' # Get morphological distances for the Day et
 #' # al. (2016) data set:
-#' distances <- calculate_morphological_distances(Day2016)
+#' distances <- calculate_morphological_distances(day_2016)
 #'
 #' # Show distance metric:
 #' distances$DistanceMetric
@@ -77,7 +77,7 @@
 #'
 #' # Get morphological distances for the Day et
 #' # al. (2016) data set using HSJ approach:
-#' distances <- calculate_morphological_distances(Day2016,
+#' distances <- calculate_morphological_distances(day_2016,
 #'   inapplicable.behaviour = "HSJ",
 #'   character.dependencies = character.dependencies,
 #'   alpha = 0.5)
@@ -93,7 +93,7 @@
 #' distances$ComparableCharacterMatrix
 #'
 #' @export calculate_morphological_distances
-calculate_morphological_distances <- function(cladistic.matrix, distance.metric = "MORD", ged.type = "Wills", distance.transformation = "arcsine_sqrt", polymorphism.behaviour = "min.difference", uncertainty.behaviour = "min.difference", inapplicable.behaviour = "missing", character.dependencies = NULL, alpha = 0.5) {
+calculate_morphological_distances <- function(cladistic_matrix, distance_metric = "MORD", ged_type = "Wills", distance.transformation = "arcsine_sqrt", polymorphism.behaviour = "min.difference", uncertainty.behaviour = "min.difference", inapplicable.behaviour = "missing", character.dependencies = NULL, alpha = 0.5) {
   
   # ADD HOPKINS SUGGESTION (VIA EMAIL) FOR FOURTH GEDTYPE WHERE MEAN DISTANCE FOR CHARACTER REPLACES MISSING VALUES.
   # CHECK POLYMORPHISM UNCERTAINTY IN GENERAL AS NOT CLEAR IT IS DOING WHAT IT SHOULD DO.
@@ -103,10 +103,10 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   # ALLOW MANHATTAN DISTANCES
   
   # Subfunction to find comparable characters for a pairwise taxon comparison:
-  find_comparable <- function(interest.col, cladistic.matrix) {
+  find_comparable <- function(interest.col, cladistic_matrix) {
     
     # Get intersection of characters that are coded for both taxa in a pair:
-    output <- intersect(intersect(which(!is.na(cladistic.matrix[interest.col[[1]], ])), which(cladistic.matrix[interest.col[[1]], ] != "")), intersect(which(!is.na(cladistic.matrix[interest.col[[2]], ])), which(cladistic.matrix[interest.col[[2]], ] != "")))
+    output <- intersect(intersect(which(!is.na(cladistic_matrix[interest.col[[1]], ])), which(cladistic_matrix[interest.col[[1]], ] != "")), intersect(which(!is.na(cladistic_matrix[interest.col[[2]], ])), which(cladistic_matrix[interest.col[[2]], ] != "")))
     
     # Return output:
     return(list(output))
@@ -114,13 +114,13 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   }
   
   # Subfunction to get character strings for each pair of taxa:
-  get_pairwise_strings <- function(interest.col, cladistic.matrix) {
+  get_pairwise_strings <- function(interest.col, cladistic_matrix) {
     
     # Get character states for first taxon in pair:
-    row1 <- cladistic.matrix[rownames(cladistic.matrix)[interest.col[[1]]], ]
+    row1 <- cladistic_matrix[rownames(cladistic_matrix)[interest.col[[1]]], ]
     
     # Get character states for second taxon in pair:
-    row2 <- cladistic.matrix[rownames(cladistic.matrix)[interest.col[[2]]], ]
+    row2 <- cladistic_matrix[rownames(cladistic_matrix)[interest.col[[2]]], ]
     
     # Return output as a list:
     return(list(row1, row2))
@@ -297,7 +297,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   }
   
   # Subfunction to find incomparable characters:
-  find_incomparable <- function(comparable.characters, cladistic.matrix) return(setdiff(1:ncol(cladistic.matrix), comparable.characters))
+  find_incomparable <- function(comparable.characters, cladistic_matrix) return(setdiff(1:ncol(cladistic_matrix), comparable.characters))
   
   # Subfunction to get weighted differences:
   weigh_differences <- function(differences, comparable.characters, weights) return(list(as.numeric(weights[comparable.characters]) * differences))
@@ -309,10 +309,10 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   find_maximum_difference <- function(comparable.characters, max.vals, min.vals) return(as.numeric(max.vals[comparable.characters]) - as.numeric(min.vals[comparable.characters]))
   
   # Subfunction to transform list of distances into an actual distance matrix:
-  convert_list_to_matrix <- function(list, cladistic.matrix, diag = NULL) {
+  convert_list_to_matrix <- function(list, cladistic_matrix, diag = NULL) {
     
     # Set the number of rows:
-    k <- nrow(cladistic.matrix)
+    k <- nrow(cladistic_matrix)
     
     # Create the empty matrix:
     mat.out <- matrix(ncol = k, nrow = k)
@@ -352,7 +352,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   calculate_mord <- function(differences, maximum.differences) return(sum(differences) / sum(maximum.differences))
   
   # Subfunction for building starting GED data:
-  build_ged_data <- function(differences, comparable.characters, cladistic.matrix, weights) return(rbind(c(differences, rep(NA, length(find_incomparable(comparable.characters, cladistic.matrix)))), c(weights[comparable.characters], weights[find_incomparable(comparable.characters, cladistic.matrix)])))
+  build_ged_data <- function(differences, comparable.characters, cladistic_matrix, weights) return(rbind(c(differences, rep(NA, length(find_incomparable(comparable.characters, cladistic_matrix)))), c(weights[comparable.characters], weights[find_incomparable(comparable.characters, cladistic_matrix)])))
   
   # Subfunction to apply Hopkins and St John (2018) Alpha weighting of inapplicables:
   weigh_inapplicable_alpha <- function(diffs, comparable.characters, ordering, weights, character.dependencies, charactersByLevel, alpha) {
@@ -414,16 +414,16 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   }
 
   # Check for step matrices and stop and warn user if found:
-  if (is.list(cladistic.matrix$topper$step_matrices)) stop("Function cannot currently deal with step matrices.")
+  if (is.list(cladistic_matrix$topper$step_matrices)) stop("Function cannot currently deal with step matrices.")
   
   # Check input of distance.transformation is valid and stop and warn if not:
   if (length(setdiff(distance.transformation, c("arcsine_sqrt", "none", "sqrt"))) > 0) stop("distance.transformation must be one of \"none\", \"sqrt\", or \"arcsine_sqrt\".")
   
   # Check input of distance is valid and stop and warn if not:
-  if (length(setdiff(distance.metric, c("RED", "GED", "GC", "MORD"))) > 0) stop("distance.metric must be one or more of \"RED\", \"GED\", \"GC\", or \"MORD\".")
+  if (length(setdiff(distance_metric, c("RED", "GED", "GC", "MORD"))) > 0) stop("distance_metric must be one or more of \"RED\", \"GED\", \"GC\", or \"MORD\".")
   
   # Check input of GED type is valid and stop and warn if not:
-  if (length(setdiff(ged.type, c("Legacy", "Hybrid", "Wills"))) > 0) stop("ged.type must be one or more of \"Legacy\", \"Hybrid\", or \"Wills\".")
+  if (length(setdiff(ged_type, c("Legacy", "Hybrid", "Wills"))) > 0) stop("ged_type must be one or more of \"Legacy\", \"Hybrid\", or \"Wills\".")
   
   # Check input for polymorphism.behaviour is valid and stop and warn if not:
   if (length(setdiff(polymorphism.behaviour, c("mean.difference", "min.difference", "random"))) > 0) stop("polymorphism.behaviour must be one or more of \"mean.difference\", \"min.difference\", or \"random\".")
@@ -453,7 +453,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
     if (!is.numeric(character.dependencies)) stop("character.dependencies values must be numeric.")
     
     # Check character.dependencies values are within range of matrix dimensions and stop and warn user if not:
-    if (length(setdiff(as.vector(character.dependencies), 1:sum(unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], function(x) ncol(x$matrix))))))) > 0) stop("character.dependencies can only contain character numbers within the dimensions of the cladistic.matrix specified.")
+    if (length(setdiff(as.vector(character.dependencies), 1:sum(unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], function(x) ncol(x$matrix))))))) > 0) stop("character.dependencies can only contain character numbers within the dimensions of the cladistic_matrix specified.")
     
     # Check character.dependencies values do not lead to duplicated parent characters and stop and warn user if not:
     if (any(duplicated(character.dependencies[, "DependentCharacter"]))) stop("character.dependencies characters can not be dependent on two or more different independent characters.")
@@ -500,28 +500,28 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   }
   
   # Isolate ordering element:
-  ordering <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "ordering")))
+  ordering <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "ordering")))
   
   # Isolate minimum values:
-  min.vals <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "minimum_values")))
+  min.vals <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "minimum_values")))
   
   # Isolate maximum values:
-  max.vals <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "maximum_values")))
+  max.vals <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "maximum_values")))
   
   # Isolate weights:
-  weights <- unname(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "weights")))
+  weights <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "weights")))
   
   # Combine matrix blocks into a single matrix:
-  cladistic.matrix <- do.call(cbind, lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix"))
+  cladistic_matrix <- do.call(cbind, lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "matrix"))
   
   # If polymorphism.behaviour is to randomly sample one state:
   if (polymorphism.behaviour == "random") {
     
     # Find cells with polymorphisms:
-    PolymorphismCells <- grep("&", cladistic.matrix)
+    PolymorphismCells <- grep("&", cladistic_matrix)
     
     # If there are polymorphisms randomly sample one value and store:
-    if (length(PolymorphismCells) > 0) cladistic.matrix[PolymorphismCells] <- unlist(lapply(as.list(cladistic.matrix[PolymorphismCells]), function(x) sample(strsplit(x, split = "&")[[1]], size = 1)))
+    if (length(PolymorphismCells) > 0) cladistic_matrix[PolymorphismCells] <- unlist(lapply(as.list(cladistic_matrix[PolymorphismCells]), function(x) sample(strsplit(x, split = "&")[[1]], size = 1)))
     
     # Reset behaviour as mean difference to allow it to interact correctly with uncertainty.behaviour later:
     polymorphism.behaviour <- "mean.difference"
@@ -532,10 +532,10 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   if (uncertainty.behaviour == "random") {
     
     # Find cells with uncertainties:
-    UncertaintyCells <- grep("/", cladistic.matrix)
+    UncertaintyCells <- grep("/", cladistic_matrix)
     
     # If there are uncertainties randomly sample one value and store:
-    if (length(UncertaintyCells) > 0) cladistic.matrix[UncertaintyCells] <- unlist(lapply(as.list(cladistic.matrix[UncertaintyCells]), function(x) sample(strsplit(x, split = "/")[[1]], size = 1)))
+    if (length(UncertaintyCells) > 0) cladistic_matrix[UncertaintyCells] <- unlist(lapply(as.list(cladistic_matrix[UncertaintyCells]), function(x) sample(strsplit(x, split = "/")[[1]], size = 1)))
     
     # Reset behaviour as mean difference to allow it to interact correctly with polymorphism.behaviour later:
     uncertainty.behaviour <- "mean.difference"
@@ -543,16 +543,16 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   }
   
   # If there are inapplicables and using the missing option then convert these to NAs:
-  if (any(sort(cladistic.matrix == "")) && inapplicable.behaviour == "missing") cladistic.matrix[cladistic.matrix == ""] <- NA
+  if (any(sort(cladistic_matrix == "")) && inapplicable.behaviour == "missing") cladistic_matrix[cladistic_matrix == ""] <- NA
   
   # Find all possible (symmetric) pairwise comparisons for the N taxa in the matrix (excluding self-comparisons):
-  comparisons <- combn(1:nrow(cladistic.matrix), 2)
+  comparisons <- combn(1:nrow(cladistic_matrix), 2)
   
   # Find all comparable characters for each pair of taxa:
-  list.of.compchar <- unlist(apply(comparisons, 2, find_comparable, cladistic.matrix), recursive = FALSE)
+  list.of.compchar <- unlist(apply(comparisons, 2, find_comparable, cladistic_matrix), recursive = FALSE)
   
   # Get character states for each pairwise comparison:
-  rows.pairs <- apply(comparisons, 2, get_pairwise_strings, cladistic.matrix)
+  rows.pairs <- apply(comparisons, 2, get_pairwise_strings, cladistic_matrix)
   
   # Subset each pairwise comparison by just the comparable characters:
   matrix.of.char.comp <- mapply(subset_by_comparable, rows.pairs, list.of.compchar)
@@ -604,10 +604,10 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   diffs <- mapply(weigh_differences, diffs, list.of.compchar, MoreArgs = list(weights))
   
   # Get raw Euclidean distance (if using it):
-  if (distance.metric == "RED") raw.dist <- lapply(diffs, calculate_red)
+  if (distance_metric == "RED") raw.dist <- lapply(diffs, calculate_red)
   
   # Only calculate the max differences for "GED" or "MORD" matrices:
-  if (distance.metric == "GED" || distance.metric == "MORD") {
+  if (distance_metric == "GED" || distance_metric == "MORD") {
     
     # Find maximum possible differences for the comparable characters:
     maxdiffs <- lapply(list.of.compchar, find_maximum_difference, max.vals, min.vals)
@@ -618,31 +618,31 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   }
   
   # If calculating Raw Euclidean Distances build the distance matrix:
-  if (distance.metric == "RED") dist.matrix <- convert_list_to_matrix(raw.dist, cladistic.matrix)
+  if (distance_metric == "RED") dist.matrix <- convert_list_to_matrix(raw.dist, cladistic_matrix)
 
   # If calculating the Gower Coefficient build the distance matrix:
-  if (distance.metric == "GC") dist.matrix <- convert_list_to_matrix(as.list(mapply(calculate_gc, diffs, list.of.compchar, MoreArgs = list(weights))), cladistic.matrix)
+  if (distance_metric == "GC") dist.matrix <- convert_list_to_matrix(as.list(mapply(calculate_gc, diffs, list.of.compchar, MoreArgs = list(weights))), cladistic_matrix)
   
   # If calculating the MORD build the distance matrix:
-  if (distance.metric == "MORD") dist.matrix <- convert_list_to_matrix(mapply(calculate_mord, diffs, maxdiffs), cladistic.matrix)
+  if (distance_metric == "MORD") dist.matrix <- convert_list_to_matrix(mapply(calculate_mord, diffs, maxdiffs), cladistic_matrix)
   
   # If calculating the GED:
-  if (distance.metric == "GED") {
+  if (distance_metric == "GED") {
     
     # Build starting GED data:
-    GED.data <- mapply(build_ged_data, diffs, list.of.compchar, MoreArgs = list(cladistic.matrix, weights), SIMPLIFY = FALSE)
+    GED.data <- mapply(build_ged_data, diffs, list.of.compchar, MoreArgs = list(cladistic_matrix, weights), SIMPLIFY = FALSE)
     
     # Transpose matrices:
     GED.data <- lapply(GED.data, t)
     
     # Now build into matrix of pairwise comparisons (odds to be compared with adjacent evens):
-    GED.data <- matrix(data = (unlist(GED.data)), ncol = ncol(cladistic.matrix), byrow = TRUE)
+    GED.data <- matrix(data = (unlist(GED.data)), ncol = ncol(cladistic_matrix), byrow = TRUE)
     
     # Calculate single weighted mean univariate distance for calculating GED Legacy or Hybrid (after equation 2 in Wills 2001):
-    if (ged.type != "Wills") NonWills_S_ijk_bar <- rep(sum(unlist(diffs)) / sum(unlist(maxdiffs)), length.out = length(diffs))
+    if (ged_type != "Wills") NonWills_S_ijk_bar <- rep(sum(unlist(diffs)) / sum(unlist(maxdiffs)), length.out = length(diffs))
     
     # Calculate individual pairwise weighted mean univariate distance for calculating GED Hybrid or Wills (after equation 2 in Wills 2001):
-    if (ged.type != "Legacy") {
+    if (ged_type != "Legacy") {
       
       # Generate individual mean pairwise distance for each comparison:
       NonLegacy_S_ijk_bar <- unlist(lapply(diffs, sum)) / unlist(lapply(maxdiffs, sum))
@@ -651,10 +651,10 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
       NaNs <- which(is.nan(NonLegacy_S_ijk_bar))
       
       # If usings WIlls version replace NaNs with NA:
-      if (ged.type == "Wills" && length(NaNs) > 0) NonLegacy_S_ijk_bar[NaNs] <- NA
+      if (ged_type == "Wills" && length(NaNs) > 0) NonLegacy_S_ijk_bar[NaNs] <- NA
       
       # If using Hybrid replace NaNs with single global mean distance value:
-      if (ged.type == "Hybrid" && length(NaNs) > 0) NonLegacy_S_ijk_bar[NaNs] <- NonWills_S_ijk_bar[NaNs]
+      if (ged_type == "Hybrid" && length(NaNs) > 0) NonLegacy_S_ijk_bar[NaNs] <- NonWills_S_ijk_bar[NaNs]
       
       # Set modified non-Legacy S_ijk_bar as main S_ijk_bar:
       S_ijk_bar <- NonLegacy_S_ijk_bar
@@ -662,7 +662,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
     }
     
     # If using Legacy set NonWills_S_ijk_bar as main S_ijk_bar:
-    if (ged.type == "Legacy") S_ijk_bar <- NonWills_S_ijk_bar
+    if (ged_type == "Legacy") S_ijk_bar <- NonWills_S_ijk_bar
     
     # For each set of differences:
     for(i in seq(from = 1, to = nrow(GED.data) - 1, length.out = length(diffs))) {
@@ -682,24 +682,24 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
     W_ijk <- GED.data[which((1:nrow(GED.data) %% 2) == 0), ]
     
     # Calculate the GED (equation 1 of Wills 2001) for each pairwise comparison (ij):
-    GED_ij <- sqrt(apply(W_ijk * (S_ijk ^ 2), 1, sum))
+    GED_ij <- sqrt(apply(W_ijk * (S_ijk^2), 1, sum))
     
     # Create GED distance matrix:
-    dist.matrix <- convert_list_to_matrix(as.list(GED_ij), cladistic.matrix)
+    dist.matrix <- convert_list_to_matrix(as.list(GED_ij), cladistic_matrix)
     
   }
   
   # Build comparable characters matrix:
-  comp.char.matrix <- convert_list_to_matrix(lapply(list.of.compchar, length), cladistic.matrix, diag = apply(cladistic.matrix, 1, count_complete))
+  comp.char.matrix <- convert_list_to_matrix(lapply(list.of.compchar, length), cladistic_matrix, diag = apply(cladistic_matrix, 1, count_complete))
   
   # Add row and column names (taxa) to distance matrices:
-  rownames(dist.matrix) <- colnames(dist.matrix) <- rownames(comp.char.matrix) <- colnames(comp.char.matrix) <- rownames(cladistic.matrix)
+  rownames(dist.matrix) <- colnames(dist.matrix) <- rownames(comp.char.matrix) <- colnames(comp.char.matrix) <- rownames(cladistic_matrix)
   
   # If there are any NaNs replace with NAs:
   if (any(is.nan(dist.matrix))) dist.matrix[is.nan(dist.matrix)] <- NA
   
   # If using a proportional distance:
-  if (distance.metric == "MORD" || distance.metric == "GC") {
+  if (distance_metric == "MORD" || distance_metric == "GC") {
     
     # If transforming distance matrix by taking the square root - take the square root:
     if (distance.transformation == "sqrt") dist.matrix <- sqrt(dist.matrix)
@@ -729,7 +729,7 @@ calculate_morphological_distances <- function(cladistic.matrix, distance.metric 
   }
   
   # Compile results as a list:
-  result <- list(distance.metric = distance.metric, DistanceMatrix = dist.matrix, ComparableCharacterMatrix = comp.char.matrix)
+  result <- list(distance_metric = distance_metric, DistanceMatrix = dist.matrix, ComparableCharacterMatrix = comp.char.matrix)
   
   # Output result:
   return(result)

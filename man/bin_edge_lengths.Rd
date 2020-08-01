@@ -4,14 +4,14 @@
 \alias{bin_edge_lengths}
 \title{Edge-lengths present in time-bins}
 \usage{
-bin_edge_lengths(time_tree, time_bins, pruned.tree = NULL)
+bin_edge_lengths(time_tree, time_bins, pruned_tree = NULL)
 }
 \arguments{
 \item{time_tree}{A time-scaled tree in phylo format with a \code{$root.time} value.}
 
 \item{time_bins}{A vector of ages in millions of years of time bin boundaries in old-to-young order.}
 
-\item{pruned.tree}{A time-scaled tree in phylo format with a \code{$root.time} value that is a subset of \code{time_tree}.}
+\item{pruned_tree}{A time-scaled tree in phylo format with a \code{$root.time} value that is a subset of \code{time_tree}.}
 }
 \value{
 \item{edge.length.in.bin}{A vector giving the summed values in millions of years for each time bin. Names indicate the maximum and minimum values for each time bin.}
@@ -24,7 +24,7 @@ Given a time-scaled tree and set of time bin boundaries will sum the edge-length
 \details{
 Calculates the total edge duration of a time-scaled tree present in a series of time bins. This is intended as an internal function for rate calculations, but may be of use to someone.
 
-The option of using a \code{pruned.tree} allows the user to correctly classify internal and terminal branches in a subtree of the larger tree. So for example, if taxa A and B are sisters then after pruning B the subtree branch leading to A is composed of an internal and a terminal branch on the complete tree.
+The option of using a \code{pruned_tree} allows the user to correctly classify internal and terminal branches in a subtree of the larger tree. So for example, if taxa A and B are sisters then after pruning B the subtree branch leading to A is composed of an internal and a terminal branch on the complete tree.
 }
 \examples{
 

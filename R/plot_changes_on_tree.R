@@ -4,12 +4,12 @@
 #'
 #' Plots character changes in boxes on branches.
 #'
-#' @param character.changes A matrix of character changes.
+#' @param character_changes A matrix of character changes.
 #' @param time_tree Tree on which character changes occur.
 #'
 #' @details
 #'
-#' Takes the \code{character.changes} output from \link{test_rates} and plots it on the tree used to generate it.
+#' Takes the \code{character_changes} output from \link{test_rates} and plots it on the tree used to generate it.
 #'
 #' @return A plot of character changes on a tree.
 #'
@@ -21,28 +21,28 @@
 #' set.seed(17)
 #'
 #' # Generate a random tree for the Michaux data set:
-#' time_tree <- rtree(nrow(Michaux1989$matrix_1$matrix))
+#' time_tree <- rtree(nrow(michaux_1989$matrix_1$matrix))
 #'
 #' # Update taxon names to match those in the data matrix:
-#' time_tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
+#' time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
 #'
 #' # Set root time by making youngest taxon extant:
 #' time_tree$root.time <- max(diag(vcv(time_tree)))
 #'
 #' # Get discrete character rates (includes changes):
-#' out <- test_rates(time_tree, Michaux1989,
+#' out <- test_rates(time_tree, michaux_1989,
 #'   seq(time_tree$root.time, 0, length.out = 3),
-#'   BranchPartitionsToTest = list(list(1)), alpha = 0.01)
+#'   branch_partitions = list(list(1)), alpha = 0.01)
 #'
 #' # Plot character changes on the tree:
 #' plot_changes_on_tree(out$InferredCharacterChanges,
 #'   time_tree)
 #'
 #' @export plot_changes_on_tree
-plot_changes_on_tree <- function(character.changes, time_tree) {
+plot_changes_on_tree <- function(character_changes, time_tree) {
   
   # Update tree edge lengths to number of character changes:
-  time_tree$edge.length <- rle(sort(c(character.changes[, "Edge"], 1:nrow(time_tree$edge))))$lengths - 1
+  time_tree$edge.length <- rle(sort(c(character_changes[, "Edge"], 1:nrow(time_tree$edge))))$lengths - 1
   
   # Create empty edge labels vector:
   edge.labels <- rep(NA, nrow(time_tree$edge))
@@ -51,13 +51,13 @@ plot_changes_on_tree <- function(character.changes, time_tree) {
   for(i in 1:nrow(time_tree$edge)) {
     
     # Get rows for where changes occur:
-    change.rows <- which(character.changes[, "Edge"] == i)
+    change.rows <- which(character_changes[, "Edge"] == i)
     
     # If there are changes on edge:
     if (length(change.rows) > 0) {
       
       # Compile all changes into edge label:
-      edge.labels[i] <- paste(paste(character.changes[change.rows, "Character"], ": ", character.changes[change.rows, "From"], " -> ", character.changes[change.rows, "To"], sep = ""), collapse = "\n")
+      edge.labels[i] <- paste(paste(character_changes[change.rows, "Character"], ": ", character_changes[change.rows, "From"], " -> ", character_changes[change.rows, "To"], sep = ""), collapse = "\n")
       
     }
     

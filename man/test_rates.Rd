@@ -6,21 +6,21 @@
 \usage{
 test_rates(
   time_tree,
-  cladistic.matrix,
+  cladistic_matrix,
   time_bins,
-  BranchPartitionsToTest = NULL,
-  CharacterPartitionsToTest = NULL,
-  CladePartitionsToTest = NULL,
-  TimeBinPartitionsToTest = NULL,
-  ChangeTimes = "random",
-  LikelihoodTest = "AIC",
+  branch_partitions = NULL,
+  character_partitions = NULL,
+  clade_partitions = NULL,
+  time_partitions = NULL,
+  change_times = "random",
+  test_type = "AIC",
   alpha = 0.01,
-  MultipleComparisonCorrection = "BenjaminiHochberg",
-  PolymorphismState = "missing",
-  UncertaintyState = "missing",
-  InapplicableState = "missing",
-  TimeBinApproach = "Lloyd",
-  EnsureAllweightsAreIntegers = FALSE,
+  multiple_comparison_correction = "benjaminihochberg",
+  polymorphism_state = "missing",
+  uncertainty_state = "missing",
+  inapplicable_state = "missing",
+  time_binning_approach = "lloyd",
+  all_weights_integers = FALSE,
   estimate.all.nodes = FALSE,
   estimate.tip.values = FALSE,
   inapplicables.as.missing = FALSE,
@@ -31,37 +31,37 @@ test_rates(
 )
 }
 \arguments{
-\item{time_tree}{A tree (phylo object) with branch durations that represents the relationships of the taxa in \code{cladistic.matrix}.}
+\item{time_tree}{A tree (phylo object) with branch durations that represents the relationships of the taxa in \code{cladistic_matrix}.}
 
-\item{cladistic.matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}.}
+\item{cladistic_matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}.}
 
 \item{time_bins}{A vector of ages (in millions of years) indicating the boundaries of a series of time bins in order from oldest to youngest.}
 
-\item{BranchPartitionsToTest}{A list of branch(es) (edge number) partitions to test as N-rate parameter model (where N is the total number of partitions). If NULL (the default) then no partition test(s) will be made.}
+\item{branch_partitions}{A list of branch(es) (edge number) partitions to test as N-rate parameter model (where N is the total number of partitions). If NULL (the default) then no partition test(s) will be made.}
 
-\item{CharacterPartitionsToTest}{A list of character partition(s) (character numbers) to test as N-rate parameter model (where N is the total number of partitions). If NULL (the default) then no partition test(s) will be made.}
+\item{character_partitions}{A list of character partition(s) (character numbers) to test as N-rate parameter model (where N is the total number of partitions). If NULL (the default) then no partition test(s) will be made.}
 
-\item{CladePartitionsToTest}{A list of clade partition(s) (node numbers) to test as N-rate parameter model (where N is the total number of partitions). If NULL (the default) then no partition test(s) will be made.}
+\item{clade_partitions}{A list of clade partition(s) (node numbers) to test as N-rate parameter model (where N is the total number of partitions). If NULL (the default) then no partition test(s) will be made.}
 
-\item{TimeBinPartitionsToTest}{A list of time bin partition(s) (numbered 1 to N) to test as N-rate parameter model (where N is the total number of partitions). If NULL (the default) then no partition test(s) will be made.}
+\item{time_partitions}{A list of time bin partition(s) (numbered 1 to N) to test as N-rate parameter model (where N is the total number of partitions). If NULL (the default) then no partition test(s) will be made.}
 
-\item{ChangeTimes}{The time at which to record the character changes. One of \code{"midpoint"} (changes occur at the midpoint of the branch), \code{"spaced"} (changes equally spaced along branch), or \code{"random"} (change times drawn at random from a uniform distribution; the default and recommended option). Note: this is only meaningful if testing for time bin partitions.}
+\item{change_times}{The time at which to record the character changes. One of \code{"midpoint"} (changes occur at the midpoint of the branch), \code{"spaced"} (changes equally spaced along branch), or \code{"random"} (change times drawn at random from a uniform distribution; the default and recommended option). Note: this is only meaningful if testing for time bin partitions.}
 
-\item{LikelihoodTest}{Whether to apply an Akaike Information Criterion (\code{"AIC"}; the default) or likelihood ratio test (\code{"LRT"}).}
+\item{test_type}{Whether to apply an Akaike Information Criterion (\code{"AIC"}; the default) or likelihood ratio test (\code{"LRT"}).}
 
 \item{alpha}{The alpha value to be used for the significance tests (only relevant if using the likelihood ratio test). The default is 0.01.}
 
-\item{MultipleComparisonCorrection}{One of \code{"BenjaminiHochberg"} (the Benjamini and Hochberg 1995 false discovery rate approach; default and recommended) or \code{"Bonferroni"} (the Bonferroni correction). Only relevant if using the likelihood ratio test.}
+\item{multiple_comparison_correction}{One of \code{"benjaminihochberg"} (the Benjamini and Hochberg 1995 false discovery rate approach; default and recommended) or \code{"bonferroni"} (the Bonferroni correction). Only relevant if using the likelihood ratio test.}
 
-\item{PolymorphismState}{One of \code{"missing"} (converts polymorphic values to NA; the default) or \code{"random"} (picks one of the possible polymorphic states at random).}
+\item{polymorphism_state}{One of \code{"missing"} (converts polymorphic values to NA; the default) or \code{"random"} (picks one of the possible polymorphic states at random).}
 
-\item{UncertaintyState}{One of \code{"missing"} (converts uncertain values to NA; the default) or \code{"random"} (picks one of the possible uncertain states at random).}
+\item{uncertainty_state}{One of \code{"missing"} (converts uncertain values to NA; the default) or \code{"random"} (picks one of the possible uncertain states at random).}
 
-\item{InapplicableState}{The only current option is \code{"missing"} (converts value to NA).}
+\item{inapplicable_state}{The only current option is \code{"missing"} (converts value to NA).}
 
-\item{TimeBinApproach}{One of \code{"Close"} or \code{"Lloyd"} (the default).}
+\item{time_binning_approach}{One of \code{"close"} or \code{"lloyd"} (the default).}
 
-\item{EnsureAllweightsAreIntegers}{Logical for whether (\code{TRUE}) to reweight non-integer weights until all weights are integers or to leave them as they are (\code{FALSE}; the default).}
+\item{all_weights_integers}{Logical for whether (\code{TRUE}) to reweight non-integer weights until all weights are integers or to leave them as they are (\code{FALSE}; the default).}
 
 \item{estimate.all.nodes}{Option passed to internal use of \link{estimate_ancestral_states}.}
 
@@ -82,14 +82,14 @@ test_rates(
 \item{InferredCharacterChanges}{Matrix of inferred character changes.}
 \item{IntrinsicCharacterRate}{The intrinsic (global) character rate in changes per million years.}
 \item{ContinuouscharactersConvertedToDiscrete}{Whether or not continuous characters were converted to discrete characters (important for handling the data in downstream analys(es)).}
-\item{BranchPartitionResults}{List of branch partition results (corresponding to \code{BranchPartitionsToTest}. NULL if not requested.}
-\item{CharacterPartitionResults}{List of character partition results (corresponding to \code{CharacterPartitionsToTest}. NULL if not requested.}
-\item{CladePartitionResults}{List of clade partition results (corresponding to \code{CladePartitionsToTest}. NULL if not requested.}
-\item{TimeBinResults}{List of time bin partition results (corresponding to \code{TimeBinPartitionsToTest}. NULL if not requested.}
-\item{BranchRates}{Matrix showing calculated rates for each branch. NULL if \code{BranchPartitionsToTest} is not requested.}
-\item{CharacterRates}{Matrix showing calculated rates for each character. NULL if \code{CharacterPartitionsToTest} is not requested.}
-\item{CladeRates}{Matrix showing calculated rates for each clade. NULL if \code{CladePartitionsToTest} is not requested.}
-\item{TimeRates}{Matrix showing calculated rates for each time bin. NULL if \code{TimeBinPartitionsToTest} is not requested.}
+\item{BranchPartitionResults}{List of branch partition results (corresponding to \code{branch_partitions}. NULL if not requested.}
+\item{CharacterPartitionResults}{List of character partition results (corresponding to \code{character_partitions}. NULL if not requested.}
+\item{CladePartitionResults}{List of clade partition results (corresponding to \code{clade_partitions}. NULL if not requested.}
+\item{TimeBinResults}{List of time bin partition results (corresponding to \code{time_partitions}. NULL if not requested.}
+\item{BranchRates}{Matrix showing calculated rates for each branch. NULL if \code{branch_partitions} is not requested.}
+\item{CharacterRates}{Matrix showing calculated rates for each character. NULL if \code{character_partitions} is not requested.}
+\item{CladeRates}{Matrix showing calculated rates for each clade. NULL if \code{clade_partitions} is not requested.}
+\item{TimeRates}{Matrix showing calculated rates for each time bin. NULL if \code{time_partitions} is not requested.}
 \item{time_tree}{The time-scaled input tree used as input (provided as output for use with visualisation functions).}
 }
 \description{
@@ -113,19 +113,19 @@ Typically we might expect the two hypotheses to be well defined a priori. E.g., 
 Following Cloutier (1991), Lloyd (2016) extended the two main types of rate hypotheses to four:
 
 \enumerate{
-  \item A branch rate (available here with the \code{BranchPartitionsToTest} option).
-  \item A clade rate (available here with the \code{CladePartitionsToTest} option).
-  \item A time bin rate (available here with the \code{TimeBinPartitionsToTest} option).
-  \item A character partition rate (available here with the \code{CharacterPartitionsToTest} option).
+  \item A branch rate (available here with the \code{branch_partitions} option).
+  \item A clade rate (available here with the \code{clade_partitions} option).
+  \item A time bin rate (available here with the \code{time_partitions} option).
+  \item A character partition rate (available here with the \code{character_partitions} option).
 }
 
-In Claddis (>=0.3) these partitions are defined as a list of lists of vectors where only the first N - 1 partitions need be defined. E.g., if comparing the first edge value (based on \pkg{ape} numbering, i.e., \code{plot(tree); edgelabels()}) to the rest of the tree then the user only needs to define the value "1" and the function will automatically add a second partition containing all other edges. This can be set with the option \code{BranchPartitionsToTest = list(list(1))}. Similarly, to do what Lloyd et al. (2012) did and repeat the test for every edge in the tree (and assuming this variable is already named "tree") you could use, \code{BranchPartitionsToTest = lapply(as.list(1:nrow(tree$edge)), as.list)}.
+In Claddis (>=0.3) these partitions are defined as a list of lists of vectors where only the first N - 1 partitions need be defined. E.g., if comparing the first edge value (based on \pkg{ape} numbering, i.e., \code{plot(tree); edgelabels()}) to the rest of the tree then the user only needs to define the value "1" and the function will automatically add a second partition containing all other edges. This can be set with the option \code{branch_partitions = list(list(1))}. Similarly, to do what Lloyd et al. (2012) did and repeat the test for every edge in the tree (and assuming this variable is already named "tree") you could use, \code{branch_partitions = lapply(as.list(1:nrow(tree$edge)), as.list)}.
 
-Because of the flexibility of this function the user can define any set of edges. For example, they could test whether terminal branches have a different rate from internal branches with \code{BranchPartitionsToTest = list(list(match(1:Ntip(tree), tree$edge[, 2])))}. The \code{CladePartitionsToTest} is really just a special subset of this type of hypothesis, but with edges being defined as descending from a specific internal node in the tree. Once again, an exploratory approach like that of Lloyd et al. (2012) can be used with: \code{CladePartitionsToTest = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)}. Note that this excludes the root node as this would define a single partition and hence would represent the null hypothesis (a single rate model for the whole tree). (If using \code{LikelihoodTest = "AIC"} then the user typically \emph{will} want a value for a single partition.) More generally clades must be defined by the node numbers they correspond to. In R an easy way to identify these is with: \code{plot(tree); nodelabels()}.
+Because of the flexibility of this function the user can define any set of edges. For example, they could test whether terminal branches have a different rate from internal branches with \code{branch_partitions = list(list(match(1:Ntip(tree), tree$edge[, 2])))}. The \code{clade_partitions} is really just a special subset of this type of hypothesis, but with edges being defined as descending from a specific internal node in the tree. Once again, an exploratory approach like that of Lloyd et al. (2012) can be used with: \code{clade_partitions = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)}. Note that this excludes the root node as this would define a single partition and hence would represent the null hypothesis (a single rate model for the whole tree). (If using \code{test_type = "AIC"} then the user typically \emph{will} want a value for a single partition.) More generally clades must be defined by the node numbers they correspond to. In R an easy way to identify these is with: \code{plot(tree); nodelabels()}.
 
-Time bin partitions are defined in a similar way, but are numbered 1:N starting from the oldest time bin. So if wanting to do an exploratory test of single bin partitions (and only four time bins were specified) you could use: \code{TimeBinPartitionsToTest = lapply(as.list(1:4), as.list)}. Bins can be combined too, just as edges are above. For example, time bins 1 and 2 could form a single partition with: \code{TimeBinPartitionsToTest = list(list(1:2))}. Or if looking to test a model where each bin has its' own rate value you could use: \code{TimeBinPartitionsToTest = list(as.list(1:3))}. Note, as before we do not need to specify the fourth bin as this will be automatically done by the function, however, \code{TimeBinPartitionsToTest = list(as.list(1:4))} will also work. Some caution needs to be applied with N-rate models (where N is three or larger) and \code{LikelihoodTest = "LRT"} as a result favouring such models does not necessarily endorse N-separate rates. I.e., it could simply be that one bin has such a large excursion that overall the N-rate model fits better than the 1-rate model, but some 2-rate models might be better still. It is up to the user to check this themselves by exploring smaller combinations of bins and more genrally if exploring partitions of three or more use of the Akaike Information Criterion (\code{LikelihoodTest = "AIC"}) is recommended.
+Time bin partitions are defined in a similar way, but are numbered 1:N starting from the oldest time bin. So if wanting to do an exploratory test of single bin partitions (and only four time bins were specified) you could use: \code{time_partitions = lapply(as.list(1:4), as.list)}. Bins can be combined too, just as edges are above. For example, time bins 1 and 2 could form a single partition with: \code{time_partitions = list(list(1:2))}. Or if looking to test a model where each bin has its' own rate value you could use: \code{time_partitions = list(as.list(1:3))}. Note, as before we do not need to specify the fourth bin as this will be automatically done by the function, however, \code{time_partitions = list(as.list(1:4))} will also work. Some caution needs to be applied with N-rate models (where N is three or larger) and \code{test_type = "LRT"} as a result favouring such models does not necessarily endorse N-separate rates. I.e., it could simply be that one bin has such a large excursion that overall the N-rate model fits better than the 1-rate model, but some 2-rate models might be better still. It is up to the user to check this themselves by exploring smaller combinations of bins and more genrally if exploring partitions of three or more use of the Akaike Information Criterion (\code{test_type = "AIC"}) is recommended.
 
-Finally, character partitions allow the user to explore whether rates vary across different character types (numbers), e.g., skeletal characters versus soft tissue characters, or cranial characters versus postcranial characters. Here characters are simply numbered 1:N (across all blocks of a matrix), but single character partitions are less likely to be of interest. As an example of use lets say the first ten characters are what we are interested in as a partition (the second partition being the remaining characters), we could use: \code{CharacterPartitionsToTest = list(list(1:10))} to test for a two-rate model with \code{LikelihoodTest = "LRT"}.
+Finally, character partitions allow the user to explore whether rates vary across different character types (numbers), e.g., skeletal characters versus soft tissue characters, or cranial characters versus postcranial characters. Here characters are simply numbered 1:N (across all blocks of a matrix), but single character partitions are less likely to be of interest. As an example of use lets say the first ten characters are what we are interested in as a partition (the second partition being the remaining characters), we could use: \code{character_partitions = list(list(1:10))} to test for a two-rate model with \code{test_type = "LRT"}.
 
 Note that the list of lists structure is critical to defining partitions as it allows them to be of different sizes and numbers. For example, one partition of three and another of six, or one set of two partitions and another set of four partitions - structures not easily realizable using vectors or matrices. However, it may not be intuitive to some users so it is recommended that the user refers to the examples above as a guide.
 
@@ -145,17 +145,17 @@ Prior to Claddis version 0.3, rate results were classified as significantly high
 
 Since Claddis version 0.3 this function has allowed the user greater control with many more options than were offered previously and these should be considered carefully before running any tests.
 
-Firstly, the user can pick an option for \code{ChangeTimes} which sets the times character changes are inferred to occur. This is only relevant when the user is performing time bin partition test(s) as this requires some inference to be made about when changes occur on branches that may span multiple time bins. The current options are: \code{"midpoint"} (all changes are inferred to occur midway along the branch, effectively mimicking the approach of Ruta et al. 2006), \code{"spaced"} (all changes are inferred to occur equally spaced along the branch, with changes occurring in character number order), or \code{"random"} (changes are assigned a random time by drawing from a uniform distribution between the beginning and end of each branch). The first of these is likely to lead to unrealistically "clumped" changes and by extension implies completely correlated character change that would violate the assumptions of the Poisson distribution that underlies the significance tests here (Lloyd et al. 2012). At the other extreme, the equally spaced option will likely unrealistically smooth out time series and potentially make it harder to reject the single-rate null (leading to Type II errors). For these reasons, the random option is recommended and is set as the default. However, because it is random this makes the function stochastic (the answer can vary each time it is run) and so the user should therefore run the function multiple times if using this option (i.e., by using a for loop) and aggregating the results at the end (e.g., as was done by previous authors; Lloyd et al. 2012; Close et al. 2015).
+Firstly, the user can pick an option for \code{change_times} which sets the times character changes are inferred to occur. This is only relevant when the user is performing time bin partition test(s) as this requires some inference to be made about when changes occur on branches that may span multiple time bins. The current options are: \code{"midpoint"} (all changes are inferred to occur midway along the branch, effectively mimicking the approach of Ruta et al. 2006), \code{"spaced"} (all changes are inferred to occur equally spaced along the branch, with changes occurring in character number order), or \code{"random"} (changes are assigned a random time by drawing from a uniform distribution between the beginning and end of each branch). The first of these is likely to lead to unrealistically "clumped" changes and by extension implies completely correlated character change that would violate the assumptions of the Poisson distribution that underlies the significance tests here (Lloyd et al. 2012). At the other extreme, the equally spaced option will likely unrealistically smooth out time series and potentially make it harder to reject the single-rate null (leading to Type II errors). For these reasons, the random option is recommended and is set as the default. However, because it is random this makes the function stochastic (the answer can vary each time it is run) and so the user should therefore run the function multiple times if using this option (i.e., by using a for loop) and aggregating the results at the end (e.g., as was done by previous authors; Lloyd et al. 2012; Close et al. 2015).
 
-Secondly, the \code{alpha} value sets the significance threshold by which the likelihood ratio test's resulting p-value is compared (i.e., it is only reelevant when \code{LikelihoodTest = "LRT"}. Following Lloyd et al. (2012) this is set lower (0.01) than the standard 0.05 value by default as those authors found rates to be highly heterogenous in their data set (fossil lungfish). However, this should not be adopted as a "standard" value without question (just as 0.05 shouldn't). Note that the function also corrects for multiple comparisons (using the \code{MultipleComparisonCorrection} option) to avoid Type I errors (false positives). It does so (following Lloyd et al. 2012) using the Benjamini-Hochberg (Benjamini and Hochberg 1995) False Discovery Rate approach (see Lloyd et al. 2012 for a discussion of why), but the Bonferroni correction is also offered here (albeit not recommended).
+Secondly, the \code{alpha} value sets the significance threshold by which the likelihood ratio test's resulting p-value is compared (i.e., it is only reelevant when \code{test_type = "LRT"}. Following Lloyd et al. (2012) this is set lower (0.01) than the standard 0.05 value by default as those authors found rates to be highly heterogenous in their data set (fossil lungfish). However, this should not be adopted as a "standard" value without question (just as 0.05 shouldn't). Note that the function also corrects for multiple comparisons (using the \code{multiple_comparison_correction} option) to avoid Type I errors (false positives). It does so (following Lloyd et al. 2012) using the Benjamini-Hochberg (Benjamini and Hochberg 1995) False Discovery Rate approach (see Lloyd et al. 2012 for a discussion of why), but the Bonferroni correction is also offered here (albeit not recommended).
 
-Thirdly, polymorphisms and uncertainities create complications for assessing character changes along branches. These can occur at the tips (true polymorphisms or uncertainties in sampled taxa) and internal nodes (uncertainty over the estimated ancestral state). There are two options presented here, and applicable to both \code{PolymorphismState} and \code{UncertaintyState} (allowing these to be set separately). These are to convert such values to missing (NA) or to pick one of the possible states at random. Using missing values will increase overall uncertainty and potentially lead to Type II errors (false negatives), but represents a conservative solution. The random option is an attempt to avoid Type II errors, but can be considered unrealistic, especially if there are true polymorphisms. Additionally, the random option will again make the function stochastic meaning the user should run it multiple times amd aggregate the results. Note that if there are no polymorphisms or uncertainties in the character-taxon matrix the latter can still occur with ancestral state estimates, especially if the threshold value is set at a high value (see \link{estimate_ancestral_states} for details).
+Thirdly, polymorphisms and uncertainities create complications for assessing character changes along branches. These can occur at the tips (true polymorphisms or uncertainties in sampled taxa) and internal nodes (uncertainty over the estimated ancestral state). There are two options presented here, and applicable to both \code{polymorphism_state} and \code{uncertainty_state} (allowing these to be set separately). These are to convert such values to missing (NA) or to pick one of the possible states at random. Using missing values will increase overall uncertainty and potentially lead to Type II errors (false negatives), but represents a conservative solution. The random option is an attempt to avoid Type II errors, but can be considered unrealistic, especially if there are true polymorphisms. Additionally, the random option will again make the function stochastic meaning the user should run it multiple times amd aggregate the results. Note that if there are no polymorphisms or uncertainties in the character-taxon matrix the latter can still occur with ancestral state estimates, especially if the threshold value is set at a high value (see \link{estimate_ancestral_states} for details).
 
 Fourthly, inapplicable characters can additionally complicate matters as they are not quite the same as missing data. I.e., they can mean that change in a particular character is not even possible along a branch. However, there is no easy way to deal with such characters at present so the user is not presented with a true option here - currently all inapplicable states are simply converted to missing values by the function. In future, though, other options may be available here. For now it is simply noted that users should be careful in making inferences if there are inapplicable characters in their data and should perhaps consider removing them with \link{prune_cladistic_matrix} to gauge their effect.
 
-Fifthly, there are currenty two further options for assessing rates across time bins. As noted above a complication here is that character changes (the rate numerator) and character completeness (part of the rate denominator) are typically assessed on branches. However, branches will typically span time bin boundaries and hence many bins will contain only some portion of particular branches. The exact portion can be easily calculated for branch durations (the other part of the rate denominator) and the \code{ChangeTimes} option above is used to set the rate numerator, however, completeness remains complex to deal with. The first attempt to deal with this was made by Close et al. (2015) who simply used weighted mean completeness by calculating the proportion of a branch in each bin as the weight and multiplying this by each branch's completeness (the \code{"Close"} option here). However, this may lead to unrealistic "smoothing" of the data and perhaps more importantly makes no account of which characters are known in a bin. Lloyd (2016) proposed an alternative "subtree" approach which assesses completeness by considering each character to be represented by a subtree where only branches that are complete are retained then branch durations in each bin are summed across subtrees such that the duration term automatically includes completeness (the \code{"Lloyd"} option here). Here the latter is strongly recommended, for example, because this will lead to the same global rate across the whole tree as the branch, clade or character partitions, whereas the Close approach will not.
+Fifthly, there are currenty two further options for assessing rates across time bins. As noted above a complication here is that character changes (the rate numerator) and character completeness (part of the rate denominator) are typically assessed on branches. However, branches will typically span time bin boundaries and hence many bins will contain only some portion of particular branches. The exact portion can be easily calculated for branch durations (the other part of the rate denominator) and the \code{change_times} option above is used to set the rate numerator, however, completeness remains complex to deal with. The first attempt to deal with this was made by Close et al. (2015) who simply used weighted mean completeness by calculating the proportion of a branch in each bin as the weight and multiplying this by each branch's completeness (the \code{"close"} option here). However, this may lead to unrealistic "smoothing" of the data and perhaps more importantly makes no account of which characters are known in a bin. Lloyd (2016) proposed an alternative "subtree" approach which assesses completeness by considering each character to be represented by a subtree where only branches that are complete are retained then branch durations in each bin are summed across subtrees such that the duration term automatically includes completeness (the \code{"lloyd"} option here). Here the latter is strongly recommended, for example, because this will lead to the same global rate across the whole tree as the branch, clade or character partitions, whereas the Close approach will not.
 
-Sixthly, all character changes are weighted according to the weights provided in the input character-taxon matrix. In many cases these will simply all be one, although see the equalise weights option in \link{read_nexus_matrix}. However, when weights vary they can create some issues for the function. Specifically, changes are expected to be in the same (integer) units, but if weights vary then they have to be modelled accordingly. I.e., a character twice the weight of another may lead to a single change being counted as two changes. This is most problematic when the user has continuous characters which are automatically converted to gap-weighted (Thiele 1993) characters. However, this conversion creates drastically down-weighted characters and hence the user may wish to set the \code{EnsureAllweightsAreIntegers} option to TRUE. Note that reweighting will affect the results and hence shifting the weights of characters up or down will necessarily lead to shifts in the relative Type I and II errors. This is an unexplored aspect of such approaches, but is something the user should be aware of. More broadly it is recommended that continuous (or gap-weighted) characters be avoided when using this function.
+Sixthly, all character changes are weighted according to the weights provided in the input character-taxon matrix. In many cases these will simply all be one, although see the equalise weights option in \link{read_nexus_matrix}. However, when weights vary they can create some issues for the function. Specifically, changes are expected to be in the same (integer) units, but if weights vary then they have to be modelled accordingly. I.e., a character twice the weight of another may lead to a single change being counted as two changes. This is most problematic when the user has continuous characters which are automatically converted to gap-weighted (Thiele 1993) characters. However, this conversion creates drastically down-weighted characters and hence the user may wish to set the \code{all_weights_integers} option to TRUE. Note that reweighting will affect the results and hence shifting the weights of characters up or down will necessarily lead to shifts in the relative Type I and II errors. This is an unexplored aspect of such approaches, but is something the user should be aware of. More broadly it is recommended that continuous (or gap-weighted) characters be avoided when using this function.
 
 Finally, the remaining options (\code{estimate.all.nodes}, \code{estimate.tip.values}, \code{inapplicables.as.missing}, \code{polymorphism.behaviour}, \code{uncertainty.behaviour}, and \code{threshold}) are all simply passed directly to \link{estimate_ancestral_states} for estimating the ancestral states and users should consult the help file for that function for further details.
 
@@ -183,7 +183,7 @@ For each rate test the \code{Rates} part of the output is a vector of the absolu
 
 The PValue is a single value indicating the probability that the likelihood ratio (see above and Lloyd et al. 2012) is one, i.e., that the likelihoods of the one-rate and N-rate models are the same.
 
-The CorrectedAlpha is the alpha-value that should be used to determine the significance of the current partition test (i.e., The PValue, above). If the PValue exceeds the CorrectedAlpha then the null (single-rate) hypothesis should be accepted, if lower then the null should be rejected in favour of the N-rate hypthesis. Note that the CorrectedAlpha will not typically be the same for each partition and will also typically be different from the input \code{alpha} value due to the \code{MultipleComparisonCorrection} option used.
+The CorrectedAlpha is the alpha-value that should be used to determine the significance of the current partition test (i.e., The PValue, above). If the PValue exceeds the CorrectedAlpha then the null (single-rate) hypothesis should be accepted, if lower then the null should be rejected in favour of the N-rate hypthesis. Note that the CorrectedAlpha will not typically be the same for each partition and will also typically be different from the input \code{alpha} value due to the \code{multiple_comparison_correction} option used.
 
 The AIC is the Akaike Information Criterion, and is relatively meaningless on its own and can only really be used to compare with the AIC values for other partitions of the data. The AICc is simply the sample-size corrected version of the AIC and is preferable when sample sizes are small.
 }
@@ -193,28 +193,28 @@ The AIC is the Akaike Information Criterion, and is relatively meaningless on it
 set.seed(17)
 
 # Generate a random tree for the Michaux data set:
-time_tree <- rtree(nrow(Michaux1989$matrix_1$matrix))
+time_tree <- rtree(nrow(michaux_1989$matrix_1$matrix))
 
 # Update taxon names to match those in the data matrix:
-time_tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
+time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
 time_tree$root.time <- max(diag(vcv(time_tree)))
 
 # Get discrete character rates:
-x <- test_rates(time_tree = time_tree, cladistic.matrix =
-  Michaux1989, time_bins = seq(from = time_tree$root.time,
-  to = 0, length.out = 5), BranchPartitionsToTest =
+x <- test_rates(time_tree = time_tree, cladistic_matrix =
+  michaux_1989, time_bins = seq(from = time_tree$root.time,
+  to = 0, length.out = 5), branch_partitions =
   lapply(as.list(1:nrow(time_tree$edge)), as.list),
-  CharacterPartitionsToTest = lapply(as.list(1:3),
-  as.list), CladePartitionsToTest =
+  character_partitions = lapply(as.list(1:3),
+  as.list), clade_partitions =
   lapply(as.list(Ntip(time_tree) + (2:Nnode(time_tree))),
-  as.list), TimeBinPartitionsToTest =
-  lapply(as.list(1:4), as.list), ChangeTimes =
-  "random", alpha = 0.01, PolymorphismState =
-  "missing", UncertaintyState = "missing",
-  InapplicableState = "missing", TimeBinApproach =
-  "Lloyd")
+  as.list), time_partitions =
+  lapply(as.list(1:4), as.list), change_times =
+  "random", alpha = 0.01, polymorphism_state =
+  "missing", uncertainty_state = "missing",
+  inapplicable_state = "missing", time_binning_approach =
+  "lloyd")
 
 }
 \references{

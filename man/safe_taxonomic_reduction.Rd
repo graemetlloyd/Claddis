@@ -4,10 +4,10 @@
 \alias{safe_taxonomic_reduction}
 \title{Safe Taxonomic Reduction}
 \usage{
-safe_taxonomic_reduction(cladistic.matrix)
+safe_taxonomic_reduction(cladistic_matrix)
 }
 \arguments{
-\item{cladistic.matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}.}
+\item{cladistic_matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}.}
 }
 \value{
 \item{str.list}{A matrix listing the taxa that can be removed (\code{Junior}), the taxa which they are equivalent to (\code{Senior}) and the rule under which they can be safely removed (\code{Rule}).}
@@ -27,7 +27,7 @@ NB: If your data contains inapplicable characters these will be treated as missi
 \examples{
 
 # Performs STR on the Gauthier 1986 dataset used in Wilkinson (1995):
-str.out <- safe_taxonomic_reduction(Gauthier1986)
+str.out <- safe_taxonomic_reduction(gauthier_1986)
 
 # View deleted taxa:
 str.out$str.list

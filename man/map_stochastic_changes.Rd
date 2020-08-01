@@ -5,7 +5,7 @@
 \title{Finds all state changes on a tree using stochastic character mapping}
 \usage{
 map_stochastic_changes(
-  cladistic.matrix,
+  cladistic_matrix,
   time_tree,
   time_bins,
   NSimulations = 10,
@@ -15,9 +15,9 @@ map_stochastic_changes(
 )
 }
 \arguments{
-\item{cladistic.matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}.}
+\item{cladistic_matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}.}
 
-\item{time_tree}{A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{cladistic.matrix}.}
+\item{time_tree}{A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{cladistic_matrix}.}
 
 \item{time_bins}{A vector of ages representing the boundaries of a series of time bins.}
 
@@ -53,29 +53,29 @@ This function is intended to enumerate all possible changes on a tree (including
 set.seed(2)
 
 # Use Day 2016 as source matrix:
-cladistic.matrix <- Day2016
+cladistic_matrix <- day_2016
 
 # Prune out continuous characters:
-cladistic.matrix <- prune_cladistic_matrix(cladistic.matrix =
-  cladistic.matrix, blocks2prune = 1)
+cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix =
+  cladistic_matrix, blocks2prune = 1)
 
 # Prune out majority of characters so
 # example runs quickly:
-cladistic.matrix <- prune_cladistic_matrix(cladistic.matrix =
-  cladistic.matrix, characters2prune = 1:32)
+cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix =
+  cladistic_matrix, characters2prune = 1:32)
 
 # Generete random tree for matrix taxa:
-time_tree <- rtree(nrow(Day2016$matrix_1$matrix))
+time_tree <- rtree(nrow(day_2016$matrix_1$matrix))
 
 # Add taxon names to tree:
-time_tree$tip.label <- rownames(Day2016$matrix_1$matrix)
+time_tree$tip.label <- rownames(day_2016$matrix_1$matrix)
 
 # Add root age to tree:
 time_tree$root.time <- max(diag(vcv(time_tree)))
 
 # Get all state changes for two simulations:
 StateChanges <-
-  map_stochastic_changes(cladistic.matrix = cladistic.matrix,
+  map_stochastic_changes(cladistic_matrix = cladistic_matrix,
   time_tree = time_tree, time_bins = seq(time_tree$root.time, 0,
   length.out = 3), NSimulations = 2)
 

@@ -5,9 +5,9 @@
 \title{Principal Coordinates on a Cladistic Matrix}
 \usage{
 ordinate_cladistic_matrix(
-  cladistic.matrix,
-  distance.metric = "MORD",
-  ged.type = "Wills",
+  cladistic_matrix,
+  distance_metric = "MORD",
+  ged_type = "Wills",
   distance.transformation = "arcsine_sqrt",
   distance.polymorphism.behaviour = "min.difference",
   distance.uncertainty.behaviour = "min.difference",
@@ -26,11 +26,11 @@ ordinate_cladistic_matrix(
 )
 }
 \arguments{
-\item{cladistic.matrix}{A vector of mode character representing the tip names for which an ancestor is sought.}
+\item{cladistic_matrix}{A vector of mode character representing the tip names for which an ancestor is sought.}
 
-\item{distance.metric}{The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{calculate_morphological_distances} for more details.}
+\item{distance_metric}{The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{calculate_morphological_distances} for more details.}
 
-\item{ged.type}{The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.}
+\item{ged_type}{The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.}
 
 \item{distance.transformation}{The transformation to apply to distances. See \link{calculate_morphological_distances} for details.}
 
@@ -94,22 +94,22 @@ IMPORTANT: The function can remove taxa (or if including a tree, nodes as well) 
 \examples{
 
 # Run on Michaux (1989) data set with defaults:
-x <- ordinate_cladistic_matrix(Michaux1989)
+x <- ordinate_cladistic_matrix(michaux_1989)
 
 # Show output:
 x
 
 # Generate a (made up) tree:
-time_tree <- rtree(length(rownames(Michaux1989$matrix_1$matrix)))
+time_tree <- rtree(length(rownames(michaux_1989$matrix_1$matrix)))
 
 # Add taxon names to it:
-time_tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
+time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
 time_tree$root.time <- max(diag(vcv(time_tree)))
 
 # Run with tree:
-y <- ordinate_cladistic_matrix(Michaux1989, time_tree = time_tree)
+y <- ordinate_cladistic_matrix(michaux_1989, time_tree = time_tree)
 
 # Show new output:
 y

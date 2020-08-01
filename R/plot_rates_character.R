@@ -4,8 +4,8 @@
 #'
 #' Given the results from a rates test produces a time series visualization for a specific model.
 #'
-#' @param RateOutput Rate output from \link{test_rates}.
-#' @param ModelNumber The number of the model you wish to visualise from the rate output.
+#' @param test_rates_output Rate output from \link{test_rates}.
+#' @param model_number The number of the model you wish to visualise from the rate output.
 #' @param ... Other options to be passed to \link{geoscalePlot}.
 #'
 #' @details
@@ -31,7 +31,7 @@
 #' # Nothing yet
 #'
 #' @export plot_rates_character
-plot_rates_character <- function(RateOutput, ModelNumber, ...) {
+plot_rates_character <- function(test_rates_output, model_number, ...) {
   
   # TO DO:
   #
@@ -39,22 +39,22 @@ plot_rates_character <- function(RateOutput, ModelNumber, ...) {
   # - Add checks that data are present (characters were tested for)
   
   # Reconstruct character partitions list:
-  CharacterPartitions <- lapply(RateOutput$CharacterPartitionResults, function(x) lapply(strsplit(x$Partition, " \\| ")[[1]], function(y) unlist(lapply(y, function(z) {z <- as.list(strsplit(z, split = " ")[[1]]); unlist(lapply(z, function(p) if (length(grep("-", p)) > 0) {p <- strsplit(p, split = "-")[[1]]; as.numeric(p[1]:as.numeric(p[2]))} else {as.numeric(p)}))}))))
+  CharacterPartitions <- lapply(test_rates_output$CharacterPartitionResults, function(x) lapply(strsplit(x$Partition, " \\| ")[[1]], function(y) unlist(lapply(y, function(z) {z <- as.list(strsplit(z, split = " ")[[1]]); unlist(lapply(z, function(p) if (length(grep("-", p)) > 0) {p <- strsplit(p, split = "-")[[1]]; as.numeric(p[1]:as.numeric(p[2]))} else {as.numeric(p)}))}))))
   
   # Get x values for plotting partitions of model:
-  ModelXValues <- lapply(apply(matrix(c(1, cumsum(unlist(lapply(CharacterPartitions[[ModelNumber]], function(x) range(1:length(x))))[-1])), ncol = 2), 2, list), unlist)
+  ModelXValues <- lapply(apply(matrix(c(1, cumsum(unlist(lapply(CharacterPartitions[[model_number]], function(x) range(1:length(x))))[-1])), ncol = 2), 2, list), unlist)
   
   # Get y values for plotting partitions of model:
-  ModelYValues <- lapply(as.list(RateOutput$CharacterPartitionResults[[ModelNumber]]$Rates), rep, 2)
+  ModelYValues <- lapply(as.list(test_rates_output$CharacterPartitionResults[[model_number]]$Rates), rep, 2)
   
   # Make vector of partition colours ready for plotting:
-  PartitionColours <- unlist(unname(mapply(function(x, y) {rep(x, length(y))}, x = hcl.colors(n = length(CharacterPartitions[[ModelNumber]]), alpha = 0.5, palette = "viridis"), y = CharacterPartitions[[ModelNumber]])))
+  PartitionColours <- unlist(unname(mapply(function(x, y) {rep(x, length(y))}, x = hcl.colors(n = length(CharacterPartitions[[model_number]]), alpha = 0.5, palette = "viridis"), y = CharacterPartitions[[model_number]])))
   
   # Plot character rates:
-  plot(x = 1:max(unlist(CharacterPartitions[[ModelNumber]])), y = RateOutput$CharacterRates[unlist(CharacterPartitions[[ModelNumber]]), "Rate"], pch = 21, bg = PartitionColours, cex = 1.5, xlab = "Character", ylab = "Changes per lineage myr", ylim = c(0, 1.1 * max(RateOutput$CharacterRates[unlist(CharacterPartitions[[ModelNumber]]), "Rate"])), xaxt = "n", lwd = 0.5, col = "black")
+  plot(x = 1:max(unlist(CharacterPartitions[[model_number]])), y = test_rates_output$CharacterRates[unlist(CharacterPartitions[[model_number]]), "Rate"], pch = 21, bg = PartitionColours, cex = 1.5, xlab = "Character", ylab = "Changes per lineage myr", ylim = c(0, 1.1 * max(test_rates_output$CharacterRates[unlist(CharacterPartitions[[model_number]]), "Rate"])), xaxt = "n", lwd = 0.5, col = "black")
   
   # Add character numbrs to plot:
-  text(x = 1:max(unlist(CharacterPartitions[[ModelNumber]])), y = RateOutput$CharacterRates[unlist(CharacterPartitions[[ModelNumber]]), "Rate"], label = unlist(CharacterPartitions[[ModelNumber]]), pos = 1, col = PartitionColours, cex = 0.5)
+  text(x = 1:max(unlist(CharacterPartitions[[model_number]])), y = test_rates_output$CharacterRates[unlist(CharacterPartitions[[model_number]]), "Rate"], label = unlist(CharacterPartitions[[model_number]]), pos = 1, col = PartitionColours, cex = 0.5)
   
   # Add lines representing clustering of requested model to plot:
   for(i in 1:length(ModelXValues)) lines(x = c(ModelXValues[[i]][1] - 0.5, ModelXValues[[i]][2] + 0.5), y = ModelYValues[[i]])
@@ -63,6 +63,6 @@ plot_rates_character <- function(RateOutput, ModelNumber, ...) {
   for(i in 1:length(ModelXValues)) text(x = mean(ModelXValues[[i]]), y = mean(ModelYValues[[i]]), labels = eval(parse(text = paste0("expression(lambda[", i, "])"))), pos = 3, cex = 1.5)
   
   # Add legend to plot:
-  legend(x = 0, y = 1.1 * max(RateOutput$CharacterRates[unlist(CharacterPartitions[[ModelNumber]]), "Rate"]), legend = paste0("Partition ", 1:length(CharacterPartitions[[ModelNumber]])), pch = rep(21, length(CharacterPartitions[[ModelNumber]])), pt.bg = unique(PartitionColours), col = rep("black", length(CharacterPartitions[[ModelNumber]])), pt.lwd = 0.5, pt.cex = 1.5)
+  legend(x = 0, y = 1.1 * max(test_rates_output$CharacterRates[unlist(CharacterPartitions[[model_number]]), "Rate"]), legend = paste0("Partition ", 1:length(CharacterPartitions[[model_number]])), pch = rep(21, length(CharacterPartitions[[model_number]])), pt.bg = unique(PartitionColours), col = rep("black", length(CharacterPartitions[[model_number]])), pt.lwd = 0.5, pt.cex = 1.5)
   
 }

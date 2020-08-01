@@ -4,12 +4,12 @@
 \alias{plot_rates_time}
 \title{Visualize a rate test time series}
 \usage{
-plot_rates_time(RateOutput, ModelNumber, ...)
+plot_rates_time(test_rates_output, model_number, ...)
 }
 \arguments{
-\item{RateOutput}{Rate output from \link{test_rates}.}
+\item{test_rates_output}{Rate output from \link{test_rates}.}
 
-\item{ModelNumber}{The number of the model you wish to visualise from the rate output.}
+\item{model_number}{The number of the model you wish to visualise from the rate output.}
 
 \item{...}{Other options to be passed to \link{geoscalePlot}.}
 }
@@ -42,8 +42,8 @@ time_tree <- lapply(time_tree, function(x) strap::DatePhylo(x, Ages, rlen = 2, m
 class(time_tree) <- "multiPhylo"
 time_bins <- c(443.8, 358.9, 298.9, 251.9, 201.3, 145.0, 66.0, 0.0)
 LungfishResults <- Claddis::test_rates(time_tree[[1]], Matrix, time_bins,
-  TimeBinPartitionsToTest = partition_time_bins(7),
-  CharacterPartitionsToTest = list(list(1:91), list(Cranial = 1:81,
+  time_partitions = partition_time_bins(7),
+  character_partitions = list(list(1:91), list(Cranial = 1:81,
   Postcranial = 82:91)))
 plot_rates_time(LungfishResults,
   which(geiger::aicw(unlist(lapply(LungfishResults$TimeBinResults,

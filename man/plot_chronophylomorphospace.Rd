@@ -32,16 +32,16 @@ require(rgl)
 set.seed(4)
 
 # Generate a random tree for the Michaux 1989 data set:
-time_tree <- rtree(nrow(Michaux1989$matrix_1$matrix))
+time_tree <- rtree(nrow(michaux_1989$matrix_1$matrix))
 
 # Set root time so latest tip terminates at the present:
 time_tree$root.time <- max(diag(vcv(time_tree)))
 
 # Add taxon names to the tree:
-time_tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
+time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
 
 # Perform a phylogenetic Principal Coordinates Analysis:
-pcoa_data <- ordinate_cladistic_matrix(Michaux1989,
+pcoa_data <- ordinate_cladistic_matrix(michaux_1989,
   time_tree = time_tree)
 
 # Plot a chronophylomorphospace:

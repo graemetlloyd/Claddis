@@ -4,7 +4,7 @@
 #'
 #' Performs Safe Taxonomic Reduction (STR) on a character-taxon matrix.
 #'
-#' @param cladistic.matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
+#' @param cladistic_matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
 #'
 #' @details
 #'
@@ -31,7 +31,7 @@
 #' @examples
 #'
 #' # Performs STR on the Gauthier 1986 dataset used in Wilkinson (1995):
-#' str.out <- safe_taxonomic_reduction(Gauthier1986)
+#' str.out <- safe_taxonomic_reduction(gauthier_1986)
 #'
 #' # View deleted taxa:
 #' str.out$str.list
@@ -43,54 +43,54 @@
 #' str.out$removed.matrix
 #'
 #' @export safe_taxonomic_reduction
-safe_taxonomic_reduction <- function(cladistic.matrix) {
+safe_taxonomic_reduction <- function(cladistic_matrix) {
   
   # Store unaltered version of matrix to return to later:
-  Unaltered <- cladistic.matrix
+  Unaltered <- cladistic_matrix
   
   # If there is more than one matrix block (will need to temporarily combine into single matrix):
-  if (length(cladistic.matrix) > 2) {
+  if (length(cladistic_matrix) > 2) {
     
     # Get list of just the matrix blocks:
-    MatrixBlocks <- lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "matrix")
+    MatrixBlocks <- lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "matrix")
     
     # For each additional block add at end of first block:
     for(i in 2:length(MatrixBlocks)) MatrixBlocks[[1]] <- cbind(MatrixBlocks[[1]], MatrixBlocks[[i]][rownames(MatrixBlocks[[1]]), ])
     
-    # Store single matrix block as first block of cladistic.matrix:
-    cladistic.matrix[[2]]$matrix <- MatrixBlocks[[1]]
+    # Store single matrix block as first block of cladistic_matrix:
+    cladistic_matrix[[2]]$matrix <- MatrixBlocks[[1]]
     
-    # Store ordering for all blocks in first block of cladistic.matrix:
-    cladistic.matrix[[2]]$ordering <- as.vector(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "ordering")))
+    # Store ordering for all blocks in first block of cladistic_matrix:
+    cladistic_matrix[[2]]$ordering <- as.vector(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "ordering")))
     
-    # Store weights for all blocks in first block of cladistic.matrix:
-    cladistic.matrix[[2]]$weights <- as.vector(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "weights")))
+    # Store weights for all blocks in first block of cladistic_matrix:
+    cladistic_matrix[[2]]$weights <- as.vector(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "weights")))
     
-    # Store minimum values for all blocks in first block of cladistic.matrix:
-    cladistic.matrix[[2]]$minimum_values <- as.vector(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "minimum_values")))
+    # Store minimum values for all blocks in first block of cladistic_matrix:
+    cladistic_matrix[[2]]$minimum_values <- as.vector(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "minimum_values")))
     
-    # Store maximum values for all blocks in first block of cladistic.matrix:
-    cladistic.matrix[[2]]$maximum_values <- as.vector(unlist(lapply(cladistic.matrix[2:length(cladistic.matrix)], '[[', "maximum_values")))
+    # Store maximum values for all blocks in first block of cladistic_matrix:
+    cladistic_matrix[[2]]$maximum_values <- as.vector(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "maximum_values")))
     
     # Isolate to just first matrix block:
-    cladistic.matrix <- cladistic.matrix[1:2]
+    cladistic_matrix <- cladistic_matrix[1:2]
 
   }
   
   # Prune out any zero weight characters, if they exist:
-  if (any(cladistic.matrix[[2]]$weights == 0)) cladistic.matrix <- prune_cladistic_matrix(cladistic.matrix = cladistic.matrix, characters2prune = which(cladistic.matrix[[2]]$weights == 0))
+  if (any(cladistic_matrix[[2]]$weights == 0)) cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix = cladistic_matrix, characters2prune = which(cladistic_matrix[[2]]$weights == 0))
   
   # Order matrix from least to most complete taxon (as least is most likely to be removed):
-  cladistic.matrix[[2]]$matrix <- cladistic.matrix[[2]]$matrix[order(apply(apply(cladistic.matrix[[2]]$matrix, 1, is.na), 2, sum), decreasing = TRUE), ]
+  cladistic_matrix[[2]]$matrix <- cladistic_matrix[[2]]$matrix[order(apply(apply(cladistic_matrix[[2]]$matrix, 1, is.na), 2, sum), decreasing = TRUE), ]
   
   # Subfunction to be used by lapply to check downwards (look at more complete taxa only) for safely removable taxa:
-  check_downward_for_matches <- function(rownumber, cladistic.matrix) {
+  check_downward_for_matches <- function(rownumber, cladistic_matrix) {
     
     # First find which characters are not scored as missing in current taxon:
-    Nonmissingcharacters <- !is.na(cladistic.matrix[[2]]$matrix[rownumber, ])
+    Nonmissingcharacters <- !is.na(cladistic_matrix[[2]]$matrix[rownumber, ])
     
     # Build isolated matrix block from current taxon to end of matrix only for characters coded for current taxon:
-    MatrixBlockToCheck <- cladistic.matrix[[2]]$matrix[rownumber:nrow(cladistic.matrix[[2]]$matrix), Nonmissingcharacters, drop = FALSE]
+    MatrixBlockToCheck <- cladistic_matrix[[2]]$matrix[rownumber:nrow(cladistic_matrix[[2]]$matrix), Nonmissingcharacters, drop = FALSE]
     
     # Find any taxa that have missing characters inside the block (can not be true parents):
     TaxaWithmissingcharacters <- names(which(apply(apply(MatrixBlockToCheck, 1, is.na), 2, any)))
@@ -127,7 +127,7 @@ safe_taxonomic_reduction <- function(cladistic.matrix) {
   }
   
   # Get any safely removable taxa and their senior parents:
-  SafeToRemove <- lapply(as.list(1:(nrow(cladistic.matrix[[2]]$matrix) - 1)), check_downward_for_matches, cladistic.matrix = cladistic.matrix)
+  SafeToRemove <- lapply(as.list(1:(nrow(cladistic_matrix[[2]]$matrix) - 1)), check_downward_for_matches, cladistic_matrix = cladistic_matrix)
   
   # If no taxa can be safely deleted:
   if (all(unlist(lapply(SafeToRemove, is.null)))) {
@@ -163,10 +163,10 @@ safe_taxonomic_reduction <- function(cladistic.matrix) {
     for(i in 1:nrow(SafeToRemove)) {
       
       # Check for rule 1 (symmetrical coding):
-      if (paste(cladistic.matrix$matrix_1$matrix[SafeToRemove[i, 1], ], collapse = "") == paste(cladistic.matrix$matrix_1$matrix[SafeToRemove[i, 2], ], collapse = "")) {
+      if (paste(cladistic_matrix$matrix_1$matrix[SafeToRemove[i, 1], ], collapse = "") == paste(cladistic_matrix$matrix_1$matrix[SafeToRemove[i, 2], ], collapse = "")) {
         
         # Check for any missing data:
-        if (any(is.na(cladistic.matrix$matrix_1$matrix[SafeToRemove[i, 1], ]))) {
+        if (any(is.na(cladistic_matrix$matrix_1$matrix[SafeToRemove[i, 1], ]))) {
           
           # Is rule 1b:
           STRRule <- c(STRRule, "Rule 1B")
@@ -183,7 +183,7 @@ safe_taxonomic_reduction <- function(cladistic.matrix) {
       } else {
         
         # Check for any missing data:
-        if (any(is.na(cladistic.matrix$matrix_1$matrix[SafeToRemove[i, 1], ]))) {
+        if (any(is.na(cladistic_matrix$matrix_1$matrix[SafeToRemove[i, 1], ]))) {
           
           # Is rule 2B:
           STRRule <- c(STRRule, "Rule 2B")

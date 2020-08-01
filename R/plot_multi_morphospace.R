@@ -22,7 +22,7 @@
 #' @examples
 #'
 #' # Create PCOA data:
-#' pcoa_input <- ordinate_cladistic_matrix(Michaux1989)
+#' pcoa_input <- ordinate_cladistic_matrix(michaux_1989)
 #'
 #' # Plot first three axes:
 #' plot_multi_morphospace(pcoa_input, N_axes = 3)
@@ -37,7 +37,7 @@ plot_multi_morphospace <- function(pcoa_input, N_axes = 4, plot_taxon_names = FA
 # Never plot taxon names!
 
   # Work out the number of plots required:
-  N_plots <- (N_axes ^ 2 - N_axes) / 2
+  N_plots <- (N_axes^2 - N_axes) / 2
 
   # Set uo matrix that will represent plot layout:
   A <- matrix(0, ncol = N_axes, nrow = N_axes)

@@ -4,8 +4,8 @@
 #'
 #' Fixes root.time after taxa have been pruned from a tree using drop.tip
 #' 
-#' @param original.tree A tree in phylo format.
-#' @param pruned.tree A tree in phylo format that represents a pruned version of \code{original.tree}.
+#' @param original_tree A tree in phylo format.
+#' @param pruned_tree A tree in phylo format that represents a pruned version of \code{original_tree}.
 #'
 #' @details
 #'
@@ -28,30 +28,30 @@
 #' tree$root.time <- 20
 #' 
 #' # Now prune taxon A:
-#' pruned.tree <- drop.tip(tree, "A")
+#' pruned_tree <- drop.tip(tree, "A")
 #' 
 #' # Show that drop.tip has not updated the tree's root time:
-#' pruned.tree$root.time
+#' pruned_tree$root.time
 #' 
 #' # Use the function to fix the root time:
-#' pruned.tree <- fix_root_time(tree, pruned.tree)
+#' pruned_tree <- fix_root_time(tree, pruned_tree)
 #' 
 #' # Show that the root time is now fixed (19 Ma):
-#' pruned.tree$root.time
+#' pruned_tree$root.time
 #' 
 #' @export fix_root_time
-fix_root_time <- function(original.tree, pruned.tree) {
+fix_root_time <- function(original_tree, pruned_tree) {
 	
 	# Conditional if pruned tree too small:
-	if (ape::Ntip(pruned.tree) < 3) stop("ERROR: pruned.tree includes too few (<3) taxa to be used.")
+	if (ape::Ntip(pruned_tree) < 3) stop("ERROR: pruned_tree includes too few (<3) taxa to be used.")
 	
 	# Conditional in case where pruned tree taxa are not a subset of the original tree taxa:
-	if (length(setdiff(pruned.tree$tip.label, original.tree$tip.label)) > 0) stop("ERROR: pruned.tree cannot include taxa not present in original.tree.")
+	if (length(setdiff(pruned_tree$tip.label, original_tree$tip.label)) > 0) stop("ERROR: pruned_tree cannot include taxa not present in original_tree.")
 	
-	# Update $root.time for pruned.tree:
-	pruned.tree$root.time <- original.tree$root.time - mean(diag(vcv(original.tree))[names(diag(vcv(pruned.tree)))] - diag(vcv(pruned.tree)))
+	# Update $root.time for pruned_tree:
+	pruned_tree$root.time <- original_tree$root.time - mean(diag(vcv(original_tree))[names(diag(vcv(pruned_tree)))] - diag(vcv(pruned_tree)))
 	
 	# Return updated pruned tree:
-	return(pruned.tree)
+	return(pruned_tree)
 	
 }

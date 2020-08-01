@@ -30,7 +30,7 @@
 #' @examples
 #'
 #' # Get morphological distances for Michaux (1989) data set:
-#' distances <- calculate_morphological_distances(Michaux1989)
+#' distances <- calculate_morphological_distances(michaux_1989)
 #'
 #' # Attempt to trim max.dist.matrix:
 #' trim_matrix(distances$DistanceMatrix)
@@ -191,7 +191,7 @@ trim_matrix <- function(dist.matrix, Tree = NULL) {
         for(i in nodes.left.to.remove) {
           
           # Find node number:
-          originating.node <- find_mrca(strsplit(i, "%%")[[1]], Tree)
+          originating.node <- find_mrca(descendant_names = strsplit(i, "%%")[[1]], tree = Tree)
           
           # Find descendants of that node:
           descendant.nodes <- Tree$edge[which(Tree$edge[, 1] == originating.node), 2]
@@ -263,13 +263,13 @@ trim_matrix <- function(dist.matrix, Tree = NULL) {
       Tree <- drop.tip(Tree, tips.to.remove)
       
       # Correct root time (if necessary):
-      Tree <- fix_root_time(original.tree = FullTree, pruned.tree = Tree)
+      Tree <- fix_root_time(original_tree = FullTree, pruned_tree = Tree)
       
       # Find node names:
       node.names <- rownames(dist.matrix)[grep("%%", rownames(dist.matrix))]
       
       # Find node numbers:
-      for(j in 1:length(node.names)) names(node.names)[j] <- find_mrca(strsplit(node.names[j], "%%")[[1]], Tree)
+      for(j in 1:length(node.names)) names(node.names)[j] <- find_mrca(descendant_names = strsplit(node.names[j], "%%")[[1]], tree = Tree)
       
       # Replace node names with numbers:
       colnames(dist.matrix)[match(node.names, colnames(dist.matrix))] <- rownames(dist.matrix)[match(node.names, rownames(dist.matrix))] <- names(node.names)

@@ -6,13 +6,13 @@
 #' 
 #' @param time_tree A time-scaled tree in phylo format with a \code{$root.time} value.
 #' @param time_bins A vector of ages in millions of years of time bin boundaries in old-to-young order.
-#' @param pruned.tree A time-scaled tree in phylo format with a \code{$root.time} value that is a subset of \code{time_tree}.
+#' @param pruned_tree A time-scaled tree in phylo format with a \code{$root.time} value that is a subset of \code{time_tree}.
 #'
 #' @details
 #'
 #' Calculates the total edge duration of a time-scaled tree present in a series of time bins. This is intended as an internal function for rate calculations, but may be of use to someone.
 #'
-#' The option of using a \code{pruned.tree} allows the user to correctly classify internal and terminal branches in a subtree of the larger tree. So for example, if taxa A and B are sisters then after pruning B the subtree branch leading to A is composed of an internal and a terminal branch on the complete tree.
+#' The option of using a \code{pruned_tree} allows the user to correctly classify internal and terminal branches in a subtree of the larger tree. So for example, if taxa A and B are sisters then after pruning B the subtree branch leading to A is composed of an internal and a terminal branch on the complete tree.
 #'
 #' @return
 #'
@@ -37,25 +37,25 @@
 #' bin_edge_lengths(time_tree, time_bins)
 #' 
 #' @export bin_edge_lengths
-bin_edge_lengths <- function(time_tree, time_bins, pruned.tree = NULL) {
+bin_edge_lengths <- function(time_tree, time_bins, pruned_tree = NULL) {
 	
 	# Tree must have $root.time:
 	if (is.null(time_tree$root.time)) stop("ERROR: time_tree must have $root.time or function can not work.")
 	
 	# If tree is pruned from a larger version (where the terminal-internal dichotomy really applies):
-	if (!is.null(pruned.tree)) {
+	if (!is.null(pruned_tree)) {
 		
 		# Check pruned tree is subset of tree:
-		if (!all(drop.tip(time_tree, setdiff(time_tree$tip.label, pruned.tree$tip.label))$edge == pruned.tree$edge)) stop("ERROR: pruned.tree must be subtree of time_tree.")
+		if (!all(drop.tip(time_tree, setdiff(time_tree$tip.label, pruned_tree$tip.label))$edge == pruned_tree$edge)) stop("ERROR: pruned_tree must be subtree of time_tree.")
 		
 		# Get dropped taxa:
-		dropped.tips <- setdiff(time_tree$tip.label, pruned.tree$tip.label)
+		dropped.tips <- setdiff(time_tree$tip.label, pruned_tree$tip.label)
 		
 		# Collapse terminal branch lengths of dropped tips to zero:
 		time_tree$edge.length[match(match(dropped.tips, time_tree$tip.label), time_tree$edge[, 2])] <- 0
 		
 		# Only continue if there are more branch lengths to collapse:
-		if (sum(pruned.tree$edge.length) < sum(time_tree$edge.length)) {
+		if (sum(pruned_tree$edge.length) < sum(time_tree$edge.length)) {
 			
 			# Find descendant tips of each node:
 			descendant.tips <- lapply(as.list((ape::Ntip(time_tree) + 1):(ape::Ntip(time_tree) + ape::Nnode(time_tree))), FindDescendants, tree = time_tree)
@@ -86,7 +86,7 @@ bin_edge_lengths <- function(time_tree, time_bins, pruned.tree = NULL) {
 	internal.edge.length.in.bin <- terminal.edge.length.in.bin <- edge.length.in.bin <- rep(0, length(time_bins) - 1)
 	
 	# Date nodes in tree:
-	node.ages <- date_nodes(time_tree)
+	node.ages <- date_nodes(time_tree = time_tree)
 	
 	# Get maximum age for each edge:
 	tree.edge.maxs <- node.ages[time_tree$edge[, 1]]

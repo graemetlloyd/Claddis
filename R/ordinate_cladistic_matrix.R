@@ -4,9 +4,9 @@
 #'
 #' Performs Principal Coordinates Analysis (PCoA) on a cladistic matrix.
 #'
-#' @param cladistic.matrix A vector of mode character representing the tip names for which an ancestor is sought.
-#' @param distance.metric The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{calculate_morphological_distances} for more details.
-#' @param ged.type The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.
+#' @param cladistic_matrix A vector of mode character representing the tip names for which an ancestor is sought.
+#' @param distance_metric The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{calculate_morphological_distances} for more details.
+#' @param ged_type The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.
 #' @param distance.transformation The transformation to apply to distances. See \link{calculate_morphological_distances} for details.
 #' @param distance.polymorphism.behaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{calculate_morphological_distances} for details.
 #' @param distance.uncertainty.behaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{calculate_morphological_distances} for details.
@@ -54,28 +54,28 @@
 #' @examples
 #'
 #' # Run on Michaux (1989) data set with defaults:
-#' x <- ordinate_cladistic_matrix(Michaux1989)
+#' x <- ordinate_cladistic_matrix(michaux_1989)
 #'
 #' # Show output:
 #' x
 #'
 #' # Generate a (made up) tree:
-#' time_tree <- rtree(length(rownames(Michaux1989$matrix_1$matrix)))
+#' time_tree <- rtree(length(rownames(michaux_1989$matrix_1$matrix)))
 #'
 #' # Add taxon names to it:
-#' time_tree$tip.label <- rownames(Michaux1989$matrix_1$matrix)
+#' time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
 #'
 #' # Set root time by making youngest taxon extant:
 #' time_tree$root.time <- max(diag(vcv(time_tree)))
 #'
 #' # Run with tree:
-#' y <- ordinate_cladistic_matrix(Michaux1989, time_tree = time_tree)
+#' y <- ordinate_cladistic_matrix(michaux_1989, time_tree = time_tree)
 #'
 #' # Show new output:
 #' y
 #'
 #' @export ordinate_cladistic_matrix
-ordinate_cladistic_matrix <- function(cladistic.matrix, distance.metric = "MORD", ged.type = "Wills", distance.transformation = "arcsine_sqrt", distance.polymorphism.behaviour = "min.difference", distance.uncertainty.behaviour = "min.difference", distance.inapplicable.behaviour = "missing", character.dependencies = NULL, alpha = 0.5, correction = "cailliez", time_tree = NULL, estimate.all.nodes = FALSE, estimate.tip.values = FALSE, inapplicables.as.missing = FALSE, ancestral.polymorphism.behaviour = "equalp", ancestral.uncertainty.behaviour = "equalp", threshold = 0.01, allow.all.missing = FALSE) {
+ordinate_cladistic_matrix <- function(cladistic_matrix, distance_metric = "MORD", ged_type = "Wills", distance.transformation = "arcsine_sqrt", distance.polymorphism.behaviour = "min.difference", distance.uncertainty.behaviour = "min.difference", distance.inapplicable.behaviour = "missing", character.dependencies = NULL, alpha = 0.5, correction = "cailliez", time_tree = NULL, estimate.all.nodes = FALSE, estimate.tip.values = FALSE, inapplicables.as.missing = FALSE, ancestral.polymorphism.behaviour = "equalp", ancestral.uncertainty.behaviour = "equalp", threshold = 0.01, allow.all.missing = FALSE) {
   
   # Add some top level conditionsl here to check input is valid.
   # Allow other ordination types such as NMDS
@@ -84,7 +84,7 @@ ordinate_cladistic_matrix <- function(cladistic.matrix, distance.metric = "MORD"
   if (is.null(time_tree)) {
     
     # Get morphological distances from the cladistic matrix:
-    morph_distances <- calculate_morphological_distances(cladistic.matrix, distance.metric = distance.metric, distance.transformation = distance.transformation, polymorphism.behaviour = distance.polymorphism.behaviour, uncertainty.behaviour = distance.uncertainty.behaviour, inapplicable.behaviour = distance.inapplicable.behaviour, character.dependencies = character.dependencies, alpha = alpha)
+    morph_distances <- calculate_morphological_distances(cladistic_matrix, distance_metric = distance_metric, distance.transformation = distance.transformation, polymorphism.behaviour = distance.polymorphism.behaviour, uncertainty.behaviour = distance.uncertainty.behaviour, inapplicable.behaviour = distance.inapplicable.behaviour, character.dependencies = character.dependencies, alpha = alpha)
     
     # Get trimmed distances:
     trimmed.distances <- trim_matrix(morph_distances$DistanceMatrix)
@@ -99,10 +99,10 @@ ordinate_cladistic_matrix <- function(cladistic.matrix, distance.metric = "MORD"
   } else {
       
     # Get ancestral character states:
-    ancestral_values <- estimate_ancestral_states(cladistic.matrix = cladistic.matrix, time_tree = time_tree, estimate.all.nodes = estimate.all.nodes, estimate.tip.values = estimate.tip.values, inapplicables.as.missing = inapplicables.as.missing, polymorphism.behaviour = ancestral.polymorphism.behaviour, uncertainty.behaviour = ancestral.uncertainty.behaviour, threshold = threshold, allow.all.missing = allow.all.missing)
+    ancestral_values <- estimate_ancestral_states(cladistic_matrix = cladistic_matrix, time_tree = time_tree, estimate.all.nodes = estimate.all.nodes, estimate.tip.values = estimate.tip.values, inapplicables.as.missing = inapplicables.as.missing, polymorphism.behaviour = ancestral.polymorphism.behaviour, uncertainty.behaviour = ancestral.uncertainty.behaviour, threshold = threshold, allow.all.missing = allow.all.missing)
 
     # Get morphological distances from the cladistic matrix:
-    morph_distances <- calculate_morphological_distances(ancestral_values, distance.metric = distance.metric, ged.type = ged.type, distance.transformation = distance.transformation, polymorphism.behaviour = distance.polymorphism.behaviour, uncertainty.behaviour = distance.uncertainty.behaviour, inapplicable.behaviour = distance.inapplicable.behaviour, character.dependencies = character.dependencies, alpha = alpha)
+    morph_distances <- calculate_morphological_distances(ancestral_values, distance_metric = distance_metric, ged_type = ged_type, distance.transformation = distance.transformation, polymorphism.behaviour = distance.polymorphism.behaviour, uncertainty.behaviour = distance.uncertainty.behaviour, inapplicable.behaviour = distance.inapplicable.behaviour, character.dependencies = character.dependencies, alpha = alpha)
     
     # Get trimmed distances:
     trimmed.distances <- trim_matrix(morph_distances$DistanceMatrix, Tree = time_tree)

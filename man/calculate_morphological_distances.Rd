@@ -5,9 +5,9 @@
 \title{Get distance matrices from a cladistic matrix}
 \usage{
 calculate_morphological_distances(
-  cladistic.matrix,
-  distance.metric = "MORD",
-  ged.type = "Wills",
+  cladistic_matrix,
+  distance_metric = "MORD",
+  ged_type = "Wills",
   distance.transformation = "arcsine_sqrt",
   polymorphism.behaviour = "min.difference",
   uncertainty.behaviour = "min.difference",
@@ -17,11 +17,11 @@ calculate_morphological_distances(
 )
 }
 \arguments{
-\item{cladistic.matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}.}
+\item{cladistic_matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}.}
 
-\item{distance.metric}{The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).}
+\item{distance_metric}{The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).}
 
-\item{ged.type}{The type of GED to use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.}
+\item{ged_type}{The type of GED to use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.}
 
 \item{distance.transformation}{The type of distance transformation to perform. Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default). (Note: this is only really appropriate for the proportional distances, i.e., "GC" and "MORD".)}
 
@@ -36,7 +36,7 @@ calculate_morphological_distances(
 \item{alpha}{The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{inapplicable.behaviour = "HSJ"}. See details.}
 }
 \value{
-\item{distance.metric}{The distance metric used.}
+\item{distance_metric}{The distance metric used.}
 \item{DistanceMatrix}{The distance matrix returned.}
 \item{ComparableCharacterMatrix}{The matrix of characters that can be compared for each pairwise distance.}
 }
@@ -48,7 +48,7 @@ There are many options to consider when generating a distance matrix from morpho
 
 Claddis currently offers four different distance metrics: 1. Raw Euclidean Distance (\code{RED}) - this is only really applicable if there are no missing data, 2. The Gower Coefficient (\code{GC}; Gower 1971) - this rescales distances by the number of characters that can be coded for both taxa in each pairwise comparison thus correcting for missing data, 3. The Maximum Observable Rescaled Distance (\code{MORD}) - this was introduced by Lloyd (2016) as an extension of the \code{GC} designed to deal with the fact that multistate ordered characters can lead to \code{GC}s of greater than 1 and works by rescaling by the maximum possible distance that could be observed based on the number of characters codable in each pairwise comparison meaning all resulting distances are on a zero to one scale, and 4. The Generalised Euclidean Distance - this was introduced by Wills (1998) as a means of correcting for the fact that a \code{RED} metric will become increasingly non-Euclidean as the amount of missing data increases and works by filling in missing distances (for characters that are coded as missing in at least one taxon in the pairwise comparison) by using the mean pairwise dissimilarity for that taxon pair as a substitute. In effect then, \code{RED} makes no consideration of missing data, \code{GC} and \code{MORD} normalise by the available data (and are identical if there are no ordered multistate characters), and \code{GED} fills in missing distances by extrapolating from the available data.
 
-Note that Lloyd (2016) misidentified the substitute dissimilarity for the \code{GED} as the mean for the whole data set (Hopkins and St John 2018) and this was the way the GED implementation of Claddis operated up to version 0.2. This has now been amended (as of version 0.3) so that the function produces the \code{GED} in the form that Wills (1998) intended. However, this implementation can still be accessed as the \code{Legacy} option for \code{ged.type}, with \code{Wills} being the WIlls (1998) implementation. An advantage of this misinterpreted form of \code{GED} is that it will always return a complete pairwise distance matrix, however it is not recommended (see Lloyd 2016). Instead a third option for \code{ged.type} - (\code{Hybrid}) - offers the same outcome but only uses the mean distance from the entire matrix in the case where there are no codable characters in common in a pairwise comparison. This new hybrid option has not been used in a published study.
+Note that Lloyd (2016) misidentified the substitute dissimilarity for the \code{GED} as the mean for the whole data set (Hopkins and St John 2018) and this was the way the GED implementation of Claddis operated up to version 0.2. This has now been amended (as of version 0.3) so that the function produces the \code{GED} in the form that Wills (1998) intended. However, this implementation can still be accessed as the \code{Legacy} option for \code{ged_type}, with \code{Wills} being the WIlls (1998) implementation. An advantage of this misinterpreted form of \code{GED} is that it will always return a complete pairwise distance matrix, however it is not recommended (see Lloyd 2016). Instead a third option for \code{ged_type} - (\code{Hybrid}) - offers the same outcome but only uses the mean distance from the entire matrix in the case where there are no codable characters in common in a pairwise comparison. This new hybrid option has not been used in a published study.
 
 Typically the resulting distance matrix will be used in an ordination procedure such as principal coordinates (effectively classical multidimensional scaling where k, the number of axes, is maximised at N - 1, where N is the number of rows (i.e., taxa) in the matrix). As such the distance should be - or approximate - Euclidean and hence a square root transformation is typically applied (\code{distance.transformation} with the \code{sqrt} option). However, if applying pre-ordination (i.e., ordination-free) disparity metrics (e.g., weighted mean pairwise distance) you may wish to avoid any transformation (\code{none} option). In particular the \code{MORD} will only fall on a zero to one scale if this is the case. However, if transforming the \code{MORD} for ordination this zero to one property may mean the arcsine square root (\code{arcsine_sqrt} option) is preferred. (Note that if using only unordered multistate or binary characters and the \code{GC} the zero to one scale will apply too.)
 
@@ -62,7 +62,7 @@ Here the implementation of this approach differs somewhat from the code availabl
 
 # Get morphological distances for the Day et
 # al. (2016) data set:
-distances <- calculate_morphological_distances(Day2016)
+distances <- calculate_morphological_distances(day_2016)
 
 # Show distance metric:
 distances$DistanceMetric
@@ -85,7 +85,7 @@ character.dependencies <- matrix(c(8, 7), ncol = 2,
 
 # Get morphological distances for the Day et
 # al. (2016) data set using HSJ approach:
-distances <- calculate_morphological_distances(Day2016,
+distances <- calculate_morphological_distances(day_2016,
   inapplicable.behaviour = "HSJ",
   character.dependencies = character.dependencies,
   alpha = 0.5)
