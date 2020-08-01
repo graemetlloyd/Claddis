@@ -19,7 +19,7 @@
 #' @examples
 #' 
 #' # Get morphological distances for Michaux (1989) data set:
-#' distances <- calculate_morphological_distances(Michaux1989)
+#' distances <- calculate_morphological_distances(michaux_1989)
 #' 
 #' # Show distances:
 #' distances
@@ -47,7 +47,7 @@ NULL
 #'
 #' The character-taxon matrix from Day et al. (2016).
 #'
-#' @name Day2016
+#' @name day_2016
 #' @docType data
 #' @format A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
 #' @references Day, M. O., Rubidge, B. S. and Abdala, F., 2016. A new mid-Permian burnetiamorph therapsid from the Main Karoo Basin of South Africa and a phylogenetic review of Burnetiamorpha. \emph{Acta Palaeontologica Polonica}, \bold{61}, 701-719.
@@ -58,7 +58,7 @@ NULL
 #'
 #' The character-taxon matrix from Gauthier (1986).
 #'
-#' @name Gauthier1986
+#' @name gauthier_1986
 #' @docType data
 #' @format A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
 #' @references Gauthier, J. A., 1986. Saurischian monophyly and the origin of birds. In Padian, K. (ed.) \emph{The Origin of Birds and the Evolution of Flight}. Towne and Bacon, San Francisco, CA, United States, 1-55.
@@ -69,7 +69,7 @@ NULL
 #' 
 #' The character-taxon matrix from Michaux (1989).
 #' 
-#' @name Michaux1989
+#' @name michaux_1989
 #' @docType data
 #' @format A character-taxon matrix in the format imported by
 #' \link{read_nexus_matrix}.
