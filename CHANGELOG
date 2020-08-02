@@ -1,5 +1,82 @@
 Version - 0.5.4 - 2020-02-08
 
 - Applied styler across package (no change to user).
-- Added CHANGELOG (thie file)
+- Added CHANGELOG (this file; no change to user).
+- Added badges to GitHub README (no change to user).
 
+Version - 0.5.3 - 2020-31-07
+
+- Added R version dependency (>= 3.5.0) to Claddis.
+- Renaming of some Claddis variables to meet tidyverse style guide (may require users to update scripts that call Claddis).
+
+Version - 0.5.2 - 2020-31-07
+
+- Renaming of some Claddis functions and variables to meet tidyverse style guide (may require users to update scripts that call Claddis).
+
+Version - 0.5.1 - 2020-31-07
+
+- Renaming of some Claddis functions and variables to meet tidyverse style guide (may require users to update scripts that call Claddis).
+
+Version - 0.5.0 - 2020-29-07
+
+- Complete renaming of Claddis functions to meet tidyverse style guide (will break any old scripts that call Claddis).
+
+Version - 0.4.10 - 2020-28-07
+
+- Starting renaming of Claddis functions to apply tidyverse style guide (will break any old scripts that call Claddis).
+- Fixing error that was stopping the Claddis manual from building correctly.
+- Fixing travis CI build issue with rgl (no change to user).
+
+Version - 0.4.9 - 2020-25-07
+
+- Added new function for visualising character-partition rate tests.
+- Added grDevices::hcl.colors and graphics::legend to imports (no chaneg to user).
+
+Version - 0.4.8 - 2020-25-07
+
+- Added new function for visualising tree-partition (edges or clades) rate tests.
+- Added tree to rate function output to allow visualisation (no change to user).
+
+Version - 0.4.7 - 2020-22-07
+
+- Fixed bug where uncorrected PCoA values were being used by disparity plotting functions (bug reported by Phil Jardine). Users should double check plots made prior to this if they were using a correction for negative eigenvalues.
+- Removed unnecessary names() calls inside functions (no change to user except potentially an extremely minor speeed increase).
+
+Version - 0.4.6 - 2020-20-07
+
+- Added new function for visualising time bin-partition rate tests.
+- Added geoscale to dependencies (no change to user).
+
+Version - 0.4.5 - 2020-19-07
+
+- Added time bins to rate output in advance of adding new rate visualisation functions (no change to user).
+- Added partitions tested to rate output in advance of adding new rate visualisation functions (no change to user).
+
+Version - 0.4.4 - 2020-18-07
+
+- Added full partitions to rate output in advance of adding new rate visualisation functions (no change to user).
+
+Version - 0.4.3 - 2020-16-07
+
+- Added option to allow all missing states for individual characters to ancestral state estimation function. This may mean some users can run files that previously would have thrown an error (requested by Phil Novack-Gottshall and Min Wang).
+- Added explicit error message to ancestral states function if all missing value character(s) are found but not explicitly allowed by the user.
+
+Version - 0.4.2 - 2020-08-07
+
+- Fixed bug in AIC option in rates function. It is extremely unlikely this will affect any users as this option has yet to be publicised but would technically render any AIC analyses made prior to version 0.4.2 invalid. 
+- Added AICc to rates function output.
+
+Version - 0.4.1 - 2020-01-07
+
+- Added new function to permute all contiguous partitions of a series of time bins to be used by rates function.
+- Added gitignore file (no change to users).
+- Allowed invariant characters to be used in ancestral state estimation function (requested by Min Wang). May mean some users can run data sets that previously would have thrown an error.
+- Complete rewriting of rates function manual. The new options in this function (especially the partitioning and AIC) should now be properly explained.
+
+Version - 0.4.0 - 2019-29-12
+
+- Added AIC option to rates function to allow more hypothesis-focused testing, instead of the more exploratory approaches that users were restricted to previously.
+- Various minor corrections and additions to the package manual, including formatting of references.
+- Added additional input checks to ancestral state function. Users may notice more informative error messages.
+- Keywords removed from package per latest CRAN guidance (no change to users).
+- Minor invisible checks made to pass R CMD check (no change to users). Thanks to Dave Bapst for his help on this.
