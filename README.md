@@ -1,3 +1,10 @@
+#Claddis
+
+[![Build
+Status](https://travis-ci.org/graemetlloyd/Claddis.svg?branch=master)](https://travis-ci.org/graemetlloyd/Claddis)
+[![cran
+version](https://www.r-pkg.org/badges/version/Claddis)](https://cran.r-project.org/package=Claddis)
+
 Claddis is an R package designed to import cladistic-type data sets (#NEXUS format) into R and perform disparity and rate tests.
 
 You can install Claddis in R via CRAN with:
