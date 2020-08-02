@@ -56,7 +56,6 @@ pcoa_input <- ordinate_cladistic_matrix(michaux_1989, time_tree = time_tree)
 
 # Plot the results:
 plot_morphospace(pcoa_input, plot_taxon_names = TRUE)
-
 }
 \references{
 Wills, M. A., 1998. Cambrian and Recent disparity: the picture from priapulids. \emph{Paleobiology}, \bold{24}, 177-199.

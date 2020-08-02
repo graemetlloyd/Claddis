@@ -41,7 +41,6 @@ pcoa_input <- ordinate_cladistic_matrix(michaux_1989)
 
 # Plot first three axes:
 plot_multi_morphospace(pcoa_input, N_axes = 3)
-
 }
 \author{
 Emma Sherratt \email{emma.sherratt@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@gmail.com}

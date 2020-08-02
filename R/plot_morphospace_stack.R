@@ -38,24 +38,39 @@
 #' @examples
 #'
 #' # Create x-values that will form a grid:
-#' x <- c(c(seq(0, 100, length.out = 101), seq(0, 100, length.out = 101),
-#'   seq(0, 100, length.out = 101), seq(0, 100, length.out = 101)),
-#'   c(rep(20, 101), rep(40, 101), rep(60, 101), rep(80, 101)))
+#' x <- c(
+#'   c(
+#'     seq(0, 100, length.out = 101), seq(0, 100, length.out = 101),
+#'     seq(0, 100, length.out = 101), seq(0, 100, length.out = 101)
+#'   ),
+#'   c(rep(20, 101), rep(40, 101), rep(60, 101), rep(80, 101))
+#' )
 #'
 #' # Create y-values that will form grid:
-#' y <- c(c(rep(20, 101), rep(40, 101), rep(60, 101), rep(80, 101)),
-#'   c(seq(0, 100, length.out = 101), seq(0, 100, length.out = 101),
-#'   seq(0, 100, length.out = 101), seq(0, 100, length.out = 101)))
+#' y <- c(
+#'   c(rep(20, 101), rep(40, 101), rep(60, 101), rep(80, 101)),
+#'   c(
+#'     seq(0, 100, length.out = 101), seq(0, 100, length.out = 101),
+#'     seq(0, 100, length.out = 101), seq(0, 100, length.out = 101)
+#'   )
+#' )
 #'
 #' # Combine x and y values into
-#' ordination_axes <- matrix(c(x, y), ncol = 2, dimnames =
-#'   list(as.list(apply(matrix(sample(LETTERS, 8 * 8 * 101,
-#'   replace = TRUE), nrow = 8 * 101), 1, paste, collapse = "")), NULL))
+#' ordination_axes <- matrix(c(x, y),
+#'   ncol = 2, dimnames =
+#'     list(as.list(apply(matrix(sample(LETTERS, 8 * 8 * 101,
+#'       replace = TRUE
+#'     ), nrow = 8 * 101), 1, paste, collapse = "")), NULL)
+#' )
 #'
 #' # Assign ages as though taxa range through entire interval (100-0 Ma):
-#' ages <- matrix(c(rep(100, 8 * 101), rep(0, 8 * 101)), ncol = 2,
-#'   dimnames = list(as.list(rownames(ordination_axes)), as.list(c("FAD",
-#'   "LAD"))))
+#' ages <- matrix(c(rep(100, 8 * 101), rep(0, 8 * 101)),
+#'   ncol = 2,
+#'   dimnames = list(as.list(rownames(ordination_axes)), as.list(c(
+#'     "FAD",
+#'     "LAD"
+#'   )))
+#' )
 #'
 #' # Create five 20 million year time slices:
 #' time_slices <- seq(0, 100, length.out = 6)
@@ -67,14 +82,21 @@
 #' set.seed(17)
 #'
 #' # Create random values to represent ordination axes:
-#' ordination_axes <- matrix(rnorm(10000), nrow = 100, dimnames =
-#'   list(as.list(apply(matrix(sample(LETTERS, 8 * 100, replace = TRUE), nrow = 100),
-#'   1, paste, collapse = "")), NULL))
+#' ordination_axes <- matrix(rnorm(10000),
+#'   nrow = 100, dimnames =
+#'     list(as.list(apply(matrix(sample(LETTERS, 8 * 100, replace = TRUE), nrow = 100),
+#'       1, paste,
+#'       collapse = ""
+#'     )), NULL)
+#' )
 #'
 #' # Create random first and last appearance dates for objects:
 #' ages <- matrix(as.vector(apply(matrix(runif(200, 0, 100), ncol = 2), 1, sort,
-#'   decreasing = TRUE)), ncol = 2, byrow=TRUE, dimnames =
-#'   list(as.list(rownames(ordination_axes)), as.list(c("FAD", "LAD"))))
+#'   decreasing = TRUE
+#' )),
+#' ncol = 2, byrow = TRUE, dimnames =
+#'   list(as.list(rownames(ordination_axes)), as.list(c("FAD", "LAD")))
+#' )
 #'
 #' # Create five 20 million year long time slices:
 #' time_slices <- seq(0, 100, length.out = 6)
@@ -87,15 +109,14 @@
 #'
 #' # Make stacked ordination plot with convex hulls for groups:
 #' plot_morphospace_stack(ordination_axes, ages, groups, time_slices)
-#'
 #' @export plot_morphospace_stack
 plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2, x_axis = 1, y_axis = 2, axis_label = "PC") {
 
-# Other options for treatment of age data than just ranges?
-# Add spaces between stacks? Could even have this be negative to allow overlapping of highly sheared plots.
-# Check axes asked for exist in data (top level conditional).
-# Add geologic time at left with geoscale at some point?
-# Am assuming PC axes, but could be Relative Warp...
+  # Other options for treatment of age data than just ranges?
+  # Add spaces between stacks? Could even have this be negative to allow overlapping of highly sheared plots.
+  # Check axes asked for exist in data (top level conditional).
+  # Add geologic time at left with geoscale at some point?
+  # Am assuming PC axes, but could be Relative Warp...
 
   # Maybe let user set this later:
   plot_cushion <- 0.1
@@ -111,49 +132,49 @@ plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_sl
 
   # Define y-axis label:
   ylab <- paste(axis_label, y_axis, " (", round((apply(ordination_axes, 2, var) / sum(apply(ordination_axes, 2, var)) * 100)[y_axis], 2), "% of total variance)", sep = "")
-  
+
   # Set some margins before plotting:
   par(mar = c(0, 0, 0, 0), oma = c(1, 1, 1, 1))
-  
+
   # Create basic (empty) plot)
   plot(0:100, 0:100, type = "n", axes = FALSE, xlab = "", ylab = "")
-  
+
   # Plot x-axis:
   text(x = 50, y = -0.5, pos = 1, srt = 0, labels = xlab)
-  
+
   # Plot y-axis:
   text(x = 100.5, y = 50, pos = 1, srt = 90, labels = ylab)
-  
+
   # For each stack:
-  for(i in 1:N_stacks) {
-  
+  for (i in 1:N_stacks) {
+
     # Find taxa present in ith stack (using a range-through approach:
     taxa_in_bin <- intersect(which(ages[, "LAD"] < time_bins[i]), which(ages[, "FAD"] > time_bins[(i + 1)]))
-  
+
     # Isolate just points present in ith stack:
     points_to_plot <- ordination_axes[taxa_in_bin, c(x_axis, y_axis)]
-  
+
     # Shift x-axis points so minimum is zero:
     points_to_plot[, 1] <- points_to_plot[, 1] - min(ordination_axes[, x_axis])
-    
+
     # Shift y-axis points so minimum is zero:
     points_to_plot[, 2] <- points_to_plot[, 2] - min(ordination_axes[, y_axis])
-  
+
     # Place x-axis points on proportional scale:
     points_to_plot[, 1] <- points_to_plot[, 1] / (max(ordination_axes[, x_axis]) - min(ordination_axes[, x_axis]))
-    
+
     # Place y-axis points on proportional scale:
     points_to_plot[, 2] <- points_to_plot[, 2] / (max(ordination_axes[, y_axis]) - min(ordination_axes[, y_axis]))
-  
+
     # Add plot cushioning:
     points_to_plot <- (points_to_plot * (1 - plot_cushion)) + (plot_cushion / 2)
-  
+
     # Values to add to x_axis values in order to shear them:
     x_shear_additions <- points_to_plot[, 2] * (shear * (100 - shear))
 
     # Get maximum y-value for plotting:
     max_y <- (100 / N_stacks) * i
-    
+
     # Get minimum y-value for plotting:
     min_y <- (100 / N_stacks) * (i - 1)
 
@@ -169,36 +190,31 @@ plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_sl
     # 0, 0 lines?
 
     # Tick marks?
-    
+
     # Case if groups are specified:
     if (!is.null(groups)) {
-      
+
       # For each group:
-      for(j in unique(groups)) {
-          
+      for (j in unique(groups)) {
+
         # Get edge points (used to plot convex hull):
         edge_points <- names(which(groups[rownames(points_to_plot)] == j))[chull(x = points_to_plot[which(groups[rownames(points_to_plot)] == j), 1], y = points_to_plot[which(groups[rownames(points_to_plot)] == j), 2])]
-        
+
         # Plot convex hull as polygon:
-        polygon(x = points_to_plot[edge_points, 1], y = points_to_plot[edge_points, 2], col = adjustcolor(j, alpha.f = 0.3) , border = 0)
-        
+        polygon(x = points_to_plot[edge_points, 1], y = points_to_plot[edge_points, 2], col = adjustcolor(j, alpha.f = 0.3), border = 0)
       }
-  
+
       # Plot data points for ith stack:
       points(x = points_to_plot[, 1], y = points_to_plot[, 2], pch = 21, bg = groups[rownames(points_to_plot)], col = groups[rownames(points_to_plot)], cex = 0.5)
 
-    # Case if no groups are specified:
+      # Case if no groups are specified:
     } else {
-        
+
       # Plot data points for ith stack:
       points(x = points_to_plot[, 1], y = points_to_plot[, 2], pch = 21, bg = "black", cex = 0.5)
-
     }
 
     # Plot ages of time slice at bottom left:
     text(x = 0, y = min_y - 2, pos = 4, labels = paste(round(time_bins[i], 1), "-", round(time_bins[(i + 1)], 1), " Ma", sep = ""))
-
   }
-  
 }
-

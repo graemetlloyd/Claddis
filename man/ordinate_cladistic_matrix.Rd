@@ -113,7 +113,6 @@ y <- ordinate_cladistic_matrix(michaux_1989, time_tree = time_tree)
 
 # Show new output:
 y
-
 }
 \references{
 Cailliez, F., 1983. The analytical solution of the additive constant problem. \emph{Psychometrika}, \bold{48}, 305-308.

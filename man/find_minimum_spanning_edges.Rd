@@ -21,8 +21,10 @@ This function is a wrapper for \link{mst} in the \link{ape} package, but returns
 \examples{
 
 # Create a simple square matrix of distances:
-dist.matrix <- matrix(c(0,1,2,3,1,0,1,2,2,1,0,1,3,2,1,0), nrow = 4,
-  dimnames = list(LETTERS[1:4], LETTERS[1:4]))
+dist.matrix <- matrix(c(0, 1, 2, 3, 1, 0, 1, 2, 2, 1, 0, 1, 3, 2, 1, 0),
+  nrow = 4,
+  dimnames = list(LETTERS[1:4], LETTERS[1:4])
+)
 
 # Show matrix to confirm that the off diagonal has the shortest
 # distances:
@@ -35,7 +37,6 @@ find_minimum_spanning_edges(dist.matrix)
 # Use sum of find_minimum_spanning_edges to get the length of the minimum
 # spanning tree:
 sum(find_minimum_spanning_edges(dist.matrix))
-
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

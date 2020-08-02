@@ -25,40 +25,41 @@
 #'
 #' \dontrun{
 #' require(rgl)
-#' 
+#'
 #' # Set random seed:
 #' set.seed(4)
-#' 
+#'
 #' # Generate a random tree for the Michaux 1989 data set:
 #' time_tree <- rtree(nrow(michaux_1989$matrix_1$matrix))
-#' 
+#'
 #' # Set root time so latest tip terminates at the present:
 #' time_tree$root.time <- max(diag(vcv(time_tree)))
-#' 
+#'
 #' # Add taxon names to the tree:
 #' time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
-#' 
+#'
 #' # Perform a phylogenetic Principal Coordinates Analysis:
 #' pcoa_data <- ordinate_cladistic_matrix(michaux_1989,
-#'   time_tree = time_tree)
-#' 
+#'   time_tree = time_tree
+#' )
+#'
 #' # Plot a chronophylomorphospace:
 #' plot_chronophylomorphospace(pcoa_data)
-#' 
 #' }
-
+#'
 #' @export plot_chronophylomorphospace
 plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shadow = TRUE) {
-  
-  # RGL CONTINUES TO CAUSE PROBLEMS, MAYBE MOVE THIS TO PLOT3D INSTEAD?
-  
 
-   if (! requireNamespace("rgl", quietly = TRUE)) {
-      stop(paste0(
-		"To plot three-dimensional chrono-phylo-morphospaces, please install package rgl",
-		"\n install.packages('lattice')"))
-	  }
-  
+  # RGL CONTINUES TO CAUSE PROBLEMS, MAYBE MOVE THIS TO PLOT3D INSTEAD?
+
+
+  if (!requireNamespace("rgl", quietly = TRUE)) {
+    stop(paste0(
+      "To plot three-dimensional chrono-phylo-morphospaces, please install package rgl",
+      "\n install.packages('lattice')"
+    ))
+  }
+
   # Add top level conditionals to check for a tree etc.
 
   # Default plotting parameters for a 2D morphospace. Need to change node colour for 3D using rgl
@@ -77,28 +78,27 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
 
   # Isolate Tree:
   time_tree <- pcoa_data$time_tree
-  
+
   # Record number of tips:
   N <- ape::Ntip(time_tree)
-  
+
   # Isolate pcoa axes:
   pcoa_data <- pcoa_data$vectors
 
   # Little function to set limits for plotting (make it cube-like):
   set_plot_limits <- function(x, s) {
-      
+
     # Get range of x:
     r <- range(x)
-    
+
     # Scale range values:
     rc <- scale(r, scale = FALSE)
-    
+
     # ?????
     l <- mean(r) + s * rc
-    
+
     # Return l:
     return(l)
-  
   }
 
   # Get node ages for z-axis in plotting:
@@ -106,82 +106,89 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
 
   # Make x label for plot:
   xlab <- paste("PC", x_axis, sep = "")
-  
+
   # Make y label for plot:
   ylab <- paste("PC", y_axis, sep = "")
 
   # Make empty plot:
-  rgl::plot3d(pcoa_data, type = "n", 
-	xlim = set_plot_limits(pcoa_data[, x_axis], 1.5),
-	ylim = set_plot_limits(pcoa_data[, y_axis], 1.5),
-	zlim = set_plot_limits(z_axis, 0), 
-	asp = c(1, 1, 0.5), 
-	xlab = xlab, ylab = ylab, 
-	zlab = "Time (Ma)", 
-	rgl::view3d(phi = 90, fov = 30))
+  rgl::plot3d(pcoa_data,
+    type = "n",
+    xlim = set_plot_limits(pcoa_data[, x_axis], 1.5),
+    ylim = set_plot_limits(pcoa_data[, y_axis], 1.5),
+    zlim = set_plot_limits(z_axis, 0),
+    asp = c(1, 1, 0.5),
+    xlab = xlab, ylab = ylab,
+    zlab = "Time (Ma)",
+    rgl::view3d(phi = 90, fov = 30)
+  )
 
-  #plots tips
-  rgl::points3d(pcoa_data[1:N, 1], 
-	pcoa_data[1:N, 2], 
-	z_axis[1:N], 
-	col = p.p$t.bg, 
-	size = p.p$t.cex * 4)
+  # plots tips
+  rgl::points3d(pcoa_data[1:N, 1],
+    pcoa_data[1:N, 2],
+    z_axis[1:N],
+    col = p.p$t.bg,
+    size = p.p$t.cex * 4
+  )
 
-  #plots nodes
-  rgl::points3d(pcoa_data[(N + 1):nrow(pcoa_data), 1], 
-	pcoa_data[(N + 1):nrow(pcoa_data), 2], 
-	z_axis[(N + 1):nrow(pcoa_data)], 
-	col = p.p$n.bg, size = p.p$n.cex * 4)
+  # plots nodes
+  rgl::points3d(pcoa_data[(N + 1):nrow(pcoa_data), 1],
+    pcoa_data[(N + 1):nrow(pcoa_data), 2],
+    z_axis[(N + 1):nrow(pcoa_data)],
+    col = p.p$n.bg, size = p.p$n.cex * 4
+  )
 
   # plots branches
   for (i in 1:nrow(time_tree$edge)) {
-	rgl::lines3d(
-		pcoa_data[(time_tree$edge[i, ]), 1],
-		pcoa_data[(time_tree$edge[i, ]), 2],
-		z_axis[(time_tree$edge[i, ])],
-		lwd = 2)
-	}
+    rgl::lines3d(
+      pcoa_data[(time_tree$edge[i, ]), 1],
+      pcoa_data[(time_tree$edge[i, ]), 2],
+      z_axis[(time_tree$edge[i, ])],
+      lwd = 2
+    )
+  }
 
   # plot taxa labels
   rgl::text3d(
-	pcoa_data[, x_axis], 
-	pcoa_data[, y_axis], 
-	z_axis, 
-	rownames(pcoa_data), 
-	col = p.p$txt.col, 
-	cex = p.p$txt.cex, 
-	adj = p.p$txt.adj)
+    pcoa_data[, x_axis],
+    pcoa_data[, y_axis],
+    z_axis,
+    rownames(pcoa_data),
+    col = p.p$txt.col,
+    cex = p.p$txt.cex,
+    adj = p.p$txt.adj
+  )
 
   # If plotting the shadow of x and y axes at the base of the plot:
-  if (shadow == TRUE){
-      
+  if (shadow == TRUE) {
+
     # Plot branches:
     for (i in 1:nrow(time_tree$edge)) {
-		rgl::lines3d(
-			pcoa_data[(time_tree$edge[i, ]), 1],
-			pcoa_data[(time_tree$edge[i, ]), 2],
-			time_tree$root.time,
-			lwd = 2, 
-			alpha = 0.5)
-		}
+      rgl::lines3d(
+        pcoa_data[(time_tree$edge[i, ]), 1],
+        pcoa_data[(time_tree$edge[i, ]), 2],
+        time_tree$root.time,
+        lwd = 2,
+        alpha = 0.5
+      )
+    }
 
     # Plot internal nodes:
     rgl::points3d(
-		pcoa_data[(N + 1):nrow(pcoa_data), 1],
-		pcoa_data[(N + 1):nrow(pcoa_data), 2], 
-		time_tree$root.time, 
-		col = p.p$n.bg, 
-		size = p.p$n.cex * 4, 
-		alpha = 0.5)
-      
-    # Plot tips:
-    rgl::points3d(pcoa_data[1:N, 1], 
-		pcoa_data[1:N, 2], 
-		time_tree$root.time,
-		col = p.p$t.bg, 
-		size = p.p$t.cex * 4, 
-		alpha = 0.5)
-      
-  }
+      pcoa_data[(N + 1):nrow(pcoa_data), 1],
+      pcoa_data[(N + 1):nrow(pcoa_data), 2],
+      time_tree$root.time,
+      col = p.p$n.bg,
+      size = p.p$n.cex * 4,
+      alpha = 0.5
+    )
 
+    # Plot tips:
+    rgl::points3d(pcoa_data[1:N, 1],
+      pcoa_data[1:N, 2],
+      time_tree$root.time,
+      col = p.p$t.bg,
+      size = p.p$t.cex * 4,
+      alpha = 0.5
+    )
+  }
 }

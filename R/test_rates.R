@@ -147,61 +147,68 @@
 #'
 #' Close, R. A., Friedman, M., Lloyd, G. T. and Benson, R. B. J., 2015. Evidence for a mid-Jurassic adaptive radiation in mammals. \emph{Current Biology}, \bold{25}, 2137-2142.
 #'
-#' Cloutier, R., 1991. Patterns, trends, and rates of evolution within the Actinistia. \emph{Environmental Biology of Fishes}, \bold{32}, 23–58.
+#' Cloutier, R., 1991. Patterns, trends, and rates of evolution within the Actinistia. \emph{Environmental Biology of Fishes}, \bold{32}, 23<U+2013>58.
 #'
 #' Lloyd, G. T., 2016. Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. \emph{Biological Journal of the Linnean Society}, \bold{118}, 131-151.
 #'
 #' Lloyd, G. T., Wang, S. C. and Brusatte, S. L., 2012. Identifying heterogeneity in rates of morphological evolution: discrete character change in the evolution of lungfish (Sarcopterygii; Dipnoi). \emph{Evolution}, \bold{66}, 330-348.
 #'
-#' Ruta, M., Wagner, P. J. and Coates, M. I., 2006. Evolutionary patterns in early tetrapods. I. Rapid initial diversification followed by decrease in rates of character change. \emph{Proceedinsg of the Royal Society of London B}, \bold{273}, 2107–2111.
+#' Ruta, M., Wagner, P. J. and Coates, M. I., 2006. Evolutionary patterns in early tetrapods. I. Rapid initial diversification followed by decrease in rates of character change. \emph{Proceedinsg of the Royal Society of London B}, \bold{273}, 2107<U+2013>2111.
 #'
 #' Thiele, K.. 1993. The Holy Grail of the perfect character: the cladistic treatment of morphometric data. \emph{Cladistics}, \bold{9}, 275-304.
 #'
 #' @examples
-#' 
+#'
 #' # Set random seed:
 #' set.seed(17)
-#' 
+#'
 #' # Generate a random tree for the Michaux data set:
 #' time_tree <- rtree(nrow(michaux_1989$matrix_1$matrix))
-#' 
+#'
 #' # Update taxon names to match those in the data matrix:
 #' time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
-#' 
+#'
 #' # Set root time by making youngest taxon extant:
 #' time_tree$root.time <- max(diag(vcv(time_tree)))
-#' 
-#' # Get discrete character rates:
-#' x <- test_rates(time_tree = time_tree, cladistic_matrix =
-#'   michaux_1989, time_bins = seq(from = time_tree$root.time,
-#'   to = 0, length.out = 5), branch_partitions =
-#'   lapply(as.list(1:nrow(time_tree$edge)), as.list),
-#'   character_partitions = lapply(as.list(1:3),
-#'   as.list), clade_partitions =
-#'   lapply(as.list(Ntip(time_tree) + (2:Nnode(time_tree))),
-#'   as.list), time_partitions =
-#'   lapply(as.list(1:4), as.list), change_times =
-#'   "random", alpha = 0.01, polymorphism_state =
-#'   "missing", uncertainty_state = "missing",
-#'   inapplicable_state = "missing", time_binning_approach =
-#'   "lloyd")
 #'
+#' # Get discrete character rates:
+#' x <- test_rates(
+#'   time_tree = time_tree, cladistic_matrix =
+#'     michaux_1989, time_bins = seq(
+#'     from = time_tree$root.time,
+#'     to = 0, length.out = 5
+#'   ), branch_partitions =
+#'     lapply(as.list(1:nrow(time_tree$edge)), as.list),
+#'   character_partitions = lapply(
+#'     as.list(1:3),
+#'     as.list
+#'   ), clade_partitions =
+#'     lapply(
+#'       as.list(Ntip(time_tree) + (2:Nnode(time_tree))),
+#'       as.list
+#'     ), time_partitions =
+#'     lapply(as.list(1:4), as.list), change_times =
+#'     "random", alpha = 0.01, polymorphism_state =
+#'     "missing", uncertainty_state = "missing",
+#'   inapplicable_state = "missing", time_binning_approach =
+#'     "lloyd"
+#' )
 #' @export test_rates
 test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions = NULL, character_partitions = NULL, clade_partitions = NULL, time_partitions = NULL, change_times = "random", test_type = "AIC", alpha = 0.01, multiple_comparison_correction = "benjaminihochberg", polymorphism_state = "missing", uncertainty_state = "missing", inapplicable_state = "missing", time_binning_approach = "lloyd", all_weights_integers = FALSE, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, polymorphism.behaviour = "equalp", uncertainty.behaviour = "equalp", threshold = 0.01, all_missing_allowed = FALSE) {
-  
+
   # ADD EXAMPLES OF VISUALISED OUTPUT
-  
+
   # AICc BREAKS IF MORE THAN N-2 PARAMETERS (INFINITY OR WRONGLY NEGATIVE OUTPUT CAN OCCUR THIS WAY)
   # GLOBAL RATE NEEDS TO GO INTO LRT OPTION IF NOT USED IN AIC
   # SOMEHOW NEED TO ALLOW MULTIPLE VERSIONS OF MAIN PIEPLINE IF DOING RANDOM ASSIGNMENTS OF CHANGE TIMES
   # NEED TO ADD PARTITIONS USED TO OUTPUT SOMEHOW...
-  
+
   # MAYBE DO SOME KIND OF WEIGHTING FOR AIC AS SOME PARTITIONS WILL CONTAIN VERY LITTLE DATA AND BE EXTREME OUTLIERS?
   # NEED TO CHECK FOR SINGLE PARTITION WITH LRT (ALLOWED WITH AIC)
   # NEED TO CHECK FOR FULLY BIFURCATING IF IMPLEMENTING WANG STUDENTS APPROACH? OR IS THAT DONE ANYWAY?
   # IF USING AIC NEED TO CHECK FOR EACH TEST TYPE AT LEAST TWO PARTITIONS ARE SUPPLIED OR ELSE THE RESULTS ARE MEANINGLESS
   # ADD CHECK TO INCLUDE ALL LESS COMPLEX SUBPARTITIONS OF ANY 3 OR MORE SIZE PARTITOINING OF THE DATA
-  
+
   # DESIDERATA (STUFF IT WOULD BE NICE TO ADD IN FUTURE):
   #
   # WRITE SEARCH VERSION FOR FINDING RATE SHIFTS? SHOULD THIS EVEN BE AN OPTION? DOES THIS REQUIRE MODIFYING LRT TO COMPARE E.G. 2-RATE DIRECTLY WITH 3-RATE MODEL? WOULD NEED TO PERMUTE ALL POSSIBLE COMBOS AND NOT SURE HOW LARGE THESE MIGHT GET (VERY FOR EDGES).
@@ -221,186 +228,191 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
 
   # Check tree has branch lengths:
   if (is.null(time_tree$edge.length)) stop("time_tree does not have branch lengths (durations). Try timescaling the tree, e.g., with DatePhylo.")
-  
+
   # Check tree has root age:
   if (is.null(time_tree$root.time)) stop("time_tree is missing $root.time. Try setting this before continuing, e.g., tree$root.time <- 104.2.")
-  
+
   # Check change_times is correctly formatted or stop and warn user:
   if (length(setdiff(change_times, c("midpoint", "spaced", "random"))) > 0) stop("change_times must be one of \"midpoint\", \"spaced\", or \"random\".")
-  
+
   # Check multiple_comparison_correction is correctly formatted or stop and warn user:
   if (length(setdiff(multiple_comparison_correction, c("benjaminihochberg", "bonferroni"))) > 0) stop("multiple_comparison_correction must be one of \"BenjaminiHochberg\" or \"Bonferroni\".")
-  
+
   # Check polymorphism_state is correctly formatted or stop and warn user:
   if (length(setdiff(polymorphism_state, c("missing", "random"))) > 0) stop("polymorphism_state must be one of \"missing\" or \"random\".")
-  
+
   # Check uncertainty_state is correctly formatted or stop and warn user:
   if (length(setdiff(uncertainty_state, c("missing", "random"))) > 0) stop("uncertainty_state must be one of \"missing\" or \"random\".")
-  
+
   # Check inapplicable_state is correctly formatted or stop and warn user:
   if (length(setdiff(inapplicable_state, c("missing"))) > 0) stop("inapplicable_state must be \"missing\".")
-  
+
   # Check time_binning_approach is correctly formatted or stop and warn user:
   if (length(setdiff(time_binning_approach, c("close", "lloyd"))) > 0) stop("time_binning_approach must be one of \"Close\" or \"Lloyd\".")
-  
+
   # Check partitions are not all NULL values:
   if (is.null(branch_partitions) && is.null(character_partitions) && is.null(clade_partitions) && is.null(time_partitions)) stop("No partitions are requested. Set at least one of branch_partitions, character_partitions, clade_partitions, or time_partitions to a list of appropriate values. Type \"?test_rates\" for help.")
-  
+
   # Get internal node numbers:
   InternalNodeNumbers <- 1:ape::Nnode(time_tree) + ape::Ntip(time_tree)
-  
+
   # Get edge numbers:
   EdgeNumbers <- 1:nrow(time_tree$edge)
-  
+
   # Get character numbers:
-  CharacterNumbers <- 1:sum(unlist(lapply(lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "matrix"), ncol)))
-  
+  CharacterNumbers <- 1:sum(unlist(lapply(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "matrix"), ncol)))
+
   # Ensure time bins are in correct order:
   time_bins <- sort(unique(time_bins), decreasing = TRUE)
-  
+
   # Find the Time bin midpoints:
   TimeBinMidpoints <- (time_bins[2:length(time_bins)] + time_bins[1:(length(time_bins) - 1)]) / 2
-  
+
   # Get the numbers for each time bins:
   TimeBinNumbers <- 1:length(TimeBinMidpoints)
-  
+
   # Subfunction to ensure partitions are formatted correctly:
   format_partition <- function(PartitionsToTest, ValidValues, PartitionName) {
-    
+
     # Check partitions are in the form of a list of lists:
     if (!all(c(all(unlist(lapply(PartitionsToTest, is.list))), is.list(PartitionsToTest)))) stop(paste(PartitionName, " must be in the form of a list of lists.", sep = ""))
-    
+
     # Get a vector of any non-present valid values:
     NonPresentValues <- setdiff(unique(unlist(PartitionsToTest)), ValidValues)
-    
+
     # Check valid values have been used and if not stop and warn user:
     if (length(NonPresentValues) > 0) stop(paste(PartitionName, "Partitions to test must be defined using the valid range of values (", paste(range(ValidValues), collapse = " to "), ") only.", sep = ""))
-    
+
     # Check partitions never overlap and stop and warn user if they do:
     Check <- lapply(PartitionsToTest, function(x) if (any(duplicated(sort(unlist(x))))) stop(paste("Each partition of ", PartitionName, " must not contain overlapping values (e.g., can not have 1:3 and 3:5 as both contain 3).", sep = "")))
-    
+
     # Subfunction to ad the missing partition (if exists):
     add_missing_partitions <- function(x, ValidValues) {
-      
+
       # Define any missing values:
       missingValues <- setdiff(ValidValues, unlist(x))
-      
+
       # If there are missing values add them to list at end:
       if (length(missingValues) > 0) x[[(length(x) + 1)]] <- missingValues
-      
+
       # Return x:
       return(x)
-      
     }
-    
+
     # Add in missing partitions (if any):
     PartitionsToTest <- lapply(PartitionsToTest, add_missing_partitions, ValidValues = ValidValues)
-    
+
     # Check partitions are all at least two in size or else no comparison can be made:
     if (any(unlist(lapply(PartitionsToTest, length)) == 1) && test_type == "LRT") stop("Partitions must divide the available data into at least two parts if performing likelihood ratio tests.")
 
     # Return formatted partitions to test:
     return(PartitionsToTest)
-
   }
-  
+
   # Subfunction to pack partitions to short format for output:
-  pack_partitions <- function(FormattedPartitions) unlist(lapply(FormattedPartitions, function(x) paste(unlist(lapply(x, function(y) {
-    
-    # First make sure y is sorted:
-    y <- sort(y)
-    
-    # Covnvert y to a list (splitting if gaps greater than 1 are found):
-    y <- unname(split(y, cumsum(c(TRUE, diff(y) > 1))))
-    
-    # Collapse gaps of one with hyphens:
-    paste0(unlist(lapply(y, function(z) {res <- as.character(z); if (length(z) > 1) {r <- rle(c(1, pmin(diff(z), 2))); res <- paste0(z[c(1, cumsum(r$lengths))], c("-", " ")[r$values], collapse = ""); res <- substr(res, 1, nchar(res) - 1)}; res})), collapse = " ")
-    
-  })), collapse = " | ")))
-  
+  pack_partitions <- function(FormattedPartitions) {
+    unlist(lapply(FormattedPartitions, function(x) {
+      paste(unlist(lapply(x, function(y) {
+
+        # First make sure y is sorted:
+        y <- sort(y)
+
+        # Covnvert y to a list (splitting if gaps greater than 1 are found):
+        y <- unname(split(y, cumsum(c(TRUE, diff(y) > 1))))
+
+        # Collapse gaps of one with hyphens:
+        paste0(unlist(lapply(y, function(z) {
+          res <- as.character(z)
+          if (length(z) > 1) {
+            r <- rle(c(1, pmin(diff(z), 2)))
+            res <- paste0(z[c(1, cumsum(r$lengths))], c("-", " ")[r$values], collapse = "")
+            res <- substr(res, 1, nchar(res) - 1)
+          }
+          res
+        })), collapse = " ")
+      })), collapse = " | ")
+    }))
+  }
+
   # If performing branch partition test(s) check and reformat branch partitions:
   if (!is.null(branch_partitions)) branch_partitions <- format_partition(PartitionsToTest = branch_partitions, ValidValues = EdgeNumbers, PartitionName = "branch_partitions")
-  
+
   # If performing character partition test(s) check and reformat character partitions:
   if (!is.null(character_partitions)) character_partitions <- format_partition(PartitionsToTest = character_partitions, ValidValues = CharacterNumbers, PartitionName = "character_partitions")
-  
+
   # If performing clade partition test(s)
   if (!is.null(clade_partitions)) {
-    
+
     # Convert clade partitions to edge partitions:
     clade_partitions <- lapply(clade_partitions, lapply, find_descendant_edges, tree = time_tree)
-    
+
     # Check and reformat clade partitions:
     clade_partitions <- format_partition(PartitionsToTest = clade_partitions, ValidValues = EdgeNumbers, PartitionName = "clade_partitions")
-    
   }
 
   # If performing time bin partition test(s) check and reformat time bin partitions:
   if (!is.null(time_partitions)) time_partitions <- format_partition(PartitionsToTest = time_partitions, ValidValues = TimeBinNumbers, PartitionName = "time_partitions")
-  
+
   # Check test_type is correctly formatted or stop and warn user:
   if (length(setdiff(test_type, c("AIC", "LRT"))) > 0) stop("test_type must be one of \"AIC\" or \"LRT\".")
 
   # Subfunction to calculate maximum likelihood p value:
   get_likelihood_p <- function(MeanRate, SampledRates, SampledChanges, SampledCompleteness, SampledTime) {
-    
+
     # Set maximum likelihood numerator:
     MaximumLikelihoodNumerator <- MeanRate
-    
+
     # Set maximum likelihood denominator:
     MaximumLikelihoodDenominator <- SampledRates
-    
+
     # Get log numerator:
     LogNumerator <- sum(log(dpois(round(SampledChanges), MaximumLikelihoodNumerator * SampledCompleteness * SampledTime)))
-    
+
     # Get log denominator:
     LogDenominator <- sum(log(dpois(round(SampledChanges), MaximumLikelihoodDenominator * SampledCompleteness * SampledTime)))
-    
+
     # Get test statistic:
     TestStatistic <- -2 * (LogNumerator - LogDenominator)
-    
+
     # Calculate position of test statistic in chi-square distribution to get probability:
     PValue <- pchisq(TestStatistic, length(SampledRates) - 1, lower.tail = FALSE)
-    
+
     # Output probability for later alpha comparison:
     return(PValue)
-    
   }
-  
+
   # Subfunction to calculate AIC:
   calculate_AIC <- function(SampledRates, SampledChanges, SampledCompleteness, SampledTime) {
-    
+
     # Get log maximum likelihood estimate:
     LogMLE <- sum(log(dpois(x = round(SampledChanges), lambda = SampledRates * SampledCompleteness * SampledTime)))
-    
+
     # Calculate AIC:
     AIC <- (2 * length(SampledRates)) - (2 * LogMLE)
-    
+
     # Return AIC:
     return(AIC)
-    
   }
-  
+
   # Subfunction to calculate AIC from partition (with columns labelled Partition, Rate, Completeness, Duration):
   calculate_partition_AIC <- function(Partition, AICc = FALSE) {
-    
+
     # Get log maximum likelihood estimate:
     LogMLE <- sum(log(dpois(round(Partition[, "Changes"]), Partition[, "Rate"] * Partition[, "Completeness"] * Partition[, "Duration"])))
-    
+
     # Get k (number of parameters) term:
     k <- max(Partition[, "Partition"])
-    
+
     # Calculate AIC:
     AIC <- (2 * k) - (2 * LogMLE)
-    
+
     # If AICc is desired then calculate this and overwrite AIC with it:
     if (AICc) AIC <- AIC + (((2 * (k^2)) + (2 * k)) / (nrow(Partition) - k - 1))
-    
+
     # Return AIC:
     return(AIC)
-    
   }
- 
+
   # Get ages for each (tip and internal) node:
   date_nodes <- date_nodes(time_tree = time_tree)
 
@@ -408,611 +420,668 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
   BranchAges <- unname(cbind(date_nodes[as.character(time_tree$edge[, 1])], date_nodes[as.character(time_tree$edge[, 2])]))
 
   # Build edge list from node numbers (from-to) for each branch:
-  EdgeList <- lapply(apply(time_tree$edge, 1, list), function(x) {names(x) <- "NodeNumberFromTo"; return(x)})
-  
+  EdgeList <- lapply(apply(time_tree$edge, 1, list), function(x) {
+    names(x) <- "NodeNumberFromTo"
+    return(x)
+  })
+
   # Add node ages to edge list:
-  for(i in 1:length(EdgeList)) EdgeList[[i]]$NodeAgeFromTo <- BranchAges[i, ]
-  
+  for (i in 1:length(EdgeList)) EdgeList[[i]]$NodeAgeFromTo <- BranchAges[i, ]
+
   # Add node ages (from-to) to each edge in list:
-  EdgeList <- lapply(EdgeList, function(x) {x$BranchDuration <- x$NodeAgeFromTo[1] - x$NodeAgeFromTo[2]; return(x)})
-  
+  EdgeList <- lapply(EdgeList, function(x) {
+    x$BranchDuration <- x$NodeAgeFromTo[1] - x$NodeAgeFromTo[2]
+    return(x)
+  })
+
   # Get vector of branch types:
   BranchTypes <- gsub("0", "Internal", gsub("1", "Terminal", as.numeric(time_tree$edge[, 2] <= ape::Ntip(time_tree))))
-  
+
   # Add branch type to edge list:
-  for(i in 1:length(EdgeList)) EdgeList[[i]]$BranchType <- BranchTypes[i]
-  
+  for (i in 1:length(EdgeList)) EdgeList[[i]]$BranchType <- BranchTypes[i]
+
   # Find descendant edges for each internal node:
   find_descendant_edgesForEachInternalNode <- lapply(as.list(InternalNodeNumbers), find_descendant_edges, tree = time_tree)
-  
+
   # Get ancestral character states:
   AncestralStates <- estimate_ancestral_states(cladistic_matrix = cladistic_matrix, time_tree = time_tree, estimate_all_nodes = estimate_all_nodes, estimate_tip_values = estimate_tip_values, inapplicables_as_missing = inapplicables_as_missing, polymorphism.behaviour = polymorphism.behaviour, uncertainty.behaviour = uncertainty.behaviour, threshold = threshold, all_missing_allowed = all_missing_allowed)
-  
+
   # Build single matrix of all states in tip label then node number order:
-  AllStates <- do.call(cbind, lapply(lapply(AncestralStates[2:length(AncestralStates)], '[[', "matrix"), function(x) x[c(time_tree$tip.label, 1:ape::Nnode(time_tree) + ape::Ntip(time_tree)), , drop = FALSE]))
-  
+  AllStates <- do.call(cbind, lapply(lapply(AncestralStates[2:length(AncestralStates)], "[[", "matrix"), function(x) x[c(time_tree$tip.label, 1:ape::Nnode(time_tree) + ape::Ntip(time_tree)), , drop = FALSE]))
+
   # Make vector of ordering of characters:
-  ordering <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "ordering")))
-  
+  ordering <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "ordering")))
+
   # Make vector of weights of characters:
-  weights <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "weights")))
-  
+  weights <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "weights")))
+
   # Make vector of minimum values:
-  minimum_values <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "minimum_values")))
-  
+  minimum_values <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "minimum_values")))
+
   # Make vector of maximum values:
-  maximum_values <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], '[[', "maximum_values")))
-  
+  maximum_values <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "maximum_values")))
+
   # Find positions in matrix with polymorphisms:
   PolymorphismPositions <- grep("&", AllStates)
-  
+
   # Find positions in matrix with uncertainties:
   UncertaintyPositions <- grep("/", AllStates)
-  
+
   # Find positions in matrix with inapplicables:
   InapplicablePositions <- which(AllStates == "")
 
   # If polymorphisms were found:
   if (length(PolymorphismPositions) > 0) {
-    
+
     # If replacing polymorphsims with missing do so:
     if (polymorphism_state == "missing") AllStates[PolymorphismPositions] <- NA
-    
+
     # If replacing polymorphisms with random values draw and replace:
     if (polymorphism_state == "random") AllStates[PolymorphismPositions] <- unlist(lapply(strsplit(AllStates[PolymorphismPositions], "&"), sample, size = 1))
-    
   }
-  
+
   # If uncertainties were found:
   if (length(UncertaintyPositions) > 0) {
-    
+
     # If replacing uncertainties with missing do so:
     if (uncertainty_state == "missing") AllStates[UncertaintyPositions] <- NA
-    
+
     # If replacing uncertainties with random values draw and replace:
     if (uncertainty_state == "random") AllStates[UncertaintyPositions] <- unlist(lapply(strsplit(AllStates[UncertaintyPositions], "/"), sample, size = 1))
-    
   }
-  
+
   # If inapplicable states were found:
   if (length(InapplicablePositions) > 0) {
-    
+
     # If replacing inapplicables with missing do so:
     if (inapplicable_state == "missing") AllStates[InapplicablePositions] <- NA
-    
   }
-  
+
   # Set default converted continuous characters to FALSE:
   ContinuouscharactersConverted <- FALSE
-  
+
   # Check for continuous characters as these will need to be modified for modelling to discrete characters:
   if (any(ordering == "cont")) {
-    
+
     # Tell user this is happening:
     cat("Continuous characters found. Converting to gap-weighted discrete characters.\n")
-    
+
     # Set default converted continuous characters to TRUE:
     ContinuouscharactersConverted <- TRUE
-    
+
     # Find out which characters are continuous:
     ContinuouscharactersFound <- which(ordering == "cont")
-    
+
     # Rescale continous characters as zero to one values:
-    ListOfContinuousValuesRescaledZeroToOne <- lapply(lapply(lapply(apply(AllStates[, ContinuouscharactersFound, drop = FALSE], 2, list), unlist), as.numeric), function(x) {x <- x - min(sort(x)); x <- x / max(sort(x)); return(x)})
-    
+    ListOfContinuousValuesRescaledZeroToOne <- lapply(lapply(lapply(apply(AllStates[, ContinuouscharactersFound, drop = FALSE], 2, list), unlist), as.numeric), function(x) {
+      x <- x - min(sort(x))
+      x <- x / max(sort(x))
+      return(x)
+    })
+
     # Now discretize and store these characters (0 to 31 scale):
     AllStates[, ContinuouscharactersFound] <- do.call(cbind, lapply(lapply(lapply(ListOfContinuousValuesRescaledZeroToOne, function(x) as.list(x)), lapply, function(x) ifelse(is.na(x), NA, max(which(x >= (0:31) / 31)) - 1)), unlist))
-    
+
     # Convert character type to ordered:
     ordering[ContinuouscharactersFound] <- "ord"
-    
+
     # Convert weights to 1/31:
     weights[ContinuouscharactersFound] <- 1 / 31
-    
+
     # Set minimum value to zero:
     minimum_values[ContinuouscharactersFound] <- 0
-    
+
     # Set maximum value to 31:
     maximum_values[ContinuouscharactersFound] <- 31
-    
   }
-  
+
   # If all_weights_integers is TRUE rescale weights until they are all integers so can model appropriately with Poisson later:
-  if (all_weights_integers) while(is.character(all.equal(sum(weights %% 1), 0))) weights <- (1 / (weights %% 1)[(weights %% 1) > 0])[1] * weights
+  if (all_weights_integers) while (is.character(all.equal(sum(weights %% 1), 0))) weights <- (1 / (weights %% 1)[(weights %% 1) > 0])[1] * weights
 
   # Add from-to node states for each character to edge list:
-  EdgeList <- lapply(EdgeList, function(x) {x$CharacterStatesFromTo <- matrix(AllStates[x$NodeNumberFromTo, , drop = FALSE], nrow = 2, dimnames = list(c("From", "To"))); return(x)})
-  
+  EdgeList <- lapply(EdgeList, function(x) {
+    x$CharacterStatesFromTo <- matrix(AllStates[x$NodeNumberFromTo, , drop = FALSE], nrow = 2, dimnames = list(c("From", "To")))
+    return(x)
+  })
+
   # Subfunction to define character changes:
   build_changes_matrix <- function(x) {
-    
+
     # Find only comparable characters (those scored for both from and to states):
     Comparablecharacters <- which(apply(!apply(x$CharacterStatesFromTo, 2, is.na), 2, all))
-    
+
     # Isolate comparable ordering:
     Comparableordering <- ordering[Comparablecharacters]
-    
+
     # Isolate comparable weights:
     Comparableweights <- weights[Comparablecharacters]
-    
+
     # Isolate only characters that actually differ (change):
     CharacterDifferences <- which(x$CharacterStatesFromTo["From", Comparablecharacters] != x$CharacterStatesFromTo["To", Comparablecharacters])
-    
+
     # Build character change matrix:
     CharacterChanges <- matrix(nrow = 0, ncol = 5, dimnames = list(c(), c("Character", "From", "To", "Steps", "Weight")))
-    
+
     # If characters change then make a matrix from them:
     if (length(CharacterDifferences) > 0) CharacterChanges <- rbind(CharacterChanges, cbind(as.numeric(Comparablecharacters[CharacterDifferences]), as.numeric(x$CharacterStatesFromTo["From", Comparablecharacters[CharacterDifferences]]), as.numeric(x$CharacterStatesFromTo["To", Comparablecharacters[CharacterDifferences]]), ifelse(Comparableordering[CharacterDifferences] == "unord", 1, abs(as.numeric(x$CharacterStatesFromTo["To", Comparablecharacters[CharacterDifferences]]) - as.numeric(x$CharacterStatesFromTo["From", Comparablecharacters[CharacterDifferences]]))), Comparableweights[CharacterDifferences]))
-    
+
     # Store character changes as new sublist for x:
     x$CharacterChanges <- CharacterChanges
-    
+
     # Store comparable characters as new sublist of x:
     x$Comparablecharacters <- Comparablecharacters
-    
+
     # Return x:
     return(x)
-    
   }
-  
+
   # Get character changes and comparable characters and add to edge list:
   EdgeList <- lapply(EdgeList, build_changes_matrix)
-  
+
   # Check whether time bins are being compared (otherwise no need to assign character changes):
   if (!is.null(time_partitions)) {
-    
+
     # Subfunction to add change times to character changes:
     add_change_times <- function(x, change_times) {
-      
+
       # Isolate character changes:
       CharacterChanges <- x$CharacterChanges
-      
+
       # If any changes involve two or more steps (requiring replacement with multiple changes):
       if (any(CharacterChanges[, "Steps"] > 1)) {
-        
+
         # Get multistep character changes:
         MultiStepcharacters <- which(CharacterChanges[, "Steps"] > 1)
-        
+
         # For each multistep character change:
-        for(i in rev(MultiStepcharacters)) {
-          
+        for (i in rev(MultiStepcharacters)) {
+
           # Isolate other rows:
           OtherRowNumbers <- setdiff(1:nrow(CharacterChanges), i)
-          
+
           # Get unpacked changes (X:Y, e.g., 0:2 would become 0 1 2):
           UnpackedChanges <- CharacterChanges[i, "From"]:CharacterChanges[i, "To"]
-          
+
           # Update character changes with multistep changes unpacked:
           CharacterChanges <- rbind(CharacterChanges[OtherRowNumbers, ], unname(cbind(rep(CharacterChanges[i, "Character"], length.out = length(UnpackedChanges) - 1), UnpackedChanges[1:(length(UnpackedChanges) - 1)], UnpackedChanges[2:length(UnpackedChanges)], rep(1, length.out = length(UnpackedChanges) - 1), rep(CharacterChanges[i, "Weight"], length.out = length(UnpackedChanges) - 1))))
-          
         }
-        
+
         # Resort character changes by character number:
         CharacterChanges <- CharacterChanges[order(CharacterChanges[, "Character"]), ]
-        
       }
-      
-      # If using midpoint option set character change times as midpoint of branch:
+
+      # <U+00A0>If using midpoint option set character change times as midpoint of branch:
       if (change_times == "midpoint") CharacterChanges <- cbind(CharacterChanges, rep(x$NodeAgeFromTo[1] - (x$BranchDuration / 2), length.out = nrow(CharacterChanges)))
-      
+
       # If using spaced then set character change times as equally spaced along branch:
       if (change_times == "spaced") CharacterChanges <- cbind(CharacterChanges, x$NodeAgeFromTo[1] - (seq(from = 0, to = x$BranchDuration, length.out = nrow(CharacterChanges) + 1)[1:nrow(CharacterChanges)] + (diff(seq(from = 0, to = x$BranchDuration, length.out = nrow(CharacterChanges) + 1))[1] / 2)))
-      
+
       # If using random then set character change times as random draws from a uniform distribution:
       if (change_times == "random") CharacterChanges <- cbind(CharacterChanges, x$NodeAgeFromTo[1] - stats::runif(n = nrow(CharacterChanges), min = 0, max = x$BranchDuration))
-      
+
       # Add column name to change time column:
       colnames(CharacterChanges)[ncol(CharacterChanges)] <- "Time"
-      
+
       # Subfunction to re-sort character change times so they occur in correct order:
       sort_change_times <- function(CharacterChanges) {
-        
+
         # Sort change time for each character from oldest (first) to youngest (last) and store it:
         CharacterChanges[, "Time"] <- unname(unlist(lapply(as.list(unique(CharacterChanges[, "Character"])), function(x) sort(CharacterChanges[which(CharacterChanges[, "Character"] == x), "Time"], decreasing = TRUE))))
-        
+
         # Return sorted character changes:
         return(CharacterChanges)
-        
       }
-      
+
       # Re-sort character change times so they occur in correct order:
       CharacterChanges <- sort_change_times(CharacterChanges)
-      
+
       # Add bin for character change as last column:
       CharacterChanges <- cbind(CharacterChanges, unlist(lapply(as.list(CharacterChanges[, "Time"]), function(x) max(which(x <= time_bins)))))
-      
+
       # Add column name to change time column:
       colnames(CharacterChanges)[ncol(CharacterChanges)] <- "Bin"
-      
+
       # Overwrite character changes with new version with changes added:
       x$CharacterChanges <- CharacterChanges
-      
-      # Return x:
+
+      # <U+00A0>Return x:
       return(x)
-    
     }
-    
+
     # Add character change times to edge list:
     EdgeList <- lapply(EdgeList, add_change_times, change_times = change_times)
-    
   }
-  
+
   # Subfunction to get edge sections in time bins:
   get_edge_sections_in_bins <- function(x, time_bins = time_bins) {
-    
+
     # Set first appearance datum of edge:
     FAD <- x$NodeAgeFromTo[1]
-    
+
     # Set last appearance datum of edge:
     LAD <- x$NodeAgeFromTo[2]
-    
+
     # Get any time bin boundaries crossed (can be empty if none are):
     BoundariesCrossed <- time_bins[2:(length(time_bins) - 1)][intersect(which(time_bins[2:(length(time_bins) - 1)] > LAD), which(time_bins[2:(length(time_bins) - 1)] < FAD))]
-    
+
     # If boundaries are crossed:
     if (length(BoundariesCrossed) > 0) {
-      
+
       # Break up branch into binned sections as vector of FADs:
       FAD <- c(FAD, BoundariesCrossed)
-      
+
       # Break up branch into binned sections as vector of LADs:
       LAD <- c(BoundariesCrossed, LAD)
-      
     }
-    
+
     # Build matrix of branch sections with FADs and LADs:
     BranchSections <- rbind(FAD, LAD)
-    
+
     # Add bin number present in to column names:
-    colnames(BranchSections) <- unlist(lapply(lapply(lapply(as.list(BranchSections["FAD", ]), '<=', time_bins), which), max))
-    
+    colnames(BranchSections) <- unlist(lapply(lapply(lapply(as.list(BranchSections["FAD", ]), "<=", time_bins), which), max))
+
     # Add new list section for branch (edge) sections binned by time:
     x$BinnedEdgeSections <- BranchSections
-    
+
     # Return output:
     return(x)
-    
   }
-  
+
   # Get edge sections in time bins:
   EdgeList <- lapply(EdgeList, get_edge_sections_in_bins, time_bins = time_bins)
-  
+
   # Add binned branch durations to edge list:
-  EdgeList <- lapply(EdgeList, function(x) {BranchDurations <- rep(0, length(time_bins) - 1); BranchDurations[as.numeric(colnames(x$BinnedEdgeSections))] <- abs(apply(x$BinnedEdgeSections, 2, diff)); x$BinnedBranchDurations <- BranchDurations; return(x)})
-  
+  EdgeList <- lapply(EdgeList, function(x) {
+    BranchDurations <- rep(0, length(time_bins) - 1)
+    BranchDurations[as.numeric(colnames(x$BinnedEdgeSections))] <- abs(apply(x$BinnedEdgeSections, 2, diff))
+    x$BinnedBranchDurations <- BranchDurations
+    return(x)
+  })
+
   # Add proportional binned branch lengths to edge list:
-  EdgeList <- lapply(EdgeList, function(x) {x$ProportionalBinnedEdgeDurations <- x$BinnedBranchDurations / sum(x$BinnedBranchDurations); return(x)})
-  
+  EdgeList <- lapply(EdgeList, function(x) {
+    x$ProportionalBinnedEdgeDurations <- x$BinnedBranchDurations / sum(x$BinnedBranchDurations)
+    return(x)
+  })
+
   # Start to build matrix of all changes with list of character changes:
   AllChanges <- lapply(EdgeList, function(x) x$CharacterChanges)
-  
+
   # Add edge number to each matrix of character changes:
-  for(i in 1:length(AllChanges)) AllChanges[[i]] <- cbind(rep(i, times = nrow(AllChanges[[i]])), AllChanges[[i]])
-  
+  for (i in 1:length(AllChanges)) AllChanges[[i]] <- cbind(rep(i, times = nrow(AllChanges[[i]])), AllChanges[[i]])
+
   # Combine all changes into a single matrix:
-  AllChanges <- do.call(rbind, lapply(AllChanges, function(x) {colnames(x)[1] <- "Edge"; x}))
-  
+  AllChanges <- do.call(rbind, lapply(AllChanges, function(x) {
+    colnames(x)[1] <- "Edge"
+    x
+  }))
+
   # Remove silly rownames from all changes:
   rownames(AllChanges) <- NULL
-  
+
   # Create NULL output variables (to be overwritten if called):
   BranchRates <- CladeRates <- TimeRates <- CharacterRates <- NULL
 
   # If doing some kind of edge test (branch or clade):
   if (!is.null(branch_partitions) || !is.null(clade_partitions)) {
-    
+
     # Get (weighted) number of changes on each edge:
     EdgeChanges <- unlist(lapply(EdgeList, function(x) sum(x$CharacterChanges[, "Steps"] * x$CharacterChanges[, "Weight"])))
 
     # Get completeness for each edge:
     EdgeCompleteness <- unlist(lapply(EdgeList, function(x) sum(weights[x$Comparablecharacters]) / sum(weights)))
-    
+
     # Get duration of each edge:
     EdgeDurations <- unlist(lapply(EdgeList, function(x) x$BranchDuration))
-    
+
     # Set global rate:
     GlobalRate <- sum(EdgeChanges) / sum(EdgeCompleteness * EdgeDurations)
-    
+
     # If performing branch partition tests:
     if (!is.null(branch_partitions)) {
-      
+
       # Create branch rates for output:
       BranchRates <- lapply(list(as.list(1:nrow(time_tree$edge))), function(x) matrix(unlist(lapply(x, function(y) c(sum(EdgeChanges[y]), sum(EdgeCompleteness[y] * EdgeDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))[[1]]
-      
+
       # Add edge numbers and rates:
       BranchRates <- cbind(Edge = 1:nrow(time_tree$edge), Rate = as.numeric(gsub(NaN, 0, BranchRates[, "Changes"] / BranchRates[, "Completeness"])), BranchRates)
-      
+
       # If using Likelihood Ratio Test:
       if (test_type == "LRT") {
-        
+
         # Build partitioned data matrices (NB: completeness and duration get combined here as they cannot be summed separately later):
         PartitionedData <- lapply(branch_partitions, function(x) matrix(unlist(lapply(x, function(y) c(sum(EdgeChanges[y]), sum(EdgeCompleteness[y] * EdgeDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))
-        
+
         # Add sampled rate to paritioned data matrices:
-        PartitionedData <- lapply(PartitionedData, function(x) {x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x); colnames(x)[1] <- "Rate"; x})
-        
+        PartitionedData <- lapply(PartitionedData, function(x) {
+          x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x)
+          colnames(x)[1] <- "Rate"
+          x
+        })
+
         # Get LRT p-values and combine output as edge test results:
-        BranchPartitionTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], get_likelihood_p(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "PValue"); x})
-        
+        BranchPartitionTestResults <- lapply(PartitionedData, function(x) {
+          x <- list(x[, "Rate"], get_likelihood_p(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"]))
+          names(x) <- c("Rates", "PValue")
+          x
+        })
       }
-      
+
       # If using AIC:
       if (test_type == "AIC") {
-        
+
         # Build partitioned data for AIC:
-        PartitionedData <- lapply(branch_partitions, function(x) {y <- cbind(Partition = rep(NA, length(time_tree$edge.length)), Rate = rep(NA, length(time_tree$edge.length)), Changes = EdgeChanges, Completeness = EdgeCompleteness, Duration = EdgeDurations); y[, "Rate"] <- as.numeric(gsub(NaN, 0, unlist(lapply(x, function(x) rep(sum(y[x, "Changes"]) / (sum(y[x, "Completeness"]) * sum(y[x, "Duration"])), length(x))))[order(unlist(x))])); y[, "Partition"] <- rep(1:length(x), unlist(lapply(x, length)))[order(unlist(x))]; y})
-        
+        PartitionedData <- lapply(branch_partitions, function(x) {
+          y <- cbind(Partition = rep(NA, length(time_tree$edge.length)), Rate = rep(NA, length(time_tree$edge.length)), Changes = EdgeChanges, Completeness = EdgeCompleteness, Duration = EdgeDurations)
+          y[, "Rate"] <- as.numeric(gsub(NaN, 0, unlist(lapply(x, function(x) rep(sum(y[x, "Changes"]) / (sum(y[x, "Completeness"]) * sum(y[x, "Duration"])), length(x))))[order(unlist(x))]))
+          y[, "Partition"] <- rep(1:length(x), unlist(lapply(x, length)))[order(unlist(x))]
+          y
+        })
+
         # Get AIC, AICc and rate results:
         BranchPartitionTestResults <- lapply(PartitionedData, function(x) list(Rates = unname(unlist(lapply(as.list(unique(x[, "Partition"])), function(y) x[x[, "Partition"] == y, "Rate"][1]))), AIC = calculate_partition_AIC(x), AICc = calculate_partition_AIC(x, AICc = TRUE)))
-        
       }
-      
+
       # Pack branch partitions to test into single strings for output:
       PackedBranchPartitions <- pack_partitions(branch_partitions)
-      
+
       # Add packed partitions to results:
-      for(i in 1:length(BranchPartitionTestResults)) BranchPartitionTestResults[[i]]$Partition <- PackedBranchPartitions[i]
-    
-    # If not performing branch partition tests:
+      for (i in 1:length(BranchPartitionTestResults)) BranchPartitionTestResults[[i]]$Partition <- PackedBranchPartitions[i]
+
+      # If not performing branch partition tests:
     } else {
-      
+
       # Make empty branch partition result output:
       BranchPartitionTestResults <- NULL
-      
     }
-    
+
     # If performing clade partition tests:
     if (!is.null(clade_partitions)) {
-      
+
       # Create clade rates for output:
       CladeRates <- do.call(rbind, lapply(lapply(as.list(ape::Ntip(time_tree) + c(1:time_tree$Nnode)), function(x) find_descendant_edges(x, tree = time_tree)), function(y) c(Changes = sum(EdgeChanges[y]), Completeness = sum(EdgeCompleteness[y] * EdgeDurations[y]), Duration = 1)))
-      
+
       # Add rates and node numbers:
       CladeRates <- cbind(Node = ape::Ntip(time_tree) + c(1:time_tree$Nnode), Rate = as.numeric(gsub(NaN, 0, CladeRates[, "Changes"] / CladeRates[, "Completeness"])), CladeRates)
-      
+
       # If using Likelihood Ratio Test:
       if (test_type == "LRT") {
-        
+
         # Build partitioned data matrices (NB: completeness and duration get combined here as they cannot be summed separately later):
         PartitionedData <- lapply(clade_partitions, function(x) matrix(unlist(lapply(x, function(y) c(sum(EdgeChanges[y]), sum(EdgeCompleteness[y] * EdgeDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))
-        
+
         # Add sampled rate to paritioned data matrices:
-        PartitionedData <- lapply(PartitionedData, function(x) {x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x); colnames(x)[1] <- "Rate"; x})
-        
+        PartitionedData <- lapply(PartitionedData, function(x) {
+          x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x)
+          colnames(x)[1] <- "Rate"
+          x
+        })
+
         # Get LRT p-values and combine output as edge test results:
-        CladePartitionTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], get_likelihood_p(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "PValue"); x})
-        
+        CladePartitionTestResults <- lapply(PartitionedData, function(x) {
+          x <- list(x[, "Rate"], get_likelihood_p(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"]))
+          names(x) <- c("Rates", "PValue")
+          x
+        })
       }
-      
+
       # If using AIC:
       if (test_type == "AIC") {
-        
+
         # Build partitioned data for AIC:
-        PartitionedData <- lapply(clade_partitions, function(x) {y <- cbind(Partition = rep(NA, length(time_tree$edge.length)), Rate = rep(NA, length(time_tree$edge.length)), Changes = EdgeChanges, Completeness = EdgeCompleteness, Duration = EdgeDurations); y[, "Rate"] <- as.numeric(gsub(NaN, 0, unlist(lapply(x, function(x) rep(sum(y[x, "Changes"]) / (sum(y[x, "Completeness"]) * sum(y[x, "Duration"])), length(x))))[order(unlist(x))])); y[, "Partition"] <- rep(1:length(x), unlist(lapply(x, length)))[order(unlist(x))]; y})
-        
+        PartitionedData <- lapply(clade_partitions, function(x) {
+          y <- cbind(Partition = rep(NA, length(time_tree$edge.length)), Rate = rep(NA, length(time_tree$edge.length)), Changes = EdgeChanges, Completeness = EdgeCompleteness, Duration = EdgeDurations)
+          y[, "Rate"] <- as.numeric(gsub(NaN, 0, unlist(lapply(x, function(x) rep(sum(y[x, "Changes"]) / (sum(y[x, "Completeness"]) * sum(y[x, "Duration"])), length(x))))[order(unlist(x))]))
+          y[, "Partition"] <- rep(1:length(x), unlist(lapply(x, length)))[order(unlist(x))]
+          y
+        })
+
         # Get AIC, AICc and rate results:
         CladePartitionTestResults <- lapply(PartitionedData, function(x) list(Rates = unname(unlist(lapply(as.list(unique(x[, "Partition"])), function(y) x[x[, "Partition"] == y, "Rate"][1]))), AIC = calculate_partition_AIC(x), AICc = calculate_partition_AIC(x, AICc = TRUE)))
-        
       }
-      
+
       # Pack clade partitions to test into single strings for output:
       PackedCladePartitions <- pack_partitions(clade_partitions)
-      
+
       # Add packed partitions to results:
-      for(i in 1:length(CladePartitionTestResults)) CladePartitionTestResults[[i]]$Partition <- PackedCladePartitions[i]
+      for (i in 1:length(CladePartitionTestResults)) CladePartitionTestResults[[i]]$Partition <- PackedCladePartitions[i]
 
 
-    # If not performing clade partition tests:
+      # If not performing clade partition tests:
     } else {
-      
+
       # Make empty clade partition result output:
       CladePartitionTestResults <- NULL
-      
     }
-    
-  # If not doing clade OR branch tests:
+
+    # If not doing clade OR branch tests:
   } else {
-    
+
     # Make empty branch partition result output:
     BranchPartitionTestResults <- NULL
 
     # Make empty clade partition result output:
     CladePartitionTestResults <- NULL
-
   }
 
   # If performing character partition tests:
   if (!is.null(character_partitions)) {
-    
+
     # Get vector of (weighted) changes for each character:
-    CharacterChanges <- unlist(lapply(as.list(CharacterNumbers), function(x) {CharacterRows <- which(AllChanges[, "Character"] == x); sum(AllChanges[CharacterRows, "Steps"] * AllChanges[CharacterRows, "Weight"])}))
-    
+    CharacterChanges <- unlist(lapply(as.list(CharacterNumbers), function(x) {
+      CharacterRows <- which(AllChanges[, "Character"] == x)
+      sum(AllChanges[CharacterRows, "Steps"] * AllChanges[CharacterRows, "Weight"])
+    }))
+
     # Get vector of weighted durations for each character:
     CharacterDurations <- (weights / sum(weights)) * sum(time_tree$edge.length)
-    
+
     # Get vector of completness (opportunity to observe changes) for each character:
-    CharacterCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) {CharacterPresence <- rep(0, times = length(CharacterNumbers)); CharacterPresence[x$Comparablecharacters] <- 1; CharacterPresence * x$BranchDuration})), 2, sum) / sum(time_tree$edge.length)
-    
+    CharacterCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) {
+      CharacterPresence <- rep(0, times = length(CharacterNumbers))
+      CharacterPresence[x$Comparablecharacters] <- 1
+      CharacterPresence * x$BranchDuration
+    })), 2, sum) / sum(time_tree$edge.length)
+
     # Set global rate:
     GlobalRate <- sum(CharacterChanges) / sum(CharacterCompleteness * CharacterDurations)
-    
+
     # Create character rates for output:
     CharacterRates <- lapply(list(as.list(1:max(CharacterNumbers))), function(x) matrix(unlist(lapply(x, function(y) c(sum(CharacterChanges[y]), sum(CharacterCompleteness[y] * CharacterDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))[[1]]
-    
+
     # Add character numbers and rates:
     CharacterRates <- cbind(Character = 1:max(CharacterNumbers), Rate = as.numeric(gsub(NaN, 0, CharacterRates[, "Changes"] / CharacterRates[, "Completeness"])), CharacterRates)
-    
+
     # If using likelihood ratio test:
-    if (test_type== "LRT") {
-      
+    if (test_type == "LRT") {
+
       # Build partitioned data matrices (NB: completeness and duration get combined here as they cannot be summed separately later):
       PartitionedData <- lapply(character_partitions, function(x) matrix(unlist(lapply(x, function(y) c(sum(CharacterChanges[y]), sum(CharacterCompleteness[y] * CharacterDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))
-      
+
       # Add sampled rate to paritioned data matrices:
-      PartitionedData <- lapply(PartitionedData, function(x) {x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x); colnames(x)[1] <- "Rate"; x})
-      
+      PartitionedData <- lapply(PartitionedData, function(x) {
+        x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x)
+        colnames(x)[1] <- "Rate"
+        x
+      })
+
       # Get P-Values and combine output as edge test results:
-      CharacterPartitionTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], get_likelihood_p(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "PValue"); x})
-      
+      CharacterPartitionTestResults <- lapply(PartitionedData, function(x) {
+        x <- list(x[, "Rate"], get_likelihood_p(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"]))
+        names(x) <- c("Rates", "PValue")
+        x
+      })
     }
-    
+
     # If using AIC:
-    if (test_type== "AIC") {
-      
+    if (test_type == "AIC") {
+
       # Build partitioned data for AIC:
-      PartitionedData <- lapply(character_partitions, function(x) {y <- cbind(Partition = rep(NA, max(CharacterNumbers)), Rate = rep(NA, max(CharacterNumbers)), Changes = CharacterChanges, Completeness = CharacterCompleteness, Duration = CharacterDurations); y[, "Rate"] <- as.numeric(gsub(NaN, 0, unlist(lapply(x, function(x) rep(sum(y[x, "Changes"]) / (sum(y[x, "Completeness"]) * sum(y[x, "Duration"])), length(x))))[order(unlist(x))])); y[, "Partition"] <- rep(1:length(x), unlist(lapply(x, length)))[order(unlist(x))]; y})
-      
+      PartitionedData <- lapply(character_partitions, function(x) {
+        y <- cbind(Partition = rep(NA, max(CharacterNumbers)), Rate = rep(NA, max(CharacterNumbers)), Changes = CharacterChanges, Completeness = CharacterCompleteness, Duration = CharacterDurations)
+        y[, "Rate"] <- as.numeric(gsub(NaN, 0, unlist(lapply(x, function(x) rep(sum(y[x, "Changes"]) / (sum(y[x, "Completeness"]) * sum(y[x, "Duration"])), length(x))))[order(unlist(x))]))
+        y[, "Partition"] <- rep(1:length(x), unlist(lapply(x, length)))[order(unlist(x))]
+        y
+      })
+
       # Get AIC, AICc and rate results:
       CharacterPartitionTestResults <- lapply(PartitionedData, function(x) list(Rates = unname(unlist(lapply(as.list(unique(x[, "Partition"])), function(y) x[x[, "Partition"] == y, "Rate"][1]))), AIC = calculate_partition_AIC(x), AICc = calculate_partition_AIC(x, AICc = TRUE)))
-      
     }
-    
+
     # Pack character partitions to test into single strings for output:
     PackedCharacterPartitions <- pack_partitions(character_partitions)
-    
+
     # Add packed partitions to results:
-    for(i in 1:length(CharacterPartitionTestResults)) CharacterPartitionTestResults[[i]]$Partition <- PackedCharacterPartitions[i]
+    for (i in 1:length(CharacterPartitionTestResults)) CharacterPartitionTestResults[[i]]$Partition <- PackedCharacterPartitions[i]
 
 
-  # If performing branch partition tests:
+    # If performing branch partition tests:
   } else {
-    
+
     # Make empty character partition result output:
     CharacterPartitionTestResults <- NULL
-    
   }
 
   # If performing time bin partition tests:
   if (!is.null(time_partitions)) {
-    
+
     # Get weighted number of changes from each time bin:
-    Timebin_changes <- unlist(lapply(as.list(1:(length(time_bins) - 1)), function(x) {ChangeRows <- AllChanges[, "Bin"] == x; sum(AllChanges[ChangeRows, "Steps"] * AllChanges[ChangeRows, "Weight"])}))
-    
+    Timebin_changes <- unlist(lapply(as.list(1:(length(time_bins) - 1)), function(x) {
+      ChangeRows <- AllChanges[, "Bin"] == x
+      sum(AllChanges[ChangeRows, "Steps"] * AllChanges[ChangeRows, "Weight"])
+    }))
+
     # If using the Close time bin completeness approach get completeness value for each time bin:
     if (time_binning_approach == "close") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations * (sum(weights[x$Comparablecharacters]) / sum(weights)))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations)), 2, sum)
-    
+
     # If using the Lloyd time bin completeness approach get completeness value for each time bin::
     if (time_binning_approach == "lloyd") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(weights[x$Comparablecharacters], ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(weights, ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum)
-    
+
     # Get durations of edges in each time bin:
     TimeBinDurations <- apply(do.call(rbind, lapply(EdgeList, function(x) x$BinnedBranchDurations)), 2, sum)
-    
+
     # Set global rate (NB: will differ between Close and Lloyd approaches, but Lloyd approach will match edge or character global rate):
     GlobalRate <- sum(Timebin_changes) / sum(TimeBinCompleteness * TimeBinDurations)
-    
+
     # Create time rates for output:
     TimeRates <- lapply(list(as.list(1:(length(time_bins) - 1))), function(x) matrix(unlist(lapply(x, function(y) c(sum(Timebin_changes[y]), sum(TimeBinCompleteness[y] * TimeBinDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))[[1]]
-    
+
     # Add bin numbers and rates:
     TimeRates <- cbind(Bin = 1:(length(time_bins) - 1), Rate = as.numeric(gsub(NaN, 0, TimeRates[, "Changes"] / TimeRates[, "Completeness"])), TimeRates)
-    
+
     # If using Likelihood Ratio Test to compare partitions:
     if (test_type == "LRT") {
-      
+
       # Build partitioned data matrices (NB: completeness and duration get combined here as they cannot be summed separately later) for LRT:
       PartitionedData <- lapply(time_partitions, function(x) matrix(unlist(lapply(x, function(y) c(sum(Timebin_changes[y]), sum(TimeBinCompleteness[y] * TimeBinDurations[y]), 1))), ncol = 3, byrow = TRUE, dimnames = list(c(), c("Changes", "Completeness", "Duration"))))
-      
+
       # Add sampled rate to paritioned data matrices for LRT:
-      PartitionedData <- lapply(PartitionedData, function(x) {x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x); colnames(x)[1] <- "Rate"; x})
-      
+      PartitionedData <- lapply(PartitionedData, function(x) {
+        x <- cbind(as.numeric(gsub(NaN, 0, c(x[, "Changes"] / (x[, "Completeness"] * x[, "Duration"])))), x)
+        colnames(x)[1] <- "Rate"
+        x
+      })
+
       # Get P-Values and combine output as edge test results:
-      TimeBinTestResults <- lapply(PartitionedData, function(x) {x <- list(x[, "Rate"], get_likelihood_p(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"])); names(x) <- c("Rates", "PValue"); x})
-      
+      TimeBinTestResults <- lapply(PartitionedData, function(x) {
+        x <- list(x[, "Rate"], get_likelihood_p(MeanRate = GlobalRate, SampledRates = x[, "Rate"], SampledChanges = x[, "Changes"], SampledCompleteness = x[, "Completeness"], SampledTime = x[, "Duration"]))
+        names(x) <- c("Rates", "PValue")
+        x
+      })
     }
-    
+
     # If using AIC to compare partitions:
     if (test_type == "AIC") {
-      
+
       # Build partitioned data for AIC:
-      PartitionedData <- lapply(time_partitions, function(x) {y <- cbind(Partition = rep(NA, length(Timebin_changes)), Rate = rep(NA, length(Timebin_changes)), Changes = Timebin_changes, Completeness = TimeBinCompleteness * TimeBinDurations, Duration = rep(1, length(Timebin_changes))); y[, "Rate"] <- as.numeric(gsub(NaN, 0, unlist(lapply(x, function(x) rep(sum(y[x, "Changes"]) / sum(y[x, "Completeness"]), length(x)))))); y[, "Partition"] <- rep(1:length(x), unlist(lapply(x, length))); y})
-      
+      PartitionedData <- lapply(time_partitions, function(x) {
+        y <- cbind(Partition = rep(NA, length(Timebin_changes)), Rate = rep(NA, length(Timebin_changes)), Changes = Timebin_changes, Completeness = TimeBinCompleteness * TimeBinDurations, Duration = rep(1, length(Timebin_changes)))
+        y[, "Rate"] <- as.numeric(gsub(NaN, 0, unlist(lapply(x, function(x) rep(sum(y[x, "Changes"]) / sum(y[x, "Completeness"]), length(x))))))
+        y[, "Partition"] <- rep(1:length(x), unlist(lapply(x, length)))
+        y
+      })
+
       # Get AIC, AICc and rate results:
       TimeBinTestResults <- lapply(PartitionedData, function(x) list(Rates = unname(unlist(lapply(as.list(unique(x[, "Partition"])), function(y) x[x[, "Partition"] == y, "Rate"][1]))), AIC = calculate_partition_AIC(x), AICc = calculate_partition_AIC(x, AICc = TRUE)))
-      
     }
-    
+
     # Pack time bin partitions to test into single strings for output:
     PackedTimeBinPartitions <- pack_partitions(time_partitions)
-    
-    # Add packed partitions to results:
-    for(i in 1:length(TimeBinTestResults)) TimeBinTestResults[[i]]$Partition <- PackedTimeBinPartitions[i]
 
-  # If not performing time bin partition tests:
+    # Add packed partitions to results:
+    for (i in 1:length(TimeBinTestResults)) TimeBinTestResults[[i]]$Partition <- PackedTimeBinPartitions[i]
+
+    # If not performing time bin partition tests:
   } else {
-    
+
     # Make empty time bin partition result output:
     TimeBinTestResults <- NULL
-    
   }
 
   # Set global rate for output:
   GlobalRate <- sum(unlist(lapply(EdgeList, function(x) sum(x$CharacterChanges[, "Steps"] * x$CharacterChanges[, "Weight"])))) / sum(unlist(lapply(EdgeList, function(x) sum(weights[x$Comparablecharacters]) / sum(weights))) * unlist(lapply(EdgeList, function(x) x$BranchDuration)))
-  
+
   # If performing Likelihood Ratio Test:
   if (test_type == "LRT") {
-    
+
     # Subfunction to calculate adjusted alphas for multiple comparison corrections:
     add_cutoffs <- function(TestResults, alpha, multiple_comparison_correction = multiple_comparison_correction) {
-      
+
       # Get number of comparisons performed:
       NComparisons <- length(TestResults)
-      
+
       # If using the Benjamini-Hochberg false discovery rate approach:
       if (multiple_comparison_correction == "benjaminihochberg") {
-        
+
         # Set cutoff values:
         CutoffValues <- ((1:NComparisons) / NComparisons) * alpha
-        
+
         # Get actual p-values found:
-        PValues <- unlist(lapply(TestResults, '[[', "PValue"))
-        
+        PValues <- unlist(lapply(TestResults, "[[", "PValue"))
+
         # Order cutoffs by p-value rank:
         CutoffValues <- CutoffValues[rank(PValues, ties.method = "random")]
-        
       }
-      
+
       # If using the Bonferroni correction set cutoff values as alpha over N:
       if (multiple_comparison_correction == "bonferroni") CutoffValues <- alpha / NComparisons
-      
+
       # Add cutoffs to output:
-      for(i in 1:length(TestResults)) TestResults[[i]]$CorrectedAlpha <- CutoffValues[i]
-      
+      for (i in 1:length(TestResults)) TestResults[[i]]$CorrectedAlpha <- CutoffValues[i]
+
       # Return modified test results:
       return(TestResults)
-      
     }
-    
+
     # If doing branch partition tests then add multiple comparison alpha cutoffs:
     if (!is.null(branch_partitions)) BranchPartitionTestResults <- add_cutoffs(TestResults = BranchPartitionTestResults, alpha = alpha, multiple_comparison_correction = multiple_comparison_correction)
-    
+
     # If doing character partition tests then add multiple comparison alpha cutoffs:
     if (!is.null(character_partitions)) CharacterPartitionTestResults <- add_cutoffs(TestResults = CharacterPartitionTestResults, alpha = alpha, multiple_comparison_correction = multiple_comparison_correction)
-    
+
     # If doing clade partition tests then add multiple comparison alpha cutoffs:
     if (!is.null(clade_partitions)) CladePartitionTestResults <- add_cutoffs(TestResults = CladePartitionTestResults, alpha = alpha, multiple_comparison_correction = multiple_comparison_correction)
-    
+
     # If doing time bin partition tests then add multiple comparison alpha cutoffs:
     if (!is.null(time_partitions)) TimeBinTestResults <- add_cutoffs(TestResults = TimeBinTestResults, alpha = alpha, multiple_comparison_correction = multiple_comparison_correction)
-    
   }
 
   # Compile output:
   Output <- list(time_binsUsed = time_bins, InferredCharacterChanges = AllChanges, IntrinsicCharacterRate = GlobalRate, ContinuouscharactersConvertedToDiscrete = ContinuouscharactersConverted, BranchPartitionResults = BranchPartitionTestResults, CharacterPartitionResults = CharacterPartitionTestResults, CladePartitionResults = CladePartitionTestResults, TimeBinResults = TimeBinTestResults, BranchRates = BranchRates, CharacterRates = CharacterRates, CladeRates = CladeRates, TimeRates = TimeRates, time_tree = time_tree)
-  
+
   # Return output:
   return(Output)
-
 }
 
 # Ages <- read.table("~/Documents/Packages/Claddis/LungfishTest/ages.txt", sep = ",")
 # Matrix <- Claddis::read_nexus_matrix("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.nex")
 # time_tree <- ape::read.tree("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.tre")
 # time_bins <- c(443.8, 419.2, 358.9, 298.9, 251.9, 201.3, 145.0, 0.0)
-# 
+#
 # time_tree <- time_tree[sample(1:100000, 100)]
 # time_tree <- lapply(time_tree, function(x) strap::DatePhylo(x, Ages, rlen = 2, method = "equal"))
 # class(Tree) <- "multiPhylo"
-# 
+#
 # time_tree <- Tree[[1]]
 # cladistic_matrix <- Matrix
 # time_bins <- time_bins
@@ -1035,4 +1104,3 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
 # polymorphism.behaviour = "equalp"
 # uncertainty.behaviour = "equalp"
 # threshold = 0.01
-

@@ -73,37 +73,36 @@
 #'
 #' # Show new output:
 #' y
-#'
 #' @export ordinate_cladistic_matrix
 ordinate_cladistic_matrix <- function(cladistic_matrix, distance_metric = "MORD", ged_type = "Wills", distance_transformation = "arcsine_sqrt", distance_polymorphism_behaviour = "min.difference", distance_uncertainty_behaviour = "min.difference", distance_inapplicable_behaviour = "missing", character_dependencies = NULL, alpha = 0.5, correction = "cailliez", time_tree = NULL, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, ancestral_polymorphism_behaviour = "equalp", ancestral_uncertainty_behaviour = "equalp", threshold = 0.01, all_missing_allowed = FALSE) {
-  
+
   # Add some top level conditionsl here to check input is valid.
   # Allow other ordination types such as NMDS
-  
+
   # If no tree is supplied:
   if (is.null(time_tree)) {
-    
+
     # Get morphological distances from the cladistic matrix:
     morphological_distances <- calculate_morphological_distances(cladistic_matrix, distance_metric = distance_metric, distance_transformation = distance_transformation, polymorphism.behaviour = distance_polymorphism_behaviour, uncertainty.behaviour = distance_uncertainty_behaviour, inapplicable.behaviour = distance_inapplicable_behaviour, character_dependencies = character_dependencies, alpha = alpha)
-    
+
     # Get trimmed distances:
     trimmed_distances <- trim_matrix(morphological_distances$DistanceMatrix)
 
     # If trimming of matrix lead to taxa being removed warn user:
     if (!is.null(trimmed_distances$removed_taxa)) message(paste("The following taxa had to be removed to produce a complete distance matrix:", paste(trimmed_distances$removed_taxa, collapse = ", ")))
-    
+
     # Perform Principal Coordinates Analysis on the data:
     pcoa_results <- ape::pcoa(trimmed_distances$distance_matrix, correction = correction, rn = rownames(trimmed_distances$distance_matrix))
-    
-  # Case if a tree is included (and a phylomorphospace is requested):
+
+    # Case if a tree is included (and a phylomorphospace is requested):
   } else {
-      
+
     # Get ancestral character states:
     ancestral_values <- estimate_ancestral_states(cladistic_matrix = cladistic_matrix, time_tree = time_tree, estimate_all_nodes = estimate_all_nodes, estimate_tip_values = estimate_tip_values, inapplicables_as_missing = inapplicables_as_missing, polymorphism.behaviour = ancestral_polymorphism_behaviour, uncertainty.behaviour = ancestral_uncertainty_behaviour, threshold = threshold, all_missing_allowed = all_missing_allowed)
 
     # Get morphological distances from the cladistic matrix:
     morphological_distances <- calculate_morphological_distances(ancestral_values, distance_metric = distance_metric, ged_type = ged_type, distance_transformation = distance_transformation, polymorphism.behaviour = distance_polymorphism_behaviour, uncertainty.behaviour = distance_uncertainty_behaviour, inapplicable.behaviour = distance_inapplicable_behaviour, character_dependencies = character_dependencies, alpha = alpha)
-    
+
     # Get trimmed distances:
     trimmed_distances <- trim_matrix(morphological_distances$DistanceMatrix, Tree = time_tree)
 
@@ -115,35 +114,31 @@ ordinate_cladistic_matrix <- function(cladistic_matrix, distance_metric = "MORD"
 
     # Perform Principal Coordinates Analysis on the data:
     pcoa_results <- ape::pcoa(trimmed_distances$distance_matrix, correction = correction, rn = rownames(trimmed_distances$distance_matrix))
-
   }
-  
+
   # If corrected vectors exist:
   if (!is.null(pcoa_results$vectors.cor)) {
-    
+
     # Overwrite uncorrected with corrected:
     pcoa_results$vectors <- pcoa_results$vectors.cor
-    
+
     # Remove corrected from output:
     pcoa_results$vectors.cor <- NULL
-    
   }
-  
+
   # If corrected trace exists:
   if (!is.null(pcoa_results$trace.cor)) {
-    
+
     # Overwite uncorrected with corrected:
     pcoa_results$trace <- pcoa_results$trace.cor
-    
+
     # Remove corrected from output:
     pcoa_results$trace.cor <- NULL
-    
   }
-  
+
   # Compile output:
   output <- c(time_tree = list(time_tree), distance_matrix = list(trimmed_distances$distance_matrix), removed_taxa = list(trimmed_distances$removed_taxa), pcoa_results)
 
   # Return output invisibly:
   invisible(output)
-  
 }

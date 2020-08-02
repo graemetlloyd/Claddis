@@ -26,7 +26,6 @@ You can also ask for only partitions of a specific number using the \code{NParti
 
 # Get all partitions for four time bins:
 partition_time_bins(4)
-
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

@@ -78,17 +78,24 @@ distances$ComparableCharacterMatrix
 # we first need to define the character dependency
 # (here there is only one, character 8 is a
 # secondary where 7 is the primary character):
-character_dependencies <- matrix(c(8, 7), ncol = 2,
-  byrow = TRUE, dimnames = list(c(),
-  c("DependentCharacter",
-  "IndependentCharacter")))
+character_dependencies <- matrix(c(8, 7),
+  ncol = 2,
+  byrow = TRUE, dimnames = list(
+    c(),
+    c(
+      "DependentCharacter",
+      "IndependentCharacter"
+    )
+  )
+)
 
 # Get morphological distances for the Day et
 # al. (2016) data set using HSJ approach:
 distances <- calculate_morphological_distances(day_2016,
   inapplicable.behaviour = "HSJ",
   character_dependencies = character_dependencies,
-  alpha = 0.5)
+  alpha = 0.5
+)
 
 # Show distance metric:
 distances$DistanceMetric
@@ -99,10 +106,9 @@ distances$DistanceMatrix
 # Show number of characters that can be scored for
 # each pairwise comparison:
 distances$ComparableCharacterMatrix
-
 }
 \references{
-Gower, J. C., 1971. A general coefficient of similarity and some of its properties. \emph{Biometrika}, \bold{27}, 857–871.
+Gower, J. C., 1971. A general coefficient of similarity and some of its properties. \emph{Biometrika}, \bold{27}, 857<U+2013>871.
 
 Hopkins, M. J. and St John, K., 2018. A new family of dissimilarity metrics for discrete character matrices that include inapplicable characters and its importance for disparity studies. \emph{Proceedings of the Royal Society of London B}, \bold{285}, 20181784.
 

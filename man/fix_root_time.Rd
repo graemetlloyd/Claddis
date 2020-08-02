@@ -43,7 +43,6 @@ pruned_tree <- fix_root_time(tree, pruned_tree)
 
 # Show that the root time is now fixed (19 Ma):
 pruned_tree$root.time
-
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

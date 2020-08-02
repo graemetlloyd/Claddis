@@ -33,7 +33,6 @@ distances <- calculate_morphological_distances(michaux_1989)
 
 # Attempt to trim max.dist.matrix:
 trim_matrix(distances$DistanceMatrix)
-
 }
 \seealso{
 \link{calculate_morphological_distances}

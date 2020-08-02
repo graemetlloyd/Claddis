@@ -30,7 +30,6 @@ time_bins <- seq(100, 0, length.out = 11)
 
 # Get N changes for each bin:
 bin_changes(change_times, time_bins)
-
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

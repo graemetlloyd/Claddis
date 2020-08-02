@@ -31,7 +31,6 @@ Calculated rates (changes per lineage million years) are plotted as filled circl
 \examples{
 
 # Nothing yet
-
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

@@ -39,7 +39,6 @@ time_bins <- seq(100, 0, length.out = 11)
 
 # Get edge lengths for each bin:
 bin_edge_lengths(time_tree, time_bins)
-
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

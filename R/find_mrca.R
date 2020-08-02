@@ -19,43 +19,42 @@
 #'
 #' # Create a simple four-taxon tree:
 #' tree <- read.tree(text = "(A,(B,(C,D)));")
-#' 
+#'
 #' # Plot the tree:
 #' plot(tree)
-#' 
+#'
 #' # Add nodelabels and show that the most recent common
 #' # ancestor of B, C, and D is node 6:
 #' nodelabels()
-#' 
+#'
 #' # Use find_mrca to show that the most recent common
 #' # ancestor of B, C, and D is node 6:
-#' find_mrca(descendant_names = c("B", "C", "D"),
-#'   tree = tree)
-#' 
+#' find_mrca(
+#'   descendant_names = c("B", "C", "D"),
+#'   tree = tree
+#' )
 #' @export find_mrca
 find_mrca <- function(descendant_names, tree) {
 
   # Get tip numbers:
   tipnos <- match(descendant_names, tree$tip.label)
-  
+
   # Get ancestral nodes in order:
   ancestor_node <- sort(unique(tree$edge[, 1][match(tipnos, tree$edge[, 2])]))
-  
+
   # Keep going until a single ancestral node is converged upon:
-  while(length(ancestor_node) > 1) {
-    
+  while (length(ancestor_node) > 1) {
+
     # Get node with highest number (definitely not ancestor):
     highest_node <- ancestor_node[length(ancestor_node)]
-    
+
     # Remove this node from the list:
     ancestor_node <- ancestor_node[-length(ancestor_node)]
-    
+
     # Find its ancestor and add to unique list:
     ancestor_node <- sort(unique(c(ancestor_node, tree$edge[match(highest_node, tree$edge[, 2]), 1])))
-
   }
-  
+
   # Return ancestral node:
   return(ancestor_node)
-
 }

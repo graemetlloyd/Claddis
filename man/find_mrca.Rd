@@ -34,9 +34,10 @@ nodelabels()
 
 # Use find_mrca to show that the most recent common
 # ancestor of B, C, and D is node 6:
-find_mrca(descendant_names = c("B", "C", "D"),
-  tree = tree)
-
+find_mrca(
+  descendant_names = c("B", "C", "D"),
+  tree = tree
+)
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

@@ -37,7 +37,6 @@ str.out$reduced.matrix
 
 # View removed matrix:
 str.out$removed.matrix
-
 }
 \references{
 Wilkinson, M., 1995. Coping with abundant missing entries in phylogenetic inference using parsimony. \emph{Systematic Biology}, \bold{44}, 501-514.

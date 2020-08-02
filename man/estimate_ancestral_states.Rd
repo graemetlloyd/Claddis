@@ -67,12 +67,14 @@ cladistic_matrix <- day_2016
 
 # Prune most characters out to make example run fast:
 cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix,
-  characters2prune = c(2:3, 5:37))
+  characters2prune = c(2:3, 5:37)
+)
 
 # Estimate ancestral states:
-estimate_ancestral_states(cladistic_matrix = cladistic_matrix,
-  time_tree = time_tree)
-
+estimate_ancestral_states(
+  cladistic_matrix = cladistic_matrix,
+  time_tree = time_tree
+)
 }
 \references{
 Brusatte, S. L., Lloyd, G. T., Wang, S. C. and Norell, M. A., 2014. Gradual assembly of avian body plan culminated in rapid rates of evolution across dinosaur-bird transition. Current Biology, 24, 2386-2392.

@@ -43,11 +43,14 @@ day_2016tree$root.time <- max(diag(vcv(day_2016tree)))
 
 # Get proportional phylogenetic character completeness in ten equal-length
 # time bins:
-bin_character_completeness(cladistic_matrix = day_2016,
-  time_tree = day_2016tree, time_bins = seq(from =
-  day_2016tree$root.time, to = day_2016tree$root.time -
-  max(diag(vcv(day_2016tree))), length.out = 11))
-
+bin_character_completeness(
+  cladistic_matrix = day_2016,
+  time_tree = day_2016tree, time_bins = seq(
+    from =
+      day_2016tree$root.time, to = day_2016tree$root.time -
+      max(diag(vcv(day_2016tree))), length.out = 11
+  )
+)
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

@@ -15,7 +15,6 @@ distances <- calculate_morphological_distances(michaux_1989)
 
 # Show distances:
 distances
-
 }
 \references{
 Lloyd, G. T., 2016. Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. \emph{Biological Journal of the Linnean Society}, \bold{118}, 131-151.

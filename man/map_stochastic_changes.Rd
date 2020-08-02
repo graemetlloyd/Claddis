@@ -56,13 +56,17 @@ set.seed(2)
 cladistic_matrix <- day_2016
 
 # Prune out continuous characters:
-cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix =
-  cladistic_matrix, blocks2prune = 1)
+cladistic_matrix <- prune_cladistic_matrix(
+  cladistic_matrix =
+    cladistic_matrix, blocks2prune = 1
+)
 
 # Prune out majority of characters so
 # example runs quickly:
-cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix =
-  cladistic_matrix, characters2prune = 1:32)
+cladistic_matrix <- prune_cladistic_matrix(
+  cladistic_matrix =
+    cladistic_matrix, characters2prune = 1:32
+)
 
 # Generete random tree for matrix taxa:
 time_tree <- rtree(nrow(day_2016$matrix_1$matrix))
@@ -75,9 +79,12 @@ time_tree$root.time <- max(diag(vcv(time_tree)))
 
 # Get all state changes for two simulations:
 StateChanges <-
-  map_stochastic_changes(cladistic_matrix = cladistic_matrix,
-  time_tree = time_tree, time_bins = seq(time_tree$root.time, 0,
-  length.out = 3), NSimulations = 2)
+  map_stochastic_changes(
+    cladistic_matrix = cladistic_matrix,
+    time_tree = time_tree, time_bins = seq(time_tree$root.time, 0,
+      length.out = 3
+    ), NSimulations = 2
+  )
 
 # View matrix of all stochstic character changes:
 StateChanges$AllStateChanges
@@ -94,7 +101,6 @@ StateChanges$TerminalEdgeLengthsPerBin
 
 # View matrix of internal edge lengths in each time bin:
 StateChanges$InternalEdgeLengthsPerBin
-
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

@@ -32,45 +32,44 @@
 #' # Get discrete character rates (includes changes):
 #' out <- test_rates(time_tree, michaux_1989,
 #'   seq(time_tree$root.time, 0, length.out = 3),
-#'   branch_partitions = list(list(1)), alpha = 0.01)
+#'   branch_partitions = list(list(1)), alpha = 0.01
+#' )
 #'
 #' # Plot character changes on the tree:
-#' plot_changes_on_tree(out$InferredCharacterChanges,
-#'   time_tree)
-#'
+#' plot_changes_on_tree(
+#'   out$InferredCharacterChanges,
+#'   time_tree
+#' )
 #' @export plot_changes_on_tree
 plot_changes_on_tree <- function(character_changes, time_tree) {
-  
+
   # Update tree edge lengths to number of character changes:
   time_tree$edge.length <- rle(sort(c(character_changes[, "Edge"], 1:nrow(time_tree$edge))))$lengths - 1
-  
+
   # Create empty edge labels vector:
   edge.labels <- rep(NA, nrow(time_tree$edge))
-  
+
   # For each edge:
-  for(i in 1:nrow(time_tree$edge)) {
-    
+  for (i in 1:nrow(time_tree$edge)) {
+
     # Get rows for where changes occur:
     change.rows <- which(character_changes[, "Edge"] == i)
-    
+
     # If there are changes on edge:
     if (length(change.rows) > 0) {
-      
+
       # Compile all changes into edge label:
       edge.labels[i] <- paste(paste(character_changes[change.rows, "Character"], ": ", character_changes[change.rows, "From"], " -> ", character_changes[change.rows, "To"], sep = ""), collapse = "\n")
-      
     }
-    
   }
-  
+
   # ADD DOT DOT DOT.....
-  
+
   # Plot tree:
   plot(time_tree, direction = "upwards")
-  
+
   # Add edge labels for changes:
   edgelabels(text = edge.labels, bg = "white", cex = 0.3)
-  
+
   # NEED TO LADDERISE LEFT IF WRITING ON RIGHT OF BRANCHES...
-  
 }

@@ -32,7 +32,8 @@ Calculated rates (changes per lineage million years) are plotted as filled circl
 
 \dontrun{
 Ages <- read.table("~/Documents/Packages/Claddis/LungfishTest/ages.txt",
-  sep =",")
+  sep = ","
+)
 Matrix <-
   Claddis::read_nexus_matrix("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.nex")
 time_tree <-
@@ -43,12 +44,19 @@ class(time_tree) <- "multiPhylo"
 time_bins <- c(443.8, 358.9, 298.9, 251.9, 201.3, 145.0, 66.0, 0.0)
 LungfishResults <- Claddis::test_rates(time_tree[[1]], Matrix, time_bins,
   time_partitions = partition_time_bins(7),
-  character_partitions = list(list(1:91), list(Cranial = 1:81,
-  Postcranial = 82:91)))
+  character_partitions = list(list(1:91), list(
+    Cranial = 1:81,
+    Postcranial = 82:91
+  ))
+)
 plot_rates_time(LungfishResults,
-  which(geiger::aicw(unlist(lapply(LungfishResults$TimeBinResults,
-  function(x) x$AIC)))[, "delta"] == 0), units = "Period", cex.ts = 1,
-  cex.age = 1, abbrev = "Period")
+  which(geiger::aicw(unlist(lapply(
+    LungfishResults$TimeBinResults,
+    function(x) x$AIC
+  )))[, "delta"] == 0),
+  units = "Period", cex.ts = 1,
+  cex.age = 1, abbrev = "Period"
+)
 }
 
 }

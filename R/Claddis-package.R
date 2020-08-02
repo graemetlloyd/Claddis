@@ -1,9 +1,9 @@
 # devtools::build_win(version = "R-devel")
 
 #' Measuring Morphological Diversity and Evolutionary Tempo
-#' 
+#'
 #' Measures morphological diversity from discrete character data and estimates evolutionary tempo on phylogenetic trees.
-#' 
+#'
 #' @name Claddis-package
 #'
 #' @aliases Claddis
@@ -17,13 +17,12 @@
 #' Lloyd, G. T., 2016. Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. \emph{Biological Journal of the Linnean Society}, \bold{118}, 131-151.
 #'
 #' @examples
-#' 
+#'
 #' # Get morphological distances for Michaux (1989) data set:
 #' distances <- calculate_morphological_distances(michaux_1989)
-#' 
+#'
 #' # Show distances:
 #' distances
-#'
 #' @exportPattern "^[[:alpha:]]+"
 #' @import ape
 #' @import phytools
@@ -32,7 +31,7 @@
 
 # there's no hope, move rgl to suggests!
 # @import rgl
-# @importFrom rgl plot3d lines3d points3d text3d view3d 
+# @importFrom rgl plot3d lines3d points3d text3d view3d
 
 #' @importFrom clipr write_clip
 #' @importFrom gdata trim
@@ -40,7 +39,7 @@
 #' @importFrom graphics layout legend lines par plot points polygon text
 #' @importFrom grDevices adjustcolor chull hcl.colors
 #' @importFrom stats as.dist dist dpois pchisq runif var
-#' @importFrom utils combn 
+#' @importFrom utils combn
 NULL
 
 #' Character-taxon matrix from Day et al. 2016
@@ -66,9 +65,9 @@ NULL
 NULL
 
 #' Character-taxon matrix from Michaux 1989
-#' 
+#'
 #' The character-taxon matrix from Michaux (1989).
-#' 
+#'
 #' @name michaux_1989
 #' @docType data
 #' @format A character-taxon matrix in the format imported by
@@ -76,6 +75,3 @@ NULL
 #' @references Michaux, B., 1989. Cladograms can reconstruct phylogenies: an example from the fossil record. \emph{Alcheringa}, \bold{13}, 21-36.
 #' @keywords datasets
 NULL
-
-
-

@@ -24,7 +24,6 @@ write_nexus_matrix(cladistic_matrix = michaux_1989, file_name = "michaux_1989.ne
 
 # Remove file when finished:
 file.remove("michaux_1989.nex")
-
 }
 \references{
 Maddison, D. R., Swofford, D. L. and Maddison, W. P., 1997. NEXUS: an extensible file format for systematic information. \emph{Systematic Biology}, \bold{46}, 590-621.

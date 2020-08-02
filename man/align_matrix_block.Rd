@@ -35,10 +35,12 @@ I use this in building the NEXUS files on my site, \href{http://www.graemetlloyd
 \examples{
 
 # Build example block from above:
-x <- paste(c("Allosaurus  012100?1011",
+x <- paste(c(
+  "Allosaurus  012100?1011",
   "Abelisaurus  0100???0000",
   "Tyrannosaurus  01012012010",
-  "Yi  10101?0????"), collapse = "\n")
+  "Yi  10101?0????"
+), collapse = "\n")
 
 # Look at block pre-alignment:
 x
@@ -50,7 +52,6 @@ align_matrix_block(x)
 
 # To test the response open a text editor and paste the
 # contents of the clipboard.
-
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

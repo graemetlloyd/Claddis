@@ -38,7 +38,6 @@ X$matching.edges
 
 # Show removed edges:
 X$removed.edges
-
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

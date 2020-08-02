@@ -35,7 +35,6 @@ edgelabels()
 # Use Gdtfind_descendant_edges to show that edges
 # 5 and 6 are descendants of node 7:
 find_descendant_edges(7, tree)
-
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

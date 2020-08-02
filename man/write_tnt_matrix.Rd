@@ -28,7 +28,6 @@ write_tnt_matrix(cladistic_matrix = michaux_1989, file_name = "michaux_1989.tnt"
 
 # Remove file when finished:
 file.remove("michaux_1989.tnt")
-
 }
 \references{
 Goloboff, P. A. and Catalano, S. A., 2016. TNT version 1.5, including a full implementation of phylogenetic morphometrics/ \emph{Cladistics}, \bold{32}. 221-238

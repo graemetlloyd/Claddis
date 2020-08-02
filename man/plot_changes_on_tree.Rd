@@ -37,12 +37,14 @@ time_tree$root.time <- max(diag(vcv(time_tree)))
 # Get discrete character rates (includes changes):
 out <- test_rates(time_tree, michaux_1989,
   seq(time_tree$root.time, 0, length.out = 3),
-  branch_partitions = list(list(1)), alpha = 0.01)
+  branch_partitions = list(list(1)), alpha = 0.01
+)
 
 # Plot character changes on the tree:
-plot_changes_on_tree(out$InferredCharacterChanges,
-  time_tree)
-
+plot_changes_on_tree(
+  out$InferredCharacterChanges,
+  time_tree
+)
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

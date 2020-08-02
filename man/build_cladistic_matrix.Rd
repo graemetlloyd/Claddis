@@ -45,14 +45,19 @@ NB: Currently the function cannot deal directly with step matrices or continuous
 
 # Create random 10-by-50 matrix:
 character.taxon.matrix <- matrix(sample(c("0", "1", "0&1", NA, ""),
-  500, replace = TRUE), nrow = 10, dimnames =
+  500,
+  replace = TRUE
+),
+nrow = 10, dimnames =
   list(apply(matrix(sample(LETTERS, 40,
-  replace = TRUE), nrow = 10), 1, paste,
-  collapse = ""), c()))
+    replace = TRUE
+  ), nrow = 10), 1, paste,
+  collapse = ""
+  ), c())
+)
 
 # Reformat for use elsewhere in Claddis:
 build_cladistic_matrix(character.taxon.matrix)
-
 }
 \seealso{
 \link{compactify_matrix}, \link{prune_cladistic_matrix}, \link{read_nexus_matrix}, \link{safe_taxonomic_reduction}, \link{write_nexus_matrix}, \link{write_tnt_matrix}

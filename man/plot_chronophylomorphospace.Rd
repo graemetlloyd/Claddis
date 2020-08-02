@@ -42,12 +42,13 @@ time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
 
 # Perform a phylogenetic Principal Coordinates Analysis:
 pcoa_data <- ordinate_cladistic_matrix(michaux_1989,
-  time_tree = time_tree)
+  time_tree = time_tree
+)
 
 # Plot a chronophylomorphospace:
 plot_chronophylomorphospace(pcoa_data)
-
 }
+
 }
 \references{
 Sakamoto, M. and Ruta, M. 2012. Convergence and divergence in the evolution of cat skulls: temporal and spatial patterns of morphological diversity. \emph{PLoS ONE}, \bold{7}, e39752.

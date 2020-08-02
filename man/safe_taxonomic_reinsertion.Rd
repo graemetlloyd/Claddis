@@ -34,7 +34,6 @@ OPERATES ON TEXT FILES, NOT APE IMPORTED TREES AS ASSUMES VERY LARGE FILES AND H
 \examples{
 
 # Nothing yet
-
 }
 \seealso{
 \link{safe_taxonomic_reduction}

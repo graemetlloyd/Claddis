@@ -43,24 +43,23 @@
 #'
 #' # Plot the results:
 #' plot_morphospace(pcoa_input, plot_taxon_names = TRUE)
-#'
 #' @export plot_morphospace
 plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, plot_taxon_names = FALSE, plot_internal_nodes = FALSE, plot_root = TRUE, root_colour = "grey") {
 
-# Option to plot names but not points
-# Add legend to z-axis if using it
-# Group colours
-# Group colours will conflict with z-axis so have conditional to turn z off and warn user if doing so.
+  # Option to plot names but not points
+  # Add legend to z-axis if using it
+  # Group colours
+  # Group colours will conflict with z-axis so have conditional to turn z off and warn user if doing so.
 
 
 
 
-#gp is a vector with n species and p groups
-#is.factor() # to check if group names, otherwise is assumed to be colours
+  # gp is a vector with n species and p groups
+  # is.factor() # to check if group names, otherwise is assumed to be colours
 
-#col.gp <- rainbow(length(levels(gp))) # generates a set of different colors length p
-#names(col.gp) <- levels(gp) # assign those colurs to the p groups
-#col.gp <- col.gp[match(gp, names(col.gp))] # creates a vector length n with a group and colour for each
+  # col.gp <- rainbow(length(levels(gp))) # generates a set of different colors length p
+  # names(col.gp) <- levels(gp) # assign those colurs to the p groups
+  # col.gp <- col.gp[match(gp, names(col.gp))] # creates a vector length n with a group and colour for each
 
 
 
@@ -70,34 +69,33 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
 
   # Make x-axis label:
   x_lab <- paste("PC", x_axis, " (", round(scree_values[x_axis], 2), "% of total variance)", sep = "")
-  
+
   # Make y-axis label:
   y_lab <- paste("PC", y_axis, " (", round(scree_values[y_axis], 2), "% of total variance)", sep = "")
 
   # Create the basic plot space (will be empty for now):
-  plot(pcoa_input$vectors[, x_axis], pcoa_input$vectors[, y_axis], type="n", bg = "black", xlab = x_lab, ylab = y_lab, asp = TRUE)
+  plot(pcoa_input$vectors[, x_axis], pcoa_input$vectors[, y_axis], type = "n", bg = "black", xlab = x_lab, ylab = y_lab, asp = TRUE)
 
   # Case if no z-axis chosen:
   if (is.null(z_axis)) {
 
     # Make all z-axis colours black:
     z_colours <- rep("black", nrow(pcoa_input$vectors))
-    
+
     # Make all z-axis values equal in size:
     z_sizes <- rep(1, nrow(pcoa_input$vectors))
 
-  # Case if a z-axis is specified:
+    # Case if a z-axis is specified:
   } else {
-    
+
     # Create vector of colours for z-axis (default of white):
     z_colours <- rep("white", nrow(pcoa_input$vectors))
-    
+
     # CUpdate z-axis colours for positive values to black:
     z_colours[which(pcoa_input$vectors[, z_axis] > 0)] <- "black"
-    
+
     # Create z-axis vector for absolute size of values (up to a max of 3):
     z_sizes <- abs(pcoa_input$vectors[, z_axis]) / max(abs(pcoa_input$vectors[, z_axis])) * 3
-    
   }
 
   # Case if tree supplied:
@@ -107,14 +105,14 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
     pcoa_input$vectors <- pcoa_input$vectors[c(pcoa_input$time_tree$tip.label, setdiff(rownames(pcoa_input$vectors), pcoa_input$time_tree$tip.label)), ]
 
     # For each branch, plot branch:
-    for(i in 1:nrow(pcoa_input$time_tree$edge)) lines(x = pcoa_input$vectors[pcoa_input$time_tree$edge[i, ], x_axis], y = pcoa_input$vectors[pcoa_input$time_tree$edge[i, ], y_axis], col = "black")
+    for (i in 1:nrow(pcoa_input$time_tree$edge)) lines(x = pcoa_input$vectors[pcoa_input$time_tree$edge[i, ], x_axis], y = pcoa_input$vectors[pcoa_input$time_tree$edge[i, ], y_axis], col = "black")
 
     # Establish tip node numbers:
     tip_numbers <- c(1:ape::Ntip(pcoa_input$time_tree))
-    
+
     # Establish internal node numbers:
     node_numbers <- setdiff(1:nrow(pcoa_input$vectors), tip_numbers)
-    
+
     # Establish root number:
     root_number <- ape::Ntip(pcoa_input$time_tree) + 1
 
@@ -129,19 +127,18 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
 
     # If plotting taxon names:
     if (plot_taxon_names) {
-    
+
       # First establish a default position for names (to the left of the point):
       x_positions <- rep(2, nrow(pcoa_input$vectors))
-    
+
       # Now changes negative values to plot on the right instead:
       x_positions[which(pcoa_input$vectors[, x_axis] < 0)] <- 4
-    
+
       # Plot taxon names (for tips only):
       text(x = pcoa_input$vectors[tip_numbers, x_axis], y = pcoa_input$vectors[tip_numbers, y_axis], labels = rownames(pcoa_input$vectors)[tip_numbers], pos = x_positions[tip_numbers], cex = 0.7)
-    
     }
 
-  # Case if no tree supplied:
+    # Case if no tree supplied:
   } else {
 
     # Plot points:
@@ -149,18 +146,15 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
 
     # If plotting taxon names:
     if (plot_taxon_names) {
-    
+
       # First establish a default position for names (to the left of the point):
       x_positions <- rep(2, nrow(pcoa_input$vectors))
-    
+
       # Now changes negative values to plot on the right instead:
       x_positions[which(pcoa_input$vectors[, x_axis] < 0)] <- 4
-    
+
       # Plot taxon names:
       text(x = pcoa_input$vectors[, x_axis], y = pcoa_input$vectors[, y_axis], labels = rownames(pcoa_input$vectors), pos = x_positions, cex = 0.7)
-    
     }
-
   }
-
 }

@@ -26,15 +26,14 @@
 #'
 #' # Plot first three axes:
 #' plot_multi_morphospace(pcoa_input, N_axes = 3)
-#'
 #' @export plot_multi_morphospace
 plot_multi_morphospace <- function(pcoa_input, N_axes = 4, plot_taxon_names = FALSE, plot_internal_nodes = FALSE, plot_root = TRUE, root_colour = "grey") {
 
-# Add zero lines or grids?
-# Make margins zero and add axes at edges somehow?
-# Conditional that changes N axes to max axes if set higher and warns user
-# Similarly, only 2 axes means plot is kinda pointless!
-# Never plot taxon names!
+  # Add zero lines or grids?
+  # Make margins zero and add axes at edges somehow?
+  # Conditional that changes N axes to max axes if set higher and warns user
+  # Similarly, only 2 axes means plot is kinda pointless!
+  # Never plot taxon names!
 
   # Work out the number of plots required:
   N_plots <- (N_axes^2 - N_axes) / 2
@@ -62,47 +61,42 @@ plot_multi_morphospace <- function(pcoa_input, N_axes = 4, plot_taxon_names = FA
 
   # For each x-axis:
   for (i in 1:(N_axes - 1)) {
-    
+
     # For each y-axis:
     for (j in (i + 1):N_axes) {
-        
-# CHANGE THIS TO EXISTING MORPHOSPACE FUNCTION:
-#plot(pcoa_input$vectors[, i], pcoa_input$vectors[, j], pch = 21, bg = "black", xlab = "", ylab = "", asp = TRUE)
+
+      # CHANGE THIS TO EXISTING MORPHOSPACE FUNCTION:
+      # plot(pcoa_input$vectors[, i], pcoa_input$vectors[, j], pch = 21, bg = "black", xlab = "", ylab = "", asp = TRUE)
       plot_morphospace(pcoa_input, x_axis = i, y_axis = j, z_axis = NULL, plot_taxon_names = plot_taxon_names, plot_internal_nodes = plot_internal_nodes, plot_root = plot_root, root_colour = root_colour)
-    
     }
-    
   }
 
   # Create PC axis labels:
-  labels <- c(paste("PC", 2:N_axes, sep = "") , paste("PC", 1:(N_axes - 1), sep = ""))
+  labels <- c(paste("PC", 2:N_axes, sep = ""), paste("PC", 1:(N_axes - 1), sep = ""))
 
   # Set up margins for plotting PC labels:
   par(mar = c(0, 0, 0, 0))
 
   # Place PC labels along left
-  for(i in 1:(length(labels) / 2)) {
-    
+  for (i in 1:(length(labels) / 2)) {
+
     # Empty plot:
     plot(N_axes, type = "n", axes = FALSE, xlab = "", ylab = "", xlim = c(-1, 1), ylim = c(-1, 1))
-  
+
     # Add ordination axis labels:
     text(x = 0, y = 0, labels = labels[i], cex = 2, srt = 90)
-    
   }
 
   # Place PC labels along top
-  for(i in (((length(labels) / 2) + 1):length(labels))) {
-    
+  for (i in (((length(labels) / 2) + 1):length(labels))) {
+
     # Empty plot:
     plot(N_axes, type = "n", axes = FALSE, xlab = "", ylab = "", xlim = c(-1, 1), ylim = c(-1, 1))
-  
+
     # Empty plot:
     text(x = 0, y = 0, labels = labels[i], cex = 2)
-  
   }
 
   # Reset plotting device so layout is not inherited by the next plot the user makes:
   layout(1)
-
 }

@@ -37,7 +37,6 @@ michaux_1989compact$matrix_1$matrix
 
 # Examine the weights post-compactification:
 michaux_1989compact$matrix_1$weights
-
 }
 \seealso{
 \link{build_cladistic_matrix}, \link{prune_cladistic_matrix}, \link{read_nexus_matrix}, \link{safe_taxonomic_reduction}, \link{write_nexus_matrix}, \link{write_tnt_matrix}
