@@ -20,13 +20,13 @@
 #' @param inapplicable_state The only current option is \code{"missing"} (converts value to NA).
 #' @param time_binning_approach One of \code{"close"} or \code{"lloyd"} (the default).
 #' @param all_weights_integers Logical for whether (\code{TRUE}) to reweight non-integer weights until all weights are integers or to leave them as they are (\code{FALSE}; the default).
-#' @param estimate.all.nodes Option passed to internal use of \link{estimate_ancestral_states}.
-#' @param estimate.tip.values Option passed to internal use of \link{estimate_ancestral_states}.
-#' @param inapplicables.as.missing Option passed to internal use of \link{estimate_ancestral_states}.
+#' @param estimate_all_nodes Option passed to internal use of \link{estimate_ancestral_states}.
+#' @param estimate_tip_values Option passed to internal use of \link{estimate_ancestral_states}.
+#' @param inapplicables_as_missing Option passed to internal use of \link{estimate_ancestral_states}.
 #' @param polymorphism.behaviour Option passed to internal use of \link{estimate_ancestral_states}.
 #' @param uncertainty.behaviour Option passed to internal use of \link{estimate_ancestral_states}.
 #' @param threshold Option passed to internal use of \link{estimate_ancestral_states}.
-#' @param allow.all.missing Logical to allow all missing character values - see \link{estimate_ancestral_states} for details.
+#' @param all_missing_allowed Logical to allow all missing character values - see \link{estimate_ancestral_states} for details.
 #'
 #' @details
 #'
@@ -91,7 +91,7 @@
 #'
 #' Sixthly, all character changes are weighted according to the weights provided in the input character-taxon matrix. In many cases these will simply all be one, although see the equalise weights option in \link{read_nexus_matrix}. However, when weights vary they can create some issues for the function. Specifically, changes are expected to be in the same (integer) units, but if weights vary then they have to be modelled accordingly. I.e., a character twice the weight of another may lead to a single change being counted as two changes. This is most problematic when the user has continuous characters which are automatically converted to gap-weighted (Thiele 1993) characters. However, this conversion creates drastically down-weighted characters and hence the user may wish to set the \code{all_weights_integers} option to TRUE. Note that reweighting will affect the results and hence shifting the weights of characters up or down will necessarily lead to shifts in the relative Type I and II errors. This is an unexplored aspect of such approaches, but is something the user should be aware of. More broadly it is recommended that continuous (or gap-weighted) characters be avoided when using this function.
 #'
-#' Finally, the remaining options (\code{estimate.all.nodes}, \code{estimate.tip.values}, \code{inapplicables.as.missing}, \code{polymorphism.behaviour}, \code{uncertainty.behaviour}, and \code{threshold}) are all simply passed directly to \link{estimate_ancestral_states} for estimating the ancestral states and users should consult the help file for that function for further details.
+#' Finally, the remaining options (\code{estimate_all_nodes}, \code{estimate_tip_values}, \code{inapplicables_as_missing}, \code{polymorphism.behaviour}, \code{uncertainty.behaviour}, and \code{threshold}) are all simply passed directly to \link{estimate_ancestral_states} for estimating the ancestral states and users should consult the help file for that function for further details.
 #'
 #' Note that currently the function cannot deal with step matrices and that the terminal versus internal option from Brusatte et al. (2014) is yet to be implemented.
 #'
@@ -187,7 +187,7 @@
 #'   "lloyd")
 #'
 #' @export test_rates
-test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions = NULL, character_partitions = NULL, clade_partitions = NULL, time_partitions = NULL, change_times = "random", test_type = "AIC", alpha = 0.01, multiple_comparison_correction = "benjaminihochberg", polymorphism_state = "missing", uncertainty_state = "missing", inapplicable_state = "missing", time_binning_approach = "lloyd", all_weights_integers = FALSE, estimate.all.nodes = FALSE, estimate.tip.values = FALSE, inapplicables.as.missing = FALSE, polymorphism.behaviour = "equalp", uncertainty.behaviour = "equalp", threshold = 0.01, allow.all.missing = FALSE) {
+test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions = NULL, character_partitions = NULL, clade_partitions = NULL, time_partitions = NULL, change_times = "random", test_type = "AIC", alpha = 0.01, multiple_comparison_correction = "benjaminihochberg", polymorphism_state = "missing", uncertainty_state = "missing", inapplicable_state = "missing", time_binning_approach = "lloyd", all_weights_integers = FALSE, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, polymorphism.behaviour = "equalp", uncertainty.behaviour = "equalp", threshold = 0.01, all_missing_allowed = FALSE) {
   
   # ADD EXAMPLES OF VISUALISED OUTPUT
   
@@ -426,7 +426,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
   find_descendant_edgesForEachInternalNode <- lapply(as.list(InternalNodeNumbers), find_descendant_edges, tree = time_tree)
   
   # Get ancestral character states:
-  AncestralStates <- estimate_ancestral_states(cladistic_matrix = cladistic_matrix, time_tree = time_tree, estimate.all.nodes = estimate.all.nodes, estimate.tip.values = estimate.tip.values, inapplicables.as.missing = inapplicables.as.missing, polymorphism.behaviour = polymorphism.behaviour, uncertainty.behaviour = uncertainty.behaviour, threshold = threshold, allow.all.missing = allow.all.missing)
+  AncestralStates <- estimate_ancestral_states(cladistic_matrix = cladistic_matrix, time_tree = time_tree, estimate_all_nodes = estimate_all_nodes, estimate_tip_values = estimate_tip_values, inapplicables_as_missing = inapplicables_as_missing, polymorphism.behaviour = polymorphism.behaviour, uncertainty.behaviour = uncertainty.behaviour, threshold = threshold, all_missing_allowed = all_missing_allowed)
   
   # Build single matrix of all states in tip label then node number order:
   AllStates <- do.call(cbind, lapply(lapply(AncestralStates[2:length(AncestralStates)], '[[', "matrix"), function(x) x[c(time_tree$tip.label, 1:ape::Nnode(time_tree) + ape::Ntip(time_tree)), , drop = FALSE]))
@@ -1029,9 +1029,9 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
 # inapplicable_state = "missing"
 # time_binning_approach = "lloyd"
 # all_weights_integers = FALSE
-# estimate.all.nodes = FALSE
-# estimate.tip.values = FALSE
-# inapplicables.as.missing = FALSE
+# estimate_all_nodes = FALSE
+# estimate_tip_values = FALSE
+# inapplicables_as_missing = FALSE
 # polymorphism.behaviour = "equalp"
 # uncertainty.behaviour = "equalp"
 # threshold = 0.01

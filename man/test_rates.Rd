@@ -21,13 +21,13 @@ test_rates(
   inapplicable_state = "missing",
   time_binning_approach = "lloyd",
   all_weights_integers = FALSE,
-  estimate.all.nodes = FALSE,
-  estimate.tip.values = FALSE,
-  inapplicables.as.missing = FALSE,
+  estimate_all_nodes = FALSE,
+  estimate_tip_values = FALSE,
+  inapplicables_as_missing = FALSE,
   polymorphism.behaviour = "equalp",
   uncertainty.behaviour = "equalp",
   threshold = 0.01,
-  allow.all.missing = FALSE
+  all_missing_allowed = FALSE
 )
 }
 \arguments{
@@ -63,11 +63,11 @@ test_rates(
 
 \item{all_weights_integers}{Logical for whether (\code{TRUE}) to reweight non-integer weights until all weights are integers or to leave them as they are (\code{FALSE}; the default).}
 
-\item{estimate.all.nodes}{Option passed to internal use of \link{estimate_ancestral_states}.}
+\item{estimate_all_nodes}{Option passed to internal use of \link{estimate_ancestral_states}.}
 
-\item{estimate.tip.values}{Option passed to internal use of \link{estimate_ancestral_states}.}
+\item{estimate_tip_values}{Option passed to internal use of \link{estimate_ancestral_states}.}
 
-\item{inapplicables.as.missing}{Option passed to internal use of \link{estimate_ancestral_states}.}
+\item{inapplicables_as_missing}{Option passed to internal use of \link{estimate_ancestral_states}.}
 
 \item{polymorphism.behaviour}{Option passed to internal use of \link{estimate_ancestral_states}.}
 
@@ -75,7 +75,7 @@ test_rates(
 
 \item{threshold}{Option passed to internal use of \link{estimate_ancestral_states}.}
 
-\item{allow.all.missing}{Logical to allow all missing character values - see \link{estimate_ancestral_states} for details.}
+\item{all_missing_allowed}{Logical to allow all missing character values - see \link{estimate_ancestral_states} for details.}
 }
 \value{
 \item{time_binsUsed}{The time binning used (NB: May be slightly altered from the input values).}
@@ -157,7 +157,7 @@ Fifthly, there are currenty two further options for assessing rates across time 
 
 Sixthly, all character changes are weighted according to the weights provided in the input character-taxon matrix. In many cases these will simply all be one, although see the equalise weights option in \link{read_nexus_matrix}. However, when weights vary they can create some issues for the function. Specifically, changes are expected to be in the same (integer) units, but if weights vary then they have to be modelled accordingly. I.e., a character twice the weight of another may lead to a single change being counted as two changes. This is most problematic when the user has continuous characters which are automatically converted to gap-weighted (Thiele 1993) characters. However, this conversion creates drastically down-weighted characters and hence the user may wish to set the \code{all_weights_integers} option to TRUE. Note that reweighting will affect the results and hence shifting the weights of characters up or down will necessarily lead to shifts in the relative Type I and II errors. This is an unexplored aspect of such approaches, but is something the user should be aware of. More broadly it is recommended that continuous (or gap-weighted) characters be avoided when using this function.
 
-Finally, the remaining options (\code{estimate.all.nodes}, \code{estimate.tip.values}, \code{inapplicables.as.missing}, \code{polymorphism.behaviour}, \code{uncertainty.behaviour}, and \code{threshold}) are all simply passed directly to \link{estimate_ancestral_states} for estimating the ancestral states and users should consult the help file for that function for further details.
+Finally, the remaining options (\code{estimate_all_nodes}, \code{estimate_tip_values}, \code{inapplicables_as_missing}, \code{polymorphism.behaviour}, \code{uncertainty.behaviour}, and \code{threshold}) are all simply passed directly to \link{estimate_ancestral_states} for estimating the ancestral states and users should consult the help file for that function for further details.
 
 Note that currently the function cannot deal with step matrices and that the terminal versus internal option from Brusatte et al. (2014) is yet to be implemented.
 

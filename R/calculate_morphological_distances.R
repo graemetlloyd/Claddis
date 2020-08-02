@@ -7,11 +7,11 @@
 #' @param cladistic_matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
 #' @param distance_metric The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).
 #' @param ged_type The type of GED to use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.
-#' @param distance.transformation The type of distance transformation to perform. Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default). (Note: this is only really appropriate for the proportional distances, i.e., "GC" and "MORD".)
+#' @param distance_transformation The type of distance transformation to perform. Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default). (Note: this is only really appropriate for the proportional distances, i.e., "GC" and "MORD".)
 #' @param polymorphism.behaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}.
 #' @param uncertainty.behaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}.
 #' @param inapplicable.behaviour The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"} (Hopkins and St John 2018; see details).
-#' @param character.dependencies Only relevant if using \code{inapplicable.behaviour = "HSJ"}. Must be a two-column matrix with colnames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See details.
+#' @param character_dependencies Only relevant if using \code{inapplicable.behaviour = "HSJ"}. Must be a two-column matrix with colnames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See details.
 #' @param alpha The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{inapplicable.behaviour = "HSJ"}. See details.
 #'
 #' @details
@@ -22,13 +22,13 @@
 #'
 #' Note that Lloyd (2016) misidentified the substitute dissimilarity for the \code{GED} as the mean for the whole data set (Hopkins and St John 2018) and this was the way the GED implementation of Claddis operated up to version 0.2. This has now been amended (as of version 0.3) so that the function produces the \code{GED} in the form that Wills (1998) intended. However, this implementation can still be accessed as the \code{Legacy} option for \code{ged_type}, with \code{Wills} being the WIlls (1998) implementation. An advantage of this misinterpreted form of \code{GED} is that it will always return a complete pairwise distance matrix, however it is not recommended (see Lloyd 2016). Instead a third option for \code{ged_type} - (\code{Hybrid}) - offers the same outcome but only uses the mean distance from the entire matrix in the case where there are no codable characters in common in a pairwise comparison. This new hybrid option has not been used in a published study.
 #'
-#' Typically the resulting distance matrix will be used in an ordination procedure such as principal coordinates (effectively classical multidimensional scaling where k, the number of axes, is maximised at N - 1, where N is the number of rows (i.e., taxa) in the matrix). As such the distance should be - or approximate - Euclidean and hence a square root transformation is typically applied (\code{distance.transformation} with the \code{sqrt} option). However, if applying pre-ordination (i.e., ordination-free) disparity metrics (e.g., weighted mean pairwise distance) you may wish to avoid any transformation (\code{none} option). In particular the \code{MORD} will only fall on a zero to one scale if this is the case. However, if transforming the \code{MORD} for ordination this zero to one property may mean the arcsine square root (\code{arcsine_sqrt} option) is preferred. (Note that if using only unordered multistate or binary characters and the \code{GC} the zero to one scale will apply too.)
+#' Typically the resulting distance matrix will be used in an ordination procedure such as principal coordinates (effectively classical multidimensional scaling where k, the number of axes, is maximised at N - 1, where N is the number of rows (i.e., taxa) in the matrix). As such the distance should be - or approximate - Euclidean and hence a square root transformation is typically applied (\code{distance_transformation} with the \code{sqrt} option). However, if applying pre-ordination (i.e., ordination-free) disparity metrics (e.g., weighted mean pairwise distance) you may wish to avoid any transformation (\code{none} option). In particular the \code{MORD} will only fall on a zero to one scale if this is the case. However, if transforming the \code{MORD} for ordination this zero to one property may mean the arcsine square root (\code{arcsine_sqrt} option) is preferred. (Note that if using only unordered multistate or binary characters and the \code{GC} the zero to one scale will apply too.)
 #'
 #' An unexplored option in distance matrix construction is how to deal with polymorphisms (Lloyd 2016). Up to version 0.2 of Claddis all polymorphisms were treated the same regardless of whether they were true polymorphisms (multiple states are observed in the taxon) or uncertainties (multiple, but not all states, are posited for the taxon). Since version 0.3, however, these two forms can be distinguished by using the different #NEXUS forms (Maddison et al. 1997), i.e., (01) for polymorphisms and \{01\} for uncertainties and within Claddis these are represented as 0&1 or 0/1, respectively. Thus, since 0.3 Claddis allows these two forms to be treated separately, and hence differently (with \code{polymorphism.behaviour} and \code{uncertainty.behaviour}). Again, up to version 0.2 of Claddis no options for polymorphism behaviour were offered, instead only a minimum distance was employed. I.e., the distance between a taxon coded 0&1 and a taxon coded 2 would be the smaller of the comparisons 0 with 2 or 1 with 2. Since version 0.3 this is encoded in the \code{min.difference} option. Currentlly two alternatives (\code{mean.difference} and \code{random}) are offered. The first takes the mean of each possible difference and the second simply samples one of the states at random. Note this latter option makes the function stochastic and so it should be rerun multiple times (for example, with a \code{for} loop or \code{apply} function). In general this issue (and these options) are not explored in the literature and so no recommendation can be made beyond that users should think carefully about what this choice may mean for their individual data set(s) and question(s).
 #'
-#' A final consideration is how to deal with inapplicable characters. Up to version 0.2 Claddis treated inapplicable and missing characters the same (as NA values, i.e., missing data). However, since Claddis version 0.3 these can be imported separately, i.e., by using the "MISSING" and "GAP" states in #NEXUS format (Maddison et al. 1997), with the latter typically representing the inapplicable character. These appear as NA and empty strings (""), respectively, in Claddis format. Hopkins and St John (2018) showed how inapplicable characters - typically assumed to represent secondary characters - could be treated in generating distance matrices. These are usually hierarchical in form. E.g., a primary character might record the presence or absence of feathers and a secondary character whether those feathers are symmetric or asymmetric. The latter will generate inapplicable states for taxa without feathers and without correcting for this ranked distances can be incorrect (Hopkins and St John 2018). Unfortunately, however, the #NEXUS format (Maddison et al. 1997) does not really allow explicit linkage between primary and secondary characters and so this information must be provided separately to use the Hopkins and St John (2018) approach. This is done here with the \code{character.dependencies} option. This must be in the form of a two-column matrix with column headers of "DependentCharacter" and "IndependentCharacter". The former being secondary characters and the latter the corresponding primary character. (Note that characters are to be numbered across the whole matrix from 1 to N and do not restart with each block of the matrix.) If using \code{inapplicable.behaviour = "HSJ"} the user must also provide an \code{alpha} value between zero and one. When \code{alpha = 0} the secondary characters contribute nothing to the distance and when \code{alpha = 1} the primary character is not counted in the weight separately (see Hopkins and St John 2018). The default value (0.5) offers a compromise bteween these two extremes.
+#' A final consideration is how to deal with inapplicable characters. Up to version 0.2 Claddis treated inapplicable and missing characters the same (as NA values, i.e., missing data). However, since Claddis version 0.3 these can be imported separately, i.e., by using the "MISSING" and "GAP" states in #NEXUS format (Maddison et al. 1997), with the latter typically representing the inapplicable character. These appear as NA and empty strings (""), respectively, in Claddis format. Hopkins and St John (2018) showed how inapplicable characters - typically assumed to represent secondary characters - could be treated in generating distance matrices. These are usually hierarchical in form. E.g., a primary character might record the presence or absence of feathers and a secondary character whether those feathers are symmetric or asymmetric. The latter will generate inapplicable states for taxa without feathers and without correcting for this ranked distances can be incorrect (Hopkins and St John 2018). Unfortunately, however, the #NEXUS format (Maddison et al. 1997) does not really allow explicit linkage between primary and secondary characters and so this information must be provided separately to use the Hopkins and St John (2018) approach. This is done here with the \code{character_dependencies} option. This must be in the form of a two-column matrix with column headers of "DependentCharacter" and "IndependentCharacter". The former being secondary characters and the latter the corresponding primary character. (Note that characters are to be numbered across the whole matrix from 1 to N and do not restart with each block of the matrix.) If using \code{inapplicable.behaviour = "HSJ"} the user must also provide an \code{alpha} value between zero and one. When \code{alpha = 0} the secondary characters contribute nothing to the distance and when \code{alpha = 1} the primary character is not counted in the weight separately (see Hopkins and St John 2018). The default value (0.5) offers a compromise bteween these two extremes.
 #'
-#' Here the implementation of this approach differs somewhat from the code available in the supplementary materials to Hopkins and St John (2018). Specifically, this approach is incorporated (and used) regardless of the overriding distance metric (i.e., the \code{Distance} option). Additionally, the Hopkins and St John function specifically allows an extra level of dependency (secondary and tertary characters) with these being applied recursively (tertiary first then secondary). Here, though, additional levels of dependency do not need to be defined by the user as this information is already encoded in the \code{character.dependencies} option. Furthermore, because of this any level of dependency is possible (if unlikely).
+#' Here the implementation of this approach differs somewhat from the code available in the supplementary materials to Hopkins and St John (2018). Specifically, this approach is incorporated (and used) regardless of the overriding distance metric (i.e., the \code{Distance} option). Additionally, the Hopkins and St John function specifically allows an extra level of dependency (secondary and tertary characters) with these being applied recursively (tertiary first then secondary). Here, though, additional levels of dependency do not need to be defined by the user as this information is already encoded in the \code{character_dependencies} option. Furthermore, because of this any level of dependency is possible (if unlikely).
 #'
 #' @return
 #'
@@ -70,7 +70,7 @@
 #' # we first need to define the character dependency
 #' # (here there is only one, character 8 is a
 #' # secondary where 7 is the primary character):
-#' character.dependencies <- matrix(c(8, 7), ncol = 2,
+#' character_dependencies <- matrix(c(8, 7), ncol = 2,
 #'   byrow = TRUE, dimnames = list(c(),
 #'   c("DependentCharacter",
 #'   "IndependentCharacter")))
@@ -79,7 +79,7 @@
 #' # al. (2016) data set using HSJ approach:
 #' distances <- calculate_morphological_distances(day_2016,
 #'   inapplicable.behaviour = "HSJ",
-#'   character.dependencies = character.dependencies,
+#'   character_dependencies = character_dependencies,
 #'   alpha = 0.5)
 #'
 #' # Show distance metric:
@@ -93,7 +93,7 @@
 #' distances$ComparableCharacterMatrix
 #'
 #' @export calculate_morphological_distances
-calculate_morphological_distances <- function(cladistic_matrix, distance_metric = "MORD", ged_type = "Wills", distance.transformation = "arcsine_sqrt", polymorphism.behaviour = "min.difference", uncertainty.behaviour = "min.difference", inapplicable.behaviour = "missing", character.dependencies = NULL, alpha = 0.5) {
+calculate_morphological_distances <- function(cladistic_matrix, distance_metric = "MORD", ged_type = "Wills", distance_transformation = "arcsine_sqrt", polymorphism.behaviour = "min.difference", uncertainty.behaviour = "min.difference", inapplicable.behaviour = "missing", character_dependencies = NULL, alpha = 0.5) {
   
   # ADD HOPKINS SUGGESTION (VIA EMAIL) FOR FOURTH GEDTYPE WHERE MEAN DISTANCE FOR CHARACTER REPLACES MISSING VALUES.
   # CHECK POLYMORPHISM UNCERTAINTY IN GENERAL AS NOT CLEAR IT IS DOING WHAT IT SHOULD DO.
@@ -355,7 +355,7 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
   build_ged_data <- function(differences, comparable.characters, cladistic_matrix, weights) return(rbind(c(differences, rep(NA, length(find_incomparable(comparable.characters, cladistic_matrix)))), c(weights[comparable.characters], weights[find_incomparable(comparable.characters, cladistic_matrix)])))
   
   # Subfunction to apply Hopkins and St John (2018) Alpha weighting of inapplicables:
-  weigh_inapplicable_alpha <- function(diffs, comparable.characters, ordering, weights, character.dependencies, charactersByLevel, alpha) {
+  weigh_inapplicable_alpha <- function(diffs, comparable.characters, ordering, weights, character_dependencies, charactersByLevel, alpha) {
     
     # Set differences:
     Differences <- diffs
@@ -373,13 +373,13 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
     for(i in length(charactersByLevel):2) {
       
       # Get independent characters for current levels dependent characters:
-      Independentcharacters <- unique(unlist(lapply(as.list(charactersByLevel[[i]]), function(x) unname(character.dependencies[character.dependencies[, "DependentCharacter"] == x, "IndependentCharacter"]))))
+      Independentcharacters <- unique(unlist(lapply(as.list(charactersByLevel[[i]]), function(x) unname(character_dependencies[character_dependencies[, "DependentCharacter"] == x, "IndependentCharacter"]))))
       
       # For each independent character:
       for(j in Independentcharacters) {
         
         # Find dependent characters:
-        Dependentcharacters <- unname(character.dependencies[character.dependencies[, "IndependentCharacter"] == j, "DependentCharacter"])
+        Dependentcharacters <- unname(character_dependencies[character_dependencies[, "IndependentCharacter"] == j, "DependentCharacter"])
         
         # Check characters are present in current distance:
         charactersPresent <- intersect(Comparablecharacters, Dependentcharacters)
@@ -416,8 +416,8 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
   # Check for step matrices and stop and warn user if found:
   if (is.list(cladistic_matrix$topper$step_matrices)) stop("Function cannot currently deal with step matrices.")
   
-  # Check input of distance.transformation is valid and stop and warn if not:
-  if (length(setdiff(distance.transformation, c("arcsine_sqrt", "none", "sqrt"))) > 0) stop("distance.transformation must be one of \"none\", \"sqrt\", or \"arcsine_sqrt\".")
+  # Check input of distance_transformation is valid and stop and warn if not:
+  if (length(setdiff(distance_transformation, c("arcsine_sqrt", "none", "sqrt"))) > 0) stop("distance_transformation must be one of \"none\", \"sqrt\", or \"arcsine_sqrt\".")
   
   # Check input of distance is valid and stop and warn if not:
   if (length(setdiff(distance_metric, c("RED", "GED", "GC", "MORD"))) > 0) stop("distance_metric must be one or more of \"RED\", \"GED\", \"GC\", or \"MORD\".")
@@ -435,37 +435,37 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
   if (length(setdiff(inapplicable.behaviour, c("missing", "HSJ"))) > 0) stop("inapplicable.behaviour must be one or more of \"missing\", or \"HSJ\".")
   
   # Check that if using HSJ character dependencies have been specified:
-  if (inapplicable.behaviour == "HSJ" && is.null(character.dependencies)) stop("If using the \"HSJ\" inapplicable.behaviour then character.dependencies must be specified.")
+  if (inapplicable.behaviour == "HSJ" && is.null(character_dependencies)) stop("If using the \"HSJ\" inapplicable.behaviour then character_dependencies must be specified.")
   
-  # If using HSJ and character.dependencies is set (will check data are formatted correctly):
-  if (inapplicable.behaviour == "HSJ" && !is.null(character.dependencies)) {
+  # If using HSJ and character_dependencies is set (will check data are formatted correctly):
+  if (inapplicable.behaviour == "HSJ" && !is.null(character_dependencies)) {
     
-    # Check character.dependencies is a matrix and stop and warn user if not:
-    if (!is.matrix(character.dependencies)) stop("character.dependencies must be in the form of a two-column matrix.")
+    # Check character_dependencies is a matrix and stop and warn user if not:
+    if (!is.matrix(character_dependencies)) stop("character_dependencies must be in the form of a two-column matrix.")
     
-    # Check character.dependencies has two columns and stop and warn user if not:
-    if (ncol(character.dependencies) != 2) stop("character.dependencies must be in the form of a two-column matrix.")
+    # Check character_dependencies has two columns and stop and warn user if not:
+    if (ncol(character_dependencies) != 2) stop("character_dependencies must be in the form of a two-column matrix.")
     
-    # Check character.dependencies column names are correct and stop and warn user if not:
-    if (length(setdiff(c("DependentCharacter", "IndependentCharacter"), colnames(character.dependencies))) > 0) stop("character.dependencies column names must be exactly \"DependentCharacter\" and \"IndependentCharacter\".")
+    # Check character_dependencies column names are correct and stop and warn user if not:
+    if (length(setdiff(c("DependentCharacter", "IndependentCharacter"), colnames(character_dependencies))) > 0) stop("character_dependencies column names must be exactly \"DependentCharacter\" and \"IndependentCharacter\".")
     
-    # Check character.dependencies are numeric values and stop and warn user if not:
-    if (!is.numeric(character.dependencies)) stop("character.dependencies values must be numeric.")
+    # Check character_dependencies are numeric values and stop and warn user if not:
+    if (!is.numeric(character_dependencies)) stop("character_dependencies values must be numeric.")
     
-    # Check character.dependencies values are within range of matrix dimensions and stop and warn user if not:
-    if (length(setdiff(as.vector(character.dependencies), 1:sum(unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], function(x) ncol(x$matrix))))))) > 0) stop("character.dependencies can only contain character numbers within the dimensions of the cladistic_matrix specified.")
+    # Check character_dependencies values are within range of matrix dimensions and stop and warn user if not:
+    if (length(setdiff(as.vector(character_dependencies), 1:sum(unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], function(x) ncol(x$matrix))))))) > 0) stop("character_dependencies can only contain character numbers within the dimensions of the cladistic_matrix specified.")
     
-    # Check character.dependencies values do not lead to duplicated parent characters and stop and warn user if not:
-    if (any(duplicated(character.dependencies[, "DependentCharacter"]))) stop("character.dependencies characters can not be dependent on two or more different independent characters.")
+    # Check character_dependencies values do not lead to duplicated parent characters and stop and warn user if not:
+    if (any(duplicated(character_dependencies[, "DependentCharacter"]))) stop("character_dependencies characters can not be dependent on two or more different independent characters.")
     
     # Find any characters that are both dependent and independent (and hence may lead to circularity issues):
-    charactersToCheckForCircularDependency <- intersect(character.dependencies[, "DependentCharacter"], character.dependencies[, "IndependentCharacter"])
+    charactersToCheckForCircularDependency <- intersect(character_dependencies[, "DependentCharacter"], character_dependencies[, "IndependentCharacter"])
     
     # If there is the possibility for circularity:
     if (length(charactersToCheckForCircularDependency) > 0) {
       
       # For the ith independent character:
-      for(i in unique(character.dependencies[, "IndependentCharacter"])) {
+      for(i in unique(character_dependencies[, "IndependentCharacter"])) {
         
         # Set current character as ith character:
         CurrentCharacter <- i
@@ -474,13 +474,13 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
         Foundcharacters <- i
         
         # Keep going until the current character is not an independent character:
-        while(sum(unlist(lapply(as.list(CurrentCharacter), function(x) sum(character.dependencies[, "IndependentCharacter"] == x)))) > 0) {
+        while(sum(unlist(lapply(as.list(CurrentCharacter), function(x) sum(character_dependencies[, "IndependentCharacter"] == x)))) > 0) {
           
           # Find any dependent character(s):
-          DependentCharacter <- unlist(lapply(as.list(CurrentCharacter), function(x) unname(character.dependencies[character.dependencies[, "IndependentCharacter"] == x, "DependentCharacter"])))
+          DependentCharacter <- unlist(lapply(as.list(CurrentCharacter), function(x) unname(character_dependencies[character_dependencies[, "IndependentCharacter"] == x, "DependentCharacter"])))
           
           # Check character was not already found (creating a circularity) and stop and wanr user if true:
-          if (length(intersect(DependentCharacter, Foundcharacters)) > 0) stop("Circularity found in character.dependencies.")
+          if (length(intersect(DependentCharacter, Foundcharacters)) > 0) stop("Circularity found in character_dependencies.")
           
           # Update found characters:
           Foundcharacters <- c(Foundcharacters, DependentCharacter)
@@ -570,24 +570,24 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
   if (inapplicable.behaviour == "HSJ") {
     
     # Set primary-level characters in a list (where secondary etc. level characters will be added in turn):
-    charactersByLevel <- list(unname(setdiff(unique(character.dependencies[, "IndependentCharacter"]), unique(character.dependencies[, "DependentCharacter"]))))
+    charactersByLevel <- list(unname(setdiff(unique(character_dependencies[, "IndependentCharacter"]), unique(character_dependencies[, "DependentCharacter"]))))
     
     # Set starting more nested characters:
-    HigherLevelcharacters <- setdiff(unique(c(character.dependencies)), unlist(charactersByLevel))
+    HigherLevelcharacters <- setdiff(unique(c(character_dependencies)), unlist(charactersByLevel))
     
     # Whilst there are still more nested levels of characters:
     while(length(HigherLevelcharacters) > 0) {
       
       # Add next level characters to characters by level list at next level:
-      charactersByLevel[[(length(charactersByLevel) + 1)]] <- unname(character.dependencies[unlist(lapply(as.list(charactersByLevel[[length(charactersByLevel)]]), function(x) which(character.dependencies[, "IndependentCharacter"] == x))), "DependentCharacter"])
+      charactersByLevel[[(length(charactersByLevel) + 1)]] <- unname(character_dependencies[unlist(lapply(as.list(charactersByLevel[[length(charactersByLevel)]]), function(x) which(character_dependencies[, "IndependentCharacter"] == x))), "DependentCharacter"])
       
       # Set new higher level characters:
-      HigherLevelcharacters <- setdiff(unique(c(character.dependencies)), unlist(charactersByLevel))
+      HigherLevelcharacters <- setdiff(unique(c(character_dependencies)), unlist(charactersByLevel))
       
     }
     
     # Update differences with HSJ alpha weights:
-    diffs <- mapply(weigh_inapplicable_alpha, diffs, list.of.compchar, MoreArgs = list(ordering, weights, character.dependencies, charactersByLevel, alpha))
+    diffs <- mapply(weigh_inapplicable_alpha, diffs, list.of.compchar, MoreArgs = list(ordering, weights, character_dependencies, charactersByLevel, alpha))
     
     # Reweight dependent characters zero:
     weights[unlist(charactersByLevel[2:length(charactersByLevel)])] <- 0
@@ -702,10 +702,10 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
   if (distance_metric == "MORD" || distance_metric == "GC") {
     
     # If transforming distance matrix by taking the square root - take the square root:
-    if (distance.transformation == "sqrt") dist.matrix <- sqrt(dist.matrix)
+    if (distance_transformation == "sqrt") dist.matrix <- sqrt(dist.matrix)
     
     # If transforming distance matrix by taking the arcsine square root:
-    if (distance.transformation == "arcsine_sqrt") {
+    if (distance_transformation == "arcsine_sqrt") {
       
       # Check for squared distances greater than 1:
       if (any(sort(sqrt(dist.matrix)) > 1)) {

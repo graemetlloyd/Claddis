@@ -5,7 +5,7 @@
 #' Collapses a cladistic matrix to just unique character state distributions and taxon names.
 #'
 #' @param cladistic_matrix The cladistic matrix in the format imported by \link{read_nexus_matrix}.
-#' @param Message Logical indicating whether or not a message should be printed to the screen if the matrix cannot be compactified.
+#' @param message Logical indicating whether or not a message should be printed to the screen if the matrix cannot be compactified.
 #'
 #' @details
 #'
@@ -39,7 +39,7 @@
 #' michaux_1989compact$matrix_1$weights
 #'
 #' @export compactify_matrix
-compactify_matrix <- function(cladistic_matrix, Message = TRUE) {
+compactify_matrix <- function(cladistic_matrix, message = TRUE) {
   
   # FUTURE COULD CHECK FOR UNORD AND ORD WHEN BINARY AND HENCE MEANINGLESS
   
@@ -164,7 +164,7 @@ compactify_matrix <- function(cladistic_matrix, Message = TRUE) {
     } else {
       
       # Print message to user:
-      if (Message) print("Matrix cannot be compactified. All character distributions are unique and weights are greater than zero.")
+      if (message) print("Matrix cannot be compactified. All character distributions are unique and weights are greater than zero.")
       
     }
     

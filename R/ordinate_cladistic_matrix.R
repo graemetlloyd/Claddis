@@ -7,21 +7,21 @@
 #' @param cladistic_matrix A vector of mode character representing the tip names for which an ancestor is sought.
 #' @param distance_metric The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{calculate_morphological_distances} for more details.
 #' @param ged_type The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.
-#' @param distance.transformation The transformation to apply to distances. See \link{calculate_morphological_distances} for details.
-#' @param distance.polymorphism.behaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{calculate_morphological_distances} for details.
-#' @param distance.uncertainty.behaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{calculate_morphological_distances} for details.
-#' @param distance.inapplicable.behaviour The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"}. See \link{calculate_morphological_distances} for details.
-#' @param character.dependencies Only relevant if using \code{inapplicable.behaviour = "HSJ"}. Must be a two-column matrix with colnames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See \link{calculate_morphological_distances} for details.
+#' @param distance_transformation The transformation to apply to distances. See \link{calculate_morphological_distances} for details.
+#' @param distance_polymorphism_behaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{calculate_morphological_distances} for details.
+#' @param distance_uncertainty_behaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{calculate_morphological_distances} for details.
+#' @param distance_inapplicable_behaviour The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"}. See \link{calculate_morphological_distances} for details.
+#' @param character_dependencies Only relevant if using \code{inapplicable.behaviour = "HSJ"}. Must be a two-column matrix with colnames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See \link{calculate_morphological_distances} for details.
 #' @param alpha The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{inapplicable.behaviour = "HSJ"}. See \link{calculate_morphological_distances} for details.
 #' @param correction The negative eigenvalue correction to use (one of "lingoes", "none", or "cailliez" - the default). See \link{pcoa} for more details.
 #' @param time_tree If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.
-#' @param estimate.all.nodes If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{estimate_ancestral_states} for more details.
-#' @param estimate.tip.values If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link{estimate_ancestral_states} for more details.
-#' @param inapplicables.as.missing See \link{estimate_ancestral_states}.
-#' @param ancestral.polymorphism.behaviour Behaviour for dealing with polymorphisms when producing ancestral state estimates - see \link{estimate_ancestral_states}.
-#' @param ancestral.uncertainty.behaviour Behaviour for dealing with uncertainties when producing ancestral state estimates - see \link{estimate_ancestral_states}.
+#' @param estimate_all_nodes If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{estimate_ancestral_states} for more details.
+#' @param estimate_tip_values If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link{estimate_ancestral_states} for more details.
+#' @param inapplicables_as_missing See \link{estimate_ancestral_states}.
+#' @param ancestral_polymorphism_behaviour Behaviour for dealing with polymorphisms when producing ancestral state estimates - see \link{estimate_ancestral_states}.
+#' @param ancestral_uncertainty_behaviour Behaviour for dealing with uncertainties when producing ancestral state estimates - see \link{estimate_ancestral_states}.
 #' @param threshold threshold for ancestral state estimation of discrete characters - see \link{estimate_ancestral_states} for details.
-#' @param allow.all.missing Logical to allow all missing character values - see \link{estimate_ancestral_states} for details.
+#' @param all_missing_allowed Logical to allow all missing character values - see \link{estimate_ancestral_states} for details.
 #'
 #' @details
 #'
@@ -36,8 +36,8 @@
 #' IMPORTANT: The function can remove taxa (or if including a tree, nodes as well) if they lead to an incomplete distance matrix (see \link{trim_matrix}).
 #'
 #' @return \item{time_tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{trim_matrix}.}
-#' @return \item{DistMatrix}{The distance matrix. Note this may be pruned by \link{trim_matrix} and thus not include all taxa.}
-#' @return \item{RemovedTaxa}{A vector of taxa (or nodes) removed by \link{trim_matrix}. Returns NULL if none are removed.}
+#' @return \item{distance_matrix}{The distance matrix. Note this may be pruned by \link{trim_matrix} and thus not include all taxa.}
+#' @return \item{removed_taxa}{A vector of taxa (or nodes) removed by \link{trim_matrix}. Returns NULL if none are removed.}
 #' @return \item{note}{See \link{pcoa}.}
 #' @return \item{values}{See \link{pcoa}.}
 #' @return \item{vectors}{See \link{pcoa}.}
@@ -75,7 +75,7 @@
 #' y
 #'
 #' @export ordinate_cladistic_matrix
-ordinate_cladistic_matrix <- function(cladistic_matrix, distance_metric = "MORD", ged_type = "Wills", distance.transformation = "arcsine_sqrt", distance.polymorphism.behaviour = "min.difference", distance.uncertainty.behaviour = "min.difference", distance.inapplicable.behaviour = "missing", character.dependencies = NULL, alpha = 0.5, correction = "cailliez", time_tree = NULL, estimate.all.nodes = FALSE, estimate.tip.values = FALSE, inapplicables.as.missing = FALSE, ancestral.polymorphism.behaviour = "equalp", ancestral.uncertainty.behaviour = "equalp", threshold = 0.01, allow.all.missing = FALSE) {
+ordinate_cladistic_matrix <- function(cladistic_matrix, distance_metric = "MORD", ged_type = "Wills", distance_transformation = "arcsine_sqrt", distance_polymorphism_behaviour = "min.difference", distance_uncertainty_behaviour = "min.difference", distance_inapplicable_behaviour = "missing", character_dependencies = NULL, alpha = 0.5, correction = "cailliez", time_tree = NULL, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, ancestral_polymorphism_behaviour = "equalp", ancestral_uncertainty_behaviour = "equalp", threshold = 0.01, all_missing_allowed = FALSE) {
   
   # Add some top level conditionsl here to check input is valid.
   # Allow other ordination types such as NMDS
@@ -84,64 +84,64 @@ ordinate_cladistic_matrix <- function(cladistic_matrix, distance_metric = "MORD"
   if (is.null(time_tree)) {
     
     # Get morphological distances from the cladistic matrix:
-    morph_distances <- calculate_morphological_distances(cladistic_matrix, distance_metric = distance_metric, distance.transformation = distance.transformation, polymorphism.behaviour = distance.polymorphism.behaviour, uncertainty.behaviour = distance.uncertainty.behaviour, inapplicable.behaviour = distance.inapplicable.behaviour, character.dependencies = character.dependencies, alpha = alpha)
+    morphological_distances <- calculate_morphological_distances(cladistic_matrix, distance_metric = distance_metric, distance_transformation = distance_transformation, polymorphism.behaviour = distance_polymorphism_behaviour, uncertainty.behaviour = distance_uncertainty_behaviour, inapplicable.behaviour = distance_inapplicable_behaviour, character_dependencies = character_dependencies, alpha = alpha)
     
     # Get trimmed distances:
-    trimmed.distances <- trim_matrix(morph_distances$DistanceMatrix)
+    trimmed_distances <- trim_matrix(morphological_distances$DistanceMatrix)
 
     # If trimming of matrix lead to taxa being removed warn user:
-    if (!is.null(trimmed.distances$removed.taxa)) message(paste("The following taxa had to be removed to produce a complete distance matrix:", paste(trimmed.distances$removed.taxa, collapse = ", ")))
+    if (!is.null(trimmed_distances$removed_taxa)) message(paste("The following taxa had to be removed to produce a complete distance matrix:", paste(trimmed_distances$removed_taxa, collapse = ", ")))
     
     # Perform Principal Coordinates Analysis on the data:
-    pcoa.results <- ape::pcoa(trimmed.distances$DistMatrix, correction = correction, rn = rownames(trimmed.distances$DistMatrix))
+    pcoa_results <- ape::pcoa(trimmed_distances$distance_matrix, correction = correction, rn = rownames(trimmed_distances$distance_matrix))
     
   # Case if a tree is included (and a phylomorphospace is requested):
   } else {
       
     # Get ancestral character states:
-    ancestral_values <- estimate_ancestral_states(cladistic_matrix = cladistic_matrix, time_tree = time_tree, estimate.all.nodes = estimate.all.nodes, estimate.tip.values = estimate.tip.values, inapplicables.as.missing = inapplicables.as.missing, polymorphism.behaviour = ancestral.polymorphism.behaviour, uncertainty.behaviour = ancestral.uncertainty.behaviour, threshold = threshold, allow.all.missing = allow.all.missing)
+    ancestral_values <- estimate_ancestral_states(cladistic_matrix = cladistic_matrix, time_tree = time_tree, estimate_all_nodes = estimate_all_nodes, estimate_tip_values = estimate_tip_values, inapplicables_as_missing = inapplicables_as_missing, polymorphism.behaviour = ancestral_polymorphism_behaviour, uncertainty.behaviour = ancestral_uncertainty_behaviour, threshold = threshold, all_missing_allowed = all_missing_allowed)
 
     # Get morphological distances from the cladistic matrix:
-    morph_distances <- calculate_morphological_distances(ancestral_values, distance_metric = distance_metric, ged_type = ged_type, distance.transformation = distance.transformation, polymorphism.behaviour = distance.polymorphism.behaviour, uncertainty.behaviour = distance.uncertainty.behaviour, inapplicable.behaviour = distance.inapplicable.behaviour, character.dependencies = character.dependencies, alpha = alpha)
+    morphological_distances <- calculate_morphological_distances(ancestral_values, distance_metric = distance_metric, ged_type = ged_type, distance_transformation = distance_transformation, polymorphism.behaviour = distance_polymorphism_behaviour, uncertainty.behaviour = distance_uncertainty_behaviour, inapplicable.behaviour = distance_inapplicable_behaviour, character_dependencies = character_dependencies, alpha = alpha)
     
     # Get trimmed distances:
-    trimmed.distances <- trim_matrix(morph_distances$DistanceMatrix, Tree = time_tree)
+    trimmed_distances <- trim_matrix(morphological_distances$DistanceMatrix, Tree = time_tree)
 
     # If trimming of matrix lead to taxa or nodes being removed warn user:
-    if (!is.null(trimmed.distances$removed.taxa)) message(paste("The following taxa or nodes had to be removed to produce a complete distance matrix:", paste(trimmed.distances$removed.taxa, collapse = ", ")))
+    if (!is.null(trimmed_distances$removed_taxa)) message(paste("The following taxa or nodes had to be removed to produce a complete distance matrix:", paste(trimmed_distances$removed_taxa, collapse = ", ")))
 
     # Store (possibly trimmed) tree ready to be output:
-    time_tree <- trimmed.distances$Tree
+    time_tree <- trimmed_distances$Tree
 
     # Perform Principal Coordinates Analysis on the data:
-    pcoa.results <- ape::pcoa(trimmed.distances$DistMatrix, correction = correction, rn = rownames(trimmed.distances$DistMatrix))
+    pcoa_results <- ape::pcoa(trimmed_distances$distance_matrix, correction = correction, rn = rownames(trimmed_distances$distance_matrix))
 
   }
   
   # If corrected vectors exist:
-  if (!is.null(pcoa.results$vectors.cor)) {
+  if (!is.null(pcoa_results$vectors.cor)) {
     
     # Overwrite uncorrected with corrected:
-    pcoa.results$vectors <- pcoa.results$vectors.cor
+    pcoa_results$vectors <- pcoa_results$vectors.cor
     
     # Remove corrected from output:
-    pcoa.results$vectors.cor <- NULL
+    pcoa_results$vectors.cor <- NULL
     
   }
   
   # If corrected trace exists:
-  if (!is.null(pcoa.results$trace.cor)) {
+  if (!is.null(pcoa_results$trace.cor)) {
     
     # Overwite uncorrected with corrected:
-    pcoa.results$trace <- pcoa.results$trace.cor
+    pcoa_results$trace <- pcoa_results$trace.cor
     
     # Remove corrected from output:
-    pcoa.results$trace.cor <- NULL
+    pcoa_results$trace.cor <- NULL
     
   }
   
   # Compile output:
-  output <- c(time_tree = list(time_tree), DistMatrix = list(trimmed.distances$DistMatrix), RemovedTaxa = list(trimmed.distances$RemovedTaxa), pcoa.results)
+  output <- c(time_tree = list(time_tree), distance_matrix = list(trimmed_distances$distance_matrix), removed_taxa = list(trimmed_distances$removed_taxa), pcoa_results)
 
   # Return output invisibly:
   invisible(output)

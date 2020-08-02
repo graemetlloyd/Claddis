@@ -36,7 +36,7 @@
 find_descendant_edges <- function(n, tree) {
   
   # Find number of terminals (i.e. stopping point):
-  n.terminals <- length(strap::FindDescendants(n, tree))
+  n_terminals <- length(strap::FindDescendants(n, tree))
   
   # Create vector to store internal nodes:
   nodes <- n
@@ -45,7 +45,7 @@ find_descendant_edges <- function(n, tree) {
     edges <- grep(n, tree$edge[, 1])
     
   # Keep going until all descendant edges are found:
-  while(length(which(tree$edge[edges, 2] <= ape::Ntip(tree))) < n.terminals) {
+  while(length(which(tree$edge[edges, 2] <= ape::Ntip(tree))) < n_terminals) {
     
     # Get internal nodes found so far:
     nodes <- tree$edge[edges, 2][which(tree$edge[edges, 2] > ape::Ntip(tree))]

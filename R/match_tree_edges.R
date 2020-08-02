@@ -46,10 +46,10 @@ match_tree_edges <- function(original_tree, pruned_tree) {
 	if (length(setdiff(pruned_tree$tip.label, original_tree$tip.label)) > 0) stop("ERROR: pruned_tree cannot include taxa not present in original_tree.")
 	
 	# First find removed taxa (if any):
-	removed.taxa <- setdiff(original_tree$tip.label, pruned_tree$tip.label)
+	removed_taxa <- setdiff(original_tree$tip.label, pruned_tree$tip.label)
 	
 	# If no taxa are removed:
-	if (length(removed.taxa) == 0) {
+	if (length(removed_taxa) == 0) {
 		
 		# Record removed edges as an empty vector:
 		removed.edges <- numeric(0)

@@ -6,13 +6,13 @@
 #'
 #' @param cladistic_matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
 #' @param time_tree A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{cladistic_matrix}.
-#' @param estimate.all.nodes Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).
-#' @param estimate.tip.values Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).
-#' @param inapplicables.as.missing Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).
+#' @param estimate_all_nodes Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).
+#' @param estimate_tip_values Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).
+#' @param inapplicables_as_missing Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).
 #' @param polymorphism.behaviour One of either "equalp" or "treatasmissing".
 #' @param uncertainty.behaviour One of either "equalp" or "treatasmissing".
 #' @param threshold The threshold value to use when collapsing marginal likelihoods to discrete state(s).
-#' @param allow.all.missing Logical to allow all missing character values (generally not recommended, hence default is FALSE).
+#' @param all_missing_allowed Logical to allow all missing character values (generally not recommended, hence default is FALSE).
 #'
 #' @details
 #'
@@ -58,7 +58,7 @@
 #'   time_tree = time_tree)
 #' 
 #' @export estimate_ancestral_states
-estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate.all.nodes = FALSE, estimate.tip.values = FALSE, inapplicables.as.missing = FALSE, polymorphism.behaviour = "equalp", uncertainty.behaviour = "equalp", threshold = 0.01, allow.all.missing = FALSE) {
+estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, polymorphism.behaviour = "equalp", uncertainty.behaviour = "equalp", threshold = 0.01, all_missing_allowed = FALSE) {
   
   # How to get tip states for a continuous character? (Phytools answer: http://blog.phytools.org/2013/11/reconstructed-ancestral-tip-states-for.html)
   #   - So basically under ML just inherit state from ancestral node (really this is mean of distribution where sd would grow with duration of branch so to allow the possibility of variance this could also be sampled stochastically
@@ -83,14 +83,14 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate.all.
   # Check for step matrices and stop and warn if found:
   if (length(cladistic_matrix$topper$step_matrices) > 0) stop("Function can not currently deal with step matrices.")
   
-  # Check estimate.all.nodes is a logical:
-  if (!is.logical(estimate.all.nodes)) stop("estimate.all.nodes must be a logical (TRUE or FALSE).")
+  # Check estimate_all_nodes is a logical:
+  if (!is.logical(estimate_all_nodes)) stop("estimate_all_nodes must be a logical (TRUE or FALSE).")
   
-  # Check estimate.tip.values is a logical:
-  if (!is.logical(estimate.tip.values)) stop("estimate.tip.values must be a logical (TRUE or FALSE).")
+  # Check estimate_tip_values is a logical:
+  if (!is.logical(estimate_tip_values)) stop("estimate_tip_values must be a logical (TRUE or FALSE).")
   
-  # Check inapplicables.as.missing is a logical:
-  if (!is.logical(inapplicables.as.missing)) stop("inapplicables.as.missing must be a logical (TRUE or FALSE).")
+  # Check inapplicables_as_missing is a logical:
+  if (!is.logical(inapplicables_as_missing)) stop("inapplicables_as_missing must be a logical (TRUE or FALSE).")
   
   # Check polymorphism.behaviour is a single allowable value:
   if (length(polymorphism.behaviour) != 1 || !any(c("equalp", "treatasmissing") == polymorphism.behaviour)) stop("polymorphism.behaviour must be a single value of either, \"equalp\" or \"treatasmissing\".")
@@ -126,7 +126,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate.all.
   if (length(FailedNameMatches) > 0) stop(paste("The following names do not match between the tree and matrix: ", paste(sort(FailedNameMatches), collapse = ", "), ". Check spelling and try again.", sep = ""))
   
   # If treating inapplicables as missing (and there is at least one inapplicable) replace with NA:
-  if (inapplicables.as.missing && length(which(cladistic_matrix == "")) > 0) cladistic_matrix[which(cladistic_matrix == "")] <- NA
+  if (inapplicables_as_missing && length(which(cladistic_matrix == "")) > 0) cladistic_matrix[which(cladistic_matrix == "")] <- NA
   
   # If treating polymorphisms as missing:
   if (polymorphism.behaviour == "treatasmissing" && length(grep("&", cladistic_matrix)) > 0) cladistic_matrix[grep("&", cladistic_matrix)] <- NA
@@ -138,7 +138,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate.all.
   Allmissingcharacters <- which(apply(cladistic_matrix, 2, function(x) all(is.na(x))))
   
   # Look for all missing characters and stop and wanr user if found:
-  if (!allow.all.missing && length(Allmissingcharacters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(Allmissingcharacters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using Claddis::prune_cladistic_matrix) or because of the chosen options for inapplicables.as.missing, polymorphism.behaviour, and/or uncertainty.behaviour (in which case the user may wish to chose different values for these)."))
+  if (!all_missing_allowed && length(Allmissingcharacters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(Allmissingcharacters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using Claddis::prune_cladistic_matrix) or because of the chosen options for inapplicables_as_missing, polymorphism.behaviour, and/or uncertainty.behaviour (in which case the user may wish to chose different values for these)."))
   
   # Convert tip states into a list:
   DataAsList <- apply(cladistic_matrix, 2, function(x) list(TipStates = x))
@@ -161,7 +161,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate.all.
   }
   
   # If estimating values for all characters (need to set dummy tip states for missing values):
-  if (estimate.all.nodes) {
+  if (estimate_all_nodes) {
     
     # Subfunction to fill missing values (and inapplicables if desired):
     fill_missing <- function(TipStates) {
@@ -319,7 +319,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate.all.
   DataAsList <- lapply(DataAsList, build_character_model)
 
   # Subfunction to get ancestral states:
-  estimate_ancestral_state <- function(x, estimate.tip.values, threshold) {
+  estimate_ancestral_state <- function(x, estimate_tip_values, threshold) {
     
     # As long as there is a tree:
     if (!is.null(x$Tree)) {
@@ -351,7 +351,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate.all.
         x$AncestralStates <- unlist(lapply(lapply(apply(x$AncestralStates, 1, list), unlist), function(x) {paste(names(x[x > (max(x) - threshold)]), collapse = "/")}))
         
         # If not estimating tip values then prune these:
-        if (!estimate.tip.values) x$AncestralStates <- x$AncestralStates[-match(x$Tree$tip.label, names(x$AncestralStates))]
+        if (!estimate_tip_values) x$AncestralStates <- x$AncestralStates[-match(x$Tree$tip.label, names(x$AncestralStates))]
         
       }
      
@@ -369,7 +369,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate.all.
   }
   
   # Get ancestral states for each character:
-  DataAsList <- lapply(DataAsList, estimate_ancestral_state, estimate.tip.values, threshold)
+  DataAsList <- lapply(DataAsList, estimate_ancestral_state, estimate_tip_values, threshold)
   
   # Get Newick strings of all sampled subtrees (to use to avoid redundancy in tree node mapping):
   NewickStrings <- unlist(lapply(DataAsList, function(x) ifelse(is.null(x$Tree), NA, ape::write.tree(x$Tree))))

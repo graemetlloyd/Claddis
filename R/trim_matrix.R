@@ -17,9 +17,9 @@
 #'
 #' @return
 #'
-#' \item{DistMatrix}{A complete distance matrix with all cells filled. If there were no empty cells will return original.}
+#' \item{distance_matrix}{A complete distance matrix with all cells filled. If there were no empty cells will return original.}
 #' \item{Tree}{A tree (if supplied) with the removed taxa (see below) pruned. If no taxa are dropped will return the same tree as inputted. If no tree is supplied this is set to NULL.}
-#' \item{RemovedTaxa}{A character vector listing the taxa removed. If none are removed this will be set to NULL.}
+#' \item{removed_taxa}{A character vector listing the taxa removed. If none are removed this will be set to NULL.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -54,10 +54,10 @@ trim_matrix <- function(dist.matrix, Tree = NULL) {
       print("There are no gaps in the distance matrix")
       
       # There are no taxa to be removed:
-      removed.taxa <- NULL
+      removed_taxa <- NULL
       
       # Compile data in single variable:
-      out <- list(DistMatrix = dist.matrix, Tree = Tree, RemovedTaxa = removed.taxa)
+      out <- list(distance_matrix = dist.matrix, Tree = Tree, removed_taxa = removed_taxa)
       
       # Output:
       return(out)
@@ -92,7 +92,7 @@ trim_matrix <- function(dist.matrix, Tree = NULL) {
       }
       
       # Compile data in single variable:
-      out <- list(DistMatrix = dist.matrix, Tree = Tree, RemovedTaxa = removes)
+      out <- list(distance_matrix = dist.matrix, Tree = Tree, removed_taxa = removes)
       
       # Output:
       return(out)
@@ -109,10 +109,10 @@ trim_matrix <- function(dist.matrix, Tree = NULL) {
       print("There are no gaps in the distance matrix")
       
       # Create NULL vector for removed taxa:
-      removed.taxa <- NULL
+      removed_taxa <- NULL
       
       # Compile data in single variable:
-      out <- list(DistMatrix = dist.matrix, Tree = Tree, RemovedTaxa = removed.taxa)
+      out <- list(distance_matrix = dist.matrix, Tree = Tree, removed_taxa = removed_taxa)
       
       # Return unmodified matrix and tree:
       return(out)
@@ -275,7 +275,7 @@ trim_matrix <- function(dist.matrix, Tree = NULL) {
       colnames(dist.matrix)[match(node.names, colnames(dist.matrix))] <- rownames(dist.matrix)[match(node.names, rownames(dist.matrix))] <- names(node.names)
       
       # Compile data in single variable:
-      out <- list(DistMatrix = dist.matrix, Tree = Tree, RemovedTaxa = removes)
+      out <- list(distance_matrix = dist.matrix, Tree = Tree, removed_taxa = removes)
       
       # Return answer:
       return(out)

@@ -7,13 +7,13 @@
 estimate_ancestral_states(
   cladistic_matrix,
   time_tree,
-  estimate.all.nodes = FALSE,
-  estimate.tip.values = FALSE,
-  inapplicables.as.missing = FALSE,
+  estimate_all_nodes = FALSE,
+  estimate_tip_values = FALSE,
+  inapplicables_as_missing = FALSE,
   polymorphism.behaviour = "equalp",
   uncertainty.behaviour = "equalp",
   threshold = 0.01,
-  allow.all.missing = FALSE
+  all_missing_allowed = FALSE
 )
 }
 \arguments{
@@ -21,11 +21,11 @@ estimate_ancestral_states(
 
 \item{time_tree}{A tree (phylo object) with branch lengths that represents the relationships of the taxa in \code{cladistic_matrix}.}
 
-\item{estimate.all.nodes}{Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).}
+\item{estimate_all_nodes}{Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).}
 
-\item{estimate.tip.values}{Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).}
+\item{estimate_tip_values}{Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).}
 
-\item{inapplicables.as.missing}{Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).}
+\item{inapplicables_as_missing}{Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).}
 
 \item{polymorphism.behaviour}{One of either "equalp" or "treatasmissing".}
 
@@ -33,7 +33,7 @@ estimate_ancestral_states(
 
 \item{threshold}{The threshold value to use when collapsing marginal likelihoods to discrete state(s).}
 
-\item{allow.all.missing}{Logical to allow all missing character values (generally not recommended, hence default is FALSE).}
+\item{all_missing_allowed}{Logical to allow all missing character values (generally not recommended, hence default is FALSE).}
 }
 \value{
 \item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral states.}

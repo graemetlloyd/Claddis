@@ -8,21 +8,21 @@ ordinate_cladistic_matrix(
   cladistic_matrix,
   distance_metric = "MORD",
   ged_type = "Wills",
-  distance.transformation = "arcsine_sqrt",
-  distance.polymorphism.behaviour = "min.difference",
-  distance.uncertainty.behaviour = "min.difference",
-  distance.inapplicable.behaviour = "missing",
-  character.dependencies = NULL,
+  distance_transformation = "arcsine_sqrt",
+  distance_polymorphism_behaviour = "min.difference",
+  distance_uncertainty_behaviour = "min.difference",
+  distance_inapplicable_behaviour = "missing",
+  character_dependencies = NULL,
   alpha = 0.5,
   correction = "cailliez",
   time_tree = NULL,
-  estimate.all.nodes = FALSE,
-  estimate.tip.values = FALSE,
-  inapplicables.as.missing = FALSE,
-  ancestral.polymorphism.behaviour = "equalp",
-  ancestral.uncertainty.behaviour = "equalp",
+  estimate_all_nodes = FALSE,
+  estimate_tip_values = FALSE,
+  inapplicables_as_missing = FALSE,
+  ancestral_polymorphism_behaviour = "equalp",
+  ancestral_uncertainty_behaviour = "equalp",
   threshold = 0.01,
-  allow.all.missing = FALSE
+  all_missing_allowed = FALSE
 )
 }
 \arguments{
@@ -32,15 +32,15 @@ ordinate_cladistic_matrix(
 
 \item{ged_type}{The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.}
 
-\item{distance.transformation}{The transformation to apply to distances. See \link{calculate_morphological_distances} for details.}
+\item{distance_transformation}{The transformation to apply to distances. See \link{calculate_morphological_distances} for details.}
 
-\item{distance.polymorphism.behaviour}{The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{calculate_morphological_distances} for details.}
+\item{distance_polymorphism_behaviour}{The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{calculate_morphological_distances} for details.}
 
-\item{distance.uncertainty.behaviour}{The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{calculate_morphological_distances} for details.}
+\item{distance_uncertainty_behaviour}{The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{calculate_morphological_distances} for details.}
 
-\item{distance.inapplicable.behaviour}{The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"}. See \link{calculate_morphological_distances} for details.}
+\item{distance_inapplicable_behaviour}{The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"}. See \link{calculate_morphological_distances} for details.}
 
-\item{character.dependencies}{Only relevant if using \code{inapplicable.behaviour = "HSJ"}. Must be a two-column matrix with colnames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See \link{calculate_morphological_distances} for details.}
+\item{character_dependencies}{Only relevant if using \code{inapplicable.behaviour = "HSJ"}. Must be a two-column matrix with colnames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See \link{calculate_morphological_distances} for details.}
 
 \item{alpha}{The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{inapplicable.behaviour = "HSJ"}. See \link{calculate_morphological_distances} for details.}
 
@@ -48,26 +48,26 @@ ordinate_cladistic_matrix(
 
 \item{time_tree}{If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.}
 
-\item{estimate.all.nodes}{If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{estimate_ancestral_states} for more details.}
+\item{estimate_all_nodes}{If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{estimate_ancestral_states} for more details.}
 
-\item{estimate.tip.values}{If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link{estimate_ancestral_states} for more details.}
+\item{estimate_tip_values}{If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link{estimate_ancestral_states} for more details.}
 
-\item{inapplicables.as.missing}{See \link{estimate_ancestral_states}.}
+\item{inapplicables_as_missing}{See \link{estimate_ancestral_states}.}
 
-\item{ancestral.polymorphism.behaviour}{Behaviour for dealing with polymorphisms when producing ancestral state estimates - see \link{estimate_ancestral_states}.}
+\item{ancestral_polymorphism_behaviour}{Behaviour for dealing with polymorphisms when producing ancestral state estimates - see \link{estimate_ancestral_states}.}
 
-\item{ancestral.uncertainty.behaviour}{Behaviour for dealing with uncertainties when producing ancestral state estimates - see \link{estimate_ancestral_states}.}
+\item{ancestral_uncertainty_behaviour}{Behaviour for dealing with uncertainties when producing ancestral state estimates - see \link{estimate_ancestral_states}.}
 
 \item{threshold}{threshold for ancestral state estimation of discrete characters - see \link{estimate_ancestral_states} for details.}
 
-\item{allow.all.missing}{Logical to allow all missing character values - see \link{estimate_ancestral_states} for details.}
+\item{all_missing_allowed}{Logical to allow all missing character values - see \link{estimate_ancestral_states} for details.}
 }
 \value{
 \item{time_tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{trim_matrix}.}
 
-\item{DistMatrix}{The distance matrix. Note this may be pruned by \link{trim_matrix} and thus not include all taxa.}
+\item{distance_matrix}{The distance matrix. Note this may be pruned by \link{trim_matrix} and thus not include all taxa.}
 
-\item{RemovedTaxa}{A vector of taxa (or nodes) removed by \link{trim_matrix}. Returns NULL if none are removed.}
+\item{removed_taxa}{A vector of taxa (or nodes) removed by \link{trim_matrix}. Returns NULL if none are removed.}
 
 \item{note}{See \link{pcoa}.}
 
