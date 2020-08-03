@@ -44,35 +44,48 @@ tree <- ape::read.tree(text = "(Biarmosuchus_tener,
 tree$tip.label <- gsub("\n", "", tree$tip.label)
 
 # Ages for day 2016 taxa:
-ages <- matrix(c(269, 269, 263, 263, 265, 265, 265, 265, 257, 257, 259,
+ages <- matrix(c(
+  269, 269, 263, 263, 265, 265, 265, 265, 257, 257, 259,
   259, 258, 258, 260, 260, 257, 257, 257, 257, 256, 256, 259, 259, 260,
-  260, 253, 253, 257, 257, 257, 257, 268, 268), ncol = 2, byrow = TRUE,
-  dimnames = list(c("Biarmosuchus_tener", "Hipposaurus_boonstrai",
+  260, 253, 253, 257, 257, 257, 257, 268, 268
+),
+ncol = 2, byrow = TRUE,
+dimnames = list(c(
+  "Biarmosuchus_tener", "Hipposaurus_boonstrai",
   "Bullacephalus_jacksoni", "Pachydectes_elsi", "Lemurosaurus_pricei",
   "Lobalopex_mordax", "Lophorhinus_willodenensis",
   "Proburnetia_viatkensis", "Lende_chiweta",
   "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098",
   "Niuksenitia_sukhonensis", "Ictidorhinus_martinsi", "RC_20",
-  "Herpetoskylax_hopsoni", "Lycaenodon_longiceps"), c("FAD", "LAD")))
+  "Herpetoskylax_hopsoni", "Lycaenodon_longiceps"
+), c("FAD", "LAD"))
+)
 
 # Time-scale tree using equal method:
-time_tree <- strap::DatePhylo(tree = tree, ages = ages, method = "equal",
-  rlen = 0.5)
+time_tree <- strap::DatePhylo(
+  tree = tree, ages = ages, method = "equal",
+  rlen = 0.5
+)
 
 # Prune continuous block from day 2016:
-cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix = day_2016,
-  blocks2prune = 1)
+cladistic_matrix <- prune_cladistic_matrix(
+  cladistic_matrix = day_2016,
+  blocks2prune = 1
+)
 
 # Run test rates function for two character partitions:
-test_rates_output <- test_rates(time_tree = time_tree,
+test_rates_output <- test_rates(
+  time_tree = time_tree,
   cladistic_matrix = cladistic_matrix,
   character_partition = list(list(1:34), list(1:17, 18:34)),
-  time_bins = seq(from = 270, to = 252, length.out = 10))
+  time_bins = seq(from = 270, to = 252, length.out = 10)
+)
 
 # Plot 2nd (arbitrary two-partition) character partition model:
-plot_rates_character(test_rates_output = test_rates_output,
-  model_number = 2)
-
+plot_rates_character(
+  test_rates_output = test_rates_output,
+  model_number = 2
+)
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
