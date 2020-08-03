@@ -32,7 +32,56 @@ Calculated rates (changes per lineage million years) are plotted as filled circl
 }
 \examples{
 
-# Need example(s)
+# Get first of three MPTs for day 2016 data set:
+tree <- ape::read.tree(text = "(Biarmosuchus_tener,
+  (((Hipposaurus_boonstrai,(Bullacephalus_jacksoni,
+  Pachydectes_elsi)),(Lemurosaurus_pricei,(Lobalopex_mordax,
+  ((Lophorhinus_willodenensis,(Proburnetia_viatkensis,
+  (Lende_chiweta,(Paraburnetia_sneeubergensis,
+  Burnetia_mirabilis)))),(BP_1_7098,
+  Niuksenitia_sukhonensis))))),(Ictidorhinus_martinsi,
+  (RC_20,(Herpetoskylax_hopsoni,Lycaenodon_longiceps)))));")
+
+# Remove line breaks from tip names:
+tree$tip.label <- gsub("\n", "", tree$tip.label)
+
+# Ages for day 2016 taxa:
+ages <- matrix(c(269, 269, 263, 263, 265, 265, 265, 265, 257, 257, 259,
+  259, 258, 258, 260, 260, 257, 257, 257, 257, 256, 256, 259, 259, 260,
+  260, 253, 253, 257, 257, 257, 257, 268, 268), ncol = 2, byrow = TRUE,
+  dimnames = list(c("Biarmosuchus_tener", "Hipposaurus_boonstrai",
+  "Bullacephalus_jacksoni", "Pachydectes_elsi", "Lemurosaurus_pricei",
+  "Lobalopex_mordax", "Lophorhinus_willodenensis",
+  "Proburnetia_viatkensis", "Lende_chiweta",
+  "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098",
+  "Niuksenitia_sukhonensis", "Ictidorhinus_martinsi", "RC_20",
+  "Herpetoskylax_hopsoni", "Lycaenodon_longiceps"), c("FAD", "LAD")))
+
+# Time-scale tree using equal method:
+time_tree <- strap::DatePhylo(tree = tree, ages = ages, method = "equal",
+  rlen = 0.5)
+
+# Prune continuous block from day 2016:
+cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix = day_2016,
+  blocks2prune = 1)
+
+# Run test rates function for each clade partition:
+test_rates_output <- test_rates(time_tree = time_tree,
+  cladistic_matrix = cladistic_matrix,
+  clade_partitions = as.list(seq(from = ape::Ntip(tree) + 1,
+  to = ape::Ntip(tree) + ape::Nnode(tree), by = 1)),
+  branch_partitions = lapply(as.list(seq(from = 1,
+  to = length(time_tree$edge.length), by = 1)), as.list),
+  time_bins = seq(from = 270, to = 252, length.out = 10))
+
+# Plot ninth branch partition model (lowest AIC value):
+plot_rates_tree(test_rates_output = test_rates_output,
+  model_type = "branch", model_number = 9)
+
+# Plot third clade partition model (lowest AIC value):
+plot_rates_tree(test_rates_output = test_rates_output,
+  model_type = "clade", model_number = 3)
+
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

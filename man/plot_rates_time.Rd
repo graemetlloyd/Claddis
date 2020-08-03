@@ -30,34 +30,49 @@ Calculated rates (changes per lineage million years) are plotted as filled circl
 }
 \examples{
 
-\dontrun{
-Ages <- read.table("~/Documents/Packages/Claddis/LungfishTest/ages.txt",
-  sep = ","
-)
-Matrix <-
-  Claddis::read_nexus_matrix("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.nex")
-time_tree <-
-  ape::read.tree("~/Documents/Packages/Claddis/LungfishTest/Lloyd_etal_2012a.tre")
-time_tree <- time_tree[sample(1:100000, 100)]
-time_tree <- lapply(time_tree, function(x) strap::DatePhylo(x, Ages, rlen = 2, method = "equal"))
-class(time_tree) <- "multiPhylo"
-time_bins <- c(443.8, 358.9, 298.9, 251.9, 201.3, 145.0, 66.0, 0.0)
-LungfishResults <- Claddis::test_rates(time_tree[[1]], Matrix, time_bins,
-  time_partitions = partition_time_bins(7),
-  character_partitions = list(list(1:91), list(
-    Cranial = 1:81,
-    Postcranial = 82:91
-  ))
-)
-plot_rates_time(LungfishResults,
-  which(geiger::aicw(unlist(lapply(
-    LungfishResults$TimeBinResults,
-    function(x) x$AIC
-  )))[, "delta"] == 0),
-  units = "Period", cex.ts = 1,
-  cex.age = 1, abbrev = "Period"
-)
-}
+# Get first of three MPTs for day 2016 data set:
+tree <- ape::read.tree(text = "(Biarmosuchus_tener,
+  (((Hipposaurus_boonstrai,(Bullacephalus_jacksoni,
+  Pachydectes_elsi)),(Lemurosaurus_pricei,(Lobalopex_mordax,
+  ((Lophorhinus_willodenensis,(Proburnetia_viatkensis,
+  (Lende_chiweta,(Paraburnetia_sneeubergensis,
+  Burnetia_mirabilis)))),(BP_1_7098,
+  Niuksenitia_sukhonensis))))),(Ictidorhinus_martinsi,
+  (RC_20,(Herpetoskylax_hopsoni,Lycaenodon_longiceps)))));")
+
+# Remove line breaks from tip names:
+tree$tip.label <- gsub("\n", "", tree$tip.label)
+
+# Ages for day 2016 taxa:
+ages <- matrix(c(269, 269, 263, 263, 265, 265, 265, 265, 257, 257, 259,
+  259, 258, 258, 260, 260, 257, 257, 257, 257, 256, 256, 259, 259, 260,
+  260, 253, 253, 257, 257, 257, 257, 268, 268), ncol = 2, byrow = TRUE,
+  dimnames = list(c("Biarmosuchus_tener", "Hipposaurus_boonstrai",
+  "Bullacephalus_jacksoni", "Pachydectes_elsi", "Lemurosaurus_pricei",
+  "Lobalopex_mordax", "Lophorhinus_willodenensis",
+  "Proburnetia_viatkensis", "Lende_chiweta",
+  "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098",
+  "Niuksenitia_sukhonensis", "Ictidorhinus_martinsi", "RC_20",
+  "Herpetoskylax_hopsoni", "Lycaenodon_longiceps"), c("FAD", "LAD")))
+
+# Time-scale tree using equal method:
+time_tree <- strap::DatePhylo(tree = tree, ages = ages, method = "equal",
+  rlen = 0.5)
+
+# Prune continuous block from day 2016:
+cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix = day_2016,
+  blocks2prune = 1)
+
+# Run test rates function for each time bin partition:
+test_rates_output <- test_rates(time_tree = time_tree,
+  cladistic_matrix = cladistic_matrix,
+  time_partitions = partition_time_bins(Ntime_bins = 9),
+  time_bins = seq(from = 270, to = 252, length.out = 10))
+
+# Plot 97th time bin partition model:
+plot_rates_time(test_rates_output = test_rates_output,
+  model_number = 97, units = "Stage", cex.ts = 1, cex.age = 1,
+  abbrev = "Stage")
 
 }
 \author{
