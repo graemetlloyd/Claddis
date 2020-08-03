@@ -1,8 +1,0 @@
-^\.travis\.yml$
-^\.git$
-.gitignore_global
-^\.lintr$
-^revdep$
-
-^cran-comments\.md$
- 
