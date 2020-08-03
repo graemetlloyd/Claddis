@@ -3,7 +3,7 @@ Version - 0.5.5 - 2020-03-08
 - Renamed weights variable to character_weights for matrix objects to avoid clashes with the weights() function in R. Some users may theoretically be affected by this, but given the time window this existed for was so short this is incredibly unlikely.
 - Added ape:: to rtree calls in examples (no change to users).
 - Added proper examples to rate visualisation functions.
-- Running styler on code.
+- Ran code through styler (no change to users).
 
 Version - 0.5.4 - 2020-02-08
 
@@ -192,4 +192,13 @@ Version - 0.1 - 2015-27-04
 - Successfully uploaded to CRAN to coincide with package publication (Lloyd 2016; https://doi.org/10.1111/bij.12746).
 - Added stochastic character map function in advance of allowing more than simply the parsimonious option for counting changes in rates function.
 - Updated description file to meet CRAN requirements.
-
+- Added stochastic character mapping function.
+- Added Michaux 1989 data set as small example data set that will run fast.
+- Added minimum spanning tree function.
+- Added fix root time function.
+- Added function to find linked edges.
+- Added function to bin changes by time.
+- Added function to count edge lengths in a time bin.
+- Added function to match edges between trees.
+- Added package readme file to GitHub.
+- Built initial package including distance and rates functions.
