@@ -1,3 +1,10 @@
+Version - 0.5.5 - 2020-03-08
+
+- Renamed weights variable to character_weights for matrix objects to avoid clashes with the weights() function in R. Some users may theoretically be affected by this, but given the time window this existed for was so short this is incredibly unlikely.
+- Added ape:: to rtree calls in examples (no change to users).
+- Added proper examples to rate visualisation functions.
+- Running styler on code.
+
 Version - 0.5.4 - 2020-02-08
 
 - Applied styler across package (no change to user).
@@ -80,3 +87,109 @@ Version - 0.4.0 - 2019-29-12
 - Added additional input checks to ancestral state function. Users may notice more informative error messages.
 - Keywords removed from package per latest CRAN guidance (no change to users).
 - Minor invisible checks made to pass R CMD check (no change to users). Thanks to Dave Bapst for his help on this.
+
+Version - 0.3.4 - 2019-02-12
+
+- Successfully submitted version to CRAN.
+- Added new function to align character-taxon blocks when building NEXUS files.
+- Removed mult option from TNT analysis block when writing TNT matrices. This may have minor effects on any users who were actually employing this, but in my experience the extra mult searches were not turning up shorter trees but were consuming time.
+- Fixed bug in assigning weights to continuous characters being read in from NEXUS files where previously invariant characters were assigned a weight of infinity. These are now set at one. Users may have noticed this fixes errors that would have been triggered previously if using such data sets for rates or disparity analysis. 
+- Fixed a bug when writing multi-block matrices to file where weights are assigned. This is unlikely to have affected many users as a combination of multiple blocks (e.g., discrete and continuous) and differential weighting schemes are rare.
+- Fixed a bug when writing step matrices to NEXUS format. Again, step matrices are rarely employed and so it is unlikely many users were affected by this, but those that did parse datasets with step matrices through Claddis should double-check these.
+- Fixed bug wit writing zero weight characters to file in TNT. Because TNT does not allow weights below 0.5 these are turned "off" instead ( [ -> ] ). Such datasets would previously have thrown an error in TNT.
+- Fixed bugs in the build morphological matrix function. These are mostly minor and will not have been noticed by most users.
+- Renamed weights variable to Weights in matrix formatting to avoid potential clashes with weights() function. Some users may notice an issue if they were explicitly subsetting matrices by their weights.
+- Added option to allow duplicate taxon names when building a new character-taxon matrix in R. There are edge cases where this might be desired but generally this should be avoided and will still throw an error by default.
+- Fixed bug where ancestral state estimation options were not being used by the PCoA function. This will have affected any users that used the PCoA wrapper function but not those that called the ancestral state estimation function directly. Users should double-check their data make sense.
+- Fixed bug where root time was not being corrected when using the distacne matrix trimming function. This will only have affected users that were trimming distance matrices with trees such that the root age should have been adjusted by removing all taxa from one half of the basal split and those taxa were the oldest representatives of the clade.
+- Fixed bug where edge cases of the morphological distances function were converting lists into matrices. Previously this would have thrown an error for users.
+- Improved speed of compactify matrix function.
+
+Version - 0.3.3 - 2019-14-05
+
+- Added collapsing of duplicate taxa to compactify matrix function.
+- Added optional message informing user if compactification is not possible to compactify matrix function.
+
+Version - 0.3.2 - 2019-08-04
+
+- Fixed bug in HSJ option of morphological distances function (thanks to Selina Cole and Melanie Hopkins for reporting).
+- Very minor speed up to morphological distances function.
+
+Version - 0.3.1 - 2019-07-04
+
+- Fixed bug in morphological distances function where inapplicable and polymorphism options may have clashed. Unlikely to affect many users as polymorphism options are not widely implemented or publicised yet.
+
+Version - 0.3.0 - 2019-20-02
+
+- Added third decimal to version number to better record incremental changes (compare below to above).
+- Successfully submitted version to CRAN.
+- Added much more informative package description including dois to publications where implemented methods were introduced (part of CRAN requested updates).
+- Added full list of package authors to description.
+- Various tweaks to dependencies to make package ready for CRAN submission (many thanks to Dave Bapst for his help).
+- Added Travis CI to Claddis (no change for users).
+- Fixed bug when pruning characters with matrix pruning function.
+- Major refactoring of stochastic character mapping function. This is still not considered "usable" and so users should not be affected.
+- Updated character changes plotting function to use new rates function output format.
+- Standardised roxygen manual formatting (no visible change to users).
+- Updated PCoA function to use new internal options.
+- Added HSJ option to morphological distances function to better deal with inapplicable characters.
+- Added new options for polymorphic characters in morpholoigcal distances function.
+- Added option for continuous characters to be used by rates function by internally converting them into discrete gap-weighted characters instead.
+- Added Bonferroni to rates function.
+- Added inferred character changes to rates function output.
+- Refactored rates function to be hypothesis-focused (inputs defined as data partitions) as opposed to exploratoy-focused (no partition options). This is a complete overhaul of the way rates are tested in Claddis and enables new types of test (e.g., characters) as well as use of AIC instead of likelihood ratio tests. Previous types of test are still possible, but this dramatically expands the questions users can ask of their data.
+- Added gitignore to GitHub repository (no changes to user).
+- Added new GED options to morphological distances function. This implements the correct Wills' version of GED as well as a new hybrid form. The issues with the legacy verion were discussed in Lehmann et al. (2019; https://doi.org/10.1111/pala.12430).
+- Fixed bug with morphological dustances function when polymorphisms have more than two states. This may affect some users and they should check older data sets for any issues.
+- Added check for explicit ordering to read NEXUS function. Note that other NEXUS implementations allow ordering to be undefined, but this is considered unsafe here as ordering will affect both disparity and rates analysis and there is no safe default assumption.
+- Fixed bug where morphological distances function was not properly recognising inapplicable states.
+- Adding proper :: to dependent function calls to update Claddis to current CRAN standards. Users should not notice anything here, but this is an important advance to avoid potential issues with duplicate function names across packages.
+
+Version - 0.3 - 2018-16-10
+
+- Complete overhaul of cladistic matrix format, allowing multiple blocks, continuous characters, DNA and other data types as well as explicit coding of polymorphisms and uncertainties as well as inapplicables. This new format is intended to open up the possible tests and options that can be performed with Claddis but also simply better implement what is already available in the NEXUS format.
+- Complete overhaul of morphological distances function to incorporate the faster version first produced by Thomas Guillerme. Users should mostly notice a huge speed increase.
+- Removed fast version of morphological distances function now this is redundant with the updated version.
+- Added new function to calculate phylogenetic character completeness (requested by Dan Cashmore).
+- Added Day (2016) example file to showcase continuous character options in package functions.
+- Internal speed up to compactify matrix function.
+- Fixed bug when reading header text in read NEXUS function.
+- Added new matrix writing functions (NEXUS and TNT) to incorporate new matrix format, e.g., allowing writing of DNA or continuous characters to file.
+- Internal restyling of code (no chaneg to users).
+- Added safe taxonomic reinsertion function.
+- Refactored safe taxonomic reduction function to make it run much faster.
+- Updated roxygen to 6.0.1 (no change to users).
+- Fixed a series of minor bugs with formatting of matrices.
+- Added threshold option to ancestral state estimation function (requested by Thomas Guillerme).
+- Added step matrices to matrix format in advance of implementing options for using these in disparity and rates analyses.
+- Added function to make morphological matrices inside R, e.g., to allow for use of simulated as opposed to empirical data.
+- Fixed bug in morphological distances function where GED values were not taking into account differentially weighted data (reported by Thomas Guillerme).
+- Fixed minor bugs in read NEXUS function, for example, where a taxon name includes the string "matrix". This would have thrown errors previously.
+- Fixed bug in output from safe taxonomic reduction function that stops matrices being converted to vectors (reported by Dave Bapst).
+- Removed random seed file that could corrupt stochastic functions (reported by Dave Bapst). This should not have caused problems as no core functions were stochastic.
+- Updated imports from list to meet CRAN guidelines (no change to users).
+
+Version - 0.2 - 2015-02-08
+
+- Added Dollo stochastic character map function used in Tarver et al. (2018; https://doi.org/10.1093/gbe/evy096).
+- Added function to prune matrices.
+- Fixed bug in reading wieghts in read NEXUS function.
+- Added compactify and matrix pruning functions.
+- Added various disparity plotting functions (co-authored with Emma Sherratt).
+- Added functions to write matrices to NEXUS and TNT formats.
+- Added check for rogue symbols in read NEXUS function.
+- Added PCoA wrapper function.
+- Updated description with first package publication.
+- Added citation file to package.
+- Fixed bug in ancestral state estimation function which unnecessarily duplicated a line (reported by Thomas Guillerme). Users should only notice a speed improvement.
+- Converted entire package to roxygen format (no change to users).
+- Updated internal code to deal with phytools stochastic character map output that initially broke CRAN release version.
+- Added Thomas Guillerme's fast morphological distances function.
+- Adding import from calls to package to meet CRAN requirements.
+
+Version - 0.1 - 2015-27-04
+
+- Successfully uploaded to CRAN to coincide with package publication (Lloyd 2016; https://doi.org/10.1111/bij.12746).
+- Added stochastic character map function in advance of allowing more than simply the parsimonious option for counting changes in rates function.
+- Updated description file to meet CRAN requirements.
+
