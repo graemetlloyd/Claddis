@@ -4,6 +4,7 @@ Version - 0.5.5 - 2020-03-08
 - Added ape:: to rtree calls in examples (no change to users).
 - Added proper examples to rate visualisation functions.
 - Ran code through styler (no change to users).
+- Readded .Rbuildignore file (no change to users).
 
 Version - 0.5.4 - 2020-02-08
 
