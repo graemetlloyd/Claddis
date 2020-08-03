@@ -69,7 +69,7 @@ cladistic_matrix <- prune_cladistic_matrix(
 )
 
 # Generete random tree for matrix taxa:
-time_tree <- rtree(nrow(day_2016$matrix_1$matrix))
+time_tree <- ape::rtree(nrow(day_2016$matrix_1$matrix))
 
 # Add taxon names to tree:
 time_tree$tip.label <- rownames(day_2016$matrix_1$matrix)

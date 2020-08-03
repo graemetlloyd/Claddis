@@ -26,7 +26,7 @@ Takes the \code{character_changes} output from \link{test_rates} and plots it on
 set.seed(17)
 
 # Generate a random tree for the Michaux data set:
-time_tree <- rtree(nrow(michaux_1989$matrix_1$matrix))
+time_tree <- ape::rtree(nrow(michaux_1989$matrix_1$matrix))
 
 # Update taxon names to match those in the data matrix:
 time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)

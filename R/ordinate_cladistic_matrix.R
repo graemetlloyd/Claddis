@@ -60,7 +60,7 @@
 #' x
 #'
 #' # Generate a (made up) tree:
-#' time_tree <- rtree(length(rownames(michaux_1989$matrix_1$matrix)))
+#' time_tree <- ape::rtree(length(rownames(michaux_1989$matrix_1$matrix)))
 #'
 #' # Add taxon names to it:
 #' time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)

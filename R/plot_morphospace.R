@@ -33,7 +33,7 @@
 #' set.seed(4)
 #'
 #' # Generate a random tree for the Michaux 1989 data set:
-#' time_tree <- rtree(length(rownames(michaux_1989$matrix_1$matrix)))
+#' time_tree <- ape::rtree(length(rownames(michaux_1989$matrix_1$matrix)))
 #'
 #' # Add taxon names to the tree:
 #' time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)

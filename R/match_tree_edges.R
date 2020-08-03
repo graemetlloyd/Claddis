@@ -22,7 +22,7 @@
 #' @examples
 #'
 #' # Create a random 10-taxon tree:
-#' original_tree <- rtree(10)
+#' original_tree <- ape::rtree(10)
 #'
 #' # Remove three leaves:
 #' pruned_tree <- drop.tip(original_tree, c("t1", "t3", "t8"))

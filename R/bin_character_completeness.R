@@ -25,7 +25,7 @@
 #' @examples
 #'
 #' # Create a random tree for the Day et al. 2016 data set:
-#' day_2016tree <- rtree(nrow(day_2016$matrix_1$matrix))
+#' day_2016tree <- ape::rtree(nrow(day_2016$matrix_1$matrix))
 #' day_2016tree$tip.label <- rownames(day_2016$matrix_1$matrix)
 #' day_2016tree$root.time <- max(diag(vcv(day_2016tree)))
 #'

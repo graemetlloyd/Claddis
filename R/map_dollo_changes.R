@@ -37,7 +37,7 @@
 #' @examples
 #'
 #' # Create a random 10-taxon tree:
-#' time_tree <- rtree(10)
+#' time_tree <- ape::rtree(10)
 #'
 #' # Arbitrarily add a root.time value of 100 Ma:
 #' time_tree$root.time <- 100

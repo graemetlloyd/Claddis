@@ -29,7 +29,7 @@ The option of using a \code{pruned_tree} allows the user to correctly classify i
 \examples{
 
 # Create a random 10-taxon tree:
-time_tree <- rtree(10)
+time_tree <- ape::rtree(10)
 
 # Add root age:
 time_tree$root.time <- 100
