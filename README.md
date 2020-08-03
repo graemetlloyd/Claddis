@@ -34,12 +34,14 @@ Basic help can be found with:
 
 And clicking on the Index link at the base of the help file will reveal links to every available function.
 
-Note that I have previously produced various tutorials for the package, but that current substantial reworking of the core code means these will no longer work and so the example code in each function's help file is the current best substitute for this. Please refer to package documentation for the most up-to-date usage of Claddis.
+Note that I have previously produced various tutorials for the package, but that current substantial reworking of the core code means these will no longer work and so the example code in each function's help file is the current best substitute for this.
 
 Citation
 ========
 
-Claddis was recently placed back on [CRAN](https://cran.r-project.org/package=Claddis) (version 0.3.0) but will continue to be developed on github. The first formal paper describing Claddis was published as Lloyd (2016), with further discussion in Lloyd (2018):
+Claddis is on [CRAN](https://cran.r-project.org/package=Claddis) (version 0.3.4) but is currently (03.08/20) far behind the latest GitHub version (version 0.5.5).
+
+The first formal paper describing Claddis was published as Lloyd (2016), with further discussion in Lloyd (2018):
 
 Lloyd, G. T., 2016. Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. *Biological Journal of the Linnean Society*, **118**, 131-151.
 
