@@ -6,7 +6,7 @@
 #'
 #' @param character.taxon.matrix A Character-Taxon (columns-rows) matrix, with taxon names as rownames.
 #' @param header A scalar indicating any header text (defaults to an empty string: "").
-#' @param weights A vector specifying the weights used (if not specified defaults to 1).
+#' @param character_weights A vector specifying the weights used (if not specified defaults to 1).
 #' @param ordering A vector indicating whether characters are ordered ("ord") or unordered ("unord") (if no specified defaults to ordered).
 #' @param symbols The symbols to use if writing to a file (defaults to the numbers 0:9 then the letters A to V).
 #' @param equalise.weights Optional that overrides the weights specified above make all characters truly equally weighted.
@@ -47,7 +47,7 @@
 #' # Reformat for use elsewhere in Claddis:
 #' build_cladistic_matrix(character.taxon.matrix)
 #' @export build_cladistic_matrix
-build_cladistic_matrix <- function(character.taxon.matrix, header = "", weights = NULL, ordering = NULL, symbols = NULL, equalise.weights = FALSE, ignore.duplicate.taxa = FALSE) {
+build_cladistic_matrix <- function(character.taxon.matrix, header = "", character_weights = NULL, ordering = NULL, symbols = NULL, equalise.weights = FALSE, ignore.duplicate.taxa = FALSE) {
 
   # Check input is a matrix:
   if (!is.matrix(character.taxon.matrix)) stop("character.taxon.matrix must be a matrix.")
@@ -81,13 +81,13 @@ build_cladistic_matrix <- function(character.taxon.matrix, header = "", weights 
   if (length(mystery.characters) > 0) stop("characters must either be the integers 0 to 31, NA for missing, & for polymorphisms, or / for uncertainties.")
 
   # Check supplied weights are correct length:
-  if (!is.null(weights) && length(weights) != ncol(character.taxon.matrix)) stop("weights must have same length as number of characters in character.taxon.matrix.")
+  if (!is.null(character_weights) && length(character_weights) != ncol(character.taxon.matrix)) stop("character_weights must have same length as number of characters in character.taxon.matrix.")
 
   # Check supplied weights are numeric:
-  if (!is.null(weights) && !is.numeric(weights)) stop("weights must be numeric.")
+  if (!is.null(character_weights) && !is.numeric(character_weights)) stop("character_weights must be numeric.")
 
   # Check supplied weights are non-negative:
-  if (!is.null(weights) && any(weights < 0)) stop("weights must not be negative.")
+  if (!is.null(character_weights) && any(character_weights < 0)) stop("character_weights must not be negative.")
 
   # Check supplied ordering is the correct length:
   if (!is.null(ordering) && length(ordering) != ncol(character.taxon.matrix)) stop("ordering must have same length as number of characters in character.taxon.matrix.")
@@ -108,7 +108,7 @@ build_cladistic_matrix <- function(character.taxon.matrix, header = "", weights 
   if (is.null(ordering)) ordering <- rep("ord", ncol(character.taxon.matrix))
 
   # If no weights are set:
-  if (is.null(weights)) weights <- rep(1, ncol(character.taxon.matrix))
+  if (is.null(character_weights)) character_weights <- rep(1, ncol(character.taxon.matrix))
 
   # Calculate minimum values:
   min.vals <- apply(character.taxon.matrix, 2, function(x) sort(as.numeric(unlist(strsplit(x, split = "&|/"))), decreasing = FALSE)[1])
@@ -132,13 +132,13 @@ build_cladistic_matrix <- function(character.taxon.matrix, header = "", weights 
   if (equalise.weights) {
 
     # Get starting weights:
-    weights <- apply(rbind(c(max.vals - min.vals), rep(1, nchar)), 2, max)
+    character_weights <- apply(rbind(c(max.vals - min.vals), rep(1, nchar)), 2, max)
 
-    # Updaye weights for unordered characters:
-    weights[ordering == "unord"] <- 1
+    # Update weights for unordered characters:
+    character_weights[ordering == "unord"] <- 1
 
     # Update weights for ordered characters:
-    weights[ordering == "ord"] <- 1 / weights[ordering == "ord"]
+    character_weights[ordering == "ord"] <- 1 / character_weights[ordering == "ord"]
 
     # If there are step matrices (not technically using these yet, but I guess this will have to exist eventually):
     if (!is.null(step.matrices)) {
@@ -147,11 +147,11 @@ build_cladistic_matrix <- function(character.taxon.matrix, header = "", weights 
       step.maxes <- unlist(lapply(lapply(step.matrices, as.numeric), max))
 
       # Update weights for step matrices:
-      for (i in 1:length(step.maxes)) weights[ordering == names(step.matrices)[i]] <- 1 / step.maxes[i]
+      for (i in 1:length(step.maxes)) character_weights[ordering == names(step.matrices)[i]] <- 1 / step.maxes[i]
     }
 
     # Ensure all weights are integers by multiplying by product of all reciprocals:
-    weights <- prod(unique(round(1 / weights))) * weights
+    character_weights <- prod(unique(round(1 / character_weights))) * character_weights
 
     # Sub function to get all factors of an integer (stolen from: "http://stackoverflow.com/questions/6424856/r-function-for-returning-all-factors"):
     get_all_factors <- function(x) {
@@ -170,16 +170,16 @@ build_cladistic_matrix <- function(character.taxon.matrix, header = "", weights 
     }
 
     # Get factors of every weight currently applied:
-    out <- sort(unlist(apply(matrix(unique(weights)), 1, get_all_factors)))
+    out <- sort(unlist(apply(matrix(unique(character_weights)), 1, get_all_factors)))
 
     # As long as the maximum possible factor is greater than 1:
-    while (max(rle(out)$values[rle(out)$lengths == length(unique(weights))]) > 1) {
+    while (max(rle(out)$values[rle(out)$lengths == length(unique(character_weights))]) > 1) {
 
       # Divide through weights by largest common factor:
-      weights <- weights / max(rle(out)$values[rle(out)$lengths == length(unique(weights))])
+      character_weights <- character_weights / max(rle(out)$values[rle(out)$lengths == length(unique(character_weights))])
 
       # Update factors for new weights:
-      out <- sort(unlist(apply(matrix(unique(weights)), 1, get_all_factors)))
+      out <- sort(unlist(apply(matrix(unique(character_weights)), 1, get_all_factors)))
     }
   }
 
@@ -190,7 +190,7 @@ build_cladistic_matrix <- function(character.taxon.matrix, header = "", weights 
   characters <- list(symbols = symbols, missing = "?", gap = "-")
 
   # Build matrix_1 list:
-  matrix_1 <- list(block_name = NA, datatype = "STANDARD", matrix = character.taxon.matrix, ordering = ordering, weights = weights, minimum_values = min.vals, maximum_values = max.vals, characters = characters)
+  matrix_1 <- list(block_name = NA, datatype = "STANDARD", matrix = character.taxon.matrix, ordering = ordering, character_weights = character_weights, minimum_values = min.vals, maximum_values = max.vals, characters = characters)
 
   # Assimilate into output:
   result <- list(topper = topper, matrix_1 = matrix_1)

@@ -63,7 +63,7 @@ safe_taxonomic_reduction <- function(cladistic_matrix) {
     cladistic_matrix[[2]]$ordering <- as.vector(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "ordering")))
 
     # Store weights for all blocks in first block of cladistic_matrix:
-    cladistic_matrix[[2]]$weights <- as.vector(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "weights")))
+    cladistic_matrix[[2]]$character_weights <- as.vector(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "character_weights")))
 
     # Store minimum values for all blocks in first block of cladistic_matrix:
     cladistic_matrix[[2]]$minimum_values <- as.vector(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "minimum_values")))
@@ -76,7 +76,7 @@ safe_taxonomic_reduction <- function(cladistic_matrix) {
   }
 
   # Prune out any zero weight characters, if they exist:
-  if (any(cladistic_matrix[[2]]$weights == 0)) cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix = cladistic_matrix, characters2prune = which(cladistic_matrix[[2]]$weights == 0))
+  if (any(cladistic_matrix[[2]]$character_weights == 0)) cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix = cladistic_matrix, characters2prune = which(cladistic_matrix[[2]]$character_weights == 0))
 
   # Order matrix from least to most complete taxon (as least is most likely to be removed):
   cladistic_matrix[[2]]$matrix <- cladistic_matrix[[2]]$matrix[order(apply(apply(cladistic_matrix[[2]]$matrix, 1, is.na), 2, sum), decreasing = TRUE), ]

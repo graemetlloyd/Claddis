@@ -453,7 +453,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
   ordering <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "ordering")))
 
   # Make vector of weights of characters:
-  weights <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "weights")))
+  character_weights <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "character_weights")))
 
   # Make vector of minimum values:
   minimum_values <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "minimum_values")))
@@ -526,7 +526,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
     ordering[ContinuouscharactersFound] <- "ord"
 
     # Convert weights to 1/31:
-    weights[ContinuouscharactersFound] <- 1 / 31
+    character_weights[ContinuouscharactersFound] <- 1 / 31
 
     # Set minimum value to zero:
     minimum_values[ContinuouscharactersFound] <- 0
@@ -536,7 +536,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
   }
 
   # If all_weights_integers is TRUE rescale weights until they are all integers so can model appropriately with Poisson later:
-  if (all_weights_integers) while (is.character(all.equal(sum(weights %% 1), 0))) weights <- (1 / (weights %% 1)[(weights %% 1) > 0])[1] * weights
+  if (all_weights_integers) while (is.character(all.equal(sum(character_weights %% 1), 0))) character_weights <- (1 / (character_weights %% 1)[(character_weights %% 1) > 0])[1] * character_weights
 
   # Add from-to node states for each character to edge list:
   EdgeList <- lapply(EdgeList, function(x) {
@@ -554,7 +554,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
     Comparableordering <- ordering[Comparablecharacters]
 
     # Isolate comparable weights:
-    Comparableweights <- weights[Comparablecharacters]
+    Comparableweights <- character_weights[Comparablecharacters]
 
     # Isolate only characters that actually differ (change):
     CharacterDifferences <- which(x$CharacterStatesFromTo["From", Comparablecharacters] != x$CharacterStatesFromTo["To", Comparablecharacters])
@@ -729,7 +729,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
     EdgeChanges <- unlist(lapply(EdgeList, function(x) sum(x$CharacterChanges[, "Steps"] * x$CharacterChanges[, "Weight"])))
 
     # Get completeness for each edge:
-    EdgeCompleteness <- unlist(lapply(EdgeList, function(x) sum(weights[x$Comparablecharacters]) / sum(weights)))
+    EdgeCompleteness <- unlist(lapply(EdgeList, function(x) sum(character_weights[x$Comparablecharacters]) / sum(character_weights)))
 
     # Get duration of each edge:
     EdgeDurations <- unlist(lapply(EdgeList, function(x) x$BranchDuration))
@@ -874,7 +874,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
     }))
 
     # Get vector of weighted durations for each character:
-    CharacterDurations <- (weights / sum(weights)) * sum(time_tree$edge.length)
+    CharacterDurations <- (character_weights / sum(character_weights)) * sum(time_tree$edge.length)
 
     # Get vector of completness (opportunity to observe changes) for each character:
     CharacterCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) {
@@ -952,10 +952,10 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
     }))
 
     # If using the Close time bin completeness approach get completeness value for each time bin:
-    if (time_binning_approach == "close") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations * (sum(weights[x$Comparablecharacters]) / sum(weights)))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations)), 2, sum)
+    if (time_binning_approach == "close") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations * (sum(character_weights[x$Comparablecharacters]) / sum(character_weights)))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) x$ProportionalBinnedEdgeDurations)), 2, sum)
 
     # If using the Lloyd time bin completeness approach get completeness value for each time bin::
-    if (time_binning_approach == "lloyd") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(weights[x$Comparablecharacters], ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(weights, ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum)
+    if (time_binning_approach == "lloyd") TimeBinCompleteness <- apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(character_weights[x$Comparablecharacters], ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum) / apply(do.call(rbind, lapply(EdgeList, function(x) apply(matrix(character_weights, ncol = 1) %*% x$BinnedBranchDurations, 2, sum))), 2, sum)
 
     # Get durations of edges in each time bin:
     TimeBinDurations <- apply(do.call(rbind, lapply(EdgeList, function(x) x$BinnedBranchDurations)), 2, sum)
@@ -1019,7 +1019,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
   }
 
   # Set global rate for output:
-  GlobalRate <- sum(unlist(lapply(EdgeList, function(x) sum(x$CharacterChanges[, "Steps"] * x$CharacterChanges[, "Weight"])))) / sum(unlist(lapply(EdgeList, function(x) sum(weights[x$Comparablecharacters]) / sum(weights))) * unlist(lapply(EdgeList, function(x) x$BranchDuration)))
+  GlobalRate <- sum(unlist(lapply(EdgeList, function(x) sum(x$CharacterChanges[, "Steps"] * x$CharacterChanges[, "Weight"])))) / sum(unlist(lapply(EdgeList, function(x) sum(character_weights[x$Comparablecharacters]) / sum(character_weights))) * unlist(lapply(EdgeList, function(x) x$BranchDuration)))
 
   # If performing Likelihood Ratio Test:
   if (test_type == "LRT") {

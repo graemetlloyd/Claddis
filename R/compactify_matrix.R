@@ -27,7 +27,7 @@
 #' michaux_1989$matrix_1$matrix
 #'
 #' # Examine the weights pre-compactification:
-#' michaux_1989$matrix_1$weights
+#' michaux_1989$matrix_1$character_weights
 #'
 #' # Compactify the matrix:
 #' michaux_1989compact <- compactify_matrix(michaux_1989)
@@ -36,14 +36,14 @@
 #' michaux_1989compact$matrix_1$matrix
 #'
 #' # Examine the weights post-compactification:
-#' michaux_1989compact$matrix_1$weights
+#' michaux_1989compact$matrix_1$character_weights
 #' @export compactify_matrix
 compactify_matrix <- function(cladistic_matrix, message = TRUE) {
 
   # FUTURE COULD CHECK FOR UNORD AND ORD WHEN BINARY AND HENCE MEANINGLESS
 
   # List any zero weight characters:
-  ZeroWeightcharacters <- which(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "weights")) == 0)
+  ZeroWeightcharacters <- which(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "character_weights")) == 0)
 
   # If there are zero weight characters then prune them:
   if (length(ZeroWeightcharacters) > 0) cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix, characters2prune = ZeroWeightcharacters)
@@ -66,8 +66,8 @@ compactify_matrix <- function(cladistic_matrix, message = TRUE) {
         # Set ordering of newly collapsed characters:
         cladistic_matrix[[i]]$ordering <- unlist(lapply(strsplit(rle.char.distrib.strings$values, " "), "[", 2))
 
-        # Set weights of newly collapsed characters by aggregating weights of source characters:
-        cladistic_matrix[[i]]$weights <- unlist(lapply(lapply(lapply(lapply(as.list(rle.char.distrib.strings$values), "==", char.distrib.strings), which), function(x) cladistic_matrix[[i]]$weights[x]), sum))
+        # Set character_weights of newly collapsed characters by aggregating weights of source characters:
+        cladistic_matrix[[i]]$character_weights <- unlist(lapply(lapply(lapply(lapply(as.list(rle.char.distrib.strings$values), "==", char.distrib.strings), which), function(x) cladistic_matrix[[i]]$character_weights[x]), sum))
 
         # Build new collapsed matrix:
         cladistic_matrix[[i]]$matrix <- matrix(unlist(lapply(lapply(strsplit(rle.char.distrib.strings$values, " "), "[", 1), strsplit, split = "")), nrow = nrow(cladistic_matrix[[i]]$matrix), dimnames = list(rownames(cladistic_matrix[[i]]$Matrix), c()))
@@ -111,7 +111,7 @@ compactify_matrix <- function(cladistic_matrix, message = TRUE) {
 
             # Update other parts of matrix:
             cladistic_matrix[[i]]$ordering <- rep(cladistic_matrix[[i]]$ordering, length(DuplicateRows))
-            cladistic_matrix[[i]]$weights <- rep(cladistic_matrix[[i]]$weights, length(DuplicateRows))
+            cladistic_matrix[[i]]$character_weights <- rep(cladistic_matrix[[i]]$character_weights, length(DuplicateRows))
             cladistic_matrix[[i]]$minimum_values <- rep(cladistic_matrix[[i]]$minimum_values, length(DuplicateRows))
             cladistic_matrix[[i]]$maximum_values <- rep(cladistic_matrix[[i]]$maximum_values, length(DuplicateRows))
 
@@ -130,7 +130,7 @@ compactify_matrix <- function(cladistic_matrix, message = TRUE) {
               cladistic_matrix[[i]]$ordering <- unlist(lapply(strsplit(RLECharacterDistributionStrings$values, " "), "[", 2))
 
               # Set weights of newly collapsed characters by aggregating weights of source characters:
-              cladistic_matrix[[i]]$weights <- unlist(lapply(lapply(lapply(lapply(as.list(RLECharacterDistributionStrings$values), "==", CharacterDistributionStrings), which), function(x) cladistic_matrix[[i]]$weights[x]), sum))
+              cladistic_matrix[[i]]$character_weights <- unlist(lapply(lapply(lapply(lapply(as.list(RLECharacterDistributionStrings$values), "==", CharacterDistributionStrings), which), function(x) cladistic_matrix[[i]]$character_weights[x]), sum))
 
               # Build new collapsed matrix:
               cladistic_matrix[[i]]$matrix <- matrix(unlist(lapply(lapply(strsplit(RLECharacterDistributionStrings$values, " "), "[", 1), strsplit, split = "")), nrow = nrow(cladistic_matrix[[i]]$matrix), dimnames = list(rownames(cladistic_matrix[[i]]$matrix), c()))
@@ -158,7 +158,7 @@ compactify_matrix <- function(cladistic_matrix, message = TRUE) {
     } else {
 
       # Print message to user:
-      if (message) print("Matrix cannot be compactified. All character distributions are unique and weights are greater than zero.")
+      if (message) print("Matrix cannot be compactified. All character distributions are unique and character_weights are greater than zero.")
     }
   }
 

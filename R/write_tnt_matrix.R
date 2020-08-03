@@ -155,7 +155,7 @@ write_tnt_matrix <- function(cladistic_matrix, file_name, add.analysis.block = F
   ordering <- unname(unlist(lapply(DataBlocks, "[[", "ordering")))
 
   # Get weights of all characters in sequence:
-  weights <- unname(unlist(lapply(DataBlocks, "[[", "weights")))
+  character_weights <- unname(unlist(lapply(DataBlocks, "[[", "character_weights")))
 
   # Make sure step matrices are a list if null:
   if (!is.list(cladistic_matrix$topper$step_matrices)) cladistic_matrix$topper$step_matrices <- list(NULL)
@@ -219,7 +219,7 @@ write_tnt_matrix <- function(cladistic_matrix, file_name, add.analysis.block = F
   }
 
   # Build ccode block:
-  CCodeBlock <- paste("ccode ", paste(paste(ifelse(ifelse(ordering == "cont", "ord", ordering) == "ord", "+", "-"), ifelse(weights == 0, "]", "["), "/", ifelse(ordering == "cont", "1", ifelse(weights == 0, 1, weights)), " ", paste(1:sum(Ncharacters) - 1), sep = ""), collapse = " "), " ;\n", sep = "")
+  CCodeBlock <- paste("ccode ", paste(paste(ifelse(ifelse(ordering == "cont", "ord", ordering) == "ord", "+", "-"), ifelse(character_weights == 0, "]", "["), "/", ifelse(ordering == "cont", "1", ifelse(character_weights == 0, 1, character_weights)), " ", paste(1:sum(Ncharacters) - 1), sep = ""), collapse = " "), " ;\n", sep = "")
 
   # Build full string with all blocks together:
   FullString <- paste("taxname=;\nmxram 4096;\ntaxname +", max(nchar(rownames(cladistic_matrix$matrix_1$Matrix))), ";\nnstates num 32;\nxread\n", headerBlock, sum(Ncharacters), " ", NTaxa, "\n", MatrixBlock, ";\n", CCodeBlock, StepMatrixBlock, "proc/;\n", sep = "")

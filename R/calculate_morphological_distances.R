@@ -303,8 +303,8 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
   }
 
   # Subfunction to get weighted differences:
-  weigh_differences <- function(differences, comparable.characters, weights) {
-    return(list(as.numeric(weights[comparable.characters]) * differences))
+  weigh_differences <- function(differences, comparable.characters, character_weights) {
+    return(list(as.numeric(character_weights[comparable.characters]) * differences))
   }
 
   # Subfunction to get raw Euclidean distance:
@@ -355,8 +355,8 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
   }
 
   # Subfunction to calculate the Gower Coefficient:
-  calculate_gc <- function(differences, comparable.characters, weights) {
-    return(sum(differences) / sum(weights[comparable.characters]))
+  calculate_gc <- function(differences, comparable.characters, character_weights) {
+    return(sum(differences) / sum(character_weights[comparable.characters]))
   }
 
   # Subfunction to calculate MORD:
@@ -365,12 +365,12 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
   }
 
   # Subfunction for building starting GED data:
-  build_ged_data <- function(differences, comparable.characters, cladistic_matrix, weights) {
-    return(rbind(c(differences, rep(NA, length(find_incomparable(comparable.characters, cladistic_matrix)))), c(weights[comparable.characters], weights[find_incomparable(comparable.characters, cladistic_matrix)])))
+  build_ged_data <- function(differences, comparable.characters, cladistic_matrix, character_weights) {
+    return(rbind(c(differences, rep(NA, length(find_incomparable(comparable.characters, cladistic_matrix)))), c(character_weights[comparable.characters], character_weights[find_incomparable(comparable.characters, cladistic_matrix)])))
   }
 
   # Subfunction to apply Hopkins and St John (2018) Alpha weighting of inapplicables:
-  weigh_inapplicable_alpha <- function(diffs, comparable.characters, ordering, weights, character_dependencies, charactersByLevel, alpha) {
+  weigh_inapplicable_alpha <- function(diffs, comparable.characters, ordering, character_weights, character_dependencies, charactersByLevel, alpha) {
 
     # Set differences:
     Differences <- diffs
@@ -381,8 +381,8 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
     # Set ordering for comparable characters:
     Characterordering <- ordering[Comparablecharacters]
 
-    # Set ordering for comparable characters:
-    weights <- weights[Comparablecharacters]
+    # Set weights for comparable characters:
+    character_weights <- character_weights[Comparablecharacters]
 
     # Fof each character level (from most to least nested):
     for (i in length(charactersByLevel):2) {
@@ -412,7 +412,7 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
           if (length(IndependentPosition) == 0) stop("Found a dependent character coded when character it depends on is missing. Check matrix codings.")
 
           # Overwrite independent position with alpha-weighted value:
-          diffs[IndependentPosition] <- 1 - (alpha * (1 - (sum(diffs[DependentPositions] * weights[DependentPositions]) / sum(weights[DependentPositions]))) + (1 - alpha))
+          diffs[IndependentPosition] <- 1 - (alpha * (1 - (sum(diffs[DependentPositions] * character_weights[DependentPositions]) / sum(character_weights[DependentPositions]))) + (1 - alpha))
 
           # Overwrite dependent positions with NAs:
           diffs[DependentPositions] <- NA
@@ -516,7 +516,7 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
   max.vals <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "maximum_values")))
 
   # Isolate weights:
-  weights <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "weights")))
+  character_weights <- unname(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "character_weights")))
 
   # Combine matrix blocks into a single matrix:
   cladistic_matrix <- do.call(cbind, lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "matrix"))
@@ -591,10 +591,10 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
     }
 
     # Update differences with HSJ alpha weights:
-    diffs <- mapply(weigh_inapplicable_alpha, diffs, list.of.compchar, MoreArgs = list(ordering, weights, character_dependencies, charactersByLevel, alpha))
+    diffs <- mapply(weigh_inapplicable_alpha, diffs, list.of.compchar, MoreArgs = list(ordering, character_weights, character_dependencies, charactersByLevel, alpha))
 
     # Reweight dependent characters zero:
-    weights[unlist(charactersByLevel[2:length(charactersByLevel)])] <- 0
+    character_weights[unlist(charactersByLevel[2:length(charactersByLevel)])] <- 0
 
     # Update comparable characters by pruning out NAs:
     list.of.compchar <- mapply(function(x, y) y[!is.na(x)], x = diffs, y = list.of.compchar, SIMPLIFY = FALSE)
@@ -604,7 +604,7 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
   }
 
   # Weight differences:
-  diffs <- mapply(weigh_differences, diffs, list.of.compchar, MoreArgs = list(weights))
+  diffs <- mapply(weigh_differences, diffs, list.of.compchar, MoreArgs = list(character_weights))
 
   # Get raw Euclidean distance (if using it):
   if (distance_metric == "RED") raw.dist <- lapply(diffs, calculate_red)
@@ -616,14 +616,14 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
     maxdiffs <- lapply(list.of.compchar, find_maximum_difference, max.vals, min.vals)
 
     # Correct maximum differences for unordered characters:
-    maxdiffs <- mapply(weigh_differences, mapply(fix_unordered, maxdiffs, list.of.compchar, MoreArgs = list(ordering)), list.of.compchar, MoreArgs = list(weights))
+    maxdiffs <- mapply(weigh_differences, mapply(fix_unordered, maxdiffs, list.of.compchar, MoreArgs = list(ordering)), list.of.compchar, MoreArgs = list(character_weights))
   }
 
   # If calculating Raw Euclidean Distances build the distance matrix:
   if (distance_metric == "RED") dist.matrix <- convert_list_to_matrix(raw.dist, cladistic_matrix)
 
   # If calculating the Gower Coefficient build the distance matrix:
-  if (distance_metric == "GC") dist.matrix <- convert_list_to_matrix(as.list(mapply(calculate_gc, diffs, list.of.compchar, MoreArgs = list(weights))), cladistic_matrix)
+  if (distance_metric == "GC") dist.matrix <- convert_list_to_matrix(as.list(mapply(calculate_gc, diffs, list.of.compchar, MoreArgs = list(character_weights))), cladistic_matrix)
 
   # If calculating the MORD build the distance matrix:
   if (distance_metric == "MORD") dist.matrix <- convert_list_to_matrix(mapply(calculate_mord, diffs, maxdiffs), cladistic_matrix)
@@ -632,7 +632,7 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
   if (distance_metric == "GED") {
 
     # Build starting GED data:
-    GED.data <- mapply(build_ged_data, diffs, list.of.compchar, MoreArgs = list(cladistic_matrix, weights), SIMPLIFY = FALSE)
+    GED.data <- mapply(build_ged_data, diffs, list.of.compchar, MoreArgs = list(cladistic_matrix, character_weights), SIMPLIFY = FALSE)
 
     # Transpose matrices:
     GED.data <- lapply(GED.data, t)

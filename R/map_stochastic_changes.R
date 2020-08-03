@@ -146,7 +146,7 @@ map_stochastic_changes <- function(cladistic_matrix, time_tree, time_bins, NSimu
   maximum_values <- unname(do.call(c, lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "maximum_values")))
 
   # Assemble all maximum values into a single vector:
-  weights <- unname(do.call(c, lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "weights")))
+  character_weights <- unname(do.call(c, lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "character_weights")))
 
   # Build each character into list values starting with tip state lists (of N Simulations in length):
   CharacterList <- lapply(lapply(apply(MatrixBlock, 2, list), unlist), function(x) {
@@ -156,7 +156,7 @@ map_stochastic_changes <- function(cladistic_matrix, time_tree, time_bins, NSimu
   })
 
   # Add weight to list for each character:
-  for (i in 1:length(CharacterList)) CharacterList[[i]]$Weight <- weights[i]
+  for (i in 1:length(CharacterList)) CharacterList[[i]]$Weight <- character_weights[i]
 
   # Add ordering to list for each character:
   for (i in 1:length(CharacterList)) CharacterList[[i]]$ordering <- ordering[i]

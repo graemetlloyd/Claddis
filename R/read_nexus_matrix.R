@@ -886,7 +886,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   }
   
   # Set default weights as 1:
-  weights <- lapply(lapply(MatrixBlockList, ncol), rep, x = 1)
+  character_weights <- lapply(lapply(MatrixBlockList, ncol), rep, x = 1)
   
   # Set default ordering as unordered:
   ordering <- lapply(lapply(MatrixBlockList, ncol), rep, x = "unord")
@@ -905,14 +905,14 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   # Get minimum and maximum values for each character in each matrix:
   MinMaxMatrixList <- lapply(MatrixBlockList, find_ranges)
   
-  # Now min-max is known need to check for continuous characters to amek sure default weights are all effectively 1:
+  # Now min-max is known need to check for continuous characters to make sure default character_weights are all effectively 1:
   if (any(names(MatrixBlockList) == "CONTINUOUS")) {
     
     # Get numbers of continuous blocks:
     ContinuousBlocks <- which(names(MatrixBlockList) == "CONTINUOUS")
     
     # For each continuous blocks set weights as reciprocal of difference between min and max (i.e., effectively setting all weights as one):
-    for(i in ContinuousBlocks) weights[[i]] <- as.numeric(gsub(Inf, 1, 1 / (MinMaxMatrixList[[i]][, "Max"] - MinMaxMatrixList[[i]][, "Min"])))
+    for(i in ContinuousBlocks) character_weights[[i]] <- as.numeric(gsub(Inf, 1, 1 / (MinMaxMatrixList[[i]][, "Max"] - MinMaxMatrixList[[i]][, "Min"])))
     
   }
 
@@ -1052,7 +1052,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
           weightsExtracted <- extract_assumptions(weightsInformation)
           
           # Store weights information for block in weights of block (i.e., numbered from 1 in block not 1 in whole NEXUS file):
-          weights[[i]] <- weightsExtracted
+          character_weights[[i]] <- weightsExtracted
           
         }
         
@@ -1068,13 +1068,13 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
       weightsExtracted <- extract_assumptions(weightsInformation)
       
       # Get lengths of weights for each block:
-      weightsLengths <- unlist(lapply(weights, length))
+      weightsLengths <- unlist(lapply(character_weights, length))
       
       # For each block of the matrix list:
       for(i in 1:length(weightsLengths)) {
         
         # Store part of extracted weights corresponding to ith block:
-        weights[[i]][1:weightsLengths[i]] <-  weightsExtracted[1:weightsLengths[i]]
+        character_weights[[i]][1:weightsLengths[i]] <-  weightsExtracted[1:weightsLengths[i]]
         
         # Remove already transferred weights from extracted ready for next block:
         weightsExtracted <- weightsExtracted[-(1:weightsLengths[i])]
@@ -1086,7 +1086,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   }
   
   # Convert weights to numeric:
-  weights <- lapply(weights, as.numeric)
+  character_weights <- lapply(character_weights, as.numeric)
   
   # If equalising weights:
   if (equalize_weights) {
@@ -1182,12 +1182,12 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
       ContinuousBlocks <- which(names(Startingweights) == "CONTINUOUS")
       
       # Set weights for continuous blocks as original weights:
-      for(i in ContinuousBlocks) Startingweights[[i]] <- weights[[i]]
+      for(i in ContinuousBlocks) Startingweights[[i]] <- character_weights[[i]]
       
     }
     
     # Update weights:
-    weights <- Startingweights
+    character_weights <- Startingweights
     
   }
   
@@ -1204,7 +1204,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
     characters <- list(symbols = symbols[[i]], missing = missing[[i]], gap = gap[[i]])
     
     # Build list for current block:
-    Block <- list(block_name = block_names[[i]], datatype = names(MatrixBlockList)[i], matrix = MatrixBlockList[[i]], ordering = ordering[[i]], weights = weights[[i]], minimum_values = MinMaxMatrixList[[i]][, "Min"], maximum_values = MinMaxMatrixList[[i]][, "Max"], characters = characters)
+    Block <- list(block_name = block_names[[i]], datatype = names(MatrixBlockList)[i], matrix = MatrixBlockList[[i]], ordering = ordering[[i]], character_weights = character_weights[[i]], minimum_values = MinMaxMatrixList[[i]][, "Min"], maximum_values = MinMaxMatrixList[[i]][, "Max"], characters = characters)
     
     # Store current block in output:
     Output[[(i + 1)]] <- Block

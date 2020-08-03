@@ -84,7 +84,7 @@ prune_cladistic_matrix <- function(cladistic_matrix, blocks2prune = c(), charact
       cladistic_matrix[[(i + 1)]]$ordering <- cladistic_matrix[[(i + 1)]]$ordering[-ColumnsToDelete]
 
       # Remove characters from weights:
-      cladistic_matrix[[(i + 1)]]$weights <- cladistic_matrix[[(i + 1)]]$weights[-ColumnsToDelete]
+      cladistic_matrix[[(i + 1)]]$character_weights <- cladistic_matrix[[(i + 1)]]$character_weights[-ColumnsToDelete]
 
       # Remove characters from minimum values:
       cladistic_matrix[[(i + 1)]]$minimum_values <- cladistic_matrix[[(i + 1)]]$minimum_values[-ColumnsToDelete]
@@ -133,7 +133,7 @@ prune_cladistic_matrix <- function(cladistic_matrix, blocks2prune = c(), charact
           cladistic_matrix[[(i + 1)]]$ordering <- cladistic_matrix[[(i + 1)]]$ordering[-InvariantsAsList[[i]]]
 
           # Remove characters from weights:
-          cladistic_matrix[[(i + 1)]]$weights <- cladistic_matrix[[(i + 1)]]$weights[-InvariantsAsList[[i]]]
+          cladistic_matrix[[(i + 1)]]$character_weights <- cladistic_matrix[[(i + 1)]]$character_weights[-InvariantsAsList[[i]]]
 
           # Remove characters from minimum values:
           cladistic_matrix[[(i + 1)]]$minimum_values <- cladistic_matrix[[(i + 1)]]$minimum_values[-InvariantsAsList[[i]]]

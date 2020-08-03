@@ -7,7 +7,7 @@
 build_cladistic_matrix(
   character.taxon.matrix,
   header = "",
-  weights = NULL,
+  character_weights = NULL,
   ordering = NULL,
   symbols = NULL,
   equalise.weights = FALSE,
@@ -19,7 +19,7 @@ build_cladistic_matrix(
 
 \item{header}{A scalar indicating any header text (defaults to an empty string: "").}
 
-\item{weights}{A vector specifying the weights used (if not specified defaults to 1).}
+\item{character_weights}{A vector specifying the weights used (if not specified defaults to 1).}
 
 \item{ordering}{A vector indicating whether characters are ordered ("ord") or unordered ("unord") (if no specified defaults to ordered).}
 
