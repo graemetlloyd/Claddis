@@ -21,11 +21,11 @@
 #' tree <- read.tree(text = "(A,(B,(C,D)));")
 #'
 #' # Plot the tree:
-#' plot(tree)
+#' ape::plot.phylo(tree)
 #'
 #' # Add nodelabels and show that the most recent common
 #' # ancestor of B, C, and D is node 6:
-#' nodelabels()
+#' ape::nodelabels()
 #'
 #' # Use find_mrca to show that the most recent common
 #' # ancestor of B, C, and D is node 6:
