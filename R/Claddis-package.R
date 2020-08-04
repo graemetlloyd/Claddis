@@ -29,15 +29,12 @@
 #' @import strap
 
 
-# there's no hope, move rgl to suggests!
-# @import rgl
-#' @importFrom rgl plot3d lines3d points3d text3d view3d
-
 #' @importFrom clipr write_clip
 #' @importFrom gdata trim
 #' @importFrom geoscale geoscalePlot
 #' @importFrom graphics layout legend lines par plot points polygon text
 #' @importFrom grDevices adjustcolor chull hcl.colors
+#' @importFrom rgl plot3d lines3d points3d text3d view3d
 #' @importFrom stats as.dist dist dpois pchisq runif var
 #' @importFrom utils combn
 NULL

@@ -22,10 +22,9 @@ Imports:
     geoscale,
     graphics,
     grDevices,
+    rgl,
     stats,
     utils
-Suggests:
-    rgl
 Description: Measures morphological diversity from discrete character data and
     estimates evolutionary tempo on phylogenetic trees. Imports morphological
     data from #NEXUS (Maddison et al. (1997) <doi:10.1093/sysbio/46.4.590>)
