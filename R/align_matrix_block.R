@@ -55,20 +55,17 @@
 #' @export align_matrix_block
 align_matrix_block <- function(matrix_block) {
 
-  # Build matrix of input data:
+  # Need to convert supplied block of text into list of taxon and character vectors:
   matrix_block <- lapply(as.list(strsplit(matrix_block, "\n")[[1]]), function(x) {
 
     # Split each line by whitespace:
     x <- unlist(strsplit(x, " "))
 
-    # Get vector of name plus characters:
-    x <- x[c(1, length(x))]
-
-    # Return x:
-    x
+    # Return vector of name plus characters:
+    x[c(1, length(x))]
   })
 
-  # Work out how many spaces to add:
+  # what is the most number of spaces to add:
   block_length <- max(unlist(lapply(matrix_block, function(x) nchar(x[1])))) + 2
 
   # Add spaces to names to align block:

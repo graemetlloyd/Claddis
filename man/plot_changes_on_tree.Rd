@@ -32,7 +32,7 @@ time_tree <- ape::rtree(nrow(michaux_1989$matrix_1$matrix))
 time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
-time_tree$root.time <- max(diag(vcv(time_tree)))
+time_tree$root.time <- max(diag(ape::vcv(time_tree)))
 
 # Get discrete character rates (includes changes):
 out <- test_rates(time_tree, michaux_1989,

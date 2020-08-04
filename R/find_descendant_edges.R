@@ -50,7 +50,7 @@ find_descendant_edges <- function(n, tree) {
     nodes <- tree$edge[edges, 2][which(tree$edge[edges, 2] > ape::Ntip(tree))]
 
     # For each node add any new descendant edges:
-    for (i in nodes) edges <- sort(unique(c(edges, which(tree$edge[, 1] == i))))
+    for (i in nodes) edges <- sort(x = unique(c(edges, which(tree$edge[, 1] == i))))
   }
 
   # Return edges vector:

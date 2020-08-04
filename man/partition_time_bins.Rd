@@ -4,12 +4,12 @@
 \alias{partition_time_bins}
 \title{Time bin partitioner}
 \usage{
-partition_time_bins(Ntime_bins, NPartitonsToInclude = "All")
+partition_time_bins(n_time_bins, partitions_to_include = "All")
 }
 \arguments{
-\item{Ntime_bins}{The number of time bins.}
+\item{n_time_bins}{The number of time bins.}
 
-\item{NPartitonsToInclude}{Either "All" or a vector of requested partition sizes.}
+\item{partitions_to_include}{Either "All" or a vector of requested partition sizes.}
 }
 \value{
 Returns a list of lists of vectors ready for use in \link{test_rates}.
@@ -20,12 +20,12 @@ Generates all possible contiguous partitions of N time bins.
 \details{
 This function is designed for use with the \link{test_rates} function and generates all possible contiguous partitions of N time bins. This allows use of an information criterion like AIC to pick a "best" partition, weighing fit and partition number simultaneously.
 
-You can also ask for only partitions of a specific number using the \code{NPartitonsToInclude} option. For example, \code{NPartitonsToInclude = c(0, 1, 2)} will only return partitions of 1, 2, or 3 sets of elements.
+You can also ask for only partitions of a specific number using the \code{partitions_to_include} option. For example, \code{partitions_to_include = c(0, 1, 2)} will only return partitions of 1, 2, or 3 sets of elements.
 }
 \examples{
 
 # Get all partitions for four time bins:
-partition_time_bins(4)
+partition_time_bins(n_time_bins = 4)
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

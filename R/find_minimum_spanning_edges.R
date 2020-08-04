@@ -4,7 +4,7 @@
 #'
 #' Returns edges of a minimum spanning tree given a distance matrix.
 #'
-#' @param dist.matrix A square matrix of distances between objects.
+#' @param distance_matrix A square matrix of distances between objects.
 #'
 #' @details
 #'
@@ -17,52 +17,47 @@
 #' @examples
 #'
 #' # Create a simple square matrix of distances:
-#' dist.matrix <- matrix(c(0, 1, 2, 3, 1, 0, 1, 2, 2, 1, 0, 1, 3, 2, 1, 0),
+#' distance_matrix <- matrix(c(0, 1, 2, 3, 1, 0, 1, 2, 2, 1, 0, 1, 3, 2, 1, 0),
 #'   nrow = 4,
 #'   dimnames = list(LETTERS[1:4], LETTERS[1:4])
 #' )
 #'
 #' # Show matrix to confirm that the off diagonal has the shortest
 #' # distances:
-#' dist.matrix
+#' distance_matrix
 #'
 #' # Use find_minimum_spanning_edges to get the edges for the minimum spanning
 #' # tree:
-#' find_minimum_spanning_edges(dist.matrix)
+#' find_minimum_spanning_edges(distance_matrix)
 #'
 #' # Use sum of find_minimum_spanning_edges to get the length of the minimum
 #' # spanning tree:
-#' sum(find_minimum_spanning_edges(dist.matrix))
+#' sum(find_minimum_spanning_edges(distance_matrix))
 #' @export find_minimum_spanning_edges
-find_minimum_spanning_edges <- function(dist.matrix) {
+find_minimum_spanning_edges <- function(distance_matrix) {
 
   # Convert to matrix and set up links matrix:
-  dist.matrix <- as.matrix(dist.matrix)
+  distance_matrix <- as.matrix(distance_matrix)
 
   # Get links matrix for minimum spanning tree:
-  links.matrix <- ape::mst(dist.matrix)
-
-  # Update matrix class to NULL:
-  # class(links.matrix) <- NULL
-  # DWB, 12-04-19: commented out above
-  # Why remove any class? This seems very problematic and not necessitated by code below
+  links_matrix <- ape::mst(distance_matrix)
 
   # Create empty matrix to store edges for minimum spanning tree:
-  min.span.tree.edges <- matrix(nrow = 0, ncol = 2, dimnames = list(c(), c("From", "To")))
+  minimum_spanning_tree_edges <- matrix(nrow = 0, ncol = 2, dimnames = list(c(), c("From", "To")))
 
   # For each row:
-  for (i in 1:(nrow(links.matrix) - 1)) {
+  for (i in 1:(nrow(links_matrix) - 1)) {
 
     # For each column:
-    for (j in (i + 1):ncol(links.matrix)) {
+    for (j in (i + 1):ncol(links_matrix)) {
 
       # If there is a link then record it:
-      if (links.matrix[i, j] == 1) {
-        min.span.tree.edges <- rbind(
-          min.span.tree.edges,
+      if (links_matrix[i, j] == 1) {
+        minimum_spanning_tree_edges <- rbind(
+          minimum_spanning_tree_edges,
           c(
-            rownames(links.matrix)[i],
-            colnames(links.matrix)[j]
+            rownames(links_matrix)[i],
+            colnames(links_matrix)[j]
           )
         )
       }
@@ -70,11 +65,11 @@ find_minimum_spanning_edges <- function(dist.matrix) {
   }
 
   # Get distances:
-  distances <- diag(dist.matrix[min.span.tree.edges[, "From"], min.span.tree.edges[, "To"]])
+  distances <- diag(distance_matrix[minimum_spanning_tree_edges[, "From"], minimum_spanning_tree_edges[, "To"]])
 
   # Add names to distances:
-  names(distances) <- apply(min.span.tree.edges, 1, paste, collapse = "->")
+  names(distances) <- apply(minimum_spanning_tree_edges, 1, paste, collapse = "->")
 
-  # Output distances for minimum soanning tree:
-  return(distances)
+  # Return distances for minimum spanning tree:
+  distances
 }

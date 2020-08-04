@@ -106,7 +106,7 @@ time_tree <- ape::rtree(length(rownames(michaux_1989$matrix_1$matrix)))
 time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
-time_tree$root.time <- max(diag(vcv(time_tree)))
+time_tree$root.time <- max(diag(ape::vcv(time_tree)))
 
 # Run with tree:
 y <- ordinate_cladistic_matrix(michaux_1989, time_tree = time_tree)

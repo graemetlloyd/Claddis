@@ -24,8 +24,8 @@ test_rates(
   estimate_all_nodes = FALSE,
   estimate_tip_values = FALSE,
   inapplicables_as_missing = FALSE,
-  polymorphism.behaviour = "equalp",
-  uncertainty.behaviour = "equalp",
+  polymorphism_behaviour = "equalp",
+  uncertainty_behaviour = "equalp",
   threshold = 0.01,
   all_missing_allowed = FALSE
 )
@@ -69,9 +69,9 @@ test_rates(
 
 \item{inapplicables_as_missing}{Option passed to internal use of \link{estimate_ancestral_states}.}
 
-\item{polymorphism.behaviour}{Option passed to internal use of \link{estimate_ancestral_states}.}
+\item{polymorphism_behaviour}{Option passed to internal use of \link{estimate_ancestral_states}.}
 
-\item{uncertainty.behaviour}{Option passed to internal use of \link{estimate_ancestral_states}.}
+\item{uncertainty_behaviour}{Option passed to internal use of \link{estimate_ancestral_states}.}
 
 \item{threshold}{Option passed to internal use of \link{estimate_ancestral_states}.}
 
@@ -157,7 +157,7 @@ Fifthly, there are currenty two further options for assessing rates across time 
 
 Sixthly, all character changes are weighted according to the weights provided in the input character-taxon matrix. In many cases these will simply all be one, although see the equalise weights option in \link{read_nexus_matrix}. However, when weights vary they can create some issues for the function. Specifically, changes are expected to be in the same (integer) units, but if weights vary then they have to be modelled accordingly. I.e., a character twice the weight of another may lead to a single change being counted as two changes. This is most problematic when the user has continuous characters which are automatically converted to gap-weighted (Thiele 1993) characters. However, this conversion creates drastically down-weighted characters and hence the user may wish to set the \code{all_weights_integers} option to TRUE. Note that reweighting will affect the results and hence shifting the weights of characters up or down will necessarily lead to shifts in the relative Type I and II errors. This is an unexplored aspect of such approaches, but is something the user should be aware of. More broadly it is recommended that continuous (or gap-weighted) characters be avoided when using this function.
 
-Finally, the remaining options (\code{estimate_all_nodes}, \code{estimate_tip_values}, \code{inapplicables_as_missing}, \code{polymorphism.behaviour}, \code{uncertainty.behaviour}, and \code{threshold}) are all simply passed directly to \link{estimate_ancestral_states} for estimating the ancestral states and users should consult the help file for that function for further details.
+Finally, the remaining options (\code{estimate_all_nodes}, \code{estimate_tip_values}, \code{inapplicables_as_missing}, \code{polymorphism_behaviour}, \code{uncertainty_behaviour}, and \code{threshold}) are all simply passed directly to \link{estimate_ancestral_states} for estimating the ancestral states and users should consult the help file for that function for further details.
 
 Note that currently the function cannot deal with step matrices and that the terminal versus internal option from Brusatte et al. (2014) is yet to be implemented.
 
@@ -199,7 +199,7 @@ time_tree <- ape::rtree(nrow(michaux_1989$matrix_1$matrix))
 time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
-time_tree$root.time <- max(diag(vcv(time_tree)))
+time_tree$root.time <- max(diag(ape::vcv(time_tree)))
 
 # Get discrete character rates:
 x <- test_rates(

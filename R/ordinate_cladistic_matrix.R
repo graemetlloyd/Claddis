@@ -66,7 +66,7 @@
 #' time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
 #'
 #' # Set root time by making youngest taxon extant:
-#' time_tree$root.time <- max(diag(vcv(time_tree)))
+#' time_tree$root.time <- max(diag(ape::vcv(time_tree)))
 #'
 #' # Run with tree:
 #' y <- ordinate_cladistic_matrix(michaux_1989, time_tree = time_tree)
@@ -83,10 +83,10 @@ ordinate_cladistic_matrix <- function(cladistic_matrix, distance_metric = "MORD"
   if (is.null(time_tree)) {
 
     # Get morphological distances from the cladistic matrix:
-    morphological_distances <- calculate_morphological_distances(cladistic_matrix, distance_metric = distance_metric, distance_transformation = distance_transformation, polymorphism.behaviour = distance_polymorphism_behaviour, uncertainty.behaviour = distance_uncertainty_behaviour, inapplicable.behaviour = distance_inapplicable_behaviour, character_dependencies = character_dependencies, alpha = alpha)
+    morphological_distances <- calculate_morphological_distances(cladistic_matrix = cladistic_matrix, distance_metric = distance_metric, distance_transformation = distance_transformation, polymorphism_behaviour = distance_polymorphism_behaviour, uncertainty_behaviour = distance_uncertainty_behaviour, inapplicable_behaviour = distance_inapplicable_behaviour, character_dependencies = character_dependencies, alpha = alpha)
 
     # Get trimmed distances:
-    trimmed_distances <- trim_matrix(morphological_distances$DistanceMatrix)
+    trimmed_distances <- trim_matrix(morphological_distances$distance_matrix)
 
     # If trimming of matrix lead to taxa being removed warn user:
     if (!is.null(trimmed_distances$removed_taxa)) message(paste("The following taxa had to be removed to produce a complete distance matrix:", paste(trimmed_distances$removed_taxa, collapse = ", ")))
@@ -98,19 +98,19 @@ ordinate_cladistic_matrix <- function(cladistic_matrix, distance_metric = "MORD"
   } else {
 
     # Get ancestral character states:
-    ancestral_values <- estimate_ancestral_states(cladistic_matrix = cladistic_matrix, time_tree = time_tree, estimate_all_nodes = estimate_all_nodes, estimate_tip_values = estimate_tip_values, inapplicables_as_missing = inapplicables_as_missing, polymorphism.behaviour = ancestral_polymorphism_behaviour, uncertainty.behaviour = ancestral_uncertainty_behaviour, threshold = threshold, all_missing_allowed = all_missing_allowed)
+    ancestral_values <- estimate_ancestral_states(cladistic_matrix = cladistic_matrix, time_tree = time_tree, estimate_all_nodes = estimate_all_nodes, estimate_tip_values = estimate_tip_values, inapplicables_as_missing = inapplicables_as_missing, polymorphism_behaviour = ancestral_polymorphism_behaviour, uncertainty_behaviour = ancestral_uncertainty_behaviour, threshold = threshold, all_missing_allowed = all_missing_allowed)
 
     # Get morphological distances from the cladistic matrix:
-    morphological_distances <- calculate_morphological_distances(ancestral_values, distance_metric = distance_metric, ged_type = ged_type, distance_transformation = distance_transformation, polymorphism.behaviour = distance_polymorphism_behaviour, uncertainty.behaviour = distance_uncertainty_behaviour, inapplicable.behaviour = distance_inapplicable_behaviour, character_dependencies = character_dependencies, alpha = alpha)
+    morphological_distances <- calculate_morphological_distances(cladistic_matrix = ancestral_values, distance_metric = distance_metric, ged_type = ged_type, distance_transformation = distance_transformation, polymorphism_behaviour = distance_polymorphism_behaviour, uncertainty_behaviour = distance_uncertainty_behaviour, inapplicable_behaviour = distance_inapplicable_behaviour, character_dependencies = character_dependencies, alpha = alpha)
 
     # Get trimmed distances:
-    trimmed_distances <- trim_matrix(morphological_distances$DistanceMatrix, Tree = time_tree)
+    trimmed_distances <- trim_matrix(morphological_distances$distance_matrix, tree = time_tree)
 
     # If trimming of matrix lead to taxa or nodes being removed warn user:
     if (!is.null(trimmed_distances$removed_taxa)) message(paste("The following taxa or nodes had to be removed to produce a complete distance matrix:", paste(trimmed_distances$removed_taxa, collapse = ", ")))
 
     # Store (possibly trimmed) tree ready to be output:
-    time_tree <- trimmed_distances$Tree
+    time_tree <- trimmed_distances$tree
 
     # Perform Principal Coordinates Analysis on the data:
     pcoa_results <- ape::pcoa(trimmed_distances$distance_matrix, correction = correction, rn = rownames(trimmed_distances$distance_matrix))

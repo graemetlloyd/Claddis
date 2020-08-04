@@ -5,17 +5,17 @@
 \title{Creates a morphological data file from a matrix}
 \usage{
 build_cladistic_matrix(
-  character.taxon.matrix,
+  character_taxon_matrix,
   header = "",
   character_weights = NULL,
   ordering = NULL,
   symbols = NULL,
   equalise.weights = FALSE,
-  ignore.duplicate.taxa = FALSE
+  ignore_duplicate_taxa = FALSE
 )
 }
 \arguments{
-\item{character.taxon.matrix}{A Character-Taxon (columns-rows) matrix, with taxon names as rownames.}
+\item{character_taxon_matrix}{A Character-Taxon (columns-rows) matrix, with taxon names as rownames.}
 
 \item{header}{A scalar indicating any header text (defaults to an empty string: "").}
 
@@ -27,7 +27,7 @@ build_cladistic_matrix(
 
 \item{equalise.weights}{Optional that overrides the weights specified above make all characters truly equally weighted.}
 
-\item{ignore.duplicate.taxa}{Logical indicating whether or not to ignore (allow; TRUE) duplicate taxa or not (FALSE; default).}
+\item{ignore_duplicate_taxa}{Logical indicating whether or not to ignore (allow; TRUE) duplicate taxa or not (FALSE; default).}
 }
 \value{
 \item{topper}{Contains any header text or step matrices and pertains to the entire file.}
@@ -44,7 +44,7 @@ NB: Currently the function cannot deal directly with step matrices or continuous
 \examples{
 
 # Create random 10-by-50 matrix:
-character.taxon.matrix <- matrix(sample(c("0", "1", "0&1", NA, ""),
+character_taxon_matrix <- matrix(sample(c("0", "1", "0&1", NA, ""),
   500,
   replace = TRUE
 ),
@@ -57,7 +57,7 @@ nrow = 10, dimnames =
 )
 
 # Reformat for use elsewhere in Claddis:
-build_cladistic_matrix(character.taxon.matrix)
+build_cladistic_matrix(character_taxon_matrix)
 }
 \seealso{
 \link{compactify_matrix}, \link{prune_cladistic_matrix}, \link{read_nexus_matrix}, \link{safe_taxonomic_reduction}, \link{write_nexus_matrix}, \link{write_tnt_matrix}

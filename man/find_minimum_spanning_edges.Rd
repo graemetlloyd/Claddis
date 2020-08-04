@@ -4,10 +4,10 @@
 \alias{find_minimum_spanning_edges}
 \title{Get edges of minimum spanning tree}
 \usage{
-find_minimum_spanning_edges(dist.matrix)
+find_minimum_spanning_edges(distance_matrix)
 }
 \arguments{
-\item{dist.matrix}{A square matrix of distances between objects.}
+\item{distance_matrix}{A square matrix of distances between objects.}
 }
 \value{
 A vector of named edges (X->Y) with their distances. The sum of this vector is the length of the minimum spanning tree.
@@ -21,22 +21,22 @@ This function is a wrapper for \link{mst} in the \link{ape} package, but returns
 \examples{
 
 # Create a simple square matrix of distances:
-dist.matrix <- matrix(c(0, 1, 2, 3, 1, 0, 1, 2, 2, 1, 0, 1, 3, 2, 1, 0),
+distance_matrix <- matrix(c(0, 1, 2, 3, 1, 0, 1, 2, 2, 1, 0, 1, 3, 2, 1, 0),
   nrow = 4,
   dimnames = list(LETTERS[1:4], LETTERS[1:4])
 )
 
 # Show matrix to confirm that the off diagonal has the shortest
 # distances:
-dist.matrix
+distance_matrix
 
 # Use find_minimum_spanning_edges to get the edges for the minimum spanning
 # tree:
-find_minimum_spanning_edges(dist.matrix)
+find_minimum_spanning_edges(distance_matrix)
 
 # Use sum of find_minimum_spanning_edges to get the length of the minimum
 # spanning tree:
-sum(find_minimum_spanning_edges(dist.matrix))
+sum(find_minimum_spanning_edges(distance_matrix))
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

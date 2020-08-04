@@ -152,7 +152,7 @@ map_dollo_changes <- function(time_tree, tip_states) {
     } else {
 
       # Find members of the least inclusive clade:
-      clade.members <- time_tree$tip.label[FindDescendants(new.root, time_tree)]
+      clade.members <- time_tree$tip.label[strap::FindDescendants(new.root, time_tree)]
 
       # Find non-members of the least inclusive clade:
       nonclade.members <- setdiff(time_tree$tip.label, clade.members)
@@ -204,7 +204,7 @@ map_dollo_changes <- function(time_tree, tip_states) {
       } else {
 
         # Prune taxa external to least inclusive clade to create a pruned tree:
-        new.tree <- drop.tip(time_tree, nonclade.members)
+        new.tree <- ape::drop.tip(time_tree, nonclade.members)
 
         # Ensure root time is correct:
         new.tree <- fix_root_time(time_tree, new.tree)
@@ -275,10 +275,10 @@ map_dollo_changes <- function(time_tree, tip_states) {
         for (i in 1:ape::Ntip(new.tree)) new.edges[which(new.edges[, 2] == i), 2] <- new.tree$tip.label[i]
 
         # Update node names for original tree edge matrix:
-        for (i in (ape::Ntip(time_tree) + 1):(ape::Ntip(time_tree) + ape::Nnode(time_tree))) orig.edges[which(orig.edges == i)] <- paste(sort(time_tree$tip.label[FindDescendants(i, time_tree)]), collapse = "")
+        for (i in (ape::Ntip(time_tree) + 1):(ape::Ntip(time_tree) + ape::Nnode(time_tree))) orig.edges[which(orig.edges == i)] <- paste(sort(x = time_tree$tip.label[strap::FindDescendants(i, time_tree)]), collapse = "")
 
         # Update node names for pruned tree edge matrix:
-        for (i in (ape::Ntip(new.tree) + 1):(ape::Ntip(new.tree) + ape::Nnode(new.tree))) new.edges[which(new.edges == i)] <- paste(sort(new.tree$tip.label[FindDescendants(i, new.tree)]), collapse = "")
+        for (i in (ape::Ntip(new.tree) + 1):(ape::Ntip(new.tree) + ape::Nnode(new.tree))) new.edges[which(new.edges == i)] <- paste(sort(x = new.tree$tip.label[strap::FindDescendants(i, new.tree)]), collapse = "")
 
         # Collapse original edge matrix to from-to straings for matching:
         orig.edges <- apply(orig.edges, 1, paste, collapse = "%%TO%%")

@@ -2,7 +2,7 @@
 #'
 #' @description
 #'
-#' Fixes root.time after taxa have been pruned from a tree using drop.tip
+#' Fixes root.time after taxa have been pruned from a tree using ape::drop.tip
 #'
 #' @param original_tree A tree in phylo format.
 #' @param pruned_tree A tree in phylo format that represents a pruned version of \code{original_tree}.
@@ -28,7 +28,7 @@
 #' tree$root.time <- 20
 #'
 #' # Now prune taxon A:
-#' pruned_tree <- drop.tip(tree, "A")
+#' pruned_tree <- ape::drop.tip(tree, "A")
 #'
 #' # Show that drop.tip has not updated the tree's root time:
 #' pruned_tree$root.time
@@ -42,13 +42,13 @@
 fix_root_time <- function(original_tree, pruned_tree) {
 
   # Conditional if pruned tree too small:
-  if (ape::Ntip(pruned_tree) < 3) stop("ERROR: pruned_tree includes too few (<3) taxa to be used.")
+  if (ape::Ntip(pruned_tree) < 3) stop("pruned_tree includes too few (<3) taxa to be used.")
 
   # Conditional in case where pruned tree taxa are not a subset of the original tree taxa:
-  if (length(setdiff(pruned_tree$tip.label, original_tree$tip.label)) > 0) stop("ERROR: pruned_tree cannot include taxa not present in original_tree.")
+  if (length(setdiff(pruned_tree$tip.label, original_tree$tip.label)) > 0) stop("pruned_tree cannot include taxa not present in original_tree.")
 
   # Update $root.time for pruned_tree:
-  pruned_tree$root.time <- original_tree$root.time - mean(diag(vcv(original_tree))[names(diag(vcv(pruned_tree)))] - diag(vcv(pruned_tree)))
+  pruned_tree$root.time <- original_tree$root.time - mean(diag(ape::vcv(original_tree))[names(diag(ape::vcv(pruned_tree)))] - diag(ape::vcv(pruned_tree)))
 
   # Return updated pruned tree:
   return(pruned_tree)

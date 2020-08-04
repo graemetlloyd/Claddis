@@ -43,113 +43,113 @@ compactify_matrix <- function(cladistic_matrix, message = TRUE) {
   # FUTURE COULD CHECK FOR UNORD AND ORD WHEN BINARY AND HENCE MEANINGLESS
 
   # List any zero weight characters:
-  ZeroWeightcharacters <- which(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "character_weights")) == 0)
+  zero_weight_characters <- which(unlist(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "character_weights")) == 0)
 
   # If there are zero weight characters then prune them:
-  if (length(ZeroWeightcharacters) > 0) cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix, characters2prune = ZeroWeightcharacters)
+  if (length(zero_weight_characters) > 0) cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix, characters2prune = zero_weight_characters)
 
   # For each matrix block:
   for (i in 2:length(cladistic_matrix)) {
 
     # Get strings for each character distribution, including ordering:
-    char.distrib.strings <- paste(apply(cladistic_matrix[[i]]$matrix, 2, paste, collapse = ""), cladistic_matrix[[i]]$ordering, sep = " ")
+    character_distribution_strings <- paste(apply(cladistic_matrix[[i]]$matrix, 2, paste, collapse = ""), cladistic_matrix[[i]]$ordering, sep = " ")
 
     # Case if matrix can be compactified:
-    if (length(unique(char.distrib.strings)) < length(char.distrib.strings) || any(duplicated(rownames(cladistic_matrix[[i]]$matrix)))) {
+    if (length(unique(character_distribution_strings)) < length(character_distribution_strings) || any(duplicated(rownames(cladistic_matrix[[i]]$matrix)))) {
 
       # If collapsing characters because they are duplicated:
-      if (length(unique(char.distrib.strings)) < length(char.distrib.strings)) {
+      if (length(unique(character_distribution_strings)) < length(character_distribution_strings)) {
 
         # Get rle of character distribution strings:
-        rle.char.distrib.strings <- rle(sort(char.distrib.strings, decreasing = TRUE))
+        rle_character_distribution_strings <- rle(sort(x = character_distribution_strings, decreasing = TRUE))
 
         # Set ordering of newly collapsed characters:
-        cladistic_matrix[[i]]$ordering <- unlist(lapply(strsplit(rle.char.distrib.strings$values, " "), "[", 2))
+        cladistic_matrix[[i]]$ordering <- unlist(lapply(strsplit(rle_character_distribution_strings$values, " "), "[", 2))
 
         # Set character_weights of newly collapsed characters by aggregating weights of source characters:
-        cladistic_matrix[[i]]$character_weights <- unlist(lapply(lapply(lapply(lapply(as.list(rle.char.distrib.strings$values), "==", char.distrib.strings), which), function(x) cladistic_matrix[[i]]$character_weights[x]), sum))
+        cladistic_matrix[[i]]$character_weights <- unlist(lapply(lapply(lapply(lapply(as.list(rle_character_distribution_strings$values), "==", character_distribution_strings), which), function(x) cladistic_matrix[[i]]$character_weights[x]), sum))
 
         # Build new collapsed matrix:
-        cladistic_matrix[[i]]$matrix <- matrix(unlist(lapply(lapply(strsplit(rle.char.distrib.strings$values, " "), "[", 1), strsplit, split = "")), nrow = nrow(cladistic_matrix[[i]]$matrix), dimnames = list(rownames(cladistic_matrix[[i]]$Matrix), c()))
+        cladistic_matrix[[i]]$matrix <- matrix(unlist(lapply(lapply(strsplit(rle_character_distribution_strings$values, " "), "[", 1), strsplit, split = "")), nrow = nrow(cladistic_matrix[[i]]$matrix), dimnames = list(rownames(cladistic_matrix[[i]]$Matrix), c()))
 
         # Get ranges of values for characters in new collapsed matrix:
-        MinMax <- lapply(lapply(lapply(lapply(lapply(lapply(apply(cladistic_matrix[[i]]$matrix, 2, strsplit, split = "/"), unlist), strsplit, split = "&"), unlist), unique), as.numeric), range)
+        character_ranges <- lapply(lapply(lapply(lapply(lapply(lapply(apply(cladistic_matrix[[i]]$matrix, 2, strsplit, split = "/"), unlist), strsplit, split = "&"), unlist), unique), as.numeric), range)
 
         # Set new minimum values for collapsed matrix:
-        cladistic_matrix[[i]]$minimum_values <- unlist(lapply(MinMax, "[", 1))
+        cladistic_matrix[[i]]$minimum_values <- unlist(lapply(character_ranges, "[", 1))
 
         # Set new maximum values for collapsed matrix:
-        cladistic_matrix[[i]]$maximum_values <- unlist(lapply(MinMax, "[", 2))
+        cladistic_matrix[[i]]$maximum_values <- unlist(lapply(character_ranges, "[", 2))
       }
 
       # If collapsing matrix because taxa are duplicated:
       if (any(duplicated(rownames(cladistic_matrix[[i]]$matrix)))) {
 
         # Find duplicated taxa:
-        DuplicatedTaxa <- unique(rownames(cladistic_matrix[[i]]$matrix)[duplicated(rownames(cladistic_matrix[[i]]$matrix))])
+        duplicated_taxa <- unique(rownames(cladistic_matrix[[i]]$matrix)[duplicated(rownames(cladistic_matrix[[i]]$matrix))])
 
         # For each duplicated taxon:
-        for (j in DuplicatedTaxa) {
+        for (j in duplicated_taxa) {
 
           # Get rows for taxon:
-          DuplicateRows <- which(rownames(cladistic_matrix[[i]]$matrix) == j)
+          duplicate_rows <- which(rownames(cladistic_matrix[[i]]$matrix) == j)
 
           # Only continue if the duplicated rows are actually variable:
-          if (length(unique(apply(cladistic_matrix[[i]]$matrix[DuplicateRows, ], 1, paste, collapse = ""))) > 1) {
+          if (length(unique(apply(cladistic_matrix[[i]]$matrix[duplicate_rows, ], 1, paste, collapse = ""))) > 1) {
 
             # Build duplicated matrix from other taxa:
-            TemporaryMatrix <- matrix(rep(cladistic_matrix[[i]]$matrix[-DuplicateRows, ], length(DuplicateRows)), ncol = ncol(cladistic_matrix[[i]]$matrix) * length(DuplicateRows), dimnames = list(rownames(cladistic_matrix[[i]]$matrix)[-DuplicateRows], c()))
+            temporary_matrix <- matrix(rep(cladistic_matrix[[i]]$matrix[-duplicate_rows, ], length(duplicate_rows)), ncol = ncol(cladistic_matrix[[i]]$matrix) * length(duplicate_rows), dimnames = list(rownames(cladistic_matrix[[i]]$matrix)[-duplicate_rows], c()))
 
             # Add duplicated taxon as single row:
-            TemporaryMatrix <- rbind(TemporaryMatrix, as.vector(t(cladistic_matrix[[i]]$matrix[DuplicateRows, ])))
+            temporary_matrix <- rbind(temporary_matrix, as.vector(t(cladistic_matrix[[i]]$matrix[duplicate_rows, ])))
 
             # Add duplicated taxon name:
-            rownames(TemporaryMatrix)[nrow(TemporaryMatrix)] <- j
+            rownames(temporary_matrix)[nrow(temporary_matrix)] <- j
 
             # Update stored MRP matrix:
-            cladistic_matrix[[i]]$matrix <- TemporaryMatrix
+            cladistic_matrix[[i]]$matrix <- temporary_matrix
 
             # Update other parts of matrix:
-            cladistic_matrix[[i]]$ordering <- rep(cladistic_matrix[[i]]$ordering, length(DuplicateRows))
-            cladistic_matrix[[i]]$character_weights <- rep(cladistic_matrix[[i]]$character_weights, length(DuplicateRows))
-            cladistic_matrix[[i]]$minimum_values <- rep(cladistic_matrix[[i]]$minimum_values, length(DuplicateRows))
-            cladistic_matrix[[i]]$maximum_values <- rep(cladistic_matrix[[i]]$maximum_values, length(DuplicateRows))
+            cladistic_matrix[[i]]$ordering <- rep(cladistic_matrix[[i]]$ordering, length(duplicate_rows))
+            cladistic_matrix[[i]]$character_weights <- rep(cladistic_matrix[[i]]$character_weights, length(duplicate_rows))
+            cladistic_matrix[[i]]$minimum_values <- rep(cladistic_matrix[[i]]$minimum_values, length(duplicate_rows))
+            cladistic_matrix[[i]]$maximum_values <- rep(cladistic_matrix[[i]]$maximum_values, length(duplicate_rows))
 
-            # BELOW IS EEFCTIVELY A RECURSION OF THIS FUNCTION!
+            # BELOW IS EFFECTIVELY A RECURSION OF THIS FUNCTION!
 
             # Get strings for each character distribution, including ordering:
-            CharacterDistributionStrings <- paste(apply(cladistic_matrix[[i]]$matrix, 2, paste, collapse = ""), cladistic_matrix[[i]]$ordering, sep = " ")
+            secondary_distribution_strings <- paste(apply(cladistic_matrix[[i]]$matrix, 2, paste, collapse = ""), cladistic_matrix[[i]]$ordering, sep = " ")
 
             # If need to collapse characters because they are duplicated:
-            if (length(unique(CharacterDistributionStrings)) < length(CharacterDistributionStrings)) {
+            if (length(unique(secondary_distribution_strings)) < length(secondary_distribution_strings)) {
 
               # Get rle of character distribution strings:
-              RLECharacterDistributionStrings <- rle(sort(CharacterDistributionStrings, decreasing = TRUE))
+              rle_secondary_distribution_strings <- rle(sort(x = secondary_distribution_strings, decreasing = TRUE))
 
               # Set ordering of newly collapsed characters:
-              cladistic_matrix[[i]]$ordering <- unlist(lapply(strsplit(RLECharacterDistributionStrings$values, " "), "[", 2))
+              cladistic_matrix[[i]]$ordering <- unlist(lapply(strsplit(rle_secondary_distribution_strings$values, " "), "[", 2))
 
               # Set weights of newly collapsed characters by aggregating weights of source characters:
-              cladistic_matrix[[i]]$character_weights <- unlist(lapply(lapply(lapply(lapply(as.list(RLECharacterDistributionStrings$values), "==", CharacterDistributionStrings), which), function(x) cladistic_matrix[[i]]$character_weights[x]), sum))
+              cladistic_matrix[[i]]$character_weights <- unlist(lapply(lapply(lapply(lapply(as.list(rle_secondary_distribution_strings$values), "==", secondary_distribution_strings), which), function(x) cladistic_matrix[[i]]$character_weights[x]), sum))
 
               # Build new collapsed matrix:
-              cladistic_matrix[[i]]$matrix <- matrix(unlist(lapply(lapply(strsplit(RLECharacterDistributionStrings$values, " "), "[", 1), strsplit, split = "")), nrow = nrow(cladistic_matrix[[i]]$matrix), dimnames = list(rownames(cladistic_matrix[[i]]$matrix), c()))
+              cladistic_matrix[[i]]$matrix <- matrix(unlist(lapply(lapply(strsplit(rle_secondary_distribution_strings$values, " "), "[", 1), strsplit, split = "")), nrow = nrow(cladistic_matrix[[i]]$matrix), dimnames = list(rownames(cladistic_matrix[[i]]$matrix), c()))
 
               # Get ranges of values for characters in new collapsed matrix:
-              MinMax <- lapply(lapply(lapply(lapply(lapply(lapply(apply(cladistic_matrix[[i]]$matrix, 2, strsplit, split = "/"), unlist), strsplit, split = "&"), unlist), unique), as.numeric), range)
+              character_ranges <- lapply(lapply(lapply(lapply(lapply(lapply(apply(cladistic_matrix[[i]]$matrix, 2, strsplit, split = "/"), unlist), strsplit, split = "&"), unlist), unique), as.numeric), range)
 
               # Set new minimum values for collapsed matrix:
-              cladistic_matrix[[i]]$minimum_values <- unlist(lapply(MinMax, "[", 1))
+              cladistic_matrix[[i]]$minimum_values <- unlist(lapply(character_ranges, "[", 1))
 
               # Set new maximum values for collapsed matrix:
-              cladistic_matrix[[i]]$maximum_values <- unlist(lapply(MinMax, "[", 2))
+              cladistic_matrix[[i]]$maximum_values <- unlist(lapply(character_ranges, "[", 2))
             }
 
             # If duplicated rows are not variable:
           } else {
 
             # Remove all but one duplicated row from the matrix:
-            cladistic_matrix[[i]]$matrix <- cladistic_matrix[[i]]$matrix[-DuplicateRows[2:length(DuplicateRows)], , drop = FALSE]
+            cladistic_matrix[[i]]$matrix <- cladistic_matrix[[i]]$matrix[-duplicate_rows[2:length(duplicate_rows)], , drop = FALSE]
           }
         }
       }

@@ -9,8 +9,8 @@
 #' @param estimate_all_nodes Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).
 #' @param estimate_tip_values Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).
 #' @param inapplicables_as_missing Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).
-#' @param polymorphism.behaviour One of either "equalp" or "treatasmissing".
-#' @param uncertainty.behaviour One of either "equalp" or "treatasmissing".
+#' @param polymorphism_behaviour One of either "equalp" or "treatasmissing".
+#' @param uncertainty_behaviour One of either "equalp" or "treatasmissing".
 #' @param threshold The threshold value to use when collapsing marginal likelihoods to discrete state(s).
 #' @param all_missing_allowed Logical to allow all missing character values (generally not recommended, hence default is FALSE).
 #'
@@ -44,7 +44,7 @@
 #' time_tree$tip.label <- rownames(day_2016$matrix_1$matrix)
 #'
 #' # Set root time by making youngest taxon extant:
-#' time_tree$root.time <- max(diag(vcv(time_tree)))
+#' time_tree$root.time <- max(diag(ape::vcv(time_tree)))
 #'
 #' # Use Day matrix as cladistic matrix:
 #' cladistic_matrix <- day_2016
@@ -60,7 +60,7 @@
 #'   time_tree = time_tree
 #' )
 #' @export estimate_ancestral_states
-estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, polymorphism.behaviour = "equalp", uncertainty.behaviour = "equalp", threshold = 0.01, all_missing_allowed = FALSE) {
+estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, polymorphism_behaviour = "equalp", uncertainty_behaviour = "equalp", threshold = 0.01, all_missing_allowed = FALSE) {
 
   # How to get tip states for a continuous character? (Phytools answer: http://blog.phytools.org/2013/11/reconstructed-ancestral-tip-states-for.html)
   #   - So basically under ML just inherit state from ancestral node (really this is mean of distribution where sd would grow with duration of branch so to allow the possibility of variance this could also be sampled stochastically
@@ -94,11 +94,11 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   # Check inapplicables_as_missing is a logical:
   if (!is.logical(inapplicables_as_missing)) stop("inapplicables_as_missing must be a logical (TRUE or FALSE).")
 
-  # Check polymorphism.behaviour is a single allowable value:
-  if (length(polymorphism.behaviour) != 1 || !any(c("equalp", "treatasmissing") == polymorphism.behaviour)) stop("polymorphism.behaviour must be a single value of either, \"equalp\" or \"treatasmissing\".")
+  # Check polymorphism_behaviour is a single allowable value:
+  if (length(polymorphism_behaviour) != 1 || !any(c("equalp", "treatasmissing") == polymorphism_behaviour)) stop("polymorphism_behaviour must be a single value of either, \"equalp\" or \"treatasmissing\".")
 
-  # Check uncertainty.behaviour is a single allowable value:
-  if (length(uncertainty.behaviour) != 1 || !any(c("equalp", "treatasmissing") == uncertainty.behaviour)) stop("uncertainty.behaviour must be a single value of either, \"equalp\" or \"treatasmissing\".")
+  # Check uncertainty_behaviour is a single allowable value:
+  if (length(uncertainty_behaviour) != 1 || !any(c("equalp", "treatasmissing") == uncertainty_behaviour)) stop("uncertainty_behaviour must be a single value of either, \"equalp\" or \"treatasmissing\".")
 
   # Check threshold is a numeric value between the limits of zero and one:
   if (!is.numeric(threshold) || threshold > 0.5 || threshold < 0) stop("threshold must be a numeric value between 0 and 0.5.")
@@ -125,22 +125,22 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   FailedNameMatches <- c(setdiff(rownames(cladistic_matrix), time_tree$tip.label), setdiff(time_tree$tip.label, rownames(cladistic_matrix)))
 
   # Check there are no failed name matches and stop and report if found:
-  if (length(FailedNameMatches) > 0) stop(paste("The following names do not match between the tree and matrix: ", paste(sort(FailedNameMatches), collapse = ", "), ". Check spelling and try again.", sep = ""))
+  if (length(FailedNameMatches) > 0) stop(paste("The following names do not match between the tree and matrix: ", paste(sort(x = FailedNameMatches), collapse = ", "), ". Check spelling and try again.", sep = ""))
 
   # If treating inapplicables as missing (and there is at least one inapplicable) replace with NA:
   if (inapplicables_as_missing && length(which(cladistic_matrix == "")) > 0) cladistic_matrix[which(cladistic_matrix == "")] <- NA
 
   # If treating polymorphisms as missing:
-  if (polymorphism.behaviour == "treatasmissing" && length(grep("&", cladistic_matrix)) > 0) cladistic_matrix[grep("&", cladistic_matrix)] <- NA
+  if (polymorphism_behaviour == "treatasmissing" && length(grep("&", cladistic_matrix)) > 0) cladistic_matrix[grep("&", cladistic_matrix)] <- NA
 
   # If treating uncertainties as missing:
-  if (uncertainty.behaviour == "treatasmissing" && length(grep("/", cladistic_matrix)) > 0) cladistic_matrix[grep("/", cladistic_matrix)] <- NA
+  if (uncertainty_behaviour == "treatasmissing" && length(grep("/", cladistic_matrix)) > 0) cladistic_matrix[grep("/", cladistic_matrix)] <- NA
 
   # Get vector of character numbers where all values are NA:
   Allmissingcharacters <- which(apply(cladistic_matrix, 2, function(x) all(is.na(x))))
 
   # Look for all missing characters and stop and wanr user if found:
-  if (!all_missing_allowed && length(Allmissingcharacters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(Allmissingcharacters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using Claddis::prune_cladistic_matrix) or because of the chosen options for inapplicables_as_missing, polymorphism.behaviour, and/or uncertainty.behaviour (in which case the user may wish to chose different values for these)."))
+  if (!all_missing_allowed && length(Allmissingcharacters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(Allmissingcharacters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using Claddis::prune_cladistic_matrix) or because of the chosen options for inapplicables_as_missing, polymorphism_behaviour, and/or uncertainty_behaviour (in which case the user may wish to chose different values for these)."))
 
   # Convert tip states into a list:
   DataAsList <- apply(cladistic_matrix, 2, function(x) list(TipStates = x))
@@ -192,7 +192,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   prune_tips <- function(x) {
 
     # Find all missing or inapplicable value tip names:
-    missing <- names(sort(c(which(x$TipStates == ""), which(is.na(x$TipStates)))))
+    missing <- names(sort(x = c(which(x$TipStates == ""), which(is.na(x$TipStates)))))
 
     # Work out how many tips will be left after pruning:
     NTipsRemaining <- length(setdiff(names(x$TipStates), missing))
@@ -204,7 +204,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
       if (NTipsRemaining < 2) x$Tree <- NULL
 
       # If at least two tips will remain prune missing values from tree:
-      if (NTipsRemaining > 1) x$Tree <- drop.tip(phy = x$Tree, tip = missing)
+      if (NTipsRemaining > 1) x$Tree <- ape::drop.tip(phy = x$Tree, tip = missing)
 
       # Collapse tip states:
       x$TipStates <- x$TipStates[setdiff(names(x$TipStates), missing)]
@@ -245,14 +245,14 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
           Uncertainties <- grep("/", TipStates)
 
           # If there are polymorphisms and using the "equalp" (equal probability of each state) option:
-          if (length(Polymorphisms) > 0 && polymorphism.behaviour == "equalp") {
+          if (length(Polymorphisms) > 0 && polymorphism_behaviour == "equalp") {
 
             # For each polymorphisms set each state as equally probable:
             for (i in Polymorphisms) x$TipStates[i, strsplit(TipStates[i], split = "&")[[1]]] <- 1 / length(strsplit(TipStates[i], split = "&")[[1]])
           }
 
           # If there are uncertainties and using the "equalp" (equal probability of each state) option:
-          if (length(Uncertainties) > 0 && uncertainty.behaviour == "equalp") {
+          if (length(Uncertainties) > 0 && uncertainty_behaviour == "equalp") {
 
             # For each uncertainty set each state as equally probable:
             for (i in Uncertainties) x$TipStates[i, strsplit(TipStates[i], split = "/")[[1]]] <- 1 / length(strsplit(TipStates[i], split = "/")[[1]])

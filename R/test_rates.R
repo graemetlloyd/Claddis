@@ -23,8 +23,8 @@
 #' @param estimate_all_nodes Option passed to internal use of \link{estimate_ancestral_states}.
 #' @param estimate_tip_values Option passed to internal use of \link{estimate_ancestral_states}.
 #' @param inapplicables_as_missing Option passed to internal use of \link{estimate_ancestral_states}.
-#' @param polymorphism.behaviour Option passed to internal use of \link{estimate_ancestral_states}.
-#' @param uncertainty.behaviour Option passed to internal use of \link{estimate_ancestral_states}.
+#' @param polymorphism_behaviour Option passed to internal use of \link{estimate_ancestral_states}.
+#' @param uncertainty_behaviour Option passed to internal use of \link{estimate_ancestral_states}.
 #' @param threshold Option passed to internal use of \link{estimate_ancestral_states}.
 #' @param all_missing_allowed Logical to allow all missing character values - see \link{estimate_ancestral_states} for details.
 #'
@@ -91,7 +91,7 @@
 #'
 #' Sixthly, all character changes are weighted according to the weights provided in the input character-taxon matrix. In many cases these will simply all be one, although see the equalise weights option in \link{read_nexus_matrix}. However, when weights vary they can create some issues for the function. Specifically, changes are expected to be in the same (integer) units, but if weights vary then they have to be modelled accordingly. I.e., a character twice the weight of another may lead to a single change being counted as two changes. This is most problematic when the user has continuous characters which are automatically converted to gap-weighted (Thiele 1993) characters. However, this conversion creates drastically down-weighted characters and hence the user may wish to set the \code{all_weights_integers} option to TRUE. Note that reweighting will affect the results and hence shifting the weights of characters up or down will necessarily lead to shifts in the relative Type I and II errors. This is an unexplored aspect of such approaches, but is something the user should be aware of. More broadly it is recommended that continuous (or gap-weighted) characters be avoided when using this function.
 #'
-#' Finally, the remaining options (\code{estimate_all_nodes}, \code{estimate_tip_values}, \code{inapplicables_as_missing}, \code{polymorphism.behaviour}, \code{uncertainty.behaviour}, and \code{threshold}) are all simply passed directly to \link{estimate_ancestral_states} for estimating the ancestral states and users should consult the help file for that function for further details.
+#' Finally, the remaining options (\code{estimate_all_nodes}, \code{estimate_tip_values}, \code{inapplicables_as_missing}, \code{polymorphism_behaviour}, \code{uncertainty_behaviour}, and \code{threshold}) are all simply passed directly to \link{estimate_ancestral_states} for estimating the ancestral states and users should consult the help file for that function for further details.
 #'
 #' Note that currently the function cannot deal with step matrices and that the terminal versus internal option from Brusatte et al. (2014) is yet to be implemented.
 #'
@@ -169,7 +169,7 @@
 #' time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
 #'
 #' # Set root time by making youngest taxon extant:
-#' time_tree$root.time <- max(diag(vcv(time_tree)))
+#' time_tree$root.time <- max(diag(ape::vcv(time_tree)))
 #'
 #' # Get discrete character rates:
 #' x <- test_rates(
@@ -194,14 +194,15 @@
 #'     "lloyd"
 #' )
 #' @export test_rates
-test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions = NULL, character_partitions = NULL, clade_partitions = NULL, time_partitions = NULL, change_times = "random", test_type = "AIC", alpha = 0.01, multiple_comparison_correction = "benjaminihochberg", polymorphism_state = "missing", uncertainty_state = "missing", inapplicable_state = "missing", time_binning_approach = "lloyd", all_weights_integers = FALSE, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, polymorphism.behaviour = "equalp", uncertainty.behaviour = "equalp", threshold = 0.01, all_missing_allowed = FALSE) {
+test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions = NULL, character_partitions = NULL, clade_partitions = NULL, time_partitions = NULL, change_times = "random", test_type = "AIC", alpha = 0.01, multiple_comparison_correction = "benjaminihochberg", polymorphism_state = "missing", uncertainty_state = "missing", inapplicable_state = "missing", time_binning_approach = "lloyd", all_weights_integers = FALSE, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, polymorphism_behaviour = "equalp", uncertainty_behaviour = "equalp", threshold = 0.01, all_missing_allowed = FALSE) {
 
-  # ADD EXAMPLES OF VISUALISED OUTPUT
+  # ADD EXAMPLES OF VISUALISED OUTPUT (MENTION IN MANUAL AN ADD PLOT FUNCTIONS TO SEALSO_
 
   # AICc BREAKS IF MORE THAN N-2 PARAMETERS (INFINITY OR WRONGLY NEGATIVE OUTPUT CAN OCCUR THIS WAY)
   # GLOBAL RATE NEEDS TO GO INTO LRT OPTION IF NOT USED IN AIC
   # SOMEHOW NEED TO ALLOW MULTIPLE VERSIONS OF MAIN PIEPLINE IF DOING RANDOM ASSIGNMENTS OF CHANGE TIMES
   # NEED TO ADD PARTITIONS USED TO OUTPUT SOMEHOW...
+  # STOP REQUIRING TIME BINS TO BE SET IF NOT TESTING TIME PARTITIONS.
 
   # MAYBE DO SOME KIND OF WEIGHTING FOR AIC AS SOME PARTITIONS WILL CONTAIN VERY LITTLE DATA AND BE EXTREME OUTLIERS?
   # NEED TO CHECK FOR SINGLE PARTITION WITH LRT (ALLOWED WITH AIC)
@@ -263,7 +264,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
   CharacterNumbers <- 1:sum(unlist(lapply(lapply(cladistic_matrix[2:length(cladistic_matrix)], "[[", "matrix"), ncol)))
 
   # Ensure time bins are in correct order:
-  time_bins <- sort(unique(time_bins), decreasing = TRUE)
+  time_bins <- sort(x = unique(time_bins), decreasing = TRUE)
 
   # Find the Time bin midpoints:
   TimeBinMidpoints <- (time_bins[2:length(time_bins)] + time_bins[1:(length(time_bins) - 1)]) / 2
@@ -284,7 +285,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
     if (length(NonPresentValues) > 0) stop(paste(PartitionName, "Partitions to test must be defined using the valid range of values (", paste(range(ValidValues), collapse = " to "), ") only.", sep = ""))
 
     # Check partitions never overlap and stop and warn user if they do:
-    Check <- lapply(PartitionsToTest, function(x) if (any(duplicated(sort(unlist(x))))) stop(paste("Each partition of ", PartitionName, " must not contain overlapping values (e.g., can not have 1:3 and 3:5 as both contain 3).", sep = "")))
+    Check <- lapply(PartitionsToTest, function(x) if (any(duplicated(sort(x = unlist(x))))) stop(paste("Each partition of ", PartitionName, " must not contain overlapping values (e.g., can not have 1:3 and 3:5 as both contain 3).", sep = "")))
 
     # Subfunction to ad the missing partition (if exists):
     add_missing_partitions <- function(x, ValidValues) {
@@ -315,7 +316,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
       paste(unlist(lapply(x, function(y) {
 
         # First make sure y is sorted:
-        y <- sort(y)
+        y <- sort(x = y)
 
         # Covnvert y to a list (splitting if gaps greater than 1 are found):
         y <- unname(split(y, cumsum(c(TRUE, diff(y) > 1))))
@@ -444,7 +445,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
   find_descendant_edgesForEachInternalNode <- lapply(as.list(InternalNodeNumbers), find_descendant_edges, tree = time_tree)
 
   # Get ancestral character states:
-  AncestralStates <- estimate_ancestral_states(cladistic_matrix = cladistic_matrix, time_tree = time_tree, estimate_all_nodes = estimate_all_nodes, estimate_tip_values = estimate_tip_values, inapplicables_as_missing = inapplicables_as_missing, polymorphism.behaviour = polymorphism.behaviour, uncertainty.behaviour = uncertainty.behaviour, threshold = threshold, all_missing_allowed = all_missing_allowed)
+  AncestralStates <- estimate_ancestral_states(cladistic_matrix = cladistic_matrix, time_tree = time_tree, estimate_all_nodes = estimate_all_nodes, estimate_tip_values = estimate_tip_values, inapplicables_as_missing = inapplicables_as_missing, polymorphism_behaviour = polymorphism_behaviour, uncertainty_behaviour = uncertainty_behaviour, threshold = threshold, all_missing_allowed = all_missing_allowed)
 
   # Build single matrix of all states in tip label then node number order:
   AllStates <- do.call(cbind, lapply(lapply(AncestralStates[2:length(AncestralStates)], "[[", "matrix"), function(x) x[c(time_tree$tip.label, 1:ape::Nnode(time_tree) + ape::Ntip(time_tree)), , drop = FALSE]))
@@ -514,8 +515,8 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
 
     # Rescale continous characters as zero to one values:
     ListOfContinuousValuesRescaledZeroToOne <- lapply(lapply(lapply(apply(AllStates[, ContinuouscharactersFound, drop = FALSE], 2, list), unlist), as.numeric), function(x) {
-      x <- x - min(sort(x))
-      x <- x / max(sort(x))
+      x <- x - min(sort(x = x))
+      x <- x / max(sort(x = x))
       return(x)
     })
 
@@ -626,7 +627,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
       sort_change_times <- function(CharacterChanges) {
 
         # Sort change time for each character from oldest (first) to youngest (last) and store it:
-        CharacterChanges[, "Time"] <- unname(unlist(lapply(as.list(unique(CharacterChanges[, "Character"])), function(x) sort(CharacterChanges[which(CharacterChanges[, "Character"] == x), "Time"], decreasing = TRUE))))
+        CharacterChanges[, "Time"] <- unname(unlist(lapply(as.list(unique(CharacterChanges[, "Character"])), function(x) sort(x = CharacterChanges[which(CharacterChanges[, "Character"] == x), "Time"], decreasing = TRUE))))
 
         # Return sorted character changes:
         return(CharacterChanges)
@@ -1101,6 +1102,6 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
 # estimate_all_nodes = FALSE
 # estimate_tip_values = FALSE
 # inapplicables_as_missing = FALSE
-# polymorphism.behaviour = "equalp"
-# uncertainty.behaviour = "equalp"
+# polymorphism_behaviour = "equalp"
+# uncertainty_behaviour = "equalp"
 # threshold = 0.01

@@ -15,7 +15,7 @@ fix_root_time(original_tree, pruned_tree)
 Returns a tree (phylo object) with a fixed \code{$root.time}.
 }
 \description{
-Fixes root.time after taxa have been pruned from a tree using drop.tip
+Fixes root.time after taxa have been pruned from a tree using ape::drop.tip
 }
 \details{
 (NB: This function is designed to only cope with trees containing at least three tips.)
@@ -33,7 +33,7 @@ tree <- read.tree(text = "(A:1,(B:1,(C:1,D:1):1):1);")
 tree$root.time <- 20
 
 # Now prune taxon A:
-pruned_tree <- drop.tip(tree, "A")
+pruned_tree <- ape::drop.tip(tree, "A")
 
 # Show that drop.tip has not updated the tree's root time:
 pruned_tree$root.time

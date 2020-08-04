@@ -122,7 +122,7 @@ plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_sl
   plot_cushion <- 0.1
 
   # Put time slices in order of oldest to youngest:
-  time_bins <- sort(time_slices, decreasing = TRUE)
+  time_bins <- sort(x = time_slices, decreasing = TRUE)
 
   # Record the number of stackes to plot:
   N_stacks <- length(time_bins) - 1

@@ -35,7 +35,7 @@ bin_changes <- function(change_times, time_bins) {
   # ADD BOUNDARY TIME OPTION? I.E., WHICH BIN SHOULD THEY BE ASSIGNED TO?
 
   # Enforce old-to-young order of time bins:
-  time_bins <- sort(time_bins, decreasing = TRUE)
+  time_bins <- sort(x = time_bins, decreasing = TRUE)
 
   # Create all-zero vector to store ouput in:
   changes.in.bin <- rep(0, length(time_bins) - 1)

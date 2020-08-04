@@ -75,7 +75,7 @@ time_tree <- ape::rtree(nrow(day_2016$matrix_1$matrix))
 time_tree$tip.label <- rownames(day_2016$matrix_1$matrix)
 
 # Add root age to tree:
-time_tree$root.time <- max(diag(vcv(time_tree)))
+time_tree$root.time <- max(diag(ape::vcv(time_tree)))
 
 # Get all state changes for two simulations:
 StateChanges <-

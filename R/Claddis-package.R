@@ -31,7 +31,7 @@
 
 # there's no hope, move rgl to suggests!
 # @import rgl
-# @importFrom rgl plot3d lines3d points3d text3d view3d
+#' @importFrom rgl plot3d lines3d points3d text3d view3d
 
 #' @importFrom clipr write_clip
 #' @importFrom gdata trim

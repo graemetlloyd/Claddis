@@ -37,10 +37,10 @@
 find_mrca <- function(descendant_names, tree) {
 
   # Get tip numbers:
-  tipnos <- match(descendant_names, tree$tip.label)
+  tip_numbers <- match(descendant_names, tree$tip.label)
 
   # Get ancestral nodes in order:
-  ancestor_node <- sort(unique(tree$edge[, 1][match(tipnos, tree$edge[, 2])]))
+  ancestor_node <- sort(x = unique(tree$edge[, 1][match(tip_numbers, tree$edge[, 2])]))
 
   # Keep going until a single ancestral node is converged upon:
   while (length(ancestor_node) > 1) {
@@ -52,9 +52,9 @@ find_mrca <- function(descendant_names, tree) {
     ancestor_node <- ancestor_node[-length(ancestor_node)]
 
     # Find its ancestor and add to unique list:
-    ancestor_node <- sort(unique(c(ancestor_node, tree$edge[match(highest_node, tree$edge[, 2]), 1])))
+    ancestor_node <- sort(x = unique(c(ancestor_node, tree$edge[match(highest_node, tree$edge[, 2]), 1])))
   }
 
   # Return ancestral node:
-  return(ancestor_node)
+  ancestor_node
 }

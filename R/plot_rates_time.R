@@ -75,7 +75,7 @@
 #' test_rates_output <- test_rates(
 #'   time_tree = time_tree,
 #'   cladistic_matrix = cladistic_matrix,
-#'   time_partitions = partition_time_bins(Ntime_bins = 9),
+#'   time_partitions = partition_time_bins(n_time_bins = 9),
 #'   time_bins = seq(from = 270, to = 252, length.out = 10)
 #' )
 #'

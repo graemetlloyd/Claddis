@@ -27,7 +27,7 @@
 #' # Create a random tree for the Day et al. 2016 data set:
 #' day_2016tree <- ape::rtree(nrow(day_2016$matrix_1$matrix))
 #' day_2016tree$tip.label <- rownames(day_2016$matrix_1$matrix)
-#' day_2016tree$root.time <- max(diag(vcv(day_2016tree)))
+#' day_2016tree$root.time <- max(diag(ape::vcv(day_2016tree)))
 #'
 #' # Get proportional phylogenetic character completeness in ten equal-length
 #' # time bins:
@@ -36,7 +36,7 @@
 #'   time_tree = day_2016tree, time_bins = seq(
 #'     from =
 #'       day_2016tree$root.time, to = day_2016tree$root.time -
-#'       max(diag(vcv(day_2016tree))), length.out = 11
+#'       max(diag(ape::vcv(day_2016tree))), length.out = 11
 #'   )
 #' )
 #' @export bin_character_completeness
@@ -97,7 +97,7 @@ bin_character_completeness <- function(cladistic_matrix, time_tree, time_bins, p
       if (length(setdiff(time_tree$tip.label, taxa.to.prune)) > 1) {
 
         # Remove tips with missing data from tree:
-        pruned_tree <- drop.tip(time_tree, taxa.to.prune)
+        pruned_tree <- ape::drop.tip(time_tree, taxa.to.prune)
 
         # Need to correct root time to make sure time binning makes sense:
         pruned_tree <- fix_root_time(time_tree, pruned_tree)

@@ -27,7 +27,7 @@
 date_nodes <- function(time_tree) {
 
   # Store root node number:
-  rootnode <- ape::Ntip(time_tree) + 1
+  root_node <- ape::Ntip(time_tree) + 1
 
   # If tree is a complete polytomy:
   if (time_tree$Nnode == 1) {
@@ -54,13 +54,13 @@ date_nodes <- function(time_tree) {
       j <- 1
 
       # Identify current node:
-      currentnode <- paths[[i]][j]
+      current_node <- paths[[i]][j]
 
       # While current node is not the root (path has not terminated):
-      while (currentnode != rootnode) {
+      while (current_node != root_node) {
 
         # Update current node and add to path:
-        currentnode <- paths[[i]][j + 1] <- time_tree$edge[match(currentnode, time_tree$edge[, 2]), 1]
+        current_node <- paths[[i]][j + 1] <- time_tree$edge[match(current_node, time_tree$edge[, 2]), 1]
 
         # Update counter:
         j <- j + 1

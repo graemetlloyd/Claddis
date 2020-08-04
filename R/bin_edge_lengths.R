@@ -39,13 +39,13 @@
 bin_edge_lengths <- function(time_tree, time_bins, pruned_tree = NULL) {
 
   # Tree must have $root.time:
-  if (is.null(time_tree$root.time)) stop("ERROR: time_tree must have $root.time or function can not work.")
+  if (is.null(time_tree$root.time)) stop("time_tree must have $root.time or function can not work.")
 
   # If tree is pruned from a larger version (where the terminal-internal dichotomy really applies):
   if (!is.null(pruned_tree)) {
 
     # Check pruned tree is subset of tree:
-    if (!all(drop.tip(time_tree, setdiff(time_tree$tip.label, pruned_tree$tip.label))$edge == pruned_tree$edge)) stop("ERROR: pruned_tree must be subtree of time_tree.")
+    if (!all(ape::drop.tip(time_tree, setdiff(time_tree$tip.label, pruned_tree$tip.label))$edge == pruned_tree$edge)) stop("ERROR: pruned_tree must be subtree of time_tree.")
 
     # Get dropped taxa:
     dropped.tips <- setdiff(time_tree$tip.label, pruned_tree$tip.label)
@@ -57,7 +57,7 @@ bin_edge_lengths <- function(time_tree, time_bins, pruned_tree = NULL) {
     if (sum(pruned_tree$edge.length) < sum(time_tree$edge.length)) {
 
       # Find descendant tips of each node:
-      descendant.tips <- lapply(as.list((ape::Ntip(time_tree) + 1):(ape::Ntip(time_tree) + ape::Nnode(time_tree))), FindDescendants, tree = time_tree)
+      descendant.tips <- lapply(as.list((ape::Ntip(time_tree) + 1):(ape::Ntip(time_tree) + ape::Nnode(time_tree))), strap::FindDescendants, tree = time_tree)
 
       # Add node numbers as names:
       names(descendant.tips) <- (ape::Ntip(time_tree) + 1):(ape::Ntip(time_tree) + ape::Nnode(time_tree))
@@ -77,7 +77,7 @@ bin_edge_lengths <- function(time_tree, time_bins, pruned_tree = NULL) {
   internal.edges <- setdiff(1:nrow(time_tree$edge), terminal.edges)
 
   # Enforce old-to-young order of time bins:
-  time_bins <- sort(time_bins, decreasing = TRUE)
+  time_bins <- sort(x = time_bins, decreasing = TRUE)
 
   # Create all-zero vector to store ouput in:
   internal.edge.length.in.bin <- terminal.edge.length.in.bin <- edge.length.in.bin <- rep(0, length(time_bins) - 1)

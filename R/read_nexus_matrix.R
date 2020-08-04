@@ -90,16 +90,16 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
         FirstPolymorphismEnds <- which(CurrentString == PolymorphismEndsWith)[1]
         
         # If a true polymorphism (two or more states observed) and reading data in use ampersand to separate states:
-        if (CurrentString[FirstPolymorphismBegins] == "(" && direction == "in") PolymorphicCharacter <- paste(sort(CurrentString[(FirstPolymorphismBegins + 1):(FirstPolymorphismEnds - 1)]), collapse = "&")
+        if (CurrentString[FirstPolymorphismBegins] == "(" && direction == "in") PolymorphicCharacter <- paste(sort(x = CurrentString[(FirstPolymorphismBegins + 1):(FirstPolymorphismEnds - 1)]), collapse = "&")
         
         # If an uncertainty (two or more possible states) and reading data in use slash to separate states:
-        if (CurrentString[FirstPolymorphismBegins] == "{" && direction == "in") PolymorphicCharacter <- paste(sort(CurrentString[(FirstPolymorphismBegins + 1):(FirstPolymorphismEnds - 1)]), collapse = "/")
+        if (CurrentString[FirstPolymorphismBegins] == "{" && direction == "in") PolymorphicCharacter <- paste(sort(x = CurrentString[(FirstPolymorphismBegins + 1):(FirstPolymorphismEnds - 1)]), collapse = "/")
         
         # If a true polymorphism (two or more states observed) and exporting data out use ampersand to separate states:
-        if (CurrentString[FirstPolymorphismBegins] == "(" && direction == "out") PolymorphicCharacter <- paste("(", paste(sort(CurrentString[(FirstPolymorphismBegins + 1):(FirstPolymorphismEnds - 1)]), collapse = ""), ")", sep = "")
+        if (CurrentString[FirstPolymorphismBegins] == "(" && direction == "out") PolymorphicCharacter <- paste("(", paste(sort(x = CurrentString[(FirstPolymorphismBegins + 1):(FirstPolymorphismEnds - 1)]), collapse = ""), ")", sep = "")
         
         # If an uncertainty (two or more possible states) and exporting data out use slash to separate states:
-        if (CurrentString[FirstPolymorphismBegins] == "{" && direction == "out") PolymorphicCharacter <- paste("{", paste(sort(CurrentString[(FirstPolymorphismBegins + 1):(FirstPolymorphismEnds - 1)]), collapse = ""), "}", sep = "")
+        if (CurrentString[FirstPolymorphismBegins] == "{" && direction == "out") PolymorphicCharacter <- paste("{", paste(sort(x = CurrentString[(FirstPolymorphismBegins + 1):(FirstPolymorphismEnds - 1)]), collapse = ""), "}", sep = "")
         
         # Remove now redundant characters from current string:
         CurrentString <- CurrentString[-((FirstPolymorphismBegins + 1):FirstPolymorphismEnds)]
@@ -143,7 +143,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
         }
         
         # Convert to actual numbers and sort back into increasing order:
-        Numbers <- sort(as.numeric(Numbers))
+        Numbers <- sort(x = as.numeric(Numbers))
         
         # Return unpacked numbers:
         return(Numbers)
@@ -1148,7 +1148,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
     Startingweights <- lapply(Startingweights, function(x) x * ProductWeight)
     
     # Get factors of every weight currently applied:
-    AllFactorsCombined <- sort(unlist(lapply(as.list(unique(unlist(Startingweights))), get_all_factors)))
+    AllFactorsCombined <- sort(x = unlist(lapply(as.list(unique(unlist(Startingweights))), get_all_factors)))
     
     # Get largest common factor of all weights:
     LargestCommonFactor <- max(rle(AllFactorsCombined)$values[rle(AllFactorsCombined)$lengths == length(unique(unlist(Startingweights)))])
@@ -1160,7 +1160,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
       Startingweights <- lapply(Startingweights, function(x) x / LargestCommonFactor)
       
       # Get factors of every weight currently applied:
-      AllFactorsCombined <- sort(unlist(lapply(as.list(unique(unlist(Startingweights))), get_all_factors)))
+      AllFactorsCombined <- sort(x = unlist(lapply(as.list(unique(unlist(Startingweights))), get_all_factors)))
       
       # Get largest common factor of all weights:
       LargestCommonFactor <- max(rle(AllFactorsCombined)$values[rle(AllFactorsCombined)$lengths == length(unique(unlist(Startingweights)))])

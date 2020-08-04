@@ -12,9 +12,9 @@ match_tree_edges(original_tree, pruned_tree)
 \item{pruned_tree}{A tree in phylo format that represents a pruned version of \code{original_tree}.}
 }
 \value{
-\item{matching.edges}{A list of the matching edges.}
+\item{matching_edges}{A list of the matching edges.}
 \item{matching.nodes}{A matrix of matching node numbers.}
-\item{removed.edges}{A vector of the removed edges.}
+\item{removed_edges}{A vector of the removed edges.}
 }
 \description{
 Given two trees where one is a pruned version of the other gives matching edges and nodes of pruned tree to original tree.
@@ -28,16 +28,16 @@ Finds matching edge(s) and node(s) for a pruned tree in the original tree from w
 original_tree <- ape::rtree(10)
 
 # Remove three leaves:
-pruned_tree <- drop.tip(original_tree, c("t1", "t3", "t8"))
+pruned_tree <- ape::drop.tip(original_tree, c("t1", "t3", "t8"))
 
 # Find matching edges:
 X <- match_tree_edges(original_tree, pruned_tree)
 
 # Show matching edges:
-X$matching.edges
+X$matching_edges
 
 # Show removed edges:
-X$removed.edges
+X$removed_edges
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

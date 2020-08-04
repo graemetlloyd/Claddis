@@ -33,7 +33,7 @@
 #' time_tree <- ape::rtree(nrow(michaux_1989$matrix_1$matrix))
 #'
 #' # Set root time so latest tip terminates at the present:
-#' time_tree$root.time <- max(diag(vcv(time_tree)))
+#' time_tree$root.time <- max(diag(ape::vcv(time_tree)))
 #'
 #' # Add taxon names to the tree:
 #' time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
@@ -63,18 +63,18 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
   # Add top level conditionals to check for a tree etc.
 
   # Default plotting parameters for a 2D morphospace. Need to change node colour for 3D using rgl
-  p.p <- list()
-  if (is.null(p.p$t.bg)) p.p$t.bg <- "black"
-  if (is.null(p.p$t.pch)) p.p$t.pch <- 21
-  if (is.null(p.p$t.cex)) p.p$t.cex <- 2
-  if (is.null(p.p$n.bg)) p.p$n.bg <- "white"
-  if (is.null(p.p$n.pch)) p.p$n.pch <- 21
-  if (is.null(p.p$n.cex)) p.p$n.cex <- 1.25
-  if (is.null(p.p$l.col)) p.p$l.col <- "black"
-  if (is.null(p.p$lwd)) p.p$lwd <- 3
-  if (is.null(p.p$txt.adj)) p.p$txt.adj <- c(-.1, -.1)
-  if (is.null(p.p$txt.col)) p.p$txt.col <- "black"
-  if (is.null(p.p$txt.cex)) p.p$txt.cex <- 1
+  plotting_parameters <- list()
+  if (is.null(plotting_parameters$t.bg)) plotting_parameters$t.bg <- "black"
+  if (is.null(plotting_parameters$t.pch)) plotting_parameters$t.pch <- 21
+  if (is.null(plotting_parameters$t.cex)) plotting_parameters$t.cex <- 2
+  if (is.null(plotting_parameters$n.bg)) plotting_parameters$n.bg <- "white"
+  if (is.null(plotting_parameters$n.pch)) plotting_parameters$n.pch <- 21
+  if (is.null(plotting_parameters$n.cex)) plotting_parameters$n.cex <- 1.25
+  if (is.null(plotting_parameters$l.col)) plotting_parameters$l.col <- "black"
+  if (is.null(plotting_parameters$lwd)) plotting_parameters$lwd <- 3
+  if (is.null(plotting_parameters$txt.adj)) plotting_parameters$txt.adj <- c(-.1, -.1)
+  if (is.null(plotting_parameters$txt.col)) plotting_parameters$txt.col <- "black"
+  if (is.null(plotting_parameters$txt.cex)) plotting_parameters$txt.cex <- 1
 
   # Isolate Tree:
   time_tree <- pcoa_data$time_tree
@@ -89,16 +89,13 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
   set_plot_limits <- function(x, s) {
 
     # Get range of x:
-    r <- range(x)
+    x_range <- range(x)
 
     # Scale range values:
-    rc <- scale(r, scale = FALSE)
+    rc <- scale(x_range, scale = FALSE)
 
-    # ?????
-    l <- mean(r) + s * rc
-
-    # Return l:
-    return(l)
+    # ????
+    mean(x_range) + s * rc
   }
 
   # Get node ages for z-axis in plotting:
@@ -111,7 +108,8 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
   ylab <- paste("PC", y_axis, sep = "")
 
   # Make empty plot:
-  rgl::plot3d(pcoa_data,
+  rgl::plot3d(
+    pcoa_data,
     type = "n",
     xlim = set_plot_limits(pcoa_data[, x_axis], 1.5),
     ylim = set_plot_limits(pcoa_data[, y_axis], 1.5),
@@ -123,18 +121,21 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
   )
 
   # plots tips
-  rgl::points3d(pcoa_data[1:N, 1],
+  rgl::points3d(
+    pcoa_data[1:N, 1],
     pcoa_data[1:N, 2],
     z_axis[1:N],
-    col = p.p$t.bg,
-    size = p.p$t.cex * 4
+    col = plotting_parameters$t.bg,
+    size = plotting_parameters$t.cex * 4
   )
 
   # plots nodes
-  rgl::points3d(pcoa_data[(N + 1):nrow(pcoa_data), 1],
+  rgl::points3d(
+    pcoa_data[(N + 1):nrow(pcoa_data), 1],
     pcoa_data[(N + 1):nrow(pcoa_data), 2],
     z_axis[(N + 1):nrow(pcoa_data)],
-    col = p.p$n.bg, size = p.p$n.cex * 4
+    col = plotting_parameters$n.bg,
+    size = plotting_parameters$n.cex * 4
   )
 
   # plots branches
@@ -153,9 +154,9 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
     pcoa_data[, y_axis],
     z_axis,
     rownames(pcoa_data),
-    col = p.p$txt.col,
-    cex = p.p$txt.cex,
-    adj = p.p$txt.adj
+    col = plotting_parameters$txt.col,
+    cex = plotting_parameters$txt.cex,
+    adj = plotting_parameters$txt.adj
   )
 
   # If plotting the shadow of x and y axes at the base of the plot:
@@ -177,8 +178,8 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
       pcoa_data[(N + 1):nrow(pcoa_data), 1],
       pcoa_data[(N + 1):nrow(pcoa_data), 2],
       time_tree$root.time,
-      col = p.p$n.bg,
-      size = p.p$n.cex * 4,
+      col = plotting_parameters$n.bg,
+      size = plotting_parameters$n.cex * 4,
       alpha = 0.5
     )
 
@@ -186,8 +187,8 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
     rgl::points3d(pcoa_data[1:N, 1],
       pcoa_data[1:N, 2],
       time_tree$root.time,
-      col = p.p$t.bg,
-      size = p.p$t.cex * 4,
+      col = plotting_parameters$t.bg,
+      size = plotting_parameters$t.cex * 4,
       alpha = 0.5
     )
   }

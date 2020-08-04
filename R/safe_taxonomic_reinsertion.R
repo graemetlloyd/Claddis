@@ -71,7 +71,7 @@ safe_taxonomic_reinsertion <- function(treefile.in, treefile.out, str.list, mult
     str.list <- str.list[-match(single.replacements, str.list[, "Junior"]), ]
 
     # Update names and numbers now taxa have been removed:
-    names.and.numbers <- rle(as.character(sort(str.list[, "Junior"])))
+    names.and.numbers <- rle(as.character(sort(x = str.list[, "Junior"])))
   }
 
   # Only worth contuning if there are names still to reinsert:
@@ -112,10 +112,10 @@ safe_taxonomic_reinsertion <- function(treefile.in, treefile.out, str.list, mult
         senior.taxon <- seniors[grep(TRUE, is.na(match(seniors, str.list[, "Junior"])))]
 
         # Replace senior with all juniors in polytomy:
-        text <- gsub(senior.taxon, paste("(", paste(sort(c(taxon.name, seniors)), collapse = ","), ")", sep = ""), text)
+        text <- gsub(senior.taxon, paste("(", paste(sort(x = c(taxon.name, seniors)), collapse = ","), ")", sep = ""), text)
 
         # Remove taxa just dealt with from polytomy.taxa:
-        polytomy.taxa <- polytomy.taxa[-sort(match(c(taxon.name, seniors), polytomy.taxa))]
+        polytomy.taxa <- polytomy.taxa[-sort(x = match(c(taxon.name, seniors), polytomy.taxa))]
       }
 
       # Trims str list down to remaining taxa:

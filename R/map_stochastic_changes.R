@@ -59,7 +59,7 @@
 #' time_tree$tip.label <- rownames(day_2016$matrix_1$matrix)
 #'
 #' # Add root age to tree:
-#' time_tree$root.time <- max(diag(vcv(time_tree)))
+#' time_tree$root.time <- max(diag(ape::vcv(time_tree)))
 #'
 #' # Get all state changes for two simulations:
 #' StateChanges <-
@@ -125,7 +125,7 @@ map_stochastic_changes <- function(cladistic_matrix, time_tree, time_bins, NSimu
   if (length(setdiff(inapplicable.behaviour, c("missing"))) > 0) stop("inapplicable.behaviour must be \"missing\".")
 
   # Ensure time bins are in correct order:
-  time_bins <- sort(unique(time_bins), decreasing = TRUE)
+  time_bins <- sort(x = unique(time_bins), decreasing = TRUE)
 
   # Get tree node ages:
   node_ages <- date_nodes(time_tree = time_tree)
@@ -345,7 +345,7 @@ map_stochastic_changes <- function(cladistic_matrix, time_tree, time_bins, NSimu
       if ((TipsInTree - length(TipsToDrop)) == 2) {
 
         # Prune tree and store:
-        x$PrunedTree <- drop.tip(x$FullTree, TipsToDrop)
+        x$PrunedTree <- ape::drop.tip(x$FullTree, TipsToDrop)
 
         # Correct root time manually:
         x$PrunedTree$root.time <- unname(node_ages[find_mrca(descendant_names = setdiff(time_tree$tip.label, TipsToDrop), tree = time_tree)])
@@ -355,7 +355,7 @@ map_stochastic_changes <- function(cladistic_matrix, time_tree, time_bins, NSimu
       if ((TipsInTree - length(TipsToDrop)) > 2) {
 
         # Prune tree and store:
-        x$PrunedTree <- drop.tip(x$FullTree, TipsToDrop)
+        x$PrunedTree <- ape::drop.tip(x$FullTree, TipsToDrop)
 
         # Ensure pruned trees $root.time value is correct:
         x$PrunedTree <- fix_root_time(time_tree, x$PrunedTree)
@@ -739,7 +739,7 @@ map_stochastic_changes <- function(cladistic_matrix, time_tree, time_bins, NSimu
               ChangeEdges <- unlist(lapply(as.list(change_times), function(z) min(which(z > MatchingEdgesAstime_bins)) - 1))
 
               # Create full tree stochastic character map of correct size:
-              FullStochasticMaps <- lapply(as.list(rle(sort(c(ChangeEdges, 1:length(MatchingEdges))))$lengths), function(z) rep(0, z))
+              FullStochasticMaps <- lapply(as.list(rle(sort(x = c(ChangeEdges, 1:length(MatchingEdges))))$lengths), function(z) rep(0, z))
 
               # Set current time as beginning of pruned edge:
               CurrentTime <- StartAgeOfPrunedEdge

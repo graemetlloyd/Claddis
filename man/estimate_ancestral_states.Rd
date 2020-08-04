@@ -10,8 +10,8 @@ estimate_ancestral_states(
   estimate_all_nodes = FALSE,
   estimate_tip_values = FALSE,
   inapplicables_as_missing = FALSE,
-  polymorphism.behaviour = "equalp",
-  uncertainty.behaviour = "equalp",
+  polymorphism_behaviour = "equalp",
+  uncertainty_behaviour = "equalp",
   threshold = 0.01,
   all_missing_allowed = FALSE
 )
@@ -27,9 +27,9 @@ estimate_ancestral_states(
 
 \item{inapplicables_as_missing}{Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).}
 
-\item{polymorphism.behaviour}{One of either "equalp" or "treatasmissing".}
+\item{polymorphism_behaviour}{One of either "equalp" or "treatasmissing".}
 
-\item{uncertainty.behaviour}{One of either "equalp" or "treatasmissing".}
+\item{uncertainty_behaviour}{One of either "equalp" or "treatasmissing".}
 
 \item{threshold}{The threshold value to use when collapsing marginal likelihoods to discrete state(s).}
 
@@ -60,7 +60,7 @@ time_tree <- ape::rtree(n = nrow(day_2016$matrix_1$matrix))
 time_tree$tip.label <- rownames(day_2016$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
-time_tree$root.time <- max(diag(vcv(time_tree)))
+time_tree$root.time <- max(diag(ape::vcv(time_tree)))
 
 # Use Day matrix as cladistic matrix:
 cladistic_matrix <- day_2016

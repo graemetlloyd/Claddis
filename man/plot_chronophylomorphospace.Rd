@@ -35,7 +35,7 @@ set.seed(4)
 time_tree <- ape::rtree(nrow(michaux_1989$matrix_1$matrix))
 
 # Set root time so latest tip terminates at the present:
-time_tree$root.time <- max(diag(vcv(time_tree)))
+time_tree$root.time <- max(diag(ape::vcv(time_tree)))
 
 # Add taxon names to the tree:
 time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
