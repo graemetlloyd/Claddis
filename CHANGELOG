@@ -5,6 +5,8 @@ Version - 0.5.5 - 2020-03-08
 - Added proper examples to rate visualisation functions.
 - Ran code through styler (no change to users).
 - Readded .Rbuildignore file (no change to users).
+- Continued updating of variable names to get codebase to fit tidyverse style (users are advised to wait until version 0.6.x for this to stabilise).
+- Moving rgl from suggests back to imports (no change to users).
 
 Version - 0.5.4 - 2020-02-08
 
