@@ -30,10 +30,10 @@
 #' @examples
 #'
 #' # Get morphological distances for Michaux (1989) data set:
-#' distances <- calculate_morphological_distances(michaux_1989)
+#' distances <- calculate_morphological_distances(cladistic_matrix = michaux_1989)
 #'
 #' # Attempt to trim max.distance_matrix:
-#' trim_matrix(distances$distance_matrix)
+#' trim_matrix(distance_matrix = distances$distance_matrix)
 #' @export trim_matrix
 trim_matrix <- function(distance_matrix, tree = NULL) {
 
@@ -47,7 +47,7 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
   if (is.null(tree)) {
 
     # Case if distance matrix is already complete:
-    if (length(which(is.na(distance_matrix))) == 0) {
+    if (length(x = which(x = is.na(distance_matrix))) == 0) {
 
       # Warn user:
       print("There are no gaps in the distance matrix")
@@ -68,19 +68,19 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
       removes <- vector(mode = "character")
 
       # Whilst there are still gaps in the matrix:
-      while (length(which(is.na(distance_matrix))) > 0) {
+      while (length(x = which(x = is.na(distance_matrix))) > 0) {
 
         # Vector to store number of NAs for each row of the matrix:
         na_lengths <- vector(mode = "numeric")
 
         # For each row of the matrix get the number of NAs:
-        for (i in 1:length(distance_matrix[, 1])) na_lengths[i] <- length(which(is.na(distance_matrix[i, ])))
+        for (i in 1:length(x = distance_matrix[, 1])) na_lengths[i] <- length(x = which(x = is.na(distance_matrix[i, ])))
 
         # Take row with most NAs and make it the taxon to delete:
-        taxon_to_delete <- rownames(distance_matrix)[which(na_lengths == max(na_lengths))[1]]
+        taxon_to_delete <- rownames(x = distance_matrix)[which(x = na_lengths == max(na_lengths))[1]]
 
         # Find the taxon's row:
-        row_to_delete <- which(rownames(distance_matrix) == taxon_to_delete)
+        row_to_delete <- which(x = rownames(x = distance_matrix) == taxon_to_delete)
 
         # Remove it from the distance matrix:
         distance_matrix <- distance_matrix[-row_to_delete, -row_to_delete]
@@ -100,7 +100,7 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
   } else {
 
     # Case if distance matrix is already complete:
-    if (length(which(is.na(distance_matrix))) == 0) {
+    if (length(x = which(x = is.na(distance_matrix))) == 0) {
 
       # Warn user:
       print("There are no gaps in the distance matrix")
@@ -121,7 +121,7 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
       node_numbers <- as.character((ape::Ntip(tree) + 1):(ape::Ntip(tree) + ape::Nnode(tree)))
 
       # Rename distance_matrix rownames by descendant taxa that define them:
-      for (i in match(node_numbers, rownames(distance_matrix))) colnames(distance_matrix)[i] <- rownames(distance_matrix)[i] <- paste(sort(x = tree$tip.label[strap::FindDescendants(rownames(distance_matrix)[i], tree)]), collapse = "%%")
+      for (i in match(node_numbers, rownames(x = distance_matrix))) colnames(x = distance_matrix)[i] <- rownames(x = distance_matrix)[i] <- paste(sort(x = tree$tip.label[strap::FindDescendants(rownames(x = distance_matrix)[i], tree)]), collapse = "%%")
 
       # Vector to store taxa and nodes that need removing:
       removes <- vector(mode = "character")
@@ -130,19 +130,19 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
       temporary_distance_matrix <- distance_matrix
 
       # Whilst there are still gaps in the matrix:
-      while (length(which(is.na(distance_matrix))) > 0) {
+      while (length(x = which(x = is.na(distance_matrix))) > 0) {
 
         # Vector to store number of NAs for each row of the matrix:
         na_lengths <- vector(mode = "numeric")
 
         # For each row of the matrix get the number of NAs:
-        for (i in 1:length(distance_matrix[, 1])) na_lengths[i] <- length(which(is.na(distance_matrix[i, ])))
+        for (i in 1:length(x = distance_matrix[, 1])) na_lengths[i] <- length(x = which(x = is.na(distance_matrix[i, ])))
 
         # Take row with most NAs and make it the taxon to delete:
-        taxon_to_delete <- rownames(distance_matrix)[which(na_lengths == max(na_lengths))[1]]
+        taxon_to_delete <- rownames(x = distance_matrix)[which(x = na_lengths == max(na_lengths))[1]]
 
         # Find the taxons row:
-        row_to_delete <- which(rownames(distance_matrix) == taxon_to_delete)
+        row_to_delete <- which(x = rownames(x = distance_matrix) == taxon_to_delete)
 
         # Remove it from the distance matrix:
         distance_matrix <- distance_matrix[-row_to_delete, -row_to_delete]
@@ -167,20 +167,20 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
       for (i in tips_to_remove) {
 
         # Get originating node for tip:
-        originating_node <- tree$edge[match(which(tree$tip.label == i), tree$edge[, 2]), 1]
+        originating_node <- tree$edge[match(which(x = tree$tip.label == i), tree$edge[, 2]), 1]
 
         # Get name of originating node:
         originating_node_name <- paste(sort(x = tree$tip.label[strap::FindDescendants(originating_node, tree)]), collapse = "%%")
 
         # Add to nodes to delete vector:
-        tipname_nodes_to_remove <- unique(c(tipname_nodes_to_remove, originating_node_name))
+        tipname_nodes_to_remove <- unique(x = c(tipname_nodes_to_remove, originating_node_name))
       }
 
       # Check if nodes need to be deleted that are not related to tips to be deleted:
-      if (length(setdiff(nodes_to_remove, tipname_nodes_to_remove)) > 0) {
+      if (length(x = setdiff(x = nodes_to_remove, y = tipname_nodes_to_remove)) > 0) {
 
         # Identify nodes left to remove:
-        nodes_still_to_remove <- setdiff(nodes_to_remove, tipname_nodes_to_remove)
+        nodes_still_to_remove <- setdiff(x = nodes_to_remove, y = tipname_nodes_to_remove)
 
         # Go through each node:
         for (i in nodes_still_to_remove) {
@@ -189,10 +189,10 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
           originating_node <- find_mrca(descendant_names = strsplit(i, "%%")[[1]], tree = tree)
 
           # Find descendants of that node:
-          descendant_nodes <- tree$edge[which(tree$edge[, 1] == originating_node), 2]
+          descendant_nodes <- tree$edge[which(x = tree$edge[, 1] == originating_node), 2]
 
           # Case if one of the descendants is a tip:
-          if (length(which(descendant_nodes <= ape::Ntip(tree))) > 0) {
+          if (length(x = which(x = descendant_nodes <= ape::Ntip(tree))) > 0) {
 
             # Get taxon to exclude:
             taxon_to_exclude <- tree$tip.label[min(descendant_nodes)]
@@ -201,7 +201,7 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
           } else {
 
             # If first descendant node has more taxa:
-            if (length(strap::FindDescendants(descendant_nodes[1], tree)) >= length(strap::FindDescendants(descendant_nodes[2], tree))) {
+            if (length(x = strap::FindDescendants(descendant_nodes[1], tree)) >= length(x = strap::FindDescendants(descendant_nodes[2], tree))) {
 
               # Get taxon to exclude:
               taxon_to_exclude <- tree$tip.label[strap::FindDescendants(descendant_nodes[2], tree)]
@@ -223,41 +223,41 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
       }
 
       # Prune matrix until complete:
-      distance_matrix <- distance_matrix[-match(removes, rownames(distance_matrix)), -match(removes, rownames(distance_matrix))]
+      distance_matrix <- distance_matrix[-match(removes, rownames(x = distance_matrix)), -match(removes, rownames(x = distance_matrix))]
 
       # Loop to prune removed taxa from node names:
-      for (i in 1:length(distance_matrix[, 1])) {
+      for (i in 1:length(x = distance_matrix[, 1])) {
 
         # Split name into constituent taxa:
-        taxa <- strsplit(rownames(distance_matrix)[i], "%%")[[1]]
+        taxa <- strsplit(rownames(x = distance_matrix)[i], "%%")[[1]]
 
         # Get only still present taxa and rename rows and columns:
-        rownames(distance_matrix)[i] <- colnames(distance_matrix)[i] <- paste(sort(x = taxa[which(is.na(match(taxa, tips_to_remove)))]), collapse = "%%")
+        rownames(x = distance_matrix)[i] <- colnames(x = distance_matrix)[i] <- paste(sort(x = taxa[which(x = is.na(match(taxa, tips_to_remove)))]), collapse = "%%")
       }
 
       # Establish if there are redundant rows (nodes defined by a single tip or by no tips at all):
-      redundant_rows <- c(which(duplicated(rownames(distance_matrix))), which(rownames(distance_matrix) == ""))
+      redundant_rows <- c(which(x = duplicated(rownames(x = distance_matrix))), which(x = rownames(x = distance_matrix) == ""))
 
       # If there are any redundant rows remove them from distance matrix:
-      if (length(redundant_rows) > 0) distance_matrix <- distance_matrix[-redundant_rows, -redundant_rows]
+      if (length(x = redundant_rows) > 0) distance_matrix <- distance_matrix[-redundant_rows, -redundant_rows]
 
       # Store tree prior to any pruning:
       full_tree <- tree
 
       # Remove pruned taxa from tree:
-      tree <- ape::drop.tip(tree, tips_to_remove)
+      tree <- ape::drop.tip(phy = tree, tip = tips_to_remove)
 
       # Correct root time (if necessary):
       tree <- fix_root_time(original_tree = full_tree, pruned_tree = tree)
 
       # Find node names:
-      node_names <- rownames(distance_matrix)[grep("%%", rownames(distance_matrix))]
+      node_names <- rownames(x = distance_matrix)[grep("%%", rownames(x = distance_matrix))]
 
       # Find node numbers:
-      for (j in 1:length(node_names)) names(node_names)[j] <- find_mrca(descendant_names = strsplit(node_names[j], "%%")[[1]], tree = tree)
+      for (j in 1:length(x = node_names)) names(node_names)[j] <- find_mrca(descendant_names = strsplit(node_names[j], "%%")[[1]], tree = tree)
 
       # Replace node names with numbers:
-      colnames(distance_matrix)[match(node_names, colnames(distance_matrix))] <- rownames(distance_matrix)[match(node_names, rownames(distance_matrix))] <- names(node_names)
+      colnames(x = distance_matrix)[match(node_names, colnames(x = distance_matrix))] <- rownames(x = distance_matrix)[match(node_names, rownames(x = distance_matrix))] <- names(node_names)
 
       # Return data in single variable:
       return(list(distance_matrix = distance_matrix, tree = tree, removed_taxa = removes))

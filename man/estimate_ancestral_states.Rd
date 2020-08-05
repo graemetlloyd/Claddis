@@ -57,10 +57,10 @@ set.seed(4)
 time_tree <- ape::rtree(n = nrow(day_2016$matrix_1$matrix))
 
 # Update taxon names to match those in the data matrix:
-time_tree$tip.label <- rownames(day_2016$matrix_1$matrix)
+time_tree$tip.label <- rownames(x = day_2016$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
-time_tree$root.time <- max(diag(ape::vcv(time_tree)))
+time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
 
 # Use Day matrix as cladistic matrix:
 cladistic_matrix <- day_2016

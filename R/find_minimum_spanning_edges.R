@@ -56,8 +56,8 @@ find_minimum_spanning_edges <- function(distance_matrix) {
         minimum_spanning_tree_edges <- rbind(
           minimum_spanning_tree_edges,
           c(
-            rownames(links_matrix)[i],
-            colnames(links_matrix)[j]
+            rownames(x = links_matrix)[i],
+            colnames(x = links_matrix)[j]
           )
         )
       }
@@ -65,7 +65,7 @@ find_minimum_spanning_edges <- function(distance_matrix) {
   }
 
   # Get distances:
-  distances <- diag(distance_matrix[minimum_spanning_tree_edges[, "From"], minimum_spanning_tree_edges[, "To"]])
+  distances <- diag(x = distance_matrix[minimum_spanning_tree_edges[, "From"], minimum_spanning_tree_edges[, "To"]])
 
   # Add names to distances:
   names(distances) <- apply(minimum_spanning_tree_edges, 1, paste, collapse = "->")

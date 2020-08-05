@@ -8,10 +8,10 @@ map_stochastic_changes(
   cladistic_matrix,
   time_tree,
   time_bins,
-  NSimulations = 10,
-  polymorphism.behaviour = "equalp",
-  uncertainty.behaviour = "equalp",
-  inapplicable.behaviour = "missing"
+  n_simulations = 10,
+  polymorphism_behaviour = "equalp",
+  uncertainty_behaviour = "equalp",
+  inapplicable_behaviour = "missing"
 )
 }
 \arguments{
@@ -21,21 +21,21 @@ map_stochastic_changes(
 
 \item{time_bins}{A vector of ages representing the boundaries of a series of time bins.}
 
-\item{NSimulations}{The number of simulations to perform (passed to \code{make.simmap}.}
+\item{n_simulations}{The number of simulations to perform (passed to \code{make.simmap}.}
 
-\item{polymorphism.behaviour}{What to do with polymorphic (&) characters. One of "equalp", "missing", or "random". See details.}
+\item{polymorphism_behaviour}{What to do with polymorphic (&) characters. One of "equalp", "missing", or "random". See details.}
 
-\item{uncertainty.behaviour}{What to do with uncertain (/) characters. One of "equalp", "missing", or "random". See details.}
+\item{uncertainty_behaviour}{What to do with uncertain (/) characters. One of "equalp", "missing", or "random". See details.}
 
-\item{inapplicable.behaviour}{What to do with inapplicable characters. Only one option currently ("missing"). See details.}
+\item{inapplicable_behaviour}{What to do with inapplicable characters. Only one option currently ("missing"). See details.}
 }
 \value{
-\item{RootStates}{A matrix of the root states for each character (column) and simulation (rows).}
-\item{AllStateChanges}{A matrix of rows for each change with columns corresponding to the character, the simulation number, the edge number, the time the change occurred, and the start and end states.}
-\item{CharacterTimes}{A vector of the sampled tree-length (in Ma) for each character.}
-\item{EdgeLengthsPerBin}{A matrix of time bins (columns) and characters (rows) indicating the sampled tree-length (in Ma).}
-\item{TerminalEdgeLengthsPerBin}{As above, but for terminal edges only.}
-\item{InternalEdgeLengthsPerBin}{As above, but for internal edges only.}
+\item{root_states}{A matrix of the root states for each character (column) and simulation (rows).}
+\item{all_state_changes}{A matrix of rows for each change with columns corresponding to the character, the simulation number, the edge number, the time the change occurred, and the start and end states.}
+\item{character_times}{A vector of the sampled tree-length (in Ma) for each character.}
+\item{binned_edge_lengths}{A matrix of time bins (columns) and characters (rows) indicating the sampled tree-length (in Ma).}
+\item{binned_terminal_edge_lengths}{As above, but for terminal edges only.}
+\item{binned_internal_edge_lengths}{As above, but for internal edges only.}
 }
 \description{
 Takes a cladistic matrix and time-scaled tree and makes point estimates for every character change using stochastic character mapping.
@@ -69,13 +69,13 @@ cladistic_matrix <- prune_cladistic_matrix(
 )
 
 # Generete random tree for matrix taxa:
-time_tree <- ape::rtree(nrow(day_2016$matrix_1$matrix))
+time_tree <- ape::rtree(n = nrow(day_2016$matrix_1$matrix))
 
 # Add taxon names to tree:
-time_tree$tip.label <- rownames(day_2016$matrix_1$matrix)
+time_tree$tip.label <- rownames(x = day_2016$matrix_1$matrix)
 
 # Add root age to tree:
-time_tree$root.time <- max(diag(ape::vcv(time_tree)))
+time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
 
 # Get all state changes for two simulations:
 StateChanges <-
@@ -83,24 +83,24 @@ StateChanges <-
     cladistic_matrix = cladistic_matrix,
     time_tree = time_tree, time_bins = seq(time_tree$root.time, 0,
       length.out = 3
-    ), NSimulations = 2
+    ), n_simulations = 2
   )
 
 # View matrix of all stochstic character changes:
-StateChanges$AllStateChanges
+StateChanges$all_state_changes
 
 # View vector of sampled time for each
 # character:
-StateChanges$CharacterTimes
+StateChanges$character_times
 
 # View matrix of edge lengths in each time bin:
-StateChanges$EdgeLengthsPerBin
+StateChanges$binned_edge_lengths
 
 # View matrix of termnial edge lengths in each time bin:
-StateChanges$TerminalEdgeLengthsPerBin
+StateChanges$binned_terminal_edge_lengths
 
 # View matrix of internal edge lengths in each time bin:
-StateChanges$InternalEdgeLengthsPerBin
+StateChanges$binned_internal_edge_lengths
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

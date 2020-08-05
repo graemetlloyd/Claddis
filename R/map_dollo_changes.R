@@ -37,7 +37,7 @@
 #' @examples
 #'
 #' # Create a random 10-taxon tree:
-#' time_tree <- ape::rtree(10)
+#' time_tree <- ape::rtree(n = 10)
 #'
 #' # Arbitrarily add a root.time value of 100 Ma:
 #' time_tree$root.time <- 100
@@ -59,6 +59,8 @@
 #' @export map_dollo_changes
 map_dollo_changes <- function(time_tree, tip_states) {
 
+  # Output of this should match other stochastic character map function and ultimately be a format that can be handed to test_rates or disparity functions
+
   # Check tree has branch lengths:
   if (is.null(time_tree$edge.length)) stop("time_tree must have branch lengths.")
 
@@ -66,22 +68,22 @@ map_dollo_changes <- function(time_tree, tip_states) {
   if (is.null(time_tree$root.time)) stop("time_tree must have a $root.time value.")
 
   # Record non-matching names:
-  non.matches <- c(setdiff(names(tip_states), time_tree$tip.label), setdiff(time_tree$tip.label, names(tip_states)))
+  non.matches <- c(setdiff(x = names(tip_states), y = time_tree$tip.label), setdiff(x = time_tree$tip.label, y = names(tip_states)))
 
   # If there are any non-matching names stop and notify user:
-  if (length(non.matches) > 0) stop(paste("Non-matching names between tree and tips states found:", paste(non.matches, collapse = ", ")))
+  if (length(x = non.matches) > 0) stop(paste("Non-matching names between tree and tips states found:", paste(non.matches, collapse = ", ")))
 
   # Check for states other than zero or one:
-  non.binary.states <- setdiff(unique(tip_states), c(0, 1))
+  non.binary.states <- setdiff(x = unique(x = tip_states), y = c(0, 1))
 
   # If states other than zero or one found warn user:
-  if (length(non.binary.states) > 0) stop("States other than 0 or 1 found. All states must be 0 or 1.")
+  if (length(x = non.binary.states) > 0) stop("States other than 0 or 1 found. All states must be 0 or 1.")
 
   # Make Dollo-like model where only losses (1 -> 0) are allowed (will later force root state to be one):
   Dollo.model <- matrix(c(0, 1, 0, 0), nrow = 2, ncol = 2, dimnames = list(c("0", "1"), c("0", "1")))
 
   # Find new root (indicating least inclusive clade of
-  new.root <- find_mrca(descendant_names = names(which(tip_states == 1)), tree = time_tree)
+  new.root <- find_mrca(descendant_names = names(which(x = tip_states == 1)), tree = time_tree)
 
   # If new root is really the old root:
   if ((ape::Ntip(time_tree) + 1) == new.root && sum(tip_states == 1) > 1) {
@@ -93,7 +95,7 @@ map_dollo_changes <- function(time_tree, tip_states) {
     acquisition.time <- time_tree$root.time
 
     # If tip states vary:
-    if (length(unique(tip_states)) > 1) {
+    if (length(x = unique(x = tip_states)) > 1) {
 
       # Get stochastic character map for full tree using Dollo model and a strong root prior of one:
       SCM <- make.simmap(time_tree, tip_states[time_tree$tip.label], model = Dollo.model, pi = c(0, 1), message = FALSE)$maps
@@ -102,10 +104,10 @@ map_dollo_changes <- function(time_tree, tip_states) {
     } else {
 
       # Create SCM with no losses:
-      SCM <- as.list(time_tree$edge.length)
+      SCM <- as.list(x = time_tree$edge.length)
 
       # Label all states as derived:
-      for (i in 1:length(SCM)) names(SCM[[i]]) <- as.character(unique(tip_states))
+      for (i in 1:length(x = SCM)) names(SCM[[i]]) <- as.character(unique(x = tip_states))
     }
 
     # If new root reflects a subtree:
@@ -115,10 +117,10 @@ map_dollo_changes <- function(time_tree, tip_states) {
     if (sum(tip_states == 1) == 1) {
 
       # Create base stochastic character map (SCM:
-      SCM <- as.list(c(1:nrow(time_tree$edge)))
+      SCM <- as.list(x = c(1:nrow(time_tree$edge)))
 
       # For each branch in the SCM:
-      for (i in 1:length(SCM)) {
+      for (i in 1:length(x = SCM)) {
 
         # Create a null value (vector equal to branch length):
         x <- time_tree$edge.length[i]
@@ -131,13 +133,13 @@ map_dollo_changes <- function(time_tree, tip_states) {
       }
 
       # Get branch along which (single) acqusition of derived state occurs:
-      acquisition.branch <- match(which(tip_states == 1), time_tree$edge[, 2])
+      acquisition.branch <- match(which(x = tip_states == 1), time_tree$edge[, 2])
 
       # Get bounds for acquisition times:
       acquisition.bounds <- date_nodes(time_tree = time_tree)[time_tree$edge[acquisition.branch, ]]
 
       # Draw an acusition time from a uniform distribution between the bounds:
-      acquisition.time <- runif(1, min = acquisition.bounds[2], max = acquisition.bounds[1])
+      acquisition.time <- stats::runif(n = 1, min = acquisition.bounds[2], max = acquisition.bounds[1])
 
       # Create an SCM branch for the acquisition:
       acquisition.branch.SCM <- c(acquisition.bounds[1] - acquisition.time, acquisition.time - acquisition.bounds[2])
@@ -155,10 +157,10 @@ map_dollo_changes <- function(time_tree, tip_states) {
       clade.members <- time_tree$tip.label[strap::FindDescendants(new.root, time_tree)]
 
       # Find non-members of the least inclusive clade:
-      nonclade.members <- setdiff(time_tree$tip.label, clade.members)
+      nonclade.members <- setdiff(x = time_tree$tip.label, y = clade.members)
 
       # Case if only two members in clade:
-      if (length(clade.members) == 2) {
+      if (length(x = clade.members) == 2) {
 
         # Get branch along which (single) acqusition of derived state occurs:
         acquisition.branch <- match(new.root, time_tree$edge[, 2])
@@ -167,13 +169,13 @@ map_dollo_changes <- function(time_tree, tip_states) {
         acquisition.bounds <- date_nodes(time_tree = time_tree)[time_tree$edge[acquisition.branch, ]]
 
         # Draw an acusition time from a uniform distribution between the bounds:
-        acquisition.time <- runif(1, min = acquisition.bounds[2], max = acquisition.bounds[1])
+        acquisition.time <- stats::runif(n = 1, min = acquisition.bounds[2], max = acquisition.bounds[1])
 
         # Create base stochastic character map (SCM):
-        SCM <- as.list(c(1:nrow(time_tree$edge)))
+        SCM <- as.list(x = c(1:nrow(time_tree$edge)))
 
         # For each branch in the SCM:
-        for (i in 1:length(SCM)) {
+        for (i in 1:length(x = SCM)) {
 
           # Create a null value (vector equal to branch length):
           x <- time_tree$edge.length[i]
@@ -204,7 +206,7 @@ map_dollo_changes <- function(time_tree, tip_states) {
       } else {
 
         # Prune taxa external to least inclusive clade to create a pruned tree:
-        new.tree <- ape::drop.tip(time_tree, nonclade.members)
+        new.tree <- ape::drop.tip(phy = time_tree, tip = nonclade.members)
 
         # Ensure root time is correct:
         new.tree <- fix_root_time(time_tree, new.tree)
@@ -219,13 +221,13 @@ map_dollo_changes <- function(time_tree, tip_states) {
         acquisition.bounds <- date_nodes(time_tree = time_tree)[time_tree$edge[acquisition.branch, ]]
 
         # Draw an acusition time from a uniform distribution between the bounds:
-        acquisition.time <- runif(1, min = acquisition.bounds[2], max = acquisition.bounds[1])
+        acquisition.time <- stats::runif(n = 1, min = acquisition.bounds[2], max = acquisition.bounds[1])
 
         # Create base stochastic character map (SCM):
-        SCM <- as.list(c(1:nrow(time_tree$edge)))
+        SCM <- as.list(x = c(1:nrow(time_tree$edge)))
 
         # For each branch in the SCM:
-        for (i in 1:length(SCM)) {
+        for (i in 1:length(x = SCM)) {
 
           # Create a null value (vector equal to branch length):
           x <- time_tree$edge.length[i]
@@ -247,7 +249,7 @@ map_dollo_changes <- function(time_tree, tip_states) {
         SCM[[acquisition.branch]] <- acquisition.branch.SCM
 
         # If tip states vary:
-        if (length(unique(new.tips)) > 1) {
+        if (length(x = unique(x = new.tips)) > 1) {
 
           # Now do real SCM on pruned tree using Dollo model and a strong root prior of one:
           SCM_real <- make.simmap(new.tree, new.tips[new.tree$tip.label], model = Dollo.model, pi = c(0, 1), message = FALSE)$maps
@@ -256,10 +258,10 @@ map_dollo_changes <- function(time_tree, tip_states) {
         } else {
 
           # Create SCM with no losses:
-          SCM_real <- as.list(new.tree$edge.length)
+          SCM_real <- as.list(x = new.tree$edge.length)
 
           # Label all states as derived:
-          for (i in 1:length(SCM_real)) names(SCM_real[[i]]) <- "1"
+          for (i in 1:length(x = SCM_real)) names(SCM_real[[i]]) <- "1"
         }
 
         # Create edge matrix for original tree:
@@ -269,16 +271,16 @@ map_dollo_changes <- function(time_tree, tip_states) {
         new.edges <- new.tree$edge
 
         # Update tip names for original tree edge matrix:
-        for (i in 1:ape::Ntip(time_tree)) orig.edges[which(orig.edges[, 2] == i), 2] <- time_tree$tip.label[i]
+        for (i in 1:ape::Ntip(time_tree)) orig.edges[which(x = orig.edges[, 2] == i), 2] <- time_tree$tip.label[i]
 
         # Update tip names for pruned tree edge matrix:
-        for (i in 1:ape::Ntip(new.tree)) new.edges[which(new.edges[, 2] == i), 2] <- new.tree$tip.label[i]
+        for (i in 1:ape::Ntip(new.tree)) new.edges[which(x = new.edges[, 2] == i), 2] <- new.tree$tip.label[i]
 
         # Update node names for original tree edge matrix:
-        for (i in (ape::Ntip(time_tree) + 1):(ape::Ntip(time_tree) + ape::Nnode(time_tree))) orig.edges[which(orig.edges == i)] <- paste(sort(x = time_tree$tip.label[strap::FindDescendants(i, time_tree)]), collapse = "")
+        for (i in (ape::Ntip(time_tree) + 1):(ape::Ntip(time_tree) + ape::Nnode(time_tree))) orig.edges[which(x = orig.edges == i)] <- paste(sort(x = time_tree$tip.label[strap::FindDescendants(i, time_tree)]), collapse = "")
 
         # Update node names for pruned tree edge matrix:
-        for (i in (ape::Ntip(new.tree) + 1):(ape::Ntip(new.tree) + ape::Nnode(new.tree))) new.edges[which(new.edges == i)] <- paste(sort(x = new.tree$tip.label[strap::FindDescendants(i, new.tree)]), collapse = "")
+        for (i in (ape::Ntip(new.tree) + 1):(ape::Ntip(new.tree) + ape::Nnode(new.tree))) new.edges[which(x = new.edges == i)] <- paste(sort(x = new.tree$tip.label[strap::FindDescendants(i, new.tree)]), collapse = "")
 
         # Collapse original edge matrix to from-to straings for matching:
         orig.edges <- apply(orig.edges, 1, paste, collapse = "%%TO%%")
@@ -302,13 +304,13 @@ map_dollo_changes <- function(time_tree, tip_states) {
   changes.matrix <- matrix(nrow = 0, ncol = 4, dimnames = list(c(), c("Branch", "From", "To", "Time")))
 
   # Get branches that record changes:
-  change.branches <- which(lapply(SCM, length) > 1)
+  change.branches <- which(x = lapply(X = SCM, length) > 1)
 
   # Special case of acquisition occurring prior to root (add extra line to changes matrix):
   if (acquisition.branch == 0) changes.matrix <- rbind(changes.matrix, c(acquisition.branch, 0, 1, acquisition.time))
 
   # As long as there are changes to record (i.e., it is not a constant character):
-  if (length(change.branches) > 0) {
+  if (length(x = change.branches) > 0) {
 
     # For each change branch:
     for (i in change.branches) {
@@ -331,7 +333,7 @@ map_dollo_changes <- function(time_tree, tip_states) {
   }
 
   # Clean up row names:
-  rownames(changes.matrix) <- NULL
+  rownames(x = changes.matrix) <- NULL
 
   # Build output:
   output <- list(Changes = changes.matrix, SCM = SCM)

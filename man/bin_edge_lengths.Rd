@@ -14,9 +14,9 @@ bin_edge_lengths(time_tree, time_bins, pruned_tree = NULL)
 \item{pruned_tree}{A time-scaled tree in phylo format with a \code{$root.time} value that is a subset of \code{time_tree}.}
 }
 \value{
-\item{edge.length.in.bin}{A vector giving the summed values in millions of years for each time bin. Names indicate the maximum and minimum values for each time bin.}
-\item{terminal.edge.length.in.bin}{As above, but counting terminal edges only.}
-\item{internal.edge.length.in.bin}{As above, but counting internal edges only.}
+\item{binned_edge_lengths}{A vector giving the summed values in millions of years for each time bin. Names indicate the maximum and minimum values for each time bin.}
+\item{binned_terminal_edge_lengths}{As above, but counting terminal edges only.}
+\item{binned_internal_edge_lengths}{As above, but counting internal edges only.}
 }
 \description{
 Given a time-scaled tree and set of time bin boundaries will sum the edge-lengths present in each bin.
@@ -29,7 +29,7 @@ The option of using a \code{pruned_tree} allows the user to correctly classify i
 \examples{
 
 # Create a random 10-taxon tree:
-time_tree <- ape::rtree(10)
+time_tree <- ape::rtree(n = 10)
 
 # Add root age:
 time_tree$root.time <- 100

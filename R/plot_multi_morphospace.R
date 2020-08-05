@@ -42,7 +42,7 @@ plot_multi_morphospace <- function(pcoa_input, N_axes = 4, plot_taxon_names = FA
   A <- matrix(0, ncol = N_axes, nrow = N_axes)
 
   # Make plot numbers for lower triangle of layout:
-  A[which(lower.tri(A) == TRUE)] <- 1:N_plots
+  A[which(x = lower.tri(A) == TRUE)] <- 1:N_plots
 
   # Remove last empty column:
   A <- A[, -N_axes]
@@ -78,7 +78,7 @@ plot_multi_morphospace <- function(pcoa_input, N_axes = 4, plot_taxon_names = FA
   par(mar = c(0, 0, 0, 0))
 
   # Place PC labels along left
-  for (i in 1:(length(labels) / 2)) {
+  for (i in 1:(length(x = labels) / 2)) {
 
     # Empty plot:
     plot(N_axes, type = "n", axes = FALSE, xlab = "", ylab = "", xlim = c(-1, 1), ylim = c(-1, 1))
@@ -88,7 +88,7 @@ plot_multi_morphospace <- function(pcoa_input, N_axes = 4, plot_taxon_names = FA
   }
 
   # Place PC labels along top
-  for (i in (((length(labels) / 2) + 1):length(labels))) {
+  for (i in (((length(x = labels) / 2) + 1):length(x = labels))) {
 
     # Empty plot:
     plot(N_axes, type = "n", axes = FALSE, xlab = "", ylab = "", xlim = c(-1, 1), ylim = c(-1, 1))

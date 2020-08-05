@@ -22,10 +22,10 @@
 #' @examples
 #'
 #' # Create a random 10-taxon tree:
-#' original_tree <- ape::rtree(10)
+#' original_tree <- ape::rtree(n = 10)
 #'
 #' # Remove three leaves:
-#' pruned_tree <- ape::drop.tip(original_tree, c("t1", "t3", "t8"))
+#' pruned_tree <- ape::drop.tip(phy = original_tree, tip = c("t1", "t3", "t8"))
 #'
 #' # Find matching edges:
 #' X <- match_tree_edges(original_tree, pruned_tree)
@@ -42,19 +42,19 @@ match_tree_edges <- function(original_tree, pruned_tree) {
   if (ape::Ntip(pruned_tree) < 3) stop("pruned_tree includes too few (<3) taxa to be used.")
 
   # Conditional in case where pruned tree taxa are not a subset of the original tree taxa:
-  if (length(setdiff(pruned_tree$tip.label, original_tree$tip.label)) > 0) stop("pruned_tree cannot include taxa not present in original_tree.")
+  if (length(x = setdiff(x = pruned_tree$tip.label, y = original_tree$tip.label)) > 0) stop("pruned_tree cannot include taxa not present in original_tree.")
 
   # First find removed taxa (if any):
-  removed_taxa <- setdiff(original_tree$tip.label, pruned_tree$tip.label)
+  removed_taxa <- setdiff(x = original_tree$tip.label, y = pruned_tree$tip.label)
 
   # If no taxa are removed:
-  if (length(removed_taxa) == 0) {
+  if (length(x = removed_taxa) == 0) {
 
     # Record removed edges as an empty vector:
     removed_edges <- numeric(0)
 
     # Return matching edges as list:
-    matching_edges <- as.list(1:nrow(original_tree$edge))
+    matching_edges <- as.list(x = 1:nrow(original_tree$edge))
 
     # Create lists of nodes (which will be identical):
     clades <- corresponding_nodes <- c((ape::Ntip(pruned_tree) + 1):(ape::Ntip(pruned_tree) + ape::Nnode(pruned_tree)), 1:ape::Ntip(pruned_tree))
@@ -72,7 +72,7 @@ match_tree_edges <- function(original_tree, pruned_tree) {
       clades <- c(clades, paste(pruned_tree$tip.label[strap::FindDescendants(i, pruned_tree)], collapse = "%%SpLiTtEr%%"))
 
       # Update with node number:
-      names(clades)[length(clades)] <- i
+      names(clades)[length(x = clades)] <- i
     }
 
     # Create vector to store corresponding node numbers in original tree:
@@ -97,7 +97,7 @@ match_tree_edges <- function(original_tree, pruned_tree) {
     nonmatching_edges <- pruned.edges[is.na(matching_edges), ]
 
     # Only continue if there are non-matching edges (will be the case if only "outgroup(s)" are removed:
-    if (length(nonmatching_edges) > 0) {
+    if (length(x = nonmatching_edges) > 0) {
 
       # Correct stupid matrix to vector problem:
       if (!is.matrix(nonmatching_edges)) nonmatching_edges <- matrix(nonmatching_edges, ncol = 2)
@@ -115,7 +115,7 @@ match_tree_edges <- function(original_tree, pruned_tree) {
         edges <- match(end.node, original_tree$edge[, 2])
 
         # Keep going until start and end node are joined by contiguous edges:
-        while (length(sort(x = match(original_tree$edge[edges, 1], start.node))) == 0) {
+        while (length(x = sort(x = match(original_tree$edge[edges, 1], start.node))) == 0) {
 
           # Update end node:
           end.node <- original_tree$edge[match(end.node, original_tree$edge[, 2]), 1]
@@ -125,21 +125,21 @@ match_tree_edges <- function(original_tree, pruned_tree) {
         }
 
         # Update matching edges with multiple edges separated by a double-percent:
-        matching_edges[which(is.na(matching_edges))[1]] <- paste(rev(edges), collapse = "%%")
+        matching_edges[which(x = is.na(matching_edges))[1]] <- paste(rev(edges), collapse = "%%")
       }
 
       # Get matching edges as list:
-      matching_edges <- lapply(strsplit(matching_edges, "%%"), as.numeric)
+      matching_edges <- lapply(X = strsplit(matching_edges, "%%"), as.numeric)
 
       # If there are no non-matching edges:
     } else {
 
       # Get matching edges as list:
-      matching_edges <- as.list(matching_edges)
+      matching_edges <- as.list(x = matching_edges)
     }
 
     # Get removed edges (branches from original tree missing in pruned tree:
-    removed_edges <- setdiff(1:nrow(original_tree$edge), as.numeric(unlist(matching_edges)))
+    removed_edges <- setdiff(x = 1:nrow(original_tree$edge), y = as.numeric(unlist(x = matching_edges)))
   }
 
   # Add names to matching edges:

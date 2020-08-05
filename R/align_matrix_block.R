@@ -56,31 +56,31 @@
 align_matrix_block <- function(matrix_block) {
 
   # Need to convert supplied block of text into list of taxon and character vectors:
-  matrix_block <- lapply(as.list(strsplit(matrix_block, "\n")[[1]]), function(x) {
+  matrix_block <- lapply(X = as.list(x = strsplit(matrix_block, "\n")[[1]]), function(x) {
 
     # Split each line by whitespace:
-    x <- unlist(strsplit(x, " "))
+    x <- unlist(x = strsplit(x, " "))
 
     # Return vector of name plus characters:
-    x[c(1, length(x))]
+    x[c(1, length(x = x))]
   })
 
   # what is the most number of spaces to add:
-  block_length <- max(unlist(lapply(matrix_block, function(x) nchar(x[1])))) + 2
+  block_length <- max(unlist(x = lapply(X = matrix_block, function(x) nchar(x[1])))) + 2
 
   # Add spaces to names to align block:
-  matrix_block <- lapply(matrix_block, function(x) {
+  matrix_block <- lapply(X = matrix_block, function(x) {
 
     # Isolate taxon name:
     taxon_name <- strsplit(x[1], "")[[1]]
 
     # Paste line together with correct number of spaces separating taxon name and characters:
-    x[1] <- paste(c(taxon_name, rep(" ", block_length - length(taxon_name))), collapse = "")
+    x[1] <- paste(c(taxon_name, rep(" ", block_length - length(x = taxon_name))), collapse = "")
 
     # Return aligned text:
     x
   })
 
   # Write output to clipboard ready to paste in a text (NEXUS) file:
-  clipr::write_clip(paste(unlist(lapply(matrix_block, paste, collapse = "")), collapse = "\n"))
+  clipr::write_clip(paste(unlist(x = lapply(X = matrix_block, paste, collapse = "")), collapse = "\n"))
 }

@@ -26,13 +26,13 @@ Takes the \code{character_changes} output from \link{test_rates} and plots it on
 set.seed(17)
 
 # Generate a random tree for the Michaux data set:
-time_tree <- ape::rtree(nrow(michaux_1989$matrix_1$matrix))
+time_tree <- ape::rtree(n = nrow(michaux_1989$matrix_1$matrix))
 
 # Update taxon names to match those in the data matrix:
-time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
+time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
-time_tree$root.time <- max(diag(ape::vcv(time_tree)))
+time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
 
 # Get discrete character rates (includes changes):
 out <- test_rates(time_tree, michaux_1989,
@@ -42,7 +42,7 @@ out <- test_rates(time_tree, michaux_1989,
 
 # Plot character changes on the tree:
 plot_changes_on_tree(
-  out$InferredCharacterChanges,
+  out$Inferredcharacter_changes,
   time_tree
 )
 }

@@ -43,7 +43,7 @@ tree <- ape::read.tree(text = "(Biarmosuchus_tener,
   (RC_20,(Herpetoskylax_hopsoni,Lycaenodon_longiceps)))));")
 
 # Remove line breaks from tip names:
-tree$tip.label <- gsub("\n", "", tree$tip.label)
+tree$tip.label <- gsub(pattern = "\n", replacement = "", x = tree$tip.label)
 
 # Ages for day 2016 taxa:
 ages <- matrix(c(
@@ -79,13 +79,13 @@ cladistic_matrix <- prune_cladistic_matrix(
 test_rates_output <- test_rates(
   time_tree = time_tree,
   cladistic_matrix = cladistic_matrix,
-  clade_partitions = as.list(seq(
+  clade_partitions = as.list(x = seq(
     from = ape::Ntip(tree) + 1,
     to = ape::Ntip(tree) + ape::Nnode(tree), by = 1
   )),
-  branch_partitions = lapply(as.list(seq(
+  branch_partitions = lapply(X = as.list(x = seq(
     from = 1,
-    to = length(time_tree$edge.length), by = 1
+    to = length(x = time_tree$edge.length), by = 1
   )), as.list),
   time_bins = seq(from = 270, to = 252, length.out = 10)
 )

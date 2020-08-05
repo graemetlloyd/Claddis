@@ -40,7 +40,7 @@
 #'   (RC_20,(Herpetoskylax_hopsoni,Lycaenodon_longiceps)))));")
 #'
 #' # Remove line breaks from tip names:
-#' tree$tip.label <- gsub("\n", "", tree$tip.label)
+#' tree$tip.label <- gsub(pattern = "\n", replacement = "", x = tree$tip.label)
 #'
 #' # Ages for day 2016 taxa:
 #' ages <- matrix(c(
@@ -76,13 +76,13 @@
 #' test_rates_output <- test_rates(
 #'   time_tree = time_tree,
 #'   cladistic_matrix = cladistic_matrix,
-#'   clade_partitions = as.list(seq(
+#'   clade_partitions = as.list(x = seq(
 #'     from = ape::Ntip(tree) + 1,
 #'     to = ape::Ntip(tree) + ape::Nnode(tree), by = 1
 #'   )),
-#'   branch_partitions = lapply(as.list(seq(
+#'   branch_partitions = lapply(X = as.list(x = seq(
 #'     from = 1,
-#'     to = length(time_tree$edge.length), by = 1
+#'     to = length(x = time_tree$edge.length), by = 1
 #'   )), as.list),
 #'   time_bins = seq(from = 270, to = 252, length.out = 10)
 #' )
@@ -118,12 +118,12 @@ plot_rates_tree <- function(test_rates_output, model_type, model_number, ...) {
 
   # If requesting branch partitions extract these from rate output:
   if (model_type == "branch") {
-    EdgePartitions <- lapply(test_rates_output$BranchPartitionResults, function(x) {
-      lapply(strsplit(x$Partition, " \\| ")[[1]], function(y) {
-        unlist(lapply(y, function(z) {
-          z <- as.list(strsplit(z, split = " ")[[1]])
-          unlist(lapply(z, function(p) {
-            if (length(grep("-", p)) > 0) {
+    EdgePartitions <- lapply(X = test_rates_output$BranchPartitionResults, function(x) {
+      lapply(X = strsplit(x$Partition, " \\| ")[[1]], function(y) {
+        unlist(x = lapply(X = y, function(z) {
+          z <- as.list(x = strsplit(z, split = " ")[[1]])
+          unlist(x = lapply(X = z, function(p) {
+            if (length(x = grep("-", p)) > 0) {
               p <- strsplit(p, split = "-")[[1]]
               as.numeric(p[1]:as.numeric(p[2]))
             } else {
@@ -137,12 +137,12 @@ plot_rates_tree <- function(test_rates_output, model_type, model_number, ...) {
 
   # If requesting clade partitions extract these from rate output:
   if (model_type == "clade") {
-    EdgePartitions <- lapply(test_rates_output$CladePartitionResults, function(x) {
-      lapply(strsplit(x$Partition, " \\| ")[[1]], function(y) {
-        unlist(lapply(y, function(z) {
-          z <- as.list(strsplit(z, split = " ")[[1]])
-          unlist(lapply(z, function(p) {
-            if (length(grep("-", p)) > 0) {
+    EdgePartitions <- lapply(X = test_rates_output$CladePartitionResults, function(x) {
+      lapply(X = strsplit(x$Partition, " \\| ")[[1]], function(y) {
+        unlist(x = lapply(X = y, function(z) {
+          z <- as.list(x = strsplit(z, split = " ")[[1]])
+          unlist(x = lapply(X = z, function(p) {
+            if (length(x = grep("-", p)) > 0) {
               p <- strsplit(p, split = "-")[[1]]
               as.numeric(p[1]:as.numeric(p[2]))
             } else {
@@ -155,22 +155,22 @@ plot_rates_tree <- function(test_rates_output, model_type, model_number, ...) {
   }
 
   # If requesting branch rates extract these from output:
-  if (model_type == "branch") EdgeRates <- lapply(test_rates_output$BranchPartitionResults, function(x) x$Rates)
+  if (model_type == "branch") EdgeRates <- lapply(X = test_rates_output$BranchPartitionResults, function(x) x$Rates)
 
   # If requesting clade rates extract these from output:
-  if (model_type == "clade") EdgeRates <- lapply(test_rates_output$CladePartitionResults, function(x) x$Rates)
+  if (model_type == "clade") EdgeRates <- lapply(X = test_rates_output$CladePartitionResults, function(x) x$Rates)
 
   # Get discretized vector of edge rates (needed for choosing plot colours):
   DiscretizedRateValues <- seq(from = 0, to = max(EdgeRates[[model_number]]), length.out = Resolution)
 
   # Discretize edge rates:
-  DiscretizedEdgeRates <- lapply(EdgeRates, function(x) unlist(lapply(as.list(x), function(y) DiscretizedRateValues[max(which(y >= DiscretizedRateValues))])))
+  DiscretizedEdgeRates <- lapply(X = EdgeRates, function(x) unlist(x = lapply(X = as.list(x = x), function(y) DiscretizedRateValues[max(which(x = y >= DiscretizedRateValues))])))
 
   # Create vector of edge rate values to use in plotting:
   EdgeRateValues <- rep(0, nrow(test_rates_output$time_tree$edge))
 
   # Fill vector of edge rate values to use in plotting:
-  for (i in 1:length(EdgePartitions[[model_number]])) EdgeRateValues[EdgePartitions[[model_number]][[i]]] <- DiscretizedRateValues[DiscretizedRateValues == DiscretizedEdgeRates[[model_number]][i]]
+  for (i in 1:length(x = EdgePartitions[[model_number]])) EdgeRateValues[EdgePartitions[[model_number]][[i]]] <- DiscretizedRateValues[DiscretizedRateValues == DiscretizedEdgeRates[[model_number]][i]]
 
   # Plot tree with branches colour coded by rate:
   phytools::plotBranchbyTrait(tree = test_rates_output$time_tree, x = EdgeRateValues, mode = "edge", xlims = c(0, max(EdgeRateValues)), title = "Changes per lineage myr", leg = max(nodeHeights(test_rates_output$time_tree)), ...)
@@ -178,7 +178,7 @@ plot_rates_tree <- function(test_rates_output, model_type, model_number, ...) {
   # Dead code attempting to basically do what phytools::plotBranchbyTrait does without calling phytools:
   # names(DiscretizedRateValues) <- hcl.colors(n = Resolution, palette = "viridis")
   # EdgeColours <- rep("white", nrow(test_rates_output$time_tree$edge))
-  # for(i in 1:length(EdgePartitions[[model_number]])) EdgeColours[EdgePartitions[[model_number]][[i]]] <- names(DiscretizedRateValues[DiscretizedRateValues == DiscretizedEdgeRates[[model_number]][i]])
+  # for(i in 1:length(x = EdgePartitions[[model_number]])) EdgeColours[EdgePartitions[[model_number]][[i]]] <- names(DiscretizedRateValues[DiscretizedRateValues == DiscretizedEdgeRates[[model_number]][i]])
   # ape::plot.phylo(x = test_rates_output$time_tree, edge.color = EdgeColours, show.tip.label = FALSE, edge.width = 3)
   # cols = names(DiscretizedRateValues)
   # tree = test_rates_output$time_tree
@@ -189,10 +189,10 @@ plot_rates_tree <- function(test_rates_output, model_type, model_number, ...) {
   # x <- max(nodeHeights(tree)) / 2
   # y <- 10
   # fsize <- 1.0
-  # X <- x + cbind(0:(length(cols) - 1) / length(cols), 1:length(cols) / length(cols)) * (leg)
-  # Y <- cbind(rep(y, length(cols)), rep(y, length(cols)))
+  # X <- x + cbind(0:(length(x = cols) - 1) / length(x = cols), 1:length(x = cols) / length(x = cols)) * (leg)
+  # Y <- cbind(rep(y, length(x = cols)), rep(y, length(x = cols)))
   # lines(c(X[1, 1], X[nrow(X), 2]), c(Y[1, 1], Y[nrow(Y), 2]), lwd = lwd + 2, lend = 2)
-  # for(i in 1:length(cols)) lines(X[i, ], Y[i, ], col = cols[i], lwd = lwd, lend = 2)
+  # for(i in 1:length(x = cols)) lines(X[i, ], Y[i, ], col = cols[i], lwd = lwd, lend = 2)
   # text(x = x, y = y, "0", pos = 3, cex = fsize)
   # text(x= x + leg, y = y, round(lims[2], Rounder), pos = 3, cex = fsize)
   # text(x = (2 * x + leg) / 2, y = y, "Changes", pos = 3, cex = fsize)

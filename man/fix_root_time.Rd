@@ -27,19 +27,19 @@ Note that \code{fix_root_time} in the \code{paleotree} package performs the same
 \examples{
 
 # Create a simple four-taxon tree with branch lengths:
-tree <- read.tree(text = "(A:1,(B:1,(C:1,D:1):1):1);")
+tree <- ape::read.tree(text = "(A:1,(B:1,(C:1,D:1):1):1);")
 
 # Set root age as 20 Ma:
 tree$root.time <- 20
 
 # Now prune taxon A:
-pruned_tree <- ape::drop.tip(tree, "A")
+pruned_tree <- ape::drop.tip(phy = tree, tip = "A")
 
 # Show that drop.tip has not updated the tree's root time:
 pruned_tree$root.time
 
 # Use the function to fix the root time:
-pruned_tree <- fix_root_time(tree, pruned_tree)
+pruned_tree <- fix_root_time(original_tree = tree, pruned_tree = pruned_tree)
 
 # Show that the root time is now fixed (19 Ma):
 pruned_tree$root.time

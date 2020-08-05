@@ -28,13 +28,17 @@ Previously all empty values (missing or inapplicable) were treated as NAs. But n
 \examples{
 
 # Create example matrix
-example_matrix <- paste0("#NEXUS\n\nBEGIN DATA;\n\tDIMENSIONS",
-  "  NTAX=5 NCHAR=5;\n\tFORMAT SYMBOLS= \" 0 1 2\" MISSING=? ",
-  "GAP=- ;\nMATRIX\n\nTaxon_1  010?0\nTaxon_2  021?0\nTaxon_3  ",
-  "02111\nTaxon_4  011-1\nTaxon_5  001-1\n;\nEND;\n\nBEGIN ",
-  "ASSUMPTIONS;\n\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ",
-  ";\n\tTYPESET * UNTITLED  = unord: 1 3-5, ord: 2;\n\t",
-  "WTSET * UNTITLED  = 1: 2, 2: 1 3-5;\nEND;")
+example_matrix <- paste("#NEXUS", "", "BEGIN DATA;",
+                        "\tDIMENSIONS  NTAX=5 NCHAR=5;",
+                        "\tFORMAT SYMBOLS= \" 0 1 2\" MISSING=? GAP=- ;",
+                        "MATRIX", "", "Taxon_1  010?0", "Taxon_2  021?0",
+                        "Taxon_3  02111", "Taxon_4  011-1",
+                        "Taxon_5  001-1", ";", "END;", "",
+                        "BEGIN ASSUMPTIONS;",
+                        "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;",
+                        "\tTYPESET * UNTITLED  = unord: 1 3-5, ord: 2;",
+                        "\tWTSET * UNTITLED  = 1: 2, 2: 1 3-5;",
+                        "END;", sep = "\n")
 
 # Write example matrix to current working directory called
 # "morphmatrix.nex":

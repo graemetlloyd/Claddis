@@ -33,10 +33,10 @@ date_nodes <- function(time_tree) {
   if (time_tree$Nnode == 1) {
 
     # Create paths for just tips:
-    paths <- as.list(1:ape::Ntip(time_tree))
+    paths <- as.list(x = 1:ape::Ntip(time_tree))
 
     # Add root to each path:
-    for (i in 1:length(paths)) paths[[i]] <- c(paths[[i]], ape::Ntip(time_tree) + 1)
+    for (i in 1:length(x = paths)) paths[[i]] <- c(paths[[i]], ape::Ntip(time_tree) + 1)
 
     # If tree is not a complete polytomy:
   } else {
@@ -48,7 +48,7 @@ date_nodes <- function(time_tree) {
     names(paths) <- NULL
 
     # For each path:
-    for (i in 1:length(paths)) {
+    for (i in 1:length(x = paths)) {
 
       # Set counter as 1:
       j <- 1
@@ -72,10 +72,10 @@ date_nodes <- function(time_tree) {
   date_nodes <- vector(mode = "numeric", length = ape::Ntip(time_tree) + ape::Nnode(time_tree))
 
   # For each path:
-  for (i in 1:length(paths)) {
+  for (i in 1:length(x = paths)) {
 
     # Store path lengths from root:
-    date_nodes[paths[[i]][1]] <- sum(time_tree$edge.length[match(paths[[i]][1:(length(paths[[i]]) - 1)], time_tree$edge[, 2])])
+    date_nodes[paths[[i]][1]] <- sum(time_tree$edge.length[match(paths[[i]][1:(length(x = paths[[i]]) - 1)], time_tree$edge[, 2])])
   }
 
   # Subtract path lengths from root time:

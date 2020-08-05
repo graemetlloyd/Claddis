@@ -25,10 +25,10 @@ Finds matching edge(s) and node(s) for a pruned tree in the original tree from w
 \examples{
 
 # Create a random 10-taxon tree:
-original_tree <- ape::rtree(10)
+original_tree <- ape::rtree(n = 10)
 
 # Remove three leaves:
-pruned_tree <- ape::drop.tip(original_tree, c("t1", "t3", "t8"))
+pruned_tree <- ape::drop.tip(phy = original_tree, tip = c("t1", "t3", "t8"))
 
 # Find matching edges:
 X <- match_tree_edges(original_tree, pruned_tree)

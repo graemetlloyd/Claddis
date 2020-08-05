@@ -41,7 +41,7 @@ tree <- ape::read.tree(text = "(Biarmosuchus_tener,
   (RC_20,(Herpetoskylax_hopsoni,Lycaenodon_longiceps)))));")
 
 # Remove line breaks from tip names:
-tree$tip.label <- gsub("\n", "", tree$tip.label)
+tree$tip.label <- gsub(pattern = "\n", replacement = "", x = tree$tip.label)
 
 # Ages for day 2016 taxa:
 ages <- matrix(c(

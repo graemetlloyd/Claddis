@@ -19,7 +19,7 @@ prune_cladistic_matrix(
 
 \item{characters2prune}{A vector of character numbers to prune.}
 
-\item{taxa2prune}{A vector of taxon names to prune (these must be present in \code{rownames(cladistic_matrix$matrix}).}
+\item{taxa2prune}{A vector of taxon names to prune (these must be present in \code{rownames(x = cladistic_matrix$matrix}).}
 
 \item{remove_invariant}{A logical for whether invariant characters should (TRUE) or should not (FALSE, default) be pruned.}
 }

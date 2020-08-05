@@ -49,37 +49,37 @@ test_rates(
 
 \item{test_type}{Whether to apply an Akaike Information Criterion (\code{"AIC"}; the default) or likelihood ratio test (\code{"LRT"}).}
 
-\item{alpha}{The alpha value to be used for the significance tests (only relevant if using the likelihood ratio test). The default is 0.01.}
+\item{alpha}{The alpha value to be used for the significance tests. The default is 0.01. Thsi is only relevant if using likelihood ratio tests.}
 
-\item{multiple_comparison_correction}{One of \code{"benjaminihochberg"} (the Benjamini and Hochberg 1995 false discovery rate approach; default and recommended) or \code{"bonferroni"} (the Bonferroni correction). Only relevant if using the likelihood ratio test.}
+\item{multiple_comparison_correction}{Current options are: 1. \code{"benjaminihochberg"} (the Benjamini and Hochberg 1995 false discovery rate approach; default and recommended), or 2. \code{"bonferroni"} (the Bonferroni correction). This is only relevant if using likelihood ratio tests.}
 
-\item{polymorphism_state}{One of \code{"missing"} (converts polymorphic values to NA; the default) or \code{"random"} (picks one of the possible polymorphic states at random).}
+\item{polymorphism_state}{Current options are: 1. \code{"missing"} (converts polymorphic values to NA; the default), or 2. \code{"random"} (picks one of the possible polymorphic states at random).}
 
-\item{uncertainty_state}{One of \code{"missing"} (converts uncertain values to NA; the default) or \code{"random"} (picks one of the possible uncertain states at random).}
+\item{uncertainty_state}{Current options are: 1. \code{"missing"} (converts uncertain values to NA; the default), or 2. \code{"random"} (picks one of the possible uncertain states at random).}
 
 \item{inapplicable_state}{The only current option is \code{"missing"} (converts value to NA).}
 
-\item{time_binning_approach}{One of \code{"close"} or \code{"lloyd"} (the default).}
+\item{time_binning_approach}{One of \code{"close"} or \code{"lloyd"} (the default and recommended).}
 
 \item{all_weights_integers}{Logical for whether (\code{TRUE}) to reweight non-integer weights until all weights are integers or to leave them as they are (\code{FALSE}; the default).}
 
-\item{estimate_all_nodes}{Option passed to internal use of \link{estimate_ancestral_states}.}
+\item{estimate_all_nodes}{Option passed to \link{estimate_ancestral_states}.}
 
-\item{estimate_tip_values}{Option passed to internal use of \link{estimate_ancestral_states}.}
+\item{estimate_tip_values}{Option passed to \link{estimate_ancestral_states}.}
 
-\item{inapplicables_as_missing}{Option passed to internal use of \link{estimate_ancestral_states}.}
+\item{inapplicables_as_missing}{Option passed to \link{estimate_ancestral_states}.}
 
-\item{polymorphism_behaviour}{Option passed to internal use of \link{estimate_ancestral_states}.}
+\item{polymorphism_behaviour}{Option passed to \link{estimate_ancestral_states}.}
 
-\item{uncertainty_behaviour}{Option passed to internal use of \link{estimate_ancestral_states}.}
+\item{uncertainty_behaviour}{Option passed to \link{estimate_ancestral_states}.}
 
-\item{threshold}{Option passed to internal use of \link{estimate_ancestral_states}.}
+\item{threshold}{Option passed to \link{estimate_ancestral_states}.}
 
-\item{all_missing_allowed}{Logical to allow all missing character values - see \link{estimate_ancestral_states} for details.}
+\item{all_missing_allowed}{Option passed to \link{estimate_ancestral_states} for details.}
 }
 \value{
 \item{time_binsUsed}{The time binning used (NB: May be slightly altered from the input values).}
-\item{InferredCharacterChanges}{Matrix of inferred character changes.}
+\item{Inferredcharacter_changes}{Matrix of inferred character changes.}
 \item{IntrinsicCharacterRate}{The intrinsic (global) character rate in changes per million years.}
 \item{ContinuouscharactersConvertedToDiscrete}{Whether or not continuous characters were converted to discrete characters (important for handling the data in downstream analys(es)).}
 \item{BranchPartitionResults}{List of branch partition results (corresponding to \code{branch_partitions}. NULL if not requested.}
@@ -119,11 +119,11 @@ Following Cloutier (1991), Lloyd (2016) extended the two main types of rate hypo
   \item A character partition rate (available here with the \code{character_partitions} option).
 }
 
-In Claddis (>=0.3) these partitions are defined as a list of lists of vectors where only the first N - 1 partitions need be defined. E.g., if comparing the first edge value (based on \pkg{ape} numbering, i.e., \code{plot(tree); edgelabels()}) to the rest of the tree then the user only needs to define the value "1" and the function will automatically add a second partition containing all other edges. This can be set with the option \code{branch_partitions = list(list(1))}. Similarly, to do what Lloyd et al. (2012) did and repeat the test for every edge in the tree (and assuming this variable is already named "tree") you could use, \code{branch_partitions = lapply(as.list(1:nrow(tree$edge)), as.list)}.
+In Claddis (>=0.3) these partitions are defined as a list of lists of vectors where only the first N - 1 partitions need be defined. E.g., if comparing the first edge value (based on \pkg{ape} numbering, i.e., \code{plot(tree); edgelabels()}) to the rest of the tree then the user only needs to define the value "1" and the function will automatically add a second partition containing all other edges. This can be set with the option \code{branch_partitions = list(list(1))}. Similarly, to do what Lloyd et al. (2012) did and repeat the test for every edge in the tree (and assuming this variable is already named "tree") you could use, \code{branch_partitions = lapply(X = as.list(x = 1:nrow(tree$edge)), as.list)}.
 
-Because of the flexibility of this function the user can define any set of edges. For example, they could test whether terminal branches have a different rate from internal branches with \code{branch_partitions = list(list(match(1:Ntip(tree), tree$edge[, 2])))}. The \code{clade_partitions} is really just a special subset of this type of hypothesis, but with edges being defined as descending from a specific internal node in the tree. Once again, an exploratory approach like that of Lloyd et al. (2012) can be used with: \code{clade_partitions = lapply(as.list(Ntip(tree) + (2:Nnode(tree))), as.list)}. Note that this excludes the root node as this would define a single partition and hence would represent the null hypothesis (a single rate model for the whole tree). (If using \code{test_type = "AIC"} then the user typically \emph{will} want a value for a single partition.) More generally clades must be defined by the node numbers they correspond to. In R an easy way to identify these is with: \code{plot(tree); nodelabels()}.
+Because of the flexibility of this function the user can define any set of edges. For example, they could test whether terminal branches have a different rate from internal branches with \code{branch_partitions = list(list(match(1:Ntip(tree), tree$edge[, 2])))}. The \code{clade_partitions} is really just a special subset of this type of hypothesis, but with edges being defined as descending from a specific internal node in the tree. Once again, an exploratory approach like that of Lloyd et al. (2012) can be used with: \code{clade_partitions = lapply(X = as.list(x = Ntip(tree) + (2:Nnode(tree))), as.list)}. Note that this excludes the root node as this would define a single partition and hence would represent the null hypothesis (a single rate model for the whole tree). (If using \code{test_type = "AIC"} then the user typically \emph{will} want a value for a single partition.) More generally clades must be defined by the node numbers they correspond to. In R an easy way to identify these is with: \code{plot(tree); nodelabels()}.
 
-Time bin partitions are defined in a similar way, but are numbered 1:N starting from the oldest time bin. So if wanting to do an exploratory test of single bin partitions (and only four time bins were specified) you could use: \code{time_partitions = lapply(as.list(1:4), as.list)}. Bins can be combined too, just as edges are above. For example, time bins 1 and 2 could form a single partition with: \code{time_partitions = list(list(1:2))}. Or if looking to test a model where each bin has its' own rate value you could use: \code{time_partitions = list(as.list(1:3))}. Note, as before we do not need to specify the fourth bin as this will be automatically done by the function, however, \code{time_partitions = list(as.list(1:4))} will also work. Some caution needs to be applied with N-rate models (where N is three or larger) and \code{test_type = "LRT"} as a result favouring such models does not necessarily endorse N-separate rates. I.e., it could simply be that one bin has such a large excursion that overall the N-rate model fits better than the 1-rate model, but some 2-rate models might be better still. It is up to the user to check this themselves by exploring smaller combinations of bins and more genrally if exploring partitions of three or more use of the Akaike Information Criterion (\code{test_type = "AIC"}) is recommended.
+Time bin partitions are defined in a similar way, but are numbered 1:N starting from the oldest time bin. So if wanting to do an exploratory test of single bin partitions (and only four time bins were specified) you could use: \code{time_partitions = lapply(X = as.list(x = 1:4), as.list)}. Bins can be combined too, just as edges are above. For example, time bins 1 and 2 could form a single partition with: \code{time_partitions = list(list(1:2))}. Or if looking to test a model where each bin has its' own rate value you could use: \code{time_partitions = list(as.list(x = 1:3))}. Note, as before we do not need to specify the fourth bin as this will be automatically done by the function, however, \code{time_partitions = list(as.list(x = 1:4))} will also work. Some caution needs to be applied with N-rate models (where N is three or larger) and \code{test_type = "LRT"} as a result favouring such models does not necessarily endorse N-separate rates. I.e., it could simply be that one bin has such a large excursion that overall the N-rate model fits better than the 1-rate model, but some 2-rate models might be better still. It is up to the user to check this themselves by exploring smaller combinations of bins and more genrally if exploring partitions of three or more use of the Akaike Information Criterion (\code{test_type = "AIC"}) is recommended.
 
 Finally, character partitions allow the user to explore whether rates vary across different character types (numbers), e.g., skeletal characters versus soft tissue characters, or cranial characters versus postcranial characters. Here characters are simply numbered 1:N (across all blocks of a matrix), but single character partitions are less likely to be of interest. As an example of use lets say the first ten characters are what we are interested in as a partition (the second partition being the remaining characters), we could use: \code{character_partitions = list(list(1:10))} to test for a two-rate model with \code{test_type = "LRT"}.
 
@@ -190,16 +190,16 @@ The AIC is the Akaike Information Criterion, and is relatively meaningless on it
 \examples{
 
 # Set random seed:
-set.seed(17)
+set.seed(seed = 17)
 
 # Generate a random tree for the Michaux data set:
-time_tree <- ape::rtree(nrow(michaux_1989$matrix_1$matrix))
+time_tree <- ape::rtree(n = nrow(michaux_1989$matrix_1$matrix))
 
 # Update taxon names to match those in the data matrix:
-time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
+time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
-time_tree$root.time <- max(diag(ape::vcv(time_tree)))
+time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
 
 # Get discrete character rates:
 x <- test_rates(
@@ -208,16 +208,18 @@ x <- test_rates(
     from = time_tree$root.time,
     to = 0, length.out = 5
   ), branch_partitions =
-    lapply(as.list(1:nrow(time_tree$edge)), as.list),
+    lapply(X = as.list(x = 1:nrow(time_tree$edge)), as.list),
   character_partitions = lapply(
-    as.list(1:3),
+    X =
+      as.list(x = 1:3),
     as.list
   ), clade_partitions =
     lapply(
-      as.list(Ntip(time_tree) + (2:Nnode(time_tree))),
+      X =
+        as.list(x = Ntip(time_tree) + (2:Nnode(time_tree))),
       as.list
     ), time_partitions =
-    lapply(as.list(1:4), as.list), change_times =
+    lapply(X = as.list(x = 1:4), as.list), change_times =
     "random", alpha = 0.01, polymorphism_state =
     "missing", uncertainty_state = "missing",
   inapplicable_state = "missing", time_binning_approach =

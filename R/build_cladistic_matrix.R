@@ -49,19 +49,19 @@
 #' @export build_cladistic_matrix
 build_cladistic_matrix <- function(character_taxon_matrix, header = "", character_weights = NULL, ordering = NULL, symbols = NULL, equalise.weights = FALSE, ignore_duplicate_taxa = FALSE) {
 
-# Use manual to inform user about defaults for weighting and ordering etc.
+  # Use manual to inform user about defaults for weighting and ordering etc.
 
   # Check input is a matrix:
   if (!is.matrix(character_taxon_matrix)) stop("character_taxon_matrix must be a matrix.")
 
   # Check taxon names are supplied:
-  if (is.null(rownames(character_taxon_matrix))) stop("character_taxon_matrix must have rownames indicating taxa.")
+  if (is.null(rownames(x = character_taxon_matrix))) stop("character_taxon_matrix must have rownames indicating taxa.")
 
   # Check taxon names are unique (could cause downstream issues if not):
-  if (!ignore_duplicate_taxa) if (any(duplicated(rownames(character_taxon_matrix)))) stop("Taxon names must be unique.")
+  if (!ignore_duplicate_taxa) if (any(duplicated(rownames(x = character_taxon_matrix)))) stop("Taxon names must be unique.")
 
   # Delete any column names (could cause downstream issues otherwise):
-  if (!is.null(colnames(character_taxon_matrix))) colnames(character_taxon_matrix) <- NULL
+  if (!is.null(colnames(x = character_taxon_matrix))) colnames(x = character_taxon_matrix) <- NULL
 
 
 
@@ -72,7 +72,7 @@ build_cladistic_matrix <- function(character_taxon_matrix, header = "", characte
 
 
   # List any mystery character types:
-  mystery_characters <- setdiff(unique(unlist(strsplit(as.character(unique(as.vector(character_taxon_matrix))), split = "&|/"))), c(as.character(0:31), NA))
+  mystery_characters <- setdiff(x = unique(x = unlist(x = strsplit(as.character(unique(x = as.vector(character_taxon_matrix))), split = "&|/"))), y = c(as.character(0:31), NA))
 
 
 
@@ -80,10 +80,10 @@ build_cladistic_matrix <- function(character_taxon_matrix, header = "", characte
 
 
   # If mystery character types are present warn user:
-  if (length(mystery_characters) > 0) stop("characters must either be the integers 0 to 31, NA for missing, & for polymorphisms, or / for uncertainties.")
+  if (length(x = mystery_characters) > 0) stop("characters must either be the integers 0 to 31, NA for missing, & for polymorphisms, or / for uncertainties.")
 
   # Check supplied weights are correct length:
-  if (!is.null(character_weights) && length(character_weights) != ncol(character_taxon_matrix)) stop("character_weights must have same length as number of characters in character_taxon_matrix.")
+  if (!is.null(character_weights) && length(x = character_weights) != ncol(character_taxon_matrix)) stop("character_weights must have same length as number of characters in character_taxon_matrix.")
 
   # Check supplied weights are numeric:
   if (!is.null(character_weights) && !is.numeric(character_weights)) stop("character_weights must be numeric.")
@@ -92,19 +92,19 @@ build_cladistic_matrix <- function(character_taxon_matrix, header = "", characte
   if (!is.null(character_weights) && any(character_weights < 0)) stop("character_weights must not be negative.")
 
   # Check supplied ordering is the correct length:
-  if (!is.null(ordering) && length(ordering) != ncol(character_taxon_matrix)) stop("ordering must have same length as number of characters in character_taxon_matrix.")
+  if (!is.null(ordering) && length(x = ordering) != ncol(character_taxon_matrix)) stop("ordering must have same length as number of characters in character_taxon_matrix.")
 
   # Check ordering is of unord or ord type only:
-  if (!is.null(ordering) && length(setdiff(ordering, c("unord", "ord"))) > 0) stop("ordering must be unord or ord only.")
+  if (!is.null(ordering) && length(x = setdiff(x = ordering, y = c("unord", "ord"))) > 0) stop("ordering must be unord or ord only.")
 
   # Check symbols are of correct length:
-  if (!is.null(symbols) && length(symbols) >= (diff(range(as.numeric(unique(sort(x = unlist(strsplit(as.vector(character_taxon_matrix), split = "&|/"))))))) + 1)) stop("symbols must be at least as long as the range of character values in character_taxon_matrix.")
+  if (!is.null(symbols) && length(x = symbols) >= (diff(range(as.numeric(unique(x = sort(x = unlist(x = strsplit(as.vector(character_taxon_matrix), split = "&|/"))))))) + 1)) stop("symbols must be at least as long as the range of character values in character_taxon_matrix.")
 
   # Check symbols are single characters only:
   if (!is.null(symbols) && any(nchar(symbols) != 1)) stop("symbols must be single characters only.")
 
   # Check header is a single value:
-  if (length(header) != 1) stop("header text must be a single value.")
+  if (length(x = header) != 1) stop("header text must be a single value.")
 
   # If no ordering set default to ordered.
   if (is.null(ordering)) ordering <- rep("ord", ncol(character_taxon_matrix))
@@ -113,10 +113,10 @@ build_cladistic_matrix <- function(character_taxon_matrix, header = "", characte
   if (is.null(character_weights)) character_weights <- rep(1, ncol(character_taxon_matrix))
 
   # Calculate minimum values:
-  minimum_values <- apply(character_taxon_matrix, 2, function(x) sort(x = as.numeric(unlist(strsplit(x, split = "&|/"))), decreasing = FALSE)[1])
+  minimum_values <- apply(character_taxon_matrix, 2, function(x) sort(x = as.numeric(unlist(x = strsplit(x, split = "&|/"))), decreasing = FALSE)[1])
 
   # Calculate maximum values:
-  maximum_values <- apply(character_taxon_matrix, 2, function(x) sort(x = as.numeric(unlist(strsplit(x, split = "&|/"))), decreasing = TRUE)[1])
+  maximum_values <- apply(character_taxon_matrix, 2, function(x) sort(x = as.numeric(unlist(x = strsplit(x, split = "&|/"))), decreasing = TRUE)[1])
 
   # If any NAs in minimum_values replace with zero:
   if (any(is.na(minimum_values))) minimum_values[is.na(minimum_values)] <- 0
@@ -146,14 +146,14 @@ build_cladistic_matrix <- function(character_taxon_matrix, header = "", characte
     if (!is.null(step_matrices)) {
 
       # Get maximum distances for each step matrix:
-      step_maxima <- unlist(lapply(lapply(step_matrices, as.numeric), max))
+      step_maxima <- unlist(x = lapply(X = lapply(X = step_matrices, as.numeric), max))
 
       # Update weights for step matrices:
-      for (i in 1:length(step_maxima)) character_weights[ordering == names(step_matrices)[i]] <- 1 / step_maxima[i]
+      for (i in 1:length(x = step_maxima)) character_weights[ordering == names(step_matrices)[i]] <- 1 / step_maxima[i]
     }
 
     # Ensure all weights are integers by multiplying by product of all reciprocals:
-    character_weights <- prod(unique(round(1 / character_weights))) * character_weights
+    character_weights <- prod(unique(x = round(1 / character_weights))) * character_weights
 
     # Sub function to get all factors of an integer (stolen from: "http://stackoverflow.com/questions/6424856/r-function-for-returning-all-factors"):
     get_all_factors <- function(x) {
@@ -172,16 +172,16 @@ build_cladistic_matrix <- function(character_taxon_matrix, header = "", characte
     }
 
     # Get factors of every weight currently applied:
-    out <- sort(x = unlist(apply(matrix(unique(character_weights)), 1, get_all_factors)))
+    out <- sort(x = unlist(x = apply(matrix(unique(x = character_weights)), 1, get_all_factors)))
 
     # As long as the maximum possible factor is greater than 1:
-    while (max(rle(out)$values[rle(out)$lengths == length(unique(character_weights))]) > 1) {
+    while (max(rle(out)$values[rle(out)$lengths == length(x = unique(x = character_weights))]) > 1) {
 
       # Divide through weights by largest common factor:
-      character_weights <- character_weights / max(rle(out)$values[rle(out)$lengths == length(unique(character_weights))])
+      character_weights <- character_weights / max(rle(out)$values[rle(out)$lengths == length(x = unique(x = character_weights))])
 
       # Update factors for new weights:
-      out <- sort(x = unlist(apply(matrix(unique(character_weights)), 1, get_all_factors)))
+      out <- sort(x = unlist(x = apply(matrix(unique(x = character_weights)), 1, get_all_factors)))
     }
   }
 

@@ -46,16 +46,16 @@ Allows plotting of a third axis using the technique of Matthew Wills (Wills et a
 set.seed(4)
 
 # Generate a random tree for the Michaux 1989 data set:
-time_tree <- ape::rtree(length(rownames(michaux_1989$matrix_1$matrix)))
+time_tree <- ape::rtree(n = length(x = rownames(x = michaux_1989$matrix_1$matrix)))
 
 # Add taxon names to the tree:
-time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
+time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
 
 # Perform a phylogenetic Principal Coordinates Analysis:
-pcoa_input <- ordinate_cladistic_matrix(michaux_1989, time_tree = time_tree)
+pcoa_input <- ordinate_cladistic_matrix(cladistic_matrix = michaux_1989, time_tree = time_tree)
 
 # Plot the results:
-plot_morphospace(pcoa_input, plot_taxon_names = TRUE)
+plot_morphospace(pcoa_input = pcoa_input, plot_taxon_names = TRUE)
 }
 \references{
 Wills, M. A., 1998. Cambrian and Recent disparity: the picture from priapulids. \emph{Paleobiology}, \bold{24}, 177-199.

@@ -23,7 +23,7 @@ Calculates the total number of evolutionary changes in a series of time bins. Th
 \examples{
 
 # Create a random dataset of 100 changes (between 100 and 0 Ma):
-change_times <- runif(100, 0, 100)
+change_times <- stats::runif(n = 100, min = 0, max = 100)
 
 # Create 10 equal-length time bins:
 time_bins <- seq(100, 0, length.out = 11)

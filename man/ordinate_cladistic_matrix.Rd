@@ -100,13 +100,13 @@ x <- ordinate_cladistic_matrix(michaux_1989)
 x
 
 # Generate a (made up) tree:
-time_tree <- ape::rtree(length(rownames(michaux_1989$matrix_1$matrix)))
+time_tree <- ape::rtree(n = length(x = rownames(x = michaux_1989$matrix_1$matrix)))
 
 # Add taxon names to it:
-time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
+time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
 
 # Set root time by making youngest taxon extant:
-time_tree$root.time <- max(diag(ape::vcv(time_tree)))
+time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
 
 # Run with tree:
 y <- ordinate_cladistic_matrix(michaux_1989, time_tree = time_tree)

@@ -32,13 +32,13 @@ require(rgl)
 set.seed(4)
 
 # Generate a random tree for the Michaux 1989 data set:
-time_tree <- ape::rtree(nrow(michaux_1989$matrix_1$matrix))
+time_tree <- ape::rtree(n = nrow(michaux_1989$matrix_1$matrix))
 
 # Set root time so latest tip terminates at the present:
-time_tree$root.time <- max(diag(ape::vcv(time_tree)))
+time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
 
 # Add taxon names to the tree:
-time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
+time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
 
 # Perform a phylogenetic Principal Coordinates Analysis:
 pcoa_data <- ordinate_cladistic_matrix(michaux_1989,

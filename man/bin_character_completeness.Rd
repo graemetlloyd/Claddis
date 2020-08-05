@@ -37,9 +37,9 @@ This function returns the proportional phylogenetic character completeness for a
 \examples{
 
 # Create a random tree for the Day et al. 2016 data set:
-day_2016tree <- ape::rtree(nrow(day_2016$matrix_1$matrix))
-day_2016tree$tip.label <- rownames(day_2016$matrix_1$matrix)
-day_2016tree$root.time <- max(diag(ape::vcv(day_2016tree)))
+day_2016tree <- ape::rtree(n = nrow(day_2016$matrix_1$matrix))
+day_2016tree$tip.label <- rownames(x = day_2016$matrix_1$matrix)
+day_2016tree$root.time <- max(diag(x = ape::vcv(phy = day_2016tree)))
 
 # Get proportional phylogenetic character completeness in ten equal-length
 # time bins:
@@ -48,7 +48,7 @@ bin_character_completeness(
   time_tree = day_2016tree, time_bins = seq(
     from =
       day_2016tree$root.time, to = day_2016tree$root.time -
-      max(diag(ape::vcv(day_2016tree))), length.out = 11
+      max(diag(x = ape::vcv(phy = day_2016tree))), length.out = 11
   )
 )
 }

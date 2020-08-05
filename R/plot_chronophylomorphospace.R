@@ -30,13 +30,13 @@
 #' set.seed(4)
 #'
 #' # Generate a random tree for the Michaux 1989 data set:
-#' time_tree <- ape::rtree(nrow(michaux_1989$matrix_1$matrix))
+#' time_tree <- ape::rtree(n = nrow(michaux_1989$matrix_1$matrix))
 #'
 #' # Set root time so latest tip terminates at the present:
-#' time_tree$root.time <- max(diag(ape::vcv(time_tree)))
+#' time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
 #'
 #' # Add taxon names to the tree:
-#' time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
+#' time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
 #'
 #' # Perform a phylogenetic Principal Coordinates Analysis:
 #' pcoa_data <- ordinate_cladistic_matrix(michaux_1989,
@@ -153,7 +153,7 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
     pcoa_data[, x_axis],
     pcoa_data[, y_axis],
     z_axis,
-    rownames(pcoa_data),
+    rownames(x = pcoa_data),
     col = plotting_parameters$txt.col,
     cex = plotting_parameters$txt.cex,
     adj = plotting_parameters$txt.adj

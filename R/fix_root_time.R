@@ -22,19 +22,19 @@
 #' @examples
 #'
 #' # Create a simple four-taxon tree with branch lengths:
-#' tree <- read.tree(text = "(A:1,(B:1,(C:1,D:1):1):1);")
+#' tree <- ape::read.tree(text = "(A:1,(B:1,(C:1,D:1):1):1);")
 #'
 #' # Set root age as 20 Ma:
 #' tree$root.time <- 20
 #'
 #' # Now prune taxon A:
-#' pruned_tree <- ape::drop.tip(tree, "A")
+#' pruned_tree <- ape::drop.tip(phy = tree, tip = "A")
 #'
 #' # Show that drop.tip has not updated the tree's root time:
 #' pruned_tree$root.time
 #'
 #' # Use the function to fix the root time:
-#' pruned_tree <- fix_root_time(tree, pruned_tree)
+#' pruned_tree <- fix_root_time(original_tree = tree, pruned_tree = pruned_tree)
 #'
 #' # Show that the root time is now fixed (19 Ma):
 #' pruned_tree$root.time
@@ -45,10 +45,10 @@ fix_root_time <- function(original_tree, pruned_tree) {
   if (ape::Ntip(pruned_tree) < 3) stop("pruned_tree includes too few (<3) taxa to be used.")
 
   # Conditional in case where pruned tree taxa are not a subset of the original tree taxa:
-  if (length(setdiff(pruned_tree$tip.label, original_tree$tip.label)) > 0) stop("pruned_tree cannot include taxa not present in original_tree.")
+  if (length(x = setdiff(x = pruned_tree$tip.label, y = original_tree$tip.label)) > 0) stop("pruned_tree cannot include taxa not present in original_tree.")
 
   # Update $root.time for pruned_tree:
-  pruned_tree$root.time <- original_tree$root.time - mean(diag(ape::vcv(original_tree))[names(diag(ape::vcv(pruned_tree)))] - diag(ape::vcv(pruned_tree)))
+  pruned_tree$root.time <- original_tree$root.time - mean(diag(x = ape::vcv(phy = original_tree))[names(diag(x = ape::vcv(phy = pruned_tree)))] - diag(x = ape::vcv(pruned_tree)))
 
   # Return updated pruned tree:
   return(pruned_tree)

@@ -60,13 +60,13 @@
 #' x
 #'
 #' # Generate a (made up) tree:
-#' time_tree <- ape::rtree(length(rownames(michaux_1989$matrix_1$matrix)))
+#' time_tree <- ape::rtree(n = length(x = rownames(x = michaux_1989$matrix_1$matrix)))
 #'
 #' # Add taxon names to it:
-#' time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
+#' time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
 #'
 #' # Set root time by making youngest taxon extant:
-#' time_tree$root.time <- max(diag(ape::vcv(time_tree)))
+#' time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
 #'
 #' # Run with tree:
 #' y <- ordinate_cladistic_matrix(michaux_1989, time_tree = time_tree)
@@ -92,7 +92,7 @@ ordinate_cladistic_matrix <- function(cladistic_matrix, distance_metric = "MORD"
     if (!is.null(trimmed_distances$removed_taxa)) message(paste("The following taxa had to be removed to produce a complete distance matrix:", paste(trimmed_distances$removed_taxa, collapse = ", ")))
 
     # Perform Principal Coordinates Analysis on the data:
-    pcoa_results <- ape::pcoa(trimmed_distances$distance_matrix, correction = correction, rn = rownames(trimmed_distances$distance_matrix))
+    pcoa_results <- ape::pcoa(trimmed_distances$distance_matrix, correction = correction, rn = rownames(x = trimmed_distances$distance_matrix))
 
     # Case if a tree is included (and a phylomorphospace is requested):
   } else {
@@ -113,7 +113,7 @@ ordinate_cladistic_matrix <- function(cladistic_matrix, distance_metric = "MORD"
     time_tree <- trimmed_distances$tree
 
     # Perform Principal Coordinates Analysis on the data:
-    pcoa_results <- ape::pcoa(trimmed_distances$distance_matrix, correction = correction, rn = rownames(trimmed_distances$distance_matrix))
+    pcoa_results <- ape::pcoa(trimmed_distances$distance_matrix, correction = correction, rn = rownames(x = trimmed_distances$distance_matrix))
   }
 
   # If corrected vectors exist:

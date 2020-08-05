@@ -29,10 +29,10 @@ If the matrix includes estimated ancestral states the user should also provide t
 \examples{
 
 # Get morphological distances for Michaux (1989) data set:
-distances <- calculate_morphological_distances(michaux_1989)
+distances <- calculate_morphological_distances(cladistic_matrix = michaux_1989)
 
 # Attempt to trim max.distance_matrix:
-trim_matrix(distances$distance_matrix)
+trim_matrix(distance_matrix = distances$distance_matrix)
 }
 \seealso{
 \link{calculate_morphological_distances}

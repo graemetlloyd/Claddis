@@ -33,7 +33,7 @@ find_linked_edges <- function(tree) {
   for (i in 1:nrow(tree$edge)) {
 
     # Find linked edges:
-    links <- setdiff(union(which(apply(tree$edge == tree$edge[i, 1], 1, sum) == 1), which(apply(tree$edge == tree$edge[i, 2], 1, sum) == 1)), i)
+    links <- setdiff(x = union(which(x = apply(tree$edge == tree$edge[i, 1], 1, sum) == 1), which(x = apply(tree$edge == tree$edge[i, 2], 1, sum) == 1)), y = i)
 
     # Code 1 (linked) for linked edges in matrix:
     edge_link_matrix[i, links] <- edge_link_matrix[links, i] <- 1

@@ -10,9 +10,9 @@ safe_taxonomic_reduction(cladistic_matrix)
 \item{cladistic_matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}.}
 }
 \value{
-\item{str.list}{A matrix listing the taxa that can be removed (\code{Junior}), the taxa which they are equivalent to (\code{Senior}) and the rule under which they can be safely removed (\code{Rule}).}
-\item{reduced.matrix}{A character-taxon matrix excluding the taxa that can be safely removed.}
-\item{removed.matrix}{A character-taxon matrix of the taxa that can be safely removed.}
+\item{str_taxa}{A matrix listing the taxa that can be removed (\code{junior}), the taxa which they are equivalent to (\code{senior}) and the rule under which they can be safely removed (\code{rule}).}
+\item{reduced_matrix}{A character-taxon matrix excluding the taxa that can be safely removed.}
+\item{removed_matrix}{A character-taxon matrix of the taxa that can be safely removed.}
 }
 \description{
 Performs Safe Taxonomic Reduction (STR) on a character-taxon matrix.
@@ -20,23 +20,23 @@ Performs Safe Taxonomic Reduction (STR) on a character-taxon matrix.
 \details{
 Performs Safe Taxonomic Reduction (Wilkinson 1995).
 
-If no taxa can be safely removed will print the text "No taxa can be safely removed", and the \code{str.list} and \code{removed.matrix} will have no rows.
+If no taxa can be safely removed will print the text "No taxa can be safely removed", and the \code{str_taxa} and \code{removed_matrix} will have no rows.
 
 NB: If your data contains inapplicable characters these will be treated as missing data, but this is inappropriate. Thus the user is advised to double check that any removed taxa make sense in the light of inapplicable states. (As far as I am aware this same behaviour occurs in the TAXEQ3 software.)
 }
 \examples{
 
 # Performs STR on the Gauthier 1986 dataset used in Wilkinson (1995):
-str.out <- safe_taxonomic_reduction(gauthier_1986)
+str_data <- safe_taxonomic_reduction(cladistic_matrix = gauthier_1986)
 
 # View deleted taxa:
-str.out$str.list
+str_data$str_taxa
 
 # View reduced matrix:
-str.out$reduced.matrix
+str_data$reduced_matrix
 
 # View removed matrix:
-str.out$removed.matrix
+str_data$removed_matrix
 }
 \references{
 Wilkinson, M., 1995. Coping with abundant missing entries in phylogenetic inference using parsimony. \emph{Systematic Biology}, \bold{44}, 501-514.

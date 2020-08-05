@@ -39,7 +39,7 @@
 #'   (RC_20,(Herpetoskylax_hopsoni,Lycaenodon_longiceps)))));")
 #'
 #' # Remove line breaks from tip names:
-#' tree$tip.label <- gsub("\n", "", tree$tip.label)
+#' tree$tip.label <- gsub(pattern = "\n", replacement = "", x = tree$tip.label)
 #'
 #' # Ages for day 2016 taxa:
 #' ages <- matrix(c(
@@ -94,12 +94,12 @@ plot_rates_time <- function(test_rates_output, model_number, ...) {
   # - Add better example that runs.
 
   # Build vector of time bin midpoints for plotting:
-  TimeBinMidpoints <- (test_rates_output$time_binsUsed[2:length(test_rates_output$time_binsUsed)] + test_rates_output$time_binsUsed[1:(length(test_rates_output$time_binsUsed) - 1)]) / 2
+  TimeBinMidpoints <- (test_rates_output$time_binsUsed[2:length(x = test_rates_output$time_binsUsed)] + test_rates_output$time_binsUsed[1:(length(x = test_rates_output$time_binsUsed) - 1)]) / 2
 
   # Get partitions used from results output:
-  TimeBinPartitions <- lapply(test_rates_output$TimeBinResults, function(x) {
-    lapply(strsplit(x$Partition, " \\| ")[[1]], function(y) {
-      if (length(grep("-", y)) > 0) {
+  TimeBinPartitions <- lapply(X = test_rates_output$TimeBinResults, function(x) {
+    lapply(X = strsplit(x$Partition, " \\| ")[[1]], function(y) {
+      if (length(x = grep("-", y)) > 0) {
         z <- strsplit(y, split = "-")[[1]]
         y <- paste0(z[1]:z[2])
       }
@@ -108,9 +108,9 @@ plot_rates_time <- function(test_rates_output, model_number, ...) {
   })
 
   # Get sampled rates for model:
-  TimeRates <- cbind(lapply(TimeBinPartitions[model_number], function(x) {
-    do.call(rbind, lapply(x, function(y) {
-      xs <- c(test_rates_output$time_binsUsed[y[1]], test_rates_output$time_binsUsed[(y[length(y)] + 1)])
+  TimeRates <- cbind(lapply(X = TimeBinPartitions[model_number], function(x) {
+    do.call(what = rbind, args = lapply(X = x, function(y) {
+      xs <- c(test_rates_output$time_binsUsed[y[1]], test_rates_output$time_binsUsed[(y[length(x = y)] + 1)])
     }))
   })[[1]], test_rates_output$TimeBinResults[[model_number]]$Rates, test_rates_output$TimeBinResults[[model_number]]$Rates)
 

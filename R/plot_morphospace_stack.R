@@ -58,7 +58,7 @@
 #' # Combine x and y values into
 #' ordination_axes <- matrix(c(x, y),
 #'   ncol = 2, dimnames =
-#'     list(as.list(apply(matrix(sample(LETTERS, 8 * 8 * 101,
+#'     list(as.list(x = apply(matrix(sample(LETTERS, 8 * 8 * 101,
 #'       replace = TRUE
 #'     ), nrow = 8 * 101), 1, paste, collapse = "")), NULL)
 #' )
@@ -66,7 +66,7 @@
 #' # Assign ages as though taxa range through entire interval (100-0 Ma):
 #' ages <- matrix(c(rep(100, 8 * 101), rep(0, 8 * 101)),
 #'   ncol = 2,
-#'   dimnames = list(as.list(rownames(ordination_axes)), as.list(c(
+#'   dimnames = list(as.list(x = rownames(x = ordination_axes)), as.list(x = c(
 #'     "FAD",
 #'     "LAD"
 #'   )))
@@ -84,18 +84,18 @@
 #' # Create random values to represent ordination axes:
 #' ordination_axes <- matrix(rnorm(10000),
 #'   nrow = 100, dimnames =
-#'     list(as.list(apply(matrix(sample(LETTERS, 8 * 100, replace = TRUE), nrow = 100),
+#'     list(as.list(x = apply(matrix(sample(LETTERS, 8 * 100, replace = TRUE), nrow = 100),
 #'       1, paste,
 #'       collapse = ""
 #'     )), NULL)
 #' )
 #'
 #' # Create random first and last appearance dates for objects:
-#' ages <- matrix(as.vector(apply(matrix(runif(200, 0, 100), ncol = 2), 1, sort,
+#' ages <- matrix(as.vector(apply(matrix(stats::runif(n = 200, min = 0, max = 100), ncol = 2), 1, sort,
 #'   decreasing = TRUE
 #' )),
 #' ncol = 2, byrow = TRUE, dimnames =
-#'   list(as.list(rownames(ordination_axes)), as.list(c("FAD", "LAD")))
+#'   list(as.list(x = rownames(x = ordination_axes)), as.list(x = c("FAD", "LAD")))
 #' )
 #'
 #' # Create five 20 million year long time slices:
@@ -105,7 +105,7 @@
 #' groups <- sample(x = c("red", "blue"), size = nrow(ordination_axes), replace = TRUE)
 #'
 #' # Randomly assign objects to groups:
-#' names(groups) <- rownames(ordination_axes)
+#' names(groups) <- rownames(x = ordination_axes)
 #'
 #' # Make stacked ordination plot with convex hulls for groups:
 #' plot_morphospace_stack(ordination_axes, ages, groups, time_slices)
@@ -125,7 +125,7 @@ plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_sl
   time_bins <- sort(x = time_slices, decreasing = TRUE)
 
   # Record the number of stackes to plot:
-  N_stacks <- length(time_bins) - 1
+  N_stacks <- length(x = time_bins) - 1
 
   # Define x-axis label:
   xlab <- paste(axis_label, x_axis, " (", round((apply(ordination_axes, 2, var) / sum(apply(ordination_axes, 2, var)) * 100)[x_axis], 2), "% of total variance)", sep = "")
@@ -149,7 +149,7 @@ plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_sl
   for (i in 1:N_stacks) {
 
     # Find taxa present in ith stack (using a range-through approach:
-    taxa_in_bin <- intersect(which(ages[, "LAD"] < time_bins[i]), which(ages[, "FAD"] > time_bins[(i + 1)]))
+    taxa_in_bin <- intersect(which(x = ages[, "LAD"] < time_bins[i]), which(x = ages[, "FAD"] > time_bins[(i + 1)]))
 
     # Isolate just points present in ith stack:
     points_to_plot <- ordination_axes[taxa_in_bin, c(x_axis, y_axis)]
@@ -195,17 +195,17 @@ plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_sl
     if (!is.null(groups)) {
 
       # For each group:
-      for (j in unique(groups)) {
+      for (j in unique(x = groups)) {
 
         # Get edge points (used to plot convex hull):
-        edge_points <- names(which(groups[rownames(points_to_plot)] == j))[chull(x = points_to_plot[which(groups[rownames(points_to_plot)] == j), 1], y = points_to_plot[which(groups[rownames(points_to_plot)] == j), 2])]
+        edge_points <- names(which(x = groups[rownames(x = points_to_plot)] == j))[chull(x = points_to_plot[which(x = groups[rownames(x = points_to_plot)] == j), 1], y = points_to_plot[which(x = groups[rownames(x = points_to_plot)] == j), 2])]
 
         # Plot convex hull as polygon:
         polygon(x = points_to_plot[edge_points, 1], y = points_to_plot[edge_points, 2], col = adjustcolor(j, alpha.f = 0.3), border = 0)
       }
 
       # Plot data points for ith stack:
-      points(x = points_to_plot[, 1], y = points_to_plot[, 2], pch = 21, bg = groups[rownames(points_to_plot)], col = groups[rownames(points_to_plot)], cex = 0.5)
+      points(x = points_to_plot[, 1], y = points_to_plot[, 2], pch = 21, bg = groups[rownames(x = points_to_plot)], col = groups[rownames(x = points_to_plot)], cex = 0.5)
 
       # Case if no groups are specified:
     } else {

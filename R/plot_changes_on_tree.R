@@ -21,13 +21,13 @@
 #' set.seed(17)
 #'
 #' # Generate a random tree for the Michaux data set:
-#' time_tree <- ape::rtree(nrow(michaux_1989$matrix_1$matrix))
+#' time_tree <- ape::rtree(n = nrow(michaux_1989$matrix_1$matrix))
 #'
 #' # Update taxon names to match those in the data matrix:
-#' time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
+#' time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
 #'
 #' # Set root time by making youngest taxon extant:
-#' time_tree$root.time <- max(diag(ape::vcv(time_tree)))
+#' time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
 #'
 #' # Get discrete character rates (includes changes):
 #' out <- test_rates(time_tree, michaux_1989,
@@ -37,7 +37,7 @@
 #'
 #' # Plot character changes on the tree:
 #' plot_changes_on_tree(
-#'   out$InferredCharacterChanges,
+#'   out$Inferredcharacter_changes,
 #'   time_tree
 #' )
 #' @export plot_changes_on_tree
@@ -53,10 +53,10 @@ plot_changes_on_tree <- function(character_changes, time_tree) {
   for (i in 1:nrow(time_tree$edge)) {
 
     # Get rows for where changes occur:
-    change_rows <- which(character_changes[, "Edge"] == i)
+    change_rows <- which(x = character_changes[, "Edge"] == i)
 
     # If there are changes on edge:
-    if (length(change_rows) > 0) {
+    if (length(x = change_rows) > 0) {
 
       # Compile all changes into edge label:
       edge_labels[i] <- paste(paste(character_changes[change_rows, "Character"], ": ", character_changes[change_rows, "From"], " -> ", character_changes[change_rows, "To"], sep = ""), collapse = "\n")

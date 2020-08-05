@@ -33,16 +33,16 @@
 #' set.seed(4)
 #'
 #' # Generate a random tree for the Michaux 1989 data set:
-#' time_tree <- ape::rtree(length(rownames(michaux_1989$matrix_1$matrix)))
+#' time_tree <- ape::rtree(n = length(x = rownames(x = michaux_1989$matrix_1$matrix)))
 #'
 #' # Add taxon names to the tree:
-#' time_tree$tip.label <- rownames(michaux_1989$matrix_1$matrix)
+#' time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
 #'
 #' # Perform a phylogenetic Principal Coordinates Analysis:
-#' pcoa_input <- ordinate_cladistic_matrix(michaux_1989, time_tree = time_tree)
+#' pcoa_input <- ordinate_cladistic_matrix(cladistic_matrix = michaux_1989, time_tree = time_tree)
 #'
 #' # Plot the results:
-#' plot_morphospace(pcoa_input, plot_taxon_names = TRUE)
+#' plot_morphospace(pcoa_input = pcoa_input, plot_taxon_names = TRUE)
 #' @export plot_morphospace
 plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, plot_taxon_names = FALSE, plot_internal_nodes = FALSE, plot_root = TRUE, root_colour = "grey") {
 
@@ -57,7 +57,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
   # gp is a vector with n species and p groups
   # is.factor() # to check if group names, otherwise is assumed to be colours
 
-  # col.gp <- rainbow(length(levels(gp))) # generates a set of different colors length p
+  # col.gp <- rainbow(length(x = levels(gp))) # generates a set of different colors length p
   # names(col.gp) <- levels(gp) # assign those colurs to the p groups
   # col.gp <- col.gp[match(gp, names(col.gp))] # creates a vector length n with a group and colour for each
 
@@ -92,7 +92,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
     z_colours <- rep("white", nrow(pcoa_input$vectors))
 
     # CUpdate z-axis colours for positive values to black:
-    z_colours[which(pcoa_input$vectors[, z_axis] > 0)] <- "black"
+    z_colours[which(x = pcoa_input$vectors[, z_axis] > 0)] <- "black"
 
     # Create z-axis vector for absolute size of values (up to a max of 3):
     z_sizes <- abs(pcoa_input$vectors[, z_axis]) / max(abs(pcoa_input$vectors[, z_axis])) * 3
@@ -102,7 +102,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
   if (!is.null(pcoa_input$Tree)) {
 
     # Sort axes by node number in tree:
-    pcoa_input$vectors <- pcoa_input$vectors[c(pcoa_input$time_tree$tip.label, setdiff(rownames(pcoa_input$vectors), pcoa_input$time_tree$tip.label)), ]
+    pcoa_input$vectors <- pcoa_input$vectors[c(pcoa_input$time_tree$tip.label, setdiff(x = rownames(x = pcoa_input$vectors), y = pcoa_input$time_tree$tip.label)), ]
 
     # For each branch, plot branch:
     for (i in 1:nrow(pcoa_input$time_tree$edge)) lines(x = pcoa_input$vectors[pcoa_input$time_tree$edge[i, ], x_axis], y = pcoa_input$vectors[pcoa_input$time_tree$edge[i, ], y_axis], col = "black")
@@ -111,7 +111,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
     tip_numbers <- c(1:ape::Ntip(pcoa_input$time_tree))
 
     # Establish internal node numbers:
-    node_numbers <- setdiff(1:nrow(pcoa_input$vectors), tip_numbers)
+    node_numbers <- setdiff(x = 1:nrow(pcoa_input$vectors), y = tip_numbers)
 
     # Establish root number:
     root_number <- ape::Ntip(pcoa_input$time_tree) + 1
@@ -132,10 +132,10 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
       x_positions <- rep(2, nrow(pcoa_input$vectors))
 
       # Now changes negative values to plot on the right instead:
-      x_positions[which(pcoa_input$vectors[, x_axis] < 0)] <- 4
+      x_positions[which(x = pcoa_input$vectors[, x_axis] < 0)] <- 4
 
       # Plot taxon names (for tips only):
-      text(x = pcoa_input$vectors[tip_numbers, x_axis], y = pcoa_input$vectors[tip_numbers, y_axis], labels = rownames(pcoa_input$vectors)[tip_numbers], pos = x_positions[tip_numbers], cex = 0.7)
+      text(x = pcoa_input$vectors[tip_numbers, x_axis], y = pcoa_input$vectors[tip_numbers, y_axis], labels = rownames(x = pcoa_input$vectors)[tip_numbers], pos = x_positions[tip_numbers], cex = 0.7)
     }
 
     # Case if no tree supplied:
@@ -151,10 +151,10 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
       x_positions <- rep(2, nrow(pcoa_input$vectors))
 
       # Now changes negative values to plot on the right instead:
-      x_positions[which(pcoa_input$vectors[, x_axis] < 0)] <- 4
+      x_positions[which(x = pcoa_input$vectors[, x_axis] < 0)] <- 4
 
       # Plot taxon names:
-      text(x = pcoa_input$vectors[, x_axis], y = pcoa_input$vectors[, y_axis], labels = rownames(pcoa_input$vectors), pos = x_positions, cex = 0.7)
+      text(x = pcoa_input$vectors[, x_axis], y = pcoa_input$vectors[, y_axis], labels = rownames(x = pcoa_input$vectors), pos = x_positions, cex = 0.7)
     }
   }
 }
