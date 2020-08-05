@@ -1,3 +1,11 @@
+Version - 0.5.6 - 2020-05-08
+
+- Added testthat to Claddis (no change to users).
+- Built testthat file for bin_changes function.
+- Built testthat file for find_mrca function.
+- Built testthat file for find_linked_edges function.
+- Multiple further tweaks to variable names and code styling (again, users are advised to wait until version 0.6.x for this to stabilise).
+
 Version - 0.5.5 - 2020-03-08
 
 - Renamed weights variable to character_weights for matrix objects to avoid clashes with the weights() function in R. Some users may theoretically be affected by this, but given the time window this existed for was so short this is incredibly unlikely.
