@@ -14,7 +14,7 @@
 #' @return
 #'
 #' \item{matching_edges}{A list of the matching edges.}
-#' \item{matching.nodes}{A matrix of matching node numbers.}
+#' \item{matching_nodes}{A matrix of matching node numbers.}
 #' \item{removed_edges}{A vector of the removed edges.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
@@ -37,9 +37,15 @@
 #' X$removed_edges
 #' @export match_tree_edges
 match_tree_edges <- function(original_tree, pruned_tree) {
+  
+  # Get number of pruned tips:
+  n_pruned_tips <- ape::Ntip(phy = pruned_tree)
+  
+  # Get number of pruned nodes:
+  n_pruned_nodes <- ape::Nnode(phy = pruned_tree)
 
   # Conditional if pruned tree too small:
-  if (ape::Ntip(pruned_tree) < 3) stop("pruned_tree includes too few (<3) taxa to be used.")
+  if (n_pruned_tips < 3) stop("pruned_tree includes too few (<3) taxa to be used.")
 
   # Conditional in case where pruned tree taxa are not a subset of the original tree taxa:
   if (length(x = setdiff(x = pruned_tree$tip.label, y = original_tree$tip.label)) > 0) stop("pruned_tree cannot include taxa not present in original_tree.")
@@ -57,7 +63,7 @@ match_tree_edges <- function(original_tree, pruned_tree) {
     matching_edges <- as.list(x = 1:nrow(original_tree$edge))
 
     # Create lists of nodes (which will be identical):
-    clades <- corresponding_nodes <- c((ape::Ntip(pruned_tree) + 1):(ape::Ntip(pruned_tree) + ape::Nnode(pruned_tree)), 1:ape::Ntip(pruned_tree))
+    clades <- corresponding_nodes <- c((n_pruned_tips + 1):(n_pruned_tips + n_pruned_nodes), 1:n_pruned_tips)
 
     # If taxa are removed:
   } else {
@@ -66,7 +72,7 @@ match_tree_edges <- function(original_tree, pruned_tree) {
     clades <- vector(mode = "character")
 
     # For each internal node of pruned tree:
-    for (i in (ape::Ntip(pruned_tree) + 1):(ape::Ntip(pruned_tree) + ape::Nnode(pruned_tree))) {
+    for (i in (n_pruned_tips + 1):(n_pruned_tips + n_pruned_nodes)) {
 
       # Get descendants of node (members of clade):
       clades <- c(clades, paste(pruned_tree$tip.label[strap::FindDescendants(i, pruned_tree)], collapse = "%%SpLiTtEr%%"))
@@ -85,7 +91,7 @@ match_tree_edges <- function(original_tree, pruned_tree) {
     corresponding_nodes <- c(corresponding_nodes, match(pruned_tree$tip.label, original_tree$tip.label))
 
     # Add tips to node numbers for pruned_tree:
-    clades <- c(as.numeric(names(clades)), 1:ape::Ntip(pruned_tree))
+    clades <- c(as.numeric(names(clades)), 1:n_pruned_tips)
 
     # Make edge matrix for pruned tree using corresponding nodes in original tree:
     pruned.edges <- cbind(corresponding_nodes[match(pruned_tree$edge[, 1], clades)], corresponding_nodes[match(pruned_tree$edge[, 2], clades)])
@@ -149,7 +155,7 @@ match_tree_edges <- function(original_tree, pruned_tree) {
   node.matches <- cbind(Pruned_node = clades, Original_node = corresponding_nodes)
 
   # Compile output:
-  output <- list(matching_edges = matching_edges, matching.nodes = node.matches, removed_edges = removed_edges)
+  output <- list(matching_edges = matching_edges, matching_nodes = node.matches, removed_edges = removed_edges)
 
   # Return output:
   return(output)

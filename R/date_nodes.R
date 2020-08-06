@@ -25,24 +25,32 @@
 #' date_nodes(time_tree = time_tree)
 #' @export date_nodes
 date_nodes <- function(time_tree) {
+  
+  # Need input checks
+  
+  # Get N tips:
+  n_tips <- ape::Ntip(phy = time_tree)
+  
+  # Get N nodes:
+  n_nodes <- ape::Nnode(phy = time_tree)
 
   # Store root node number:
-  root_node <- ape::Ntip(time_tree) + 1
+  root_node <- n_tips + 1
 
   # If tree is a complete polytomy:
   if (time_tree$Nnode == 1) {
 
     # Create paths for just tips:
-    paths <- as.list(x = 1:ape::Ntip(time_tree))
+    paths <- as.list(x = 1:n_tips)
 
     # Add root to each path:
-    for (i in 1:length(x = paths)) paths[[i]] <- c(paths[[i]], ape::Ntip(time_tree) + 1)
+    for (i in 1:length(x = paths)) paths[[i]] <- c(paths[[i]], n_tips + 1)
 
     # If tree is not a complete polytomy:
   } else {
 
     # Create initial paths list with end nodes (terminal and internal, excluding the root):
-    paths <- split(c(1:ape::Ntip(time_tree), (ape::Ntip(time_tree) + 2):(ape::Ntip(time_tree) + ape::Nnode(time_tree))), f = 1:(ape::Ntip(time_tree) + ape::Nnode(time_tree) - 1))
+    paths <- split(c(1:n_tips, (n_tips + 2):(n_tips + n_nodes)), f = 1:(n_tips + time_tree$Nnode - 1))
 
     # Strip names:
     names(paths) <- NULL
@@ -69,7 +77,7 @@ date_nodes <- function(time_tree) {
   }
 
   # Create vector to store node ages:
-  date_nodes <- vector(mode = "numeric", length = ape::Ntip(time_tree) + ape::Nnode(time_tree))
+  date_nodes <- vector(mode = "numeric", length = n_tips + time_tree$Nnode)
 
   # For each path:
   for (i in 1:length(x = paths)) {
@@ -82,7 +90,7 @@ date_nodes <- function(time_tree) {
   date_nodes <- time_tree$root.time - date_nodes
 
   # Add node numbers:
-  names(date_nodes) <- 1:(ape::Ntip(time_tree) + ape::Nnode(time_tree))
+  names(date_nodes) <- 1:(n_tips + time_tree$Nnode)
 
   # Return node ages:
   return(date_nodes)

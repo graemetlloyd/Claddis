@@ -101,7 +101,7 @@ build_cladistic_matrix <- function(character_taxon_matrix, header = "", characte
   if (!is.null(symbols) && length(x = symbols) >= (diff(range(as.numeric(unique(x = sort(x = unlist(x = strsplit(as.vector(character_taxon_matrix), split = "&|/"))))))) + 1)) stop("symbols must be at least as long as the range of character values in character_taxon_matrix.")
 
   # Check symbols are single characters only:
-  if (!is.null(symbols) && any(nchar(symbols) != 1)) stop("symbols must be single characters only.")
+  if (!is.null(symbols) && any(nchar(x = symbols) != 1)) stop("symbols must be single characters only.")
 
   # Check header is a single value:
   if (length(x = header) != 1) stop("header text must be a single value.")

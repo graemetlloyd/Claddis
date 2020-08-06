@@ -60,10 +60,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
   # col.gp <- rainbow(length(x = levels(gp))) # generates a set of different colors length p
   # names(col.gp) <- levels(gp) # assign those colurs to the p groups
   # col.gp <- col.gp[match(gp, names(col.gp))] # creates a vector length n with a group and colour for each
-
-
-
-
+  
   # Get vector of values that correspond to scree plot:
   scree_values <- apply(pcoa_input$vectors, 2, var) / sum(apply(pcoa_input$vectors, 2, var)) * 100
 
@@ -99,7 +96,10 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
   }
 
   # Case if tree supplied:
-  if (!is.null(pcoa_input$Tree)) {
+  if (!is.null(pcoa_input$time_tree)) {
+    
+    # Get number of tips:
+    n_tips <- ape::Ntip(phy = pcoa_input$time_tree)
 
     # Sort axes by node number in tree:
     pcoa_input$vectors <- pcoa_input$vectors[c(pcoa_input$time_tree$tip.label, setdiff(x = rownames(x = pcoa_input$vectors), y = pcoa_input$time_tree$tip.label)), ]
@@ -108,13 +108,13 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
     for (i in 1:nrow(pcoa_input$time_tree$edge)) lines(x = pcoa_input$vectors[pcoa_input$time_tree$edge[i, ], x_axis], y = pcoa_input$vectors[pcoa_input$time_tree$edge[i, ], y_axis], col = "black")
 
     # Establish tip node numbers:
-    tip_numbers <- c(1:ape::Ntip(pcoa_input$time_tree))
+    tip_numbers <- c(1:n_tips)
 
     # Establish internal node numbers:
     node_numbers <- setdiff(x = 1:nrow(pcoa_input$vectors), y = tip_numbers)
 
     # Establish root number:
-    root_number <- ape::Ntip(pcoa_input$time_tree) + 1
+    root_number <- n_tips + 1
 
     # If plotting internal nodes, plot internal nodes:
     if (plot_internal_nodes) points(pcoa_input$vectors[node_numbers, x_axis], pcoa_input$vectors[node_numbers, y_axis], pch = 21, bg = z_colours[node_numbers], cex = z_sizes[node_numbers])

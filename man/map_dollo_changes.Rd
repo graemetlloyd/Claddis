@@ -12,8 +12,8 @@ map_dollo_changes(time_tree, tip_states)
 \item{tip_states}{A vector of tip states (must be 0 or 1) with names matching \code{tree$tip.label}.}
 }
 \value{
-\item{Changes}{A matrix of all changes (gains and losses).}
-\item{SCM}{The stochastic character map.}
+\item{changes}{A matrix of all changes (gains and losses).}
+\item{stochastic_character_map}{The stochastic character map.}
 }
 \description{
 Given a tree with binary tip states produces a stochastic Dollo character map.
@@ -51,10 +51,10 @@ names(tip_states) <- time_tree$tip.label
 out <- map_dollo_changes(time_tree, tip_states)
 
 # View matrix of changes:
-out$Changes
+out$changes
 
 # View stochastic character map (time spent in each state on each branch):
-out$SCM
+out$scm
 }
 \references{
 Tarver, J. E., Taylor, R. S., Puttick, M. N., Lloyd, G. T., Pett, W., Fromm, B., Schirrmeister, B. E., Pisani, D., Peterson, K. J. and Donoghue, P. C. J., 2018. Well-annotated microRNAomes do not evidence pervasive miRNA loss. \emph{Genome Biology and Evolution}, \bold{6}, 1457-1470.

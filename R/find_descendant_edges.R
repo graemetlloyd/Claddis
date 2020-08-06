@@ -21,21 +21,24 @@
 #' # Plot tree:
 #' plot(tree)
 #'
-#' # Add nodelabels:
+#' # Show nodelabels:
 #' nodelabels()
 #'
-#' # Add edgelabels (note that edges 5 and 6
+#' # Show edgelabels (note that edges 5 and 6
 #' # are descendants of node 7):
 #' edgelabels()
 #'
-#' # Use Gdtfind_descendant_edges to show that edges
+#' # Use find_descendant_edges to show that edges
 #' # 5 and 6 are descendants of node 7:
-#' find_descendant_edges(7, tree)
+#' find_descendant_edges(n = 7, tree = tree)
 #' @export find_descendant_edges
 find_descendant_edges <- function(n, tree) {
+  
+  # Find number of tips:
+  n_tips <- ape::Ntip(phy = tree)
 
   # Find number of terminals (i.e. stopping point):
-  n_terminals <- length(x = strap::FindDescendants(n, tree))
+  n_terminals <- length(x = strap::FindDescendants(n = n, tree = tree))
 
   # Create vector to store internal nodes:
   nodes <- n
@@ -44,15 +47,15 @@ find_descendant_edges <- function(n, tree) {
   edges <- grep(n, tree$edge[, 1])
 
   # Keep going until all descendant edges are found:
-  while (length(x = which(x = tree$edge[edges, 2] <= ape::Ntip(tree))) < n_terminals) {
+  while (length(x = which(x = tree$edge[edges, 2] <= n_tips)) < n_terminals) {
 
     # Get internal nodes found so far:
-    nodes <- tree$edge[edges, 2][which(x = tree$edge[edges, 2] > ape::Ntip(tree))]
+    nodes <- tree$edge[edges, 2][which(x = tree$edge[edges, 2] > n_tips)]
 
     # For each node add any new descendant edges:
     for (i in nodes) edges <- sort(x = unique(x = c(edges, which(x = tree$edge[, 1] == i))))
   }
 
   # Return edges vector:
-  return(edges)
+  edges
 }

@@ -80,8 +80,8 @@ test_rates_output <- test_rates(
   time_tree = time_tree,
   cladistic_matrix = cladistic_matrix,
   clade_partitions = as.list(x = seq(
-    from = ape::Ntip(tree) + 1,
-    to = ape::Ntip(tree) + ape::Nnode(tree), by = 1
+    from = ape::Ntip(phy = tree) + 1,
+    to = ape::Ntip(phy = tree) + ape::Nnode(tree), by = 1
   )),
   branch_partitions = lapply(X = as.list(x = seq(
     from = 1,

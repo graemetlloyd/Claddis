@@ -13,7 +13,7 @@ match_tree_edges(original_tree, pruned_tree)
 }
 \value{
 \item{matching_edges}{A list of the matching edges.}
-\item{matching.nodes}{A matrix of matching node numbers.}
+\item{matching_nodes}{A matrix of matching node numbers.}
 \item{removed_edges}{A vector of the removed edges.}
 }
 \description{

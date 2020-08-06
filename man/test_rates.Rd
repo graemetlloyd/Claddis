@@ -78,18 +78,18 @@ test_rates(
 \item{all_missing_allowed}{Option passed to \link{estimate_ancestral_states} for details.}
 }
 \value{
-\item{time_binsUsed}{The time binning used (NB: May be slightly altered from the input values).}
-\item{Inferredcharacter_changes}{Matrix of inferred character changes.}
-\item{IntrinsicCharacterRate}{The intrinsic (global) character rate in changes per million years.}
-\item{ContinuouscharactersConvertedToDiscrete}{Whether or not continuous characters were converted to discrete characters (important for handling the data in downstream analys(es)).}
-\item{BranchPartitionResults}{List of branch partition results (corresponding to \code{branch_partitions}. NULL if not requested.}
-\item{CharacterPartitionResults}{List of character partition results (corresponding to \code{character_partitions}. NULL if not requested.}
-\item{CladePartitionResults}{List of clade partition results (corresponding to \code{clade_partitions}. NULL if not requested.}
-\item{TimeBinResults}{List of time bin partition results (corresponding to \code{time_partitions}. NULL if not requested.}
-\item{BranchRates}{Matrix showing calculated rates for each branch. NULL if \code{branch_partitions} is not requested.}
-\item{CharacterRates}{Matrix showing calculated rates for each character. NULL if \code{character_partitions} is not requested.}
-\item{CladeRates}{Matrix showing calculated rates for each clade. NULL if \code{clade_partitions} is not requested.}
-\item{TimeRates}{Matrix showing calculated rates for each time bin. NULL if \code{time_partitions} is not requested.}
+\item{time_bins_used}{The time binning used (NB: May be slightly altered from the input values).}
+\item{inferred_character_changes}{Matrix of inferred character changes.}
+\item{mean_rate}{The intrinsic (global) character rate in changes per million years.}
+\item{continuous_characters_discretized}{Whether or not continuous characters were converted to discrete characters (important for handling the data in downstream analys(es)).}
+\item{branch_test_results}{List of branch partition results (corresponding to \code{branch_partitions}. NULL if not requested.}
+\item{character_test_results}{List of character partition results (corresponding to \code{character_partitions}. NULL if not requested.}
+\item{clade_test_results}{List of clade partition results (corresponding to \code{clade_partitions}. NULL if not requested.}
+\item{time_test_results}{List of time bin partition results (corresponding to \code{time_partitions}. NULL if not requested.}
+\item{branch_rates}{Matrix showing calculated rates for each branch. NULL if \code{branch_partitions} is not requested.}
+\item{character_rates}{Matrix showing calculated rates for each character. NULL if \code{character_partitions} is not requested.}
+\item{clade_rates}{Matrix showing calculated rates for each clade. NULL if \code{clade_partitions} is not requested.}
+\item{time_rates}{Matrix showing calculated rates for each time bin. NULL if \code{time_partitions} is not requested.}
 \item{time_tree}{The time-scaled input tree used as input (provided as output for use with visualisation functions).}
 }
 \description{
@@ -121,7 +121,7 @@ Following Cloutier (1991), Lloyd (2016) extended the two main types of rate hypo
 
 In Claddis (>=0.3) these partitions are defined as a list of lists of vectors where only the first N - 1 partitions need be defined. E.g., if comparing the first edge value (based on \pkg{ape} numbering, i.e., \code{plot(tree); edgelabels()}) to the rest of the tree then the user only needs to define the value "1" and the function will automatically add a second partition containing all other edges. This can be set with the option \code{branch_partitions = list(list(1))}. Similarly, to do what Lloyd et al. (2012) did and repeat the test for every edge in the tree (and assuming this variable is already named "tree") you could use, \code{branch_partitions = lapply(X = as.list(x = 1:nrow(tree$edge)), as.list)}.
 
-Because of the flexibility of this function the user can define any set of edges. For example, they could test whether terminal branches have a different rate from internal branches with \code{branch_partitions = list(list(match(1:Ntip(tree), tree$edge[, 2])))}. The \code{clade_partitions} is really just a special subset of this type of hypothesis, but with edges being defined as descending from a specific internal node in the tree. Once again, an exploratory approach like that of Lloyd et al. (2012) can be used with: \code{clade_partitions = lapply(X = as.list(x = Ntip(tree) + (2:Nnode(tree))), as.list)}. Note that this excludes the root node as this would define a single partition and hence would represent the null hypothesis (a single rate model for the whole tree). (If using \code{test_type = "AIC"} then the user typically \emph{will} want a value for a single partition.) More generally clades must be defined by the node numbers they correspond to. In R an easy way to identify these is with: \code{plot(tree); nodelabels()}.
+Because of the flexibility of this function the user can define any set of edges. For example, they could test whether terminal branches have a different rate from internal branches with \code{branch_partitions = list(list(match(1:ape::Ntip(phy = tree), tree$edge[, 2])))}. The \code{clade_partitions} is really just a special subset of this type of hypothesis, but with edges being defined as descending from a specific internal node in the tree. Once again, an exploratory approach like that of Lloyd et al. (2012) can be used with: \code{clade_partitions = lapply(X = as.list(x = ape::Ntip(phy = tree) + (2:Nnode(tree))), as.list)}. Note that this excludes the root node as this would define a single partition and hence would represent the null hypothesis (a single rate model for the whole tree). (If using \code{test_type = "AIC"} then the user typically \emph{will} want a value for a single partition.) More generally clades must be defined by the node numbers they correspond to. In R an easy way to identify these is with: \code{plot(tree); nodelabels()}.
 
 Time bin partitions are defined in a similar way, but are numbered 1:N starting from the oldest time bin. So if wanting to do an exploratory test of single bin partitions (and only four time bins were specified) you could use: \code{time_partitions = lapply(X = as.list(x = 1:4), as.list)}. Bins can be combined too, just as edges are above. For example, time bins 1 and 2 could form a single partition with: \code{time_partitions = list(list(1:2))}. Or if looking to test a model where each bin has its' own rate value you could use: \code{time_partitions = list(as.list(x = 1:3))}. Note, as before we do not need to specify the fourth bin as this will be automatically done by the function, however, \code{time_partitions = list(as.list(x = 1:4))} will also work. Some caution needs to be applied with N-rate models (where N is three or larger) and \code{test_type = "LRT"} as a result favouring such models does not necessarily endorse N-separate rates. I.e., it could simply be that one bin has such a large excursion that overall the N-rate model fits better than the 1-rate model, but some 2-rate models might be better still. It is up to the user to check this themselves by exploring smaller combinations of bins and more genrally if exploring partitions of three or more use of the Akaike Information Criterion (\code{test_type = "AIC"}) is recommended.
 
@@ -163,7 +163,7 @@ Note that currently the function cannot deal with step matrices and that the ter
 
 \bold{Output}
 
-The output for each LRT test (i.e., the components of the \code{BranchPartitionResults}, \code{CharacterPartitionResults}, \code{CladePartitionResults} and \code{TimeBinResults} parts of the output) includes three main parts:
+The output for each LRT test (i.e., the components of the \code{branch_test_results}, \code{character_test_results}, \code{clade_test_results} and \code{time_test_results} parts of the output) includes three main parts:
 
 \enumerate{
   \item Rates.
@@ -216,7 +216,7 @@ x <- test_rates(
   ), clade_partitions =
     lapply(
       X =
-        as.list(x = Ntip(time_tree) + (2:Nnode(time_tree))),
+        as.list(x = ape::Ntip(phy = time_tree) + (2:ape::Nnode(phy = time_tree))),
       as.list
     ), time_partitions =
     lapply(X = as.list(x = 1:4), as.list), change_times =

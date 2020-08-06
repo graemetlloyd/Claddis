@@ -80,7 +80,7 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
   time_tree <- pcoa_data$time_tree
 
   # Record number of tips:
-  N <- ape::Ntip(time_tree)
+  n_tips <- ape::Ntip(phy = time_tree)
 
   # Isolate pcoa axes:
   pcoa_data <- pcoa_data$vectors
@@ -122,18 +122,18 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
 
   # plots tips
   rgl::points3d(
-    pcoa_data[1:N, 1],
-    pcoa_data[1:N, 2],
-    z_axis[1:N],
+    pcoa_data[1:n_tips, 1],
+    pcoa_data[1:n_tips, 2],
+    z_axis[1:n_tips],
     col = plotting_parameters$t.bg,
     size = plotting_parameters$t.cex * 4
   )
 
   # plots nodes
   rgl::points3d(
-    pcoa_data[(N + 1):nrow(pcoa_data), 1],
-    pcoa_data[(N + 1):nrow(pcoa_data), 2],
-    z_axis[(N + 1):nrow(pcoa_data)],
+    pcoa_data[(n_tips + 1):nrow(pcoa_data), 1],
+    pcoa_data[(n_tips + 1):nrow(pcoa_data), 2],
+    z_axis[(n_tips + 1):nrow(pcoa_data)],
     col = plotting_parameters$n.bg,
     size = plotting_parameters$n.cex * 4
   )
@@ -175,8 +175,8 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
 
     # Plot internal nodes:
     rgl::points3d(
-      pcoa_data[(N + 1):nrow(pcoa_data), 1],
-      pcoa_data[(N + 1):nrow(pcoa_data), 2],
+      pcoa_data[(n_tips + 1):nrow(pcoa_data), 1],
+      pcoa_data[(n_tips + 1):nrow(pcoa_data), 2],
       time_tree$root.time,
       col = plotting_parameters$n.bg,
       size = plotting_parameters$n.cex * 4,
@@ -184,8 +184,8 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, shado
     )
 
     # Plot tips:
-    rgl::points3d(pcoa_data[1:N, 1],
-      pcoa_data[1:N, 2],
+    rgl::points3d(pcoa_data[1:n_tips, 1],
+      pcoa_data[1:n_tips, 2],
       time_tree$root.time,
       col = plotting_parameters$t.bg,
       size = plotting_parameters$t.cex * 4,

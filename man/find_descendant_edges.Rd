@@ -25,16 +25,16 @@ tree <- read.tree(text = "(A,(B,(C,D)));")
 # Plot tree:
 plot(tree)
 
-# Add nodelabels:
+# Show nodelabels:
 nodelabels()
 
-# Add edgelabels (note that edges 5 and 6
+# Show edgelabels (note that edges 5 and 6
 # are descendants of node 7):
 edgelabels()
 
-# Use Gdtfind_descendant_edges to show that edges
+# Use find_descendant_edges to show that edges
 # 5 and 6 are descendants of node 7:
-find_descendant_edges(7, tree)
+find_descendant_edges(n = 7, tree = tree)
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

@@ -25,7 +25,7 @@
 #' pcoa_input <- ordinate_cladistic_matrix(michaux_1989)
 #'
 #' # Plot first three axes:
-#' plot_multi_morphospace(pcoa_input, N_axes = 3)
+#' plot_multi_morphospace(pcoa_input = pcoa_input, N_axes = 3)
 #' @export plot_multi_morphospace
 plot_multi_morphospace <- function(pcoa_input, N_axes = 4, plot_taxon_names = FALSE, plot_internal_nodes = FALSE, plot_root = TRUE, root_colour = "grey") {
 
@@ -67,7 +67,7 @@ plot_multi_morphospace <- function(pcoa_input, N_axes = 4, plot_taxon_names = FA
 
       # CHANGE THIS TO EXISTING MORPHOSPACE FUNCTION:
       # plot(pcoa_input$vectors[, i], pcoa_input$vectors[, j], pch = 21, bg = "black", xlab = "", ylab = "", asp = TRUE)
-      plot_morphospace(pcoa_input, x_axis = i, y_axis = j, z_axis = NULL, plot_taxon_names = plot_taxon_names, plot_internal_nodes = plot_internal_nodes, plot_root = plot_root, root_colour = root_colour)
+      plot_morphospace(pcoa_input = pcoa_input, x_axis = i, y_axis = j, z_axis = NULL, plot_taxon_names = plot_taxon_names, plot_internal_nodes = plot_internal_nodes, plot_root = plot_root, root_colour = root_colour)
     }
   }
 

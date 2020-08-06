@@ -42,7 +42,7 @@
 fix_root_time <- function(original_tree, pruned_tree) {
 
   # Conditional if pruned tree too small:
-  if (ape::Ntip(pruned_tree) < 3) stop("pruned_tree includes too few (<3) taxa to be used.")
+  if (ape::Ntip(phy = pruned_tree) < 3) stop("pruned_tree includes too few (<3) taxa to be used.")
 
   # Conditional in case where pruned tree taxa are not a subset of the original tree taxa:
   if (length(x = setdiff(x = pruned_tree$tip.label, y = original_tree$tip.label)) > 0) stop("pruned_tree cannot include taxa not present in original_tree.")

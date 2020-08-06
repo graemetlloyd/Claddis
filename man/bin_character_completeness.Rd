@@ -51,6 +51,16 @@ bin_character_completeness(
       max(diag(x = ape::vcv(phy = day_2016tree))), length.out = 11
   )
 )
+
+# Same, but with a plot:
+bin_character_completeness(
+  cladistic_matrix = day_2016,
+  time_tree = day_2016tree, time_bins = seq(
+    from =
+      day_2016tree$root.time, to = day_2016tree$root.time -
+      max(diag(x = ape::vcv(phy = day_2016tree))), length.out = 11
+  ), plot = TRUE
+)
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

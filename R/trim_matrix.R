@@ -55,11 +55,8 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
       # There are no taxa to be removed:
       removed_taxa <- NULL
 
-      # Compile data in single variable:
-      out <- list(distance_matrix = distance_matrix, tree = tree, removed_taxa = removed_taxa)
-
-      # Output:
-      return(out)
+      # Return compile data in single variable:
+      return(list(distance_matrix = distance_matrix, tree = tree, removed_taxa = removed_taxa))
 
       # Case if distance matrix has gaps:
     } else {
@@ -89,15 +86,18 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
         removes <- c(removes, taxon_to_delete)
       }
 
-      # Compile data in single variable:
-      out <- list(distance_matrix = distance_matrix, tree = tree, removed_taxa = removes)
-
-      # Output:
-      return(out)
+      # Return compiled data:
+      return(list(distance_matrix = distance_matrix, tree = tree, removed_taxa = removes))
     }
 
     # Case if there is a tree:
   } else {
+    
+    # Get tip count:
+    n_tips <- ape::Ntip(phy = tree)
+    
+    # Get node count:
+    n_nodes <- ape::Nnode(phy = tree)
 
     # Case if distance matrix is already complete:
     if (length(x = which(x = is.na(distance_matrix))) == 0) {
@@ -108,17 +108,14 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
       # Create NULL vector for removed taxa:
       removed_taxa <- NULL
 
-      # Compile data in single variable:
-      out <- list(distance_matrix = distance_matrix, tree = tree, removed_taxa = removed_taxa)
-
       # Return unmodified matrix and tree:
-      return(out)
+      return(list(distance_matrix = distance_matrix, tree = tree, removed_taxa = removed_taxa))
 
       # Case if distance matrix has gaps:
     } else {
 
       # Get list of node numbers as text:
-      node_numbers <- as.character((ape::Ntip(tree) + 1):(ape::Ntip(tree) + ape::Nnode(tree)))
+      node_numbers <- as.character((n_tips + 1):(n_tips + n_nodes))
 
       # Rename distance_matrix rownames by descendant taxa that define them:
       for (i in match(node_numbers, rownames(x = distance_matrix))) colnames(x = distance_matrix)[i] <- rownames(x = distance_matrix)[i] <- paste(sort(x = tree$tip.label[strap::FindDescendants(rownames(x = distance_matrix)[i], tree)]), collapse = "%%")
@@ -192,7 +189,7 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
           descendant_nodes <- tree$edge[which(x = tree$edge[, 1] == originating_node), 2]
 
           # Case if one of the descendants is a tip:
-          if (length(x = which(x = descendant_nodes <= ape::Ntip(tree))) > 0) {
+          if (length(x = which(x = descendant_nodes <= n_tips)) > 0) {
 
             # Get taxon to exclude:
             taxon_to_exclude <- tree$tip.label[min(descendant_nodes)]
@@ -201,16 +198,16 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
           } else {
 
             # If first descendant node has more taxa:
-            if (length(x = strap::FindDescendants(descendant_nodes[1], tree)) >= length(x = strap::FindDescendants(descendant_nodes[2], tree))) {
+            if (length(x = strap::FindDescendants(n = descendant_nodes[1], tree = tree)) >= length(x = strap::FindDescendants(n = descendant_nodes[2], tree = tree))) {
 
               # Get taxon to exclude:
-              taxon_to_exclude <- tree$tip.label[strap::FindDescendants(descendant_nodes[2], tree)]
+              taxon_to_exclude <- tree$tip.label[strap::FindDescendants(n = descendant_nodes[2], tree = tree)]
 
               # If second descendant node has more taxa:
             } else {
 
               # Get taxon to exclude:
-              taxon_to_exclude <- tree$tip.label[strap::FindDescendants(descendant_nodes[1], tree)]
+              taxon_to_exclude <- tree$tip.label[strap::FindDescendants(n = descendant_nodes[1], tree = tree)]
             }
           }
 

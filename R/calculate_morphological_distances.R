@@ -195,7 +195,7 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
       characters.to.check <- sort(x = unique(x = c(ampersand.elements, slash.elements)))
 
       # Set behaviours as either the shared version or minimum difference if they contradict (may need to modify this later for more complex options):
-      behaviour <- unlist(x = lapply(X = lapply(X = lapply(X = lapply(X = lapply(X = lapply(X = lapply(apply(apply(rbind(firstrow[characters.to.check], secondrow[characters.to.check]), 2, gsub, pattern = "[:0-9:]", replacement = ""), 2, list), unlist), function(x) x[nchar(x) > 0]), function(x) ifelse(nchar(x) > 0, strsplit(x, split = "")[[1]][1], x)), function(x) gsub(pattern = "&", replacement = polymorphism_behaviour, x = x)), function(x) gsub(pattern = "/", replacement = uncertainty_behaviour, x = x)), unique), function(x) ifelse(length(x) > 1, "min.difference", x)))
+      behaviour <- unlist(x = lapply(X = lapply(X = lapply(X = lapply(X = lapply(X = lapply(X = lapply(apply(apply(rbind(firstrow[characters.to.check], secondrow[characters.to.check]), 2, gsub, pattern = "[:0-9:]", replacement = ""), 2, list), unlist), function(x) x[nchar(x = x) > 0]), function(x) ifelse(nchar(x = x) > 0, strsplit(x, split = "")[[1]][1], x)), function(x) gsub(pattern = "&", replacement = polymorphism_behaviour, x = x)), function(x) gsub(pattern = "/", replacement = uncertainty_behaviour, x = x)), unique), function(x) ifelse(length(x) > 1, "min.difference", x)))
 
       # If behaviour is to find minimum differences:
       if (any(behaviour == "min.difference")) {

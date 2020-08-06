@@ -74,7 +74,7 @@ write_nexus_matrix <- function(cladistic_matrix, file_name) {
     }
 
     # Get equal length taxon names (with added spaces):
-    TaxonNamesWithTrailingSpaces <- paste(rownames(x = DataMatrix$matrix), unlist(x = lapply(X = lapply(X = as.list(x = (max(nchar(rownames(x = DataMatrix$matrix))) + 2) - nchar(rownames(x = DataMatrix$matrix))), rep, x = " "), paste, collapse = "")), sep = "")
+    TaxonNamesWithTrailingSpaces <- paste(rownames(x = DataMatrix$matrix), unlist(x = lapply(X = lapply(X = as.list(x = (max(nchar(x = rownames(x = DataMatrix$matrix))) + 2) - nchar(x = rownames(x = DataMatrix$matrix))), rep, x = " "), paste, collapse = "")), sep = "")
 
     # If block is continuous:
     if (DataMatrix$datatype == "CONTINUOUS") {
@@ -156,7 +156,7 @@ write_nexus_matrix <- function(cladistic_matrix, file_name) {
   DataBlocksAsTextStrings <- lapply(X = DataBlocks, convert_matrix)
 
   # Set up header block (returns empty string if nothing there):
-  headerBlock <- ifelse(nchar(cladistic_matrix$topper$header) > 0, paste("[", cladistic_matrix$topper$header, "]\n\n", sep = ""), "")
+  headerBlock <- ifelse(nchar(x = cladistic_matrix$topper$header) > 0, paste("[", cladistic_matrix$topper$header, "]\n\n", sep = ""), "")
 
   # Set up taxa block (only required if multiple matrix blocks as sets number of taxa, will be empty string otherwise):
   TaxaBlock <- ifelse(length(x = DataBlocks) > 1, paste("BEGIN TAXA;\n\tDIMENSIONS NTAX=", NTaxa, ";\n\tTAXLABELS\n\t\t", paste(rownames(x = cladistic_matrix$matrix_1$matrix), collapse = " "), "\n;\nEND;\n\n", sep = ""), "")
@@ -165,7 +165,7 @@ write_nexus_matrix <- function(cladistic_matrix, file_name) {
   DataBlock <- ifelse(length(x = DataBlocks) == 1, paste("BEGIN DATA;\n\tDIMENSIONS  NTAX=", NTaxa, " NCHAR=", Ncharacters, " ;\n\tFORMAT DATATYPE=", datatypes, " SYMBOLS=\" ", symbols, "\" MISSING=", missing, " GAP=", gap, " ;\n", sep = ""), "")
 
   # Set up character block (including MATRIX that will begin data):
-  CharacterBlock <- ifelse(rep(length(x = DataBlocks), length(x = DataBlocks)) > 1, paste("BEGIN CHARACTERS;\n\t", ifelse(nchar(block_names) > 0, paste("TITLE  ", block_names, ";\n", sep = ""), ""), "\tDIMENSIONS  NCHAR=", Ncharacters, ";\n\tFORMAT  DATATYPE=", ifelse(datatypes == "CONTINUOUS", "CONTINUOUS ", paste(datatypes, " SYMBOLS=\" ", symbols, "\" ", sep = "")), "MISSING=", missing, " GAP=", gap, " ;\nMATRIX\n\n", sep = ""), "MATRIX\n\n")
+  CharacterBlock <- ifelse(rep(length(x = DataBlocks), length(x = DataBlocks)) > 1, paste("BEGIN CHARACTERS;\n\t", ifelse(nchar(x = block_names) > 0, paste("TITLE  ", block_names, ";\n", sep = ""), ""), "\tDIMENSIONS  NCHAR=", Ncharacters, ";\n\tFORMAT  DATATYPE=", ifelse(datatypes == "CONTINUOUS", "CONTINUOUS ", paste(datatypes, " SYMBOLS=\" ", symbols, "\" ", sep = "")), "MISSING=", missing, " GAP=", gap, " ;\nMATRIX\n\n", sep = ""), "MATRIX\n\n")
 
   # Take character block and meld with matri(ces) into matrix block(s):
   MatrixBlock <- paste(paste(CharacterBlock, unlist(x = lapply(X = DataBlocksAsTextStrings, paste, collapse = "\n")), "\n;\nEND;\n\n", sep = ""), collapse = "")

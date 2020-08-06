@@ -77,8 +77,8 @@
 #'   time_tree = time_tree,
 #'   cladistic_matrix = cladistic_matrix,
 #'   clade_partitions = as.list(x = seq(
-#'     from = ape::Ntip(tree) + 1,
-#'     to = ape::Ntip(tree) + ape::Nnode(tree), by = 1
+#'     from = ape::Ntip(phy = tree) + 1,
+#'     to = ape::Ntip(phy = tree) + ape::Nnode(tree), by = 1
 #'   )),
 #'   branch_partitions = lapply(X = as.list(x = seq(
 #'     from = 1,
@@ -113,12 +113,12 @@ plot_rates_tree <- function(test_rates_output, model_type, model_number, ...) {
   # Check model type is a valid option:
   if (!model_type %in% c("branch", "clade")) stop("model_type must be one of \"branch\" or \"clade\".")
 
-  # Set resolution fro plotting (discretisation of continuous rates):
-  Resolution <- 100
+  # Set resolution for plotting (discretisation of continuous rates):
+  resolution <- 100
 
   # If requesting branch partitions extract these from rate output:
   if (model_type == "branch") {
-    EdgePartitions <- lapply(X = test_rates_output$BranchPartitionResults, function(x) {
+    edge_partitions <- lapply(X = test_rates_output$branch_test_results, function(x) {
       lapply(X = strsplit(x$Partition, " \\| ")[[1]], function(y) {
         unlist(x = lapply(X = y, function(z) {
           z <- as.list(x = strsplit(z, split = " ")[[1]])
@@ -137,7 +137,7 @@ plot_rates_tree <- function(test_rates_output, model_type, model_number, ...) {
 
   # If requesting clade partitions extract these from rate output:
   if (model_type == "clade") {
-    EdgePartitions <- lapply(X = test_rates_output$CladePartitionResults, function(x) {
+    edge_partitions <- lapply(X = test_rates_output$clade_test_results, function(x) {
       lapply(X = strsplit(x$Partition, " \\| ")[[1]], function(y) {
         unlist(x = lapply(X = y, function(z) {
           z <- as.list(x = strsplit(z, split = " ")[[1]])
@@ -155,35 +155,35 @@ plot_rates_tree <- function(test_rates_output, model_type, model_number, ...) {
   }
 
   # If requesting branch rates extract these from output:
-  if (model_type == "branch") EdgeRates <- lapply(X = test_rates_output$BranchPartitionResults, function(x) x$Rates)
+  if (model_type == "branch") edge_rates <- lapply(X = test_rates_output$branch_test_results, function(x) x$Rates)
 
   # If requesting clade rates extract these from output:
-  if (model_type == "clade") EdgeRates <- lapply(X = test_rates_output$CladePartitionResults, function(x) x$Rates)
+  if (model_type == "clade") edge_rates <- lapply(X = test_rates_output$clade_test_results, function(x) x$Rates)
 
   # Get discretized vector of edge rates (needed for choosing plot colours):
-  DiscretizedRateValues <- seq(from = 0, to = max(EdgeRates[[model_number]]), length.out = Resolution)
+  discretized_rate_values <- seq(from = 0, to = max(edge_rates[[model_number]]), length.out = resolution)
 
   # Discretize edge rates:
-  DiscretizedEdgeRates <- lapply(X = EdgeRates, function(x) unlist(x = lapply(X = as.list(x = x), function(y) DiscretizedRateValues[max(which(x = y >= DiscretizedRateValues))])))
+  discretized_edge_rates <- lapply(X = edge_rates, function(x) unlist(x = lapply(X = as.list(x = x), function(y) discretized_rate_values[max(which(x = y >= discretized_rate_values))])))
 
   # Create vector of edge rate values to use in plotting:
-  EdgeRateValues <- rep(0, nrow(test_rates_output$time_tree$edge))
+  edge_rate_values <- rep(0, nrow(test_rates_output$time_tree$edge))
 
   # Fill vector of edge rate values to use in plotting:
-  for (i in 1:length(x = EdgePartitions[[model_number]])) EdgeRateValues[EdgePartitions[[model_number]][[i]]] <- DiscretizedRateValues[DiscretizedRateValues == DiscretizedEdgeRates[[model_number]][i]]
+  for (i in 1:length(x = edge_partitions[[model_number]])) edge_rate_values[edge_partitions[[model_number]][[i]]] <- discretized_rate_values[discretized_rate_values == discretized_edge_rates[[model_number]][i]]
 
   # Plot tree with branches colour coded by rate:
-  phytools::plotBranchbyTrait(tree = test_rates_output$time_tree, x = EdgeRateValues, mode = "edge", xlims = c(0, max(EdgeRateValues)), title = "Changes per lineage myr", leg = max(nodeHeights(test_rates_output$time_tree)), ...)
+  phytools::plotBranchbyTrait(tree = test_rates_output$time_tree, x = edge_rate_values, mode = "edge", xlims = c(0, max(edge_rate_values)), title = "Changes per lineage myr", leg = max(nodeHeights(test_rates_output$time_tree)), ...)
 
   # Dead code attempting to basically do what phytools::plotBranchbyTrait does without calling phytools:
-  # names(DiscretizedRateValues) <- hcl.colors(n = Resolution, palette = "viridis")
+  # names(discretized_rate_values) <- hcl.colors(n = resolution, palette = "viridis")
   # EdgeColours <- rep("white", nrow(test_rates_output$time_tree$edge))
-  # for(i in 1:length(x = EdgePartitions[[model_number]])) EdgeColours[EdgePartitions[[model_number]][[i]]] <- names(DiscretizedRateValues[DiscretizedRateValues == DiscretizedEdgeRates[[model_number]][i]])
+  # for(i in 1:length(x = edge_partitions[[model_number]])) EdgeColours[edge_partitions[[model_number]][[i]]] <- names(discretized_rate_values[discretized_rate_values == discretized_edge_rates[[model_number]][i]])
   # ape::plot.phylo(x = test_rates_output$time_tree, edge.color = EdgeColours, show.tip.label = FALSE, edge.width = 3)
-  # cols = names(DiscretizedRateValues)
+  # cols = names(discretized_rate_values)
   # tree = test_rates_output$time_tree
   # lwd = 4
-  # lims = c(0, max(DiscretizedRateValues))
+  # lims = c(0, max(discretized_rate_values))
   # Rounder <- (-1 * (min(c(1, ceiling(log(lims[2], base = 10)))) - 1) + 1)
   # leg <- round(0.5 * max(nodeHeights(tree)), 2)
   # x <- max(nodeHeights(tree)) / 2

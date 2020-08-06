@@ -38,18 +38,18 @@ bin_changes <- function(change_times, time_bins) {
   time_bins <- sort(x = time_bins, decreasing = TRUE)
 
   # Create all-zero vector to store ouput in:
-  changes.in.bin <- rep(0, length(x = time_bins) - 1)
+  binned_changes <- rep(x = 0, times = length(x = time_bins) - 1)
 
   # For each time bin:
   for (i in 2:length(x = time_bins)) {
 
     # Find out which edges (if any) are present in the bin:
-    changes.in.bin[(i - 1)] <- length(x = intersect(which(x = change_times > time_bins[i]), which(x = change_times <= time_bins[(i - 1)])))
+    binned_changes[(i - 1)] <- length(x = intersect(which(x = change_times > time_bins[i]), which(x = change_times <= time_bins[(i - 1)])))
   }
 
   # Add time bin max-mins as names:
-  names(changes.in.bin) <- apply(cbind(time_bins[1:(length(x = time_bins) - 1)], time_bins[2:length(x = time_bins)]), 1, paste, collapse = "-")
+  names(binned_changes) <- apply(cbind(time_bins[1:(length(x = time_bins) - 1)], time_bins[2:length(x = time_bins)]), 1, paste, collapse = "-")
 
   # Return edge lengths in bins:
-  return(changes.in.bin)
+  binned_changes
 }

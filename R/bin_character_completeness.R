@@ -39,6 +39,16 @@
 #'       max(diag(x = ape::vcv(phy = day_2016tree))), length.out = 11
 #'   )
 #' )
+#'
+#' # Same, but with a plot:
+#' bin_character_completeness(
+#'   cladistic_matrix = day_2016,
+#'   time_tree = day_2016tree, time_bins = seq(
+#'     from =
+#'       day_2016tree$root.time, to = day_2016tree$root.time -
+#'       max(diag(x = ape::vcv(phy = day_2016tree))), length.out = 11
+#'   ), plot = TRUE
+#' )
 #' @export bin_character_completeness
 bin_character_completeness <- function(cladistic_matrix, time_tree, time_bins, plot = FALSE, confidence.interval = 0.95) {
 
@@ -51,56 +61,56 @@ bin_character_completeness <- function(cladistic_matrix, time_tree, time_bins, p
   find_missing_and_inapplicable <- function(x) {
 
     # Get all inapplicables:
-    x.inapplicables <- apply(apply(x, 2, "==", ""), 2, as.numeric)
+    inapplicables <- apply(apply(x, 2, "==", ""), 2, as.numeric)
 
     # Replace NAs with 0:
-    x.inapplicables[is.na(x.inapplicables)] <- 0
+    inapplicables[is.na(inapplicables)] <- 0
 
     # Get missing:
-    x.missing <- apply(apply(x, 2, is.na), 2, as.numeric)
+    missings <- apply(apply(x, 2, is.na), 2, as.numeric)
 
     # Return numeric matrix (1 for missing or inapplicable):
-    return(x.missing + x.inapplicables)
+    return(missings + inapplicables)
   }
 
   # Create vector of time bin mid-points:
-  time.bin.midpoints <- time_bins[1:(length(x = time_bins) - 1)] + abs(diff(time_bins)) / 2
+  time_bin_midpoints <- time_bins[1:(length(x = time_bins) - 1)] + abs(diff(time_bins)) / 2
 
   # Create time bin names:
-  time.bin.names <- paste(round(time_bins[1:(length(x = time_bins) - 1)], 1), round(time_bins[2:length(x = time_bins)], 1), sep = "-")
+  time_bin_names <- paste(round(time_bins[1:(length(x = time_bins) - 1)], 1), round(time_bins[2:length(x = time_bins)], 1), sep = "-")
 
   # Get total number of characters:
-  n.characters <- sum(unlist(x = lapply(X = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], "[[", "matrix"), ncol)))
+  n_characters <- sum(unlist(x = lapply(X = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = "[[", "matrix"), FUN = ncol)))
 
   # Get edge lengths in bins for complete tree (measure of a complete character):
-  complete.edges.in.bins <- bin_edge_lengths(time_tree = time_tree, time_bins = time_bins)$binned_edge_lengths
+  binned_edge_lengths <- bin_edge_lengths(time_tree = time_tree, time_bins = time_bins)$binned_edge_lengths
 
   # Set uo missing values vector (no missing values are set as empty characters (""):
-  missing.values <- rep("", n.characters)
+  missing_values <- rep("", n_characters)
 
   # If there are missing or inapplicable values collapse row numbers for them with double percentage:
-  if (any(unlist(x = lapply(X = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], "[[", "matrix"), is.na))) || any(unlist(x = lapply(X = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], "[[", "matrix"), "==", "")))) missing.values <- unname(unlist(x = lapply(X = lapply(X = lapply(X = lapply(X = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], "[[", "matrix"), find_missing_and_inapplicable), apply, 2, "==", 1), apply, 2, which), lapply, paste, collapse = "%%")))
+  if (any(unlist(x = lapply(X = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], "[[", "matrix"), is.na))) || any(unlist(x = lapply(X = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], "[[", "matrix"), "==", "")))) missing_values <- unname(unlist(x = lapply(X = lapply(X = lapply(X = lapply(X = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], "[[", "matrix"), find_missing_and_inapplicable), apply, 2, "==", 1), apply, 2, which), lapply, paste, collapse = "%%")))
 
   # Set up matrix to store edge lengths in each character bin (columns) per character (rows):
-  edge.lengths.in.bins.by.character <- matrix(0, ncol = length(x = time_bins) - 1, nrow = n.characters)
+  binned_edges_by_character <- matrix(data = 0, ncol = length(x = time_bins) - 1, nrow = n_characters)
 
   # For each unique missing value combination (no point repeating those that are the same):
-  for (i in unique(x = missing.values)) {
+  for (i in unique(x = missing_values)) {
 
     # If there is missing data:
-    if (nchar(i) > 0) {
+    if (nchar(x = i) > 0) {
 
       # List taxa to prune:
-      taxa.to.prune <- rownames(x = cladistic_matrix$matrix_1$matrix)[as.numeric(strsplit(i, "%%")[[1]])]
+      taxa_to_prune <- rownames(x = cladistic_matrix$matrix_1$matrix)[as.numeric(strsplit(i, "%%")[[1]])]
 
       # Check that there are still enough taxa left for a tree to exist:
-      if (length(x = setdiff(x = time_tree$tip.label, y = taxa.to.prune)) > 1) {
+      if (length(x = setdiff(x = time_tree$tip.label, y = taxa_to_prune)) > 1) {
 
         # Remove tips with missing data from tree:
-        pruned_tree <- ape::drop.tip(phy = time_tree, tip = taxa.to.prune)
+        pruned_tree <- ape::drop.tip(phy = time_tree, tip = taxa_to_prune)
 
         # Need to correct root time to make sure time binning makes sense:
-        pruned_tree <- fix_root_time(time_tree, pruned_tree)
+        pruned_tree <- fix_root_time(original_tree = time_tree, pruned_tree = pruned_tree)
 
         # If there is one or fewer taxa:
       } else {
@@ -117,20 +127,20 @@ bin_character_completeness <- function(cladistic_matrix, time_tree, time_bins, p
     }
 
     # As long as the tree exists (i.e., it is not pruend down to one or zero taxa) store edge lengths in bin:
-    if (!is.na(pruned_tree)[1]) edge.lengths.in.bins.by.character[which(x = missing.values == i), ] <- matrix(rep(bin_edge_lengths(time_tree = pruned_tree, time_bins = time_bins)$binned_edge_lengths, length(x = which(x = missing.values == i))), ncol = ncol(edge.lengths.in.bins.by.character), byrow = TRUE)
+    if (!is.na(pruned_tree)[1]) binned_edges_by_character[which(x = missing_values == i), ] <- matrix(rep(bin_edge_lengths(time_tree = pruned_tree, time_bins = time_bins)$binned_edge_lengths, length(x = which(x = missing_values == i))), ncol = ncol(binned_edges_by_character), byrow = TRUE)
   }
 
   # Calculate and store proportional character completeness:
-  proportional.completeness.in.bins.by.character <- edge.lengths.in.bins.by.character / matrix(rep(complete.edges.in.bins, n.characters), nrow = n.characters, byrow = TRUE)
+  binned_character_completeness <- binned_edges_by_character / matrix(rep(binned_edge_lengths, n_characters), nrow = n_characters, byrow = TRUE)
 
   # Calculate mean proportional character completeness:
-  mean.proportional.completeness.in.bins <- apply(proportional.completeness.in.bins.by.character, 2, mean)
+  mean_binned_completeness <- apply(binned_character_completeness, 2, mean)
 
   # Calculate upper 95% confidence interval proportional character completeness:
-  upper.proportional.completeness.in.bins <- apply(proportional.completeness.in.bins.by.character, 2, sort)[ceiling((confidence.interval + ((1 - confidence.interval) / 2)) * n.characters), ]
+  upper_binned_completeness <- apply(binned_character_completeness, 2, sort)[ceiling((confidence.interval + ((1 - confidence.interval) / 2)) * n_characters), ]
 
   # Calculate lower 95% confidence interval proportional character completeness:
-  lower.proportional.completeness.in.bins <- apply(proportional.completeness.in.bins.by.character, 2, sort)[max(c(1, floor(((1 - confidence.interval) / 2) * n.characters))), ]
+  lower_binned_completeness <- apply(binned_character_completeness, 2, sort)[max(c(1, floor(((1 - confidence.interval) / 2) * n_characters))), ]
 
   # If plotting output:
   if (plot) {
@@ -139,39 +149,39 @@ bin_character_completeness <- function(cladistic_matrix, time_tree, time_bins, p
     par(mfrow = c(2, 1))
 
     # Create empty plot first (y-axis limits set from 0 to 1):
-    plot(x = time.bin.midpoints, y = apply(proportional.completeness.in.bins.by.character, 2, mean), type = "n", ylim = c(0, 1), xlim = c(max(time.bin.midpoints), min(time.bin.midpoints)), xlab = "Time (Ma)", ylab = "Proportional Character Completeness")
+    graphics::plot(x = time_bin_midpoints, y = apply(binned_character_completeness, 2, mean), type = "n", ylim = c(0, 1), xlim = c(max(time_bin_midpoints), min(time_bin_midpoints)), xlab = "Time (Ma)", ylab = "Proportional Character Completeness")
 
     # Add 95% confidence interval as shaded polygon:
-    polygon(x = c(time.bin.midpoints, rev(time.bin.midpoints)), y = c(upper.proportional.completeness.in.bins, rev(lower.proportional.completeness.in.bins)), col = "grey", border = 0)
+    graphics::polygon(x = c(time_bin_midpoints, rev(time_bin_midpoints)), y = c(upper_binned_completeness, rev(lower_binned_completeness)), col = "grey", border = 0)
 
     # Plot mean character completeness on top:
-    points(x = time.bin.midpoints, y = mean.proportional.completeness.in.bins, type = "l", ylim = c(0, 1), xlim = c(max(time.bin.midpoints), min(time.bin.midpoints)), xlab = "Time (Ma)", ylab = "Proportional Character Completeness", lwd = 2)
+    graphics::points(x = time_bin_midpoints, y = mean_binned_completeness, type = "l", ylim = c(0, 1), xlim = c(max(time_bin_midpoints), min(time_bin_midpoints)), xlab = "Time (Ma)", ylab = "Proportional Character Completeness", lwd = 2)
 
     # Add legend:
-    graphics::legend(x = max(time.bin.midpoints), y = 0.4, c(paste(confidence.interval, "% confidence interval", sep = ""), "Mean"), col = c("grey", "black"), lwd = c(8, 2), merge = TRUE, bg = "white")
+    graphics::legend(x = max(time_bin_midpoints), y = 0.4, c(paste(confidence.interval, "% confidence interval", sep = ""), "Mean"), col = c("grey", "black"), lwd = c(8, 2), merge = TRUE, bg = "white")
 
     # Create empty plot first (y-axis limits set from 0 to 1):
-    plot(x = time.bin.midpoints, y = apply(proportional.completeness.in.bins.by.character, 2, mean), type = "n", ylim = c(0, 1), xlim = c(max(time.bin.midpoints), min(time.bin.midpoints)), xlab = "Time (Ma)", ylab = "Proportional Character Completeness")
+    graphics::plot(x = time_bin_midpoints, y = apply(binned_character_completeness, 2, mean), type = "n", ylim = c(0, 1), xlim = c(max(time_bin_midpoints), min(time_bin_midpoints)), xlab = "Time (Ma)", ylab = "Proportional Character Completeness")
 
     # Plot each individual characters proportional completeness:
-    for (i in 1:n.characters) points(x = time.bin.midpoints, y = proportional.completeness.in.bins.by.character[i, ], type = "l", col = "grey")
+    for (i in 1:n_characters) graphics::points(x = time_bin_midpoints, y = binned_character_completeness[i, ], type = "l", col = "grey")
 
     # Plot mean character completeness on top:
-    points(x = time.bin.midpoints, y = mean.proportional.completeness.in.bins, type = "l", ylim = c(0, 1), xlim = c(max(time.bin.midpoints), min(time.bin.midpoints)), xlab = "Time (Ma)", ylab = "Proportional Character Completeness", lwd = 2)
+    graphics::points(x = time_bin_midpoints, y = mean_binned_completeness, type = "l", ylim = c(0, 1), xlim = c(max(time_bin_midpoints), min(time_bin_midpoints)), xlab = "Time (Ma)", ylab = "Proportional Character Completeness", lwd = 2)
 
     # Add legend:
-    graphics::legend(x = max(time.bin.midpoints), y = 0.4, c("Individual characters", "Mean"), col = c("grey", "black"), lwd = c(1, 2), merge = TRUE, bg = "white")
+    graphics::legend(x = max(time_bin_midpoints), y = 0.4, legend = c("Individual characters", "Mean"), col = c("grey", "black"), lwd = c(1, 2), merge = TRUE, bg = "white")
 
     # Reset plotting environment:
-    par(mfrow = c(1, 1))
+    graphics::par(mfrow = c(1, 1))
   }
 
   # Add time bin names to output:
-  names(mean.proportional.completeness.in.bins) <- names(upper.proportional.completeness.in.bins) <- names(lower.proportional.completeness.in.bins) <- colnames(x = proportional.completeness.in.bins.by.character) <- time.bin.names
+  names(mean_binned_completeness) <- names(upper_binned_completeness) <- names(lower_binned_completeness) <- colnames(x = binned_character_completeness) <- time_bin_names
 
-  # Compile output variables:
-  output <- list(mean.proportional.character.completeness.per.time.bin = mean.proportional.completeness.in.bins, upper.confidence.interval.proportional.character.completeness.per.time.bin = upper.proportional.completeness.in.bins, lower.confidence.intervalproportional.character.completeness.per.time.bin = lower.proportional.completeness.in.bins, proportional.character.completeness.per.time.binByCharacter = proportional.completeness.in.bins.by.character)
+  # Return compiled output:
+  output <- list(mean_completeness = mean_binned_completeness, upper_completeness = upper_binned_completeness, lower_completeness = lower_binned_completeness, completeness_by_character = binned_character_completeness)
 
-  # Return output:
+  #  output:
   return(output)
 }

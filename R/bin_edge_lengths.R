@@ -31,12 +31,18 @@
 #' time_tree$root.time <- 100
 #'
 #' # Create time bins:
-#' time_bins <- seq(100, 0, length.out = 11)
+#' time_bins <- seq(from = 100, to = 0, length.out = 11)
 #'
 #' # Get edge lengths for each bin:
-#' bin_edge_lengths(time_tree, time_bins)
+#' bin_edge_lengths(time_tree = time_tree, time_bins = time_bins)
 #' @export bin_edge_lengths
 bin_edge_lengths <- function(time_tree, time_bins, pruned_tree = NULL) {
+  
+  # Find number of tips in tree:
+  n_tips <- ape::Ntip(phy = time_tree)
+
+  # Fine number of nodes in tree:
+  n_nodes <- ape::Nnode(phy = time_tree)
 
   # Tree must have $root.time:
   if (is.null(time_tree$root.time)) stop("time_tree must have $root.time or function can not work.")
@@ -48,33 +54,33 @@ bin_edge_lengths <- function(time_tree, time_bins, pruned_tree = NULL) {
     if (!all(ape::drop.tip(phy = time_tree, tip = setdiff(x = time_tree$tip.label, y = pruned_tree$tip.label))$edge == pruned_tree$edge)) stop("ERROR: pruned_tree must be subtree of time_tree.")
 
     # Get dropped taxa:
-    dropped.tips <- setdiff(x = time_tree$tip.label, y = pruned_tree$tip.label)
+    dropped_tips <- setdiff(x = time_tree$tip.label, y = pruned_tree$tip.label)
 
     # Collapse terminal branch lengths of dropped tips to zero:
-    time_tree$edge.length[match(match(dropped.tips, time_tree$tip.label), time_tree$edge[, 2])] <- 0
+    time_tree$edge.length[match(match(dropped_tips, time_tree$tip.label), time_tree$edge[, 2])] <- 0
 
     # Only continue if there are more branch lengths to collapse:
     if (sum(pruned_tree$edge.length) < sum(time_tree$edge.length)) {
 
       # Find descendant tips of each node:
-      descendant.tips <- lapply(X = as.list(x = (ape::Ntip(time_tree) + 1):(ape::Ntip(time_tree) + ape::Nnode(time_tree))), strap::FindDescendants, tree = time_tree)
+      descendants <- lapply(X = as.list(x = (n_tips + 1):(n_tips + n_nodes)), strap::FindDescendants, tree = time_tree)
 
       # Add node numbers as names:
-      names(descendant.tips) <- (ape::Ntip(time_tree) + 1):(ape::Ntip(time_tree) + ape::Nnode(time_tree))
+      names(descendants) <- (n_tips + 1):(n_tips + n_nodes)
 
       # Find edges to collapse (those with dropped descendants only):
-      edges.to.collapse <- match(as.numeric(names(which(x = unlist(x = lapply(X = lapply(X = lapply(X = descendant.tips, match, table = match(dropped.tips, time_tree$tip.label)), is.na), sum)) == 0))), time_tree$edge[, 2])
+      edges_to_collapse <- match(as.numeric(names(which(x = unlist(x = lapply(X = lapply(X = lapply(X = descendants, match, table = match(dropped_tips, time_tree$tip.label)), is.na), sum)) == 0))), time_tree$edge[, 2])
 
       # Collapse these branches to zero:
-      time_tree$edge.length[edges.to.collapse] <- 0
+      time_tree$edge.length[edges_to_collapse] <- 0
     }
   }
 
   # Get terminal edge numbers:
-  terminal.edges <- match(1:ape::Ntip(time_tree), time_tree$edge[, 2])
+  terminal_edges <- match(1:n_tips, time_tree$edge[, 2])
 
   # Get internal edge numbers:
-  internal.edges <- setdiff(x = 1:nrow(time_tree$edge), y = terminal.edges)
+  internal_edges <- setdiff(x = 1:nrow(time_tree$edge), y = terminal_edges)
 
   # Enforce old-to-young order of time bins:
   time_bins <- sort(x = time_bins, decreasing = TRUE)
@@ -83,52 +89,49 @@ bin_edge_lengths <- function(time_tree, time_bins, pruned_tree = NULL) {
   binned_internal_edge_lengths <- binned_terminal_edge_lengths <- binned_edge_lengths <- rep(0, length(x = time_bins) - 1)
 
   # Date nodes in tree:
-  node.ages <- date_nodes(time_tree = time_tree)
+  node_ages <- date_nodes(time_tree = time_tree)
 
   # Get maximum age for each edge:
-  tree.edge.maxs <- node.ages[time_tree$edge[, 1]]
+  edge_maxima <- node_ages[time_tree$edge[, 1]]
 
   # Get minimum age for each edge:
-  tree.edge.mins <- node.ages[time_tree$edge[, 2]]
+  edge_minima <- node_ages[time_tree$edge[, 2]]
 
   # For each time bin:
   for (i in 2:length(x = time_bins)) {
 
     # Find out which edges (if any) are present in the bin:
-    edges.in.bin <- intersect(which(x = tree.edge.maxs > time_bins[i]), which(x = tree.edge.mins < time_bins[(i - 1)]))
+    binned_edges <- intersect(which(x = edge_maxima > time_bins[i]), which(x = edge_minima < time_bins[(i - 1)]))
 
     # If there is at least one edge in bin:
-    if (length(x = edges.in.bin) > 0) {
+    if (length(x = binned_edges) > 0) {
 
       # Get maximum age for each edge in bin:
-      in.bin.edge.maxs <- tree.edge.maxs[edges.in.bin]
+      binned_edge_maxima <- edge_maxima[binned_edges]
 
       # Get minimum age for each edge in bin:
-      in.bin.edge.mins <- tree.edge.mins[edges.in.bin]
+      binned_edge_minima <- edge_minima[binned_edges]
 
       # Remove any part of edge that is found before the bin:
-      if (sum(in.bin.edge.maxs > time_bins[(i - 1)]) > 0) in.bin.edge.maxs[in.bin.edge.maxs > time_bins[(i - 1)]] <- time_bins[(i - 1)]
+      if (sum(binned_edge_maxima > time_bins[(i - 1)]) > 0) binned_edge_maxima[binned_edge_maxima > time_bins[(i - 1)]] <- time_bins[(i - 1)]
 
       # Remove any part of edge that is found after the bin:
-      if (sum(in.bin.edge.mins < time_bins[i]) > 0) in.bin.edge.mins[in.bin.edge.mins < time_bins[i]] <- time_bins[i]
+      if (sum(binned_edge_minima < time_bins[i]) > 0) binned_edge_minima[binned_edge_minima < time_bins[i]] <- time_bins[i]
 
       # Get sum of edge lengths found in the bin:
-      binned_edge_lengths[(i - 1)] <- sum(in.bin.edge.maxs - in.bin.edge.mins)
+      binned_edge_lengths[(i - 1)] <- sum(binned_edge_maxima - binned_edge_minima)
 
       # Get sum of terminal edge lengths found in the bin:
-      binned_terminal_edge_lengths[(i - 1)] <- sum(in.bin.edge.maxs[match(setdiff(x = edges.in.bin, y = internal.edges), edges.in.bin)] - in.bin.edge.mins[match(setdiff(x = edges.in.bin, y = internal.edges), edges.in.bin)])
+      binned_terminal_edge_lengths[(i - 1)] <- sum(binned_edge_maxima[match(setdiff(x = binned_edges, y = internal_edges), binned_edges)] - binned_edge_minima[match(setdiff(x = binned_edges, y = internal_edges), binned_edges)])
 
       # Get sum of internal edge lengths found in the bin:
-      binned_internal_edge_lengths[(i - 1)] <- sum(in.bin.edge.maxs[match(setdiff(x = edges.in.bin, y = terminal.edges), edges.in.bin)] - in.bin.edge.mins[match(setdiff(x = edges.in.bin, y = terminal.edges), edges.in.bin)])
+      binned_internal_edge_lengths[(i - 1)] <- sum(binned_edge_maxima[match(setdiff(x = binned_edges, y = terminal_edges), binned_edges)] - binned_edge_minima[match(setdiff(x = binned_edges, y = terminal_edges), binned_edges)])
     }
   }
 
   # Add time bin max-mins as names:
   names(binned_terminal_edge_lengths) <- names(binned_internal_edge_lengths) <- names(binned_edge_lengths) <- apply(cbind(time_bins[1:(length(x = time_bins) - 1)], time_bins[2:length(x = time_bins)]), 1, paste, collapse = "-")
 
-  # Compile output:
-  output <- list(binned_edge_lengths = binned_edge_lengths, binned_terminal_edge_lengths = binned_terminal_edge_lengths, binned_internal_edge_lengths = binned_internal_edge_lengths)
-
-  # Return output:
-  return(output)
+  # Return compiled output:
+  list(binned_edge_lengths = binned_edge_lengths, binned_terminal_edge_lengths = binned_terminal_edge_lengths, binned_internal_edge_lengths = binned_internal_edge_lengths)
 }

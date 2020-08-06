@@ -37,7 +37,7 @@
 #'
 #' # Plot character changes on the tree:
 #' plot_changes_on_tree(
-#'   out$Inferredcharacter_changes,
+#'   out$inferred_character_changes,
 #'   time_tree
 #' )
 #' @export plot_changes_on_tree

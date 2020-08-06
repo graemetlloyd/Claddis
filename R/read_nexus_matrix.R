@@ -280,7 +280,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
     lines.to.edit <- X[grep("'", X)]
 
     # Remove text outside single quotes:
-    for(i in replacement.items[order(nchar(replacement.items), decreasing=TRUE)]) lines.to.edit <- gsub(pattern = i, replacement = "", x = lines.to.edit, fixed = TRUE)
+    for(i in replacement.items[order(nchar(x = replacement.items), decreasing=TRUE)]) lines.to.edit <- gsub(pattern = i, replacement = "", x = lines.to.edit, fixed = TRUE)
 
     # Remove double spaces:
     while(length(x = grep("  ", lines.to.edit)) > 0) lines.to.edit <- gsub(pattern = "  ", replacement = " ", x = lines.to.edit, fixed = TRUE)
@@ -612,7 +612,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
       symbols <- strsplit(strsplit(strsplit(X[grep("symbols", X, ignore.case = TRUE)], "SYMBOLS=|symbols=|symbols=")[[1]][2], "\"")[[1]][2], " |")[[1]]
       
       # Collapse to just the symbols themselves:
-      symbols <- symbols[nchar(symbols) == 1]
+      symbols <- symbols[nchar(x = symbols) == 1]
       
       # Special case of a tilda indicating a range:
       if (length(x = symbols) == 3 && symbols[2] == "~") symbols <- as.character(as.numeric(symbols[1]):as.numeric(symbols[3]))

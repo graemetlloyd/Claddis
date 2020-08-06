@@ -66,7 +66,7 @@ align_matrix_block <- function(matrix_block) {
   })
 
   # what is the most number of spaces to add:
-  block_length <- max(unlist(x = lapply(X = matrix_block, function(x) nchar(x[1])))) + 2
+  block_length <- max(unlist(x = lapply(X = matrix_block, function(x) nchar(x = x[1])))) + 2
 
   # Add spaces to names to align block:
   matrix_block <- lapply(X = matrix_block, function(x) {

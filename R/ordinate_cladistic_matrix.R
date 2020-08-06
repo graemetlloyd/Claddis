@@ -27,21 +27,25 @@
 #'
 #' Takes a cladistic matrix in the format imported by \link{read_nexus_matrix} and performs Principal Coordinates (Gower 1966) analysis on it.
 #'
-#' This function is effectively a wrapper for \link{pcoa} from the \link{ape} package and the user is referred there for some of the options (e.g., using the Caillez 1983 approach to avoiding negative eigenvalues).
+#' This function is effectively a wrapper for the pipeline:
 #'
-#' If providing a tree and inferring ancestral states then options to also infer missing or uncertain tips and whether to infer values for all characters at all internal nodes are provided (via \link{estimate_ancestral_states}).
+#' \link{estimate_ancestral_states} -> \link{calculate_morphological_distances} -> \link{pcoa}
+#'
+#' With the first part being optional (if wanting a phylomorphospace) and the latter coming from the \link{ape} package (the user is referred there for some of the options, e.g., using the Caillez 1983 approach to avoiding negative eigenvalues). (See Lloyd 2016 for more on disparity pipelines.)
+#'
+#' If providing a tree and inferring ancestral states then options to also infer missing or uncertain tips and whether to infer values for all characters at all internal nodes are provided by the \link{estimate_ancestral_states} part.
 #'
 #' Other options within the function concern the distance metric to use and the transformation to be used if selecting a propotional distance (see \link{calculate_morphological_distances}).
 #'
-#' IMPORTANT: The function can remove taxa (or if including a tree, nodes as well) if they lead to an incomplete distance matrix (see \link{trim_matrix}).
+#' IMPORTANT: The function can remove taxa (or if including a tree, nodes as well) if they lead to an incomplete distance matrix (see \link{trim_matrix} for more details).
 #'
 #' @return \item{time_tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{trim_matrix}.}
 #' @return \item{distance_matrix}{The distance matrix. Note this may be pruned by \link{trim_matrix} and thus not include all taxa.}
-#' @return \item{removed_taxa}{A vector of taxa (or nodes) removed by \link{trim_matrix}. Returns NULL if none are removed.}
+#' @return \item{removed_taxa}{A vector of taxa and/or nodes removed by \link{trim_matrix}. Returns NULL if none were removed.}
 #' @return \item{note}{See \link{pcoa}.}
 #' @return \item{values}{See \link{pcoa}.}
-#' @return \item{vectors}{See \link{pcoa}.}
-#' @return \item{trace}{See \link{pcoa}.}
+#' @return \item{vectors}{See \link{pcoa}. Note: this will be the same as \code{vectors.cor} from the \link{pcoa} output if a correction was applied.}
+#' @return \item{trace}{See \link{pcoa}. Note: this will be the same as \code{trace.cor} from the \link{pcoa} output if a correction was applied.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -54,7 +58,7 @@
 #' @examples
 #'
 #' # Run on Michaux (1989) data set with defaults:
-#' x <- ordinate_cladistic_matrix(michaux_1989)
+#' x <- ordinate_cladistic_matrix(cladistic_matrix = michaux_1989)
 #'
 #' # Show output:
 #' x
@@ -69,7 +73,7 @@
 #' time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
 #'
 #' # Run with tree:
-#' y <- ordinate_cladistic_matrix(michaux_1989, time_tree = time_tree)
+#' y <- ordinate_cladistic_matrix(cladistic_matrix = michaux_1989, time_tree = time_tree)
 #'
 #' # Show new output:
 #' y
@@ -78,6 +82,7 @@ ordinate_cladistic_matrix <- function(cladistic_matrix, distance_metric = "MORD"
 
   # Add some top level conditionsl here to check input is valid.
   # Allow other ordination types such as NMDS
+  # Allow the "bad" phylomorphospace type
 
   # If no tree is supplied:
   if (is.null(time_tree)) {

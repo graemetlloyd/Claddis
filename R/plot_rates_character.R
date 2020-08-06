@@ -93,7 +93,7 @@ plot_rates_character <- function(test_rates_output, model_number, ...) {
   # - Add checks that data are present (characters were tested for)
 
   # Reconstruct character partitions list:
-  CharacterPartitions <- lapply(X = test_rates_output$CharacterPartitionResults, function(x) {
+  CharacterPartitions <- lapply(X = test_rates_output$character_test_results, function(x) {
     lapply(X = strsplit(x$Partition, " \\| ")[[1]], function(y) {
       unlist(x = lapply(X = y, function(z) {
         z <- as.list(x = strsplit(z, split = " ")[[1]])
@@ -113,7 +113,7 @@ plot_rates_character <- function(test_rates_output, model_number, ...) {
   ModelXValues <- lapply(X = apply(matrix(c(1, cumsum(unlist(x = lapply(X = CharacterPartitions[[model_number]], function(x) range(1:length(x = x))))[-1])), ncol = 2), 2, list), unlist)
 
   # Get y values for plotting partitions of model:
-  ModelYValues <- lapply(X = as.list(x = test_rates_output$CharacterPartitionResults[[model_number]]$Rates), rep, 2)
+  ModelYValues <- lapply(X = as.list(x = test_rates_output$character_test_results[[model_number]]$Rates), rep, 2)
 
   # Make vector of partition colours ready for plotting:
   PartitionColours <- unlist(x = unname(mapply(function(x, y) {
@@ -121,10 +121,10 @@ plot_rates_character <- function(test_rates_output, model_number, ...) {
   }, x = hcl.colors(n = length(x = CharacterPartitions[[model_number]]), alpha = 0.5, palette = "viridis"), y = CharacterPartitions[[model_number]])))
 
   # Plot character rates:
-  plot(x = 1:max(unlist(x = CharacterPartitions[[model_number]])), y = test_rates_output$CharacterRates[unlist(x = CharacterPartitions[[model_number]]), "Rate"], pch = 21, bg = PartitionColours, cex = 1.5, xlab = "Character", ylab = "Changes per lineage myr", ylim = c(0, 1.1 * max(test_rates_output$CharacterRates[unlist(x = CharacterPartitions[[model_number]]), "Rate"])), xaxt = "n", lwd = 0.5, col = "black")
+  plot(x = 1:max(unlist(x = CharacterPartitions[[model_number]])), y = test_rates_output$character_rates[unlist(x = CharacterPartitions[[model_number]]), "Rate"], pch = 21, bg = PartitionColours, cex = 1.5, xlab = "Character", ylab = "Changes per lineage myr", ylim = c(0, 1.1 * max(test_rates_output$character_rates[unlist(x = CharacterPartitions[[model_number]]), "Rate"])), xaxt = "n", lwd = 0.5, col = "black")
 
   # Add character numbrs to plot:
-  text(x = 1:max(unlist(x = CharacterPartitions[[model_number]])), y = test_rates_output$CharacterRates[unlist(x = CharacterPartitions[[model_number]]), "Rate"], label = unlist(x = CharacterPartitions[[model_number]]), pos = 1, col = PartitionColours, cex = 0.5)
+  text(x = 1:max(unlist(x = CharacterPartitions[[model_number]])), y = test_rates_output$character_rates[unlist(x = CharacterPartitions[[model_number]]), "Rate"], label = unlist(x = CharacterPartitions[[model_number]]), pos = 1, col = PartitionColours, cex = 0.5)
 
   # Add lines representing clustering of requested model to plot:
   for (i in 1:length(x = ModelXValues)) lines(x = c(ModelXValues[[i]][1] - 0.5, ModelXValues[[i]][2] + 0.5), y = ModelYValues[[i]])
@@ -133,5 +133,5 @@ plot_rates_character <- function(test_rates_output, model_number, ...) {
   for (i in 1:length(x = ModelXValues)) text(x = mean(ModelXValues[[i]]), y = mean(ModelYValues[[i]]), labels = eval(parse(text = paste0("expression(lambda[", i, "])"))), pos = 3, cex = 1.5)
 
   # Add legend to plot:
-  legend(x = 0, y = 1.1 * max(test_rates_output$CharacterRates[unlist(x = CharacterPartitions[[model_number]]), "Rate"]), legend = paste0("Partition ", 1:length(x = CharacterPartitions[[model_number]])), pch = rep(21, length(x = CharacterPartitions[[model_number]])), pt.bg = unique(x = PartitionColours), col = rep("black", length(x = CharacterPartitions[[model_number]])), pt.lwd = 0.5, pt.cex = 1.5)
+  legend(x = 0, y = 1.1 * max(test_rates_output$character_rates[unlist(x = CharacterPartitions[[model_number]]), "Rate"]), legend = paste0("Partition ", 1:length(x = CharacterPartitions[[model_number]])), pch = rep(21, length(x = CharacterPartitions[[model_number]])), pt.bg = unique(x = PartitionColours), col = rep("black", length(x = CharacterPartitions[[model_number]])), pt.lwd = 0.5, pt.cex = 1.5)
 }

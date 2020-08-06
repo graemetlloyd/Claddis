@@ -23,10 +23,10 @@
 #'
 #' This was the method used in Tarver et al. (2018).
 #'
-#' @return
+#' @return 
 #'
-#' \item{Changes}{A matrix of all changes (gains and losses).}
-#' \item{SCM}{The stochastic character map.}
+#' \item{changes}{A matrix of all changes (gains and losses).}
+#' \item{stochastic_character_map}{The stochastic character map.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -52,14 +52,20 @@
 #' out <- map_dollo_changes(time_tree, tip_states)
 #'
 #' # View matrix of changes:
-#' out$Changes
+#' out$changes
 #'
 #' # View stochastic character map (time spent in each state on each branch):
-#' out$SCM
+#' out$scm
 #' @export map_dollo_changes
 map_dollo_changes <- function(time_tree, tip_states) {
 
   # Output of this should match other stochastic character map function and ultimately be a format that can be handed to test_rates or disparity functions
+  
+  # Find number of tips:
+  n_tips <- ape::Ntip(phy = time_tree)
+  
+  # Find number of nodes:
+  n_nodes <- ape::Nnode(phy = time_tree)
 
   # Check tree has branch lengths:
   if (is.null(time_tree$edge.length)) stop("time_tree must have branch lengths.")
@@ -86,7 +92,7 @@ map_dollo_changes <- function(time_tree, tip_states) {
   new.root <- find_mrca(descendant_names = names(which(x = tip_states == 1)), tree = time_tree)
 
   # If new root is really the old root:
-  if ((ape::Ntip(time_tree) + 1) == new.root && sum(tip_states == 1) > 1) {
+  if ((n_tips + 1) == new.root && sum(tip_states == 1) > 1) {
 
     # Set acqusition branch to zero as precedes root:
     acquisition.branch <- 0
@@ -271,16 +277,19 @@ map_dollo_changes <- function(time_tree, tip_states) {
         new.edges <- new.tree$edge
 
         # Update tip names for original tree edge matrix:
-        for (i in 1:ape::Ntip(time_tree)) orig.edges[which(x = orig.edges[, 2] == i), 2] <- time_tree$tip.label[i]
+        for (i in 1:n_tips) orig.edges[which(x = orig.edges[, 2] == i), 2] <- time_tree$tip.label[i]
 
         # Update tip names for pruned tree edge matrix:
-        for (i in 1:ape::Ntip(new.tree)) new.edges[which(x = new.edges[, 2] == i), 2] <- new.tree$tip.label[i]
+        for (i in 1:n_new_tips) new.edges[which(x = new.edges[, 2] == i), 2] <- new.tree$tip.label[i]
 
         # Update node names for original tree edge matrix:
-        for (i in (ape::Ntip(time_tree) + 1):(ape::Ntip(time_tree) + ape::Nnode(time_tree))) orig.edges[which(x = orig.edges == i)] <- paste(sort(x = time_tree$tip.label[strap::FindDescendants(i, time_tree)]), collapse = "")
+        for (i in (n_tips + 1):(n_tips + n_nodes)) orig.edges[which(x = orig.edges == i)] <- paste(sort(x = time_tree$tip.label[strap::FindDescendants(i, time_tree)]), collapse = "")
+        
+        n_new_tips <- ape::Ntip(phy = new.tree)
+        n_new_nodes <- ape::Nnode(phy = new.tree)
 
         # Update node names for pruned tree edge matrix:
-        for (i in (ape::Ntip(new.tree) + 1):(ape::Ntip(new.tree) + ape::Nnode(new.tree))) new.edges[which(x = new.edges == i)] <- paste(sort(x = new.tree$tip.label[strap::FindDescendants(i, new.tree)]), collapse = "")
+        for (i in ( + 1):(n_new_tips + n_new_nodes)) new.edges[which(x = new.edges == i)] <- paste(sort(x = new.tree$tip.label[strap::FindDescendants(i, new.tree)]), collapse = "")
 
         # Collapse original edge matrix to from-to straings for matching:
         orig.edges <- apply(orig.edges, 1, paste, collapse = "%%TO%%")
@@ -336,7 +345,7 @@ map_dollo_changes <- function(time_tree, tip_states) {
   rownames(x = changes.matrix) <- NULL
 
   # Build output:
-  output <- list(Changes = changes.matrix, SCM = SCM)
+  output <- list(changes = changes.matrix, stochastic_character_map = SCM)
 
   # Return output:
   return(output)

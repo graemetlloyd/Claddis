@@ -35,10 +35,10 @@ time_tree <- ape::rtree(n = 10)
 time_tree$root.time <- 100
 
 # Create time bins:
-time_bins <- seq(100, 0, length.out = 11)
+time_bins <- seq(from = 100, to = 0, length.out = 11)
 
 # Get edge lengths for each bin:
-bin_edge_lengths(time_tree, time_bins)
+bin_edge_lengths(time_tree = time_tree, time_bins = time_bins)
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

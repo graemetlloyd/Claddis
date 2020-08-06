@@ -36,7 +36,7 @@ estimate_ancestral_states(
 \item{all_missing_allowed}{Logical to allow all missing character values (generally not recommended, hence default is FALSE).}
 }
 \value{
-\item{anc.lik.matrix}{A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral states.}
+A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral states.
 }
 \description{
 Given a tree and a cladistic matrix uses likelihood to estimate the ancestral states for every character.
