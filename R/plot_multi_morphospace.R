@@ -5,7 +5,7 @@
 #' Plots morphospaces for any number of axes.
 #'
 #' @param pcoa_input The main input in the format output from \link{ordinate_cladistic_matrix}.
-#' @param N_axes An integer indicating the total number of axes to plot (should minimally be three).
+#' @param n_axes An integer indicating the total number of axes to plot (should minimally be three).
 #' @param plot_taxon_names Optional to plot the names of the taxa (defaults to FALSE).
 #' @param plot_internal_nodes Optional to plot the internal nodes of the tree (if included in \code{pcoa_input}) (defaults to FALSE).
 #' @param plot_root Optional to plot the root separately (defaults to FALSE).
@@ -25,9 +25,9 @@
 #' pcoa_input <- ordinate_cladistic_matrix(michaux_1989)
 #'
 #' # Plot first three axes:
-#' plot_multi_morphospace(pcoa_input = pcoa_input, N_axes = 3)
+#' plot_multi_morphospace(pcoa_input = pcoa_input, n_axes = 3)
 #' @export plot_multi_morphospace
-plot_multi_morphospace <- function(pcoa_input, N_axes = 4, plot_taxon_names = FALSE, plot_internal_nodes = FALSE, plot_root = TRUE, root_colour = "grey") {
+plot_multi_morphospace <- function(pcoa_input, n_axes = 4, plot_taxon_names = FALSE, plot_internal_nodes = FALSE, plot_root = TRUE, root_colour = "grey") {
 
   # Add zero lines or grids?
   # Make margins zero and add axes at edges somehow?
@@ -36,34 +36,34 @@ plot_multi_morphospace <- function(pcoa_input, N_axes = 4, plot_taxon_names = FA
   # Never plot taxon names!
 
   # Work out the number of plots required:
-  N_plots <- (N_axes^2 - N_axes) / 2
+  n_plots <- (n_axes^2 - n_axes) / 2
 
   # Set uo matrix that will represent plot layout:
-  A <- matrix(0, ncol = N_axes, nrow = N_axes)
+  plot_matrix <- matrix(0, ncol = n_axes, nrow = n_axes)
 
   # Make plot numbers for lower triangle of layout:
-  A[which(x = lower.tri(A) == TRUE)] <- 1:N_plots
+  plot_matrix[which(x = lower.tri(plot_matrix) == TRUE)] <- 1:n_plots
 
   # Remove last empty column:
-  A <- A[, -N_axes]
+  plot_matrix <- plot_matrix[, -n_axes]
 
   # Add new column of PC labels:
-  A <- cbind(c(0, (N_plots + 1):(N_plots + (N_axes - 1))), A)
+  plot_matrix <- cbind(c(0, (n_plots + 1):(n_plots + (n_axes - 1))), plot_matrix)
 
   # Set first row of PC labels:
-  A[1, ] <- c(0, (N_plots + N_axes):(N_plots + N_axes + N_axes - 2))
+  plot_matrix[1, ] <- c(0, (n_plots + n_axes):(n_plots + n_axes + n_axes - 2))
 
   # Set up margins for morphospace plots:
-  par(mar = c(2, 2, 0, 0))
+  graphics::par(mar = c(2, 2, 0, 0))
 
   # Might want these to reflect actual PC size so that they are in correct relation to each other (NB: PDF will have to be square to retain the aspect ratio)
-  layout(A, widths = c(0.2, rep(1, (N_axes - 1))), heights = c(0.2, rep(1, (N_axes - 1))))
+  graphics::layout(plot_matrix, widths = c(0.2, rep(1, (n_axes - 1))), heights = c(0.2, rep(1, (n_axes - 1))))
 
   # For each x-axis:
-  for (i in 1:(N_axes - 1)) {
+  for (i in 1:(n_axes - 1)) {
 
     # For each y-axis:
-    for (j in (i + 1):N_axes) {
+    for (j in (i + 1):n_axes) {
 
       # CHANGE THIS TO EXISTING MORPHOSPACE FUNCTION:
       # plot(pcoa_input$vectors[, i], pcoa_input$vectors[, j], pch = 21, bg = "black", xlab = "", ylab = "", asp = TRUE)
@@ -72,31 +72,31 @@ plot_multi_morphospace <- function(pcoa_input, N_axes = 4, plot_taxon_names = FA
   }
 
   # Create PC axis labels:
-  labels <- c(paste("PC", 2:N_axes, sep = ""), paste("PC", 1:(N_axes - 1), sep = ""))
+  labels <- c(paste("PC", 2:n_axes, sep = ""), paste("PC", 1:(n_axes - 1), sep = ""))
 
   # Set up margins for plotting PC labels:
-  par(mar = c(0, 0, 0, 0))
+  graphics::par(mar = c(0, 0, 0, 0))
 
   # Place PC labels along left
   for (i in 1:(length(x = labels) / 2)) {
 
     # Empty plot:
-    plot(N_axes, type = "n", axes = FALSE, xlab = "", ylab = "", xlim = c(-1, 1), ylim = c(-1, 1))
+    graphics::plot(n_axes, type = "n", axes = FALSE, xlab = "", ylab = "", xlim = c(-1, 1), ylim = c(-1, 1))
 
     # Add ordination axis labels:
-    text(x = 0, y = 0, labels = labels[i], cex = 2, srt = 90)
+    graphics::text(x = 0, y = 0, labels = labels[i], cex = 2, srt = 90)
   }
 
   # Place PC labels along top
   for (i in (((length(x = labels) / 2) + 1):length(x = labels))) {
 
     # Empty plot:
-    plot(N_axes, type = "n", axes = FALSE, xlab = "", ylab = "", xlim = c(-1, 1), ylim = c(-1, 1))
+    graphics::plot(n_axes, type = "n", axes = FALSE, xlab = "", ylab = "", xlim = c(-1, 1), ylim = c(-1, 1))
 
     # Empty plot:
-    text(x = 0, y = 0, labels = labels[i], cex = 2)
+    graphics::text(x = 0, y = 0, labels = labels[i], cex = 2)
   }
 
   # Reset plotting device so layout is not inherited by the next plot the user makes:
-  layout(1)
+  graphics::layout(1)
 }

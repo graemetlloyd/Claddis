@@ -38,7 +38,7 @@ Plots a morphospace using the output from ordinate_cladistic_matrix.
 \details{
 Uses output from \link{ordinate_cladistic_matrix} as input.
 
-Allows plotting of a third axis using the technique of Matthew Wills (Wills et al. 1994; their Figures 4 and 8; Wills 1998; his Figure 4), where black and white indicate positive and negative values respectovely, and the size of points there magnitudes.
+Allows plotting of a third axis using the technique of Wills et al. (1994; their Figures 4 and 8; Wills 1998; his Figure 4), where black and white indicate positive and negative values respectively, and the size of points there magnitudes.
 }
 \examples{
 

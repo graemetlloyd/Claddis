@@ -14,9 +14,9 @@
 #'
 #' The function will only work for a single model, but in practice the user may wish to produce multiple plots in which case they simply need to rn the function multiple times or setup a multipanel window first with \link{layout}, or similar.
 #'
-#' Plots use the \link{geoscale} package to add geologic time to the x-axis and interested users should consult the documentation tere for a full ist of options (passed via ...) in the function (see example below).
+#' Plots use the \link{geoscale} package to add a geologic time to the x-axis and interested users should consult the documentation there for a full list of options (passed via ...) in the function (see example below).
 #'
-#' Calculated rates (changes per lineage million years) are plotted as filled circles and models are plotted as horizontal lines labelled by rate parameters (lambda_i).
+#' Calculated rates (changes per lineage million years) are plotted as filled circles and models are plotted as horizontal lines labelled by rate parameters (lambda 1, lmabda 2 etc.).
 #'
 #' @return
 #'
@@ -93,8 +93,8 @@ plot_rates_character <- function(test_rates_output, model_number, ...) {
   # - Add checks that data are present (characters were tested for)
 
   # Reconstruct character partitions list:
-  CharacterPartitions <- lapply(X = test_rates_output$character_test_results, function(x) {
-    lapply(X = strsplit(x$Partition, " \\| ")[[1]], function(y) {
+  character_partitions <- lapply(X = test_rates_output$character_test_results, function(x) {
+    lapply(X = strsplit(x$partition, " \\| ")[[1]], function(y) {
       unlist(x = lapply(X = y, function(z) {
         z <- as.list(x = strsplit(z, split = " ")[[1]])
         unlist(x = lapply(X = z, function(p) {
@@ -110,28 +110,28 @@ plot_rates_character <- function(test_rates_output, model_number, ...) {
   })
 
   # Get x values for plotting partitions of model:
-  ModelXValues <- lapply(X = apply(matrix(c(1, cumsum(unlist(x = lapply(X = CharacterPartitions[[model_number]], function(x) range(1:length(x = x))))[-1])), ncol = 2), 2, list), unlist)
+  model_x_values <- lapply(X = apply(matrix(c(1, cumsum(unlist(x = lapply(X = character_partitions[[model_number]], function(x) range(1:length(x = x))))[-1])), ncol = 2), 2, list), unlist)
 
   # Get y values for plotting partitions of model:
-  ModelYValues <- lapply(X = as.list(x = test_rates_output$character_test_results[[model_number]]$Rates), rep, 2)
+  model_y_values <- lapply(X = as.list(x = test_rates_output$character_test_results[[model_number]]$rates), rep, 2)
 
   # Make vector of partition colours ready for plotting:
-  PartitionColours <- unlist(x = unname(mapply(function(x, y) {
+  partition_colours <- unlist(x = unname(mapply(function(x, y) {
     rep(x, length(x = y))
-  }, x = hcl.colors(n = length(x = CharacterPartitions[[model_number]]), alpha = 0.5, palette = "viridis"), y = CharacterPartitions[[model_number]])))
+  }, x = hcl.colors(n = length(x = character_partitions[[model_number]]), alpha = 0.5, palette = "viridis"), y = character_partitions[[model_number]])))
 
   # Plot character rates:
-  plot(x = 1:max(unlist(x = CharacterPartitions[[model_number]])), y = test_rates_output$character_rates[unlist(x = CharacterPartitions[[model_number]]), "Rate"], pch = 21, bg = PartitionColours, cex = 1.5, xlab = "Character", ylab = "Changes per lineage myr", ylim = c(0, 1.1 * max(test_rates_output$character_rates[unlist(x = CharacterPartitions[[model_number]]), "Rate"])), xaxt = "n", lwd = 0.5, col = "black")
+  graphics::plot(x = 1:max(unlist(x = character_partitions[[model_number]])), y = test_rates_output$character_rates[unlist(x = character_partitions[[model_number]]), "rate"], pch = 21, bg = partition_colours, cex = 1.5, xlab = "Character", ylab = "Changes per lineage myr", ylim = c(0, 1.1 * max(test_rates_output$character_rates[unlist(x = character_partitions[[model_number]]), "rate"])), xaxt = "n", lwd = 0.5, col = "black")
 
   # Add character numbrs to plot:
-  text(x = 1:max(unlist(x = CharacterPartitions[[model_number]])), y = test_rates_output$character_rates[unlist(x = CharacterPartitions[[model_number]]), "Rate"], label = unlist(x = CharacterPartitions[[model_number]]), pos = 1, col = PartitionColours, cex = 0.5)
+  graphics::text(x = 1:max(unlist(x = character_partitions[[model_number]])), y = test_rates_output$character_rates[unlist(x = character_partitions[[model_number]]), "rate"], label = unlist(x = character_partitions[[model_number]]), pos = 1, col = partition_colours, cex = 0.5)
 
   # Add lines representing clustering of requested model to plot:
-  for (i in 1:length(x = ModelXValues)) lines(x = c(ModelXValues[[i]][1] - 0.5, ModelXValues[[i]][2] + 0.5), y = ModelYValues[[i]])
+  for (i in 1:length(x = model_x_values)) graphics::lines(x = c(model_x_values[[i]][1] - 0.5, model_x_values[[i]][2] + 0.5), y = model_y_values[[i]])
 
   # Add model parameters (lambda values) to plot:
-  for (i in 1:length(x = ModelXValues)) text(x = mean(ModelXValues[[i]]), y = mean(ModelYValues[[i]]), labels = eval(parse(text = paste0("expression(lambda[", i, "])"))), pos = 3, cex = 1.5)
+  for (i in 1:length(x = model_x_values)) graphics::text(x = mean(model_x_values[[i]]), y = mean(model_y_values[[i]]), labels = eval(parse(text = paste0("expression(lambda[", i, "])"))), pos = 3, cex = 1.5)
 
   # Add legend to plot:
-  legend(x = 0, y = 1.1 * max(test_rates_output$character_rates[unlist(x = CharacterPartitions[[model_number]]), "Rate"]), legend = paste0("Partition ", 1:length(x = CharacterPartitions[[model_number]])), pch = rep(21, length(x = CharacterPartitions[[model_number]])), pt.bg = unique(x = PartitionColours), col = rep("black", length(x = CharacterPartitions[[model_number]])), pt.lwd = 0.5, pt.cex = 1.5)
+  graphics::legend(x = 0, y = 1.1 * max(test_rates_output$character_rates[unlist(x = character_partitions[[model_number]]), "rate"]), legend = paste0("Partition ", 1:length(x = character_partitions[[model_number]])), pch = rep(21, length(x = character_partitions[[model_number]])), pt.bg = unique(x = partition_colours), col = rep("black", length(x = character_partitions[[model_number]])), pt.lwd = 0.5, pt.cex = 1.5)
 }

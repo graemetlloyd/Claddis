@@ -6,11 +6,11 @@
 \usage{
 ordinate_cladistic_matrix(
   cladistic_matrix,
-  distance_metric = "MORD",
-  ged_type = "Wills",
+  distance_metric = "mord",
+  ged_type = "wills",
   distance_transformation = "arcsine_sqrt",
-  distance_polymorphism_behaviour = "min.difference",
-  distance_uncertainty_behaviour = "min.difference",
+  distance_polymorphism_behaviour = "min_difference",
+  distance_uncertainty_behaviour = "min_difference",
   distance_inapplicable_behaviour = "missing",
   character_dependencies = NULL,
   alpha = 0.5,
@@ -26,55 +26,49 @@ ordinate_cladistic_matrix(
 )
 }
 \arguments{
-\item{cladistic_matrix}{A vector of mode character representing the tip names for which an ancestor is sought.}
+\item{cladistic_matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}.}
 
-\item{distance_metric}{The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{calculate_morphological_distances} for more details.}
+\item{distance_metric}{See \link{calculate_morphological_distances}.}
 
-\item{ged_type}{The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.}
+\item{ged_type}{See \link{calculate_morphological_distances}.}
 
-\item{distance_transformation}{The transformation to apply to distances. See \link{calculate_morphological_distances} for details.}
+\item{distance_transformation}{See \link{calculate_morphological_distances}.}
 
-\item{distance_polymorphism_behaviour}{The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{calculate_morphological_distances} for details.}
+\item{distance_polymorphism_behaviour}{See \link{calculate_morphological_distances}.}
 
-\item{distance_uncertainty_behaviour}{The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{calculate_morphological_distances} for details.}
+\item{distance_uncertainty_behaviour}{See \link{calculate_morphological_distances}.}
 
-\item{distance_inapplicable_behaviour}{The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"}. See \link{calculate_morphological_distances} for details.}
+\item{distance_inapplicable_behaviour}{See \link{calculate_morphological_distances}.}
 
-\item{character_dependencies}{Only relevant if using \code{inapplicable.behaviour = "HSJ"}. Must be a two-column matrix with colnames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See \link{calculate_morphological_distances} for details.}
+\item{character_dependencies}{See \link{calculate_morphological_distances}.}
 
-\item{alpha}{The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{inapplicable.behaviour = "HSJ"}. See \link{calculate_morphological_distances} for details.}
+\item{alpha}{See \link{calculate_morphological_distances}.}
 
 \item{correction}{The negative eigenvalue correction to use (one of "lingoes", "none", or "cailliez" - the default). See \link{pcoa} for more details.}
 
 \item{time_tree}{If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.}
 
-\item{estimate_all_nodes}{If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{estimate_ancestral_states} for more details.}
+\item{estimate_all_nodes}{See \link{estimate_ancestral_states}.}
 
-\item{estimate_tip_values}{If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link{estimate_ancestral_states} for more details.}
+\item{estimate_tip_values}{See \link{estimate_ancestral_states}.}
 
 \item{inapplicables_as_missing}{See \link{estimate_ancestral_states}.}
 
-\item{ancestral_polymorphism_behaviour}{Behaviour for dealing with polymorphisms when producing ancestral state estimates - see \link{estimate_ancestral_states}.}
+\item{ancestral_polymorphism_behaviour}{See \link{estimate_ancestral_states}.}
 
-\item{ancestral_uncertainty_behaviour}{Behaviour for dealing with uncertainties when producing ancestral state estimates - see \link{estimate_ancestral_states}.}
+\item{ancestral_uncertainty_behaviour}{See \link{estimate_ancestral_states}.}
 
-\item{threshold}{threshold for ancestral state estimation of discrete characters - see \link{estimate_ancestral_states} for details.}
+\item{threshold}{See \link{estimate_ancestral_states}.}
 
-\item{all_missing_allowed}{Logical to allow all missing character values - see \link{estimate_ancestral_states} for details.}
+\item{all_missing_allowed}{See \link{estimate_ancestral_states}.}
 }
 \value{
 \item{time_tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{trim_matrix}.}
-
 \item{distance_matrix}{The distance matrix. Note this may be pruned by \link{trim_matrix} and thus not include all taxa.}
-
 \item{removed_taxa}{A vector of taxa and/or nodes removed by \link{trim_matrix}. Returns NULL if none were removed.}
-
 \item{note}{See \link{pcoa}.}
-
 \item{values}{See \link{pcoa}.}
-
 \item{vectors}{See \link{pcoa}. Note: this will be the same as \code{vectors.cor} from the \link{pcoa} output if a correction was applied.}
-
 \item{trace}{See \link{pcoa}. Note: this will be the same as \code{trace.cor} from the \link{pcoa} output if a correction was applied.}
 }
 \description{
@@ -97,10 +91,10 @@ IMPORTANT: The function can remove taxa (or if including a tree, nodes as well) 
 }
 \examples{
 
-# Run on Michaux (1989) data set with defaults:
+# Run on Michaux (1989) data set with default settings:
 x <- ordinate_cladistic_matrix(cladistic_matrix = michaux_1989)
 
-# Show output:
+# Show entire output:
 x
 
 # Generate a (made up) tree:

@@ -4,24 +4,24 @@
 #'
 #' Performs Principal Coordinates Analysis (PCoA) on a cladistic matrix.
 #'
-#' @param cladistic_matrix A vector of mode character representing the tip names for which an ancestor is sought.
-#' @param distance_metric The distance method to use (one of "RED", "GED", "GC", or "MORD" - the default). See \link{calculate_morphological_distances} for more details.
-#' @param ged_type The type of GED use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.
-#' @param distance_transformation The transformation to apply to distances. See \link{calculate_morphological_distances} for details.
-#' @param distance_polymorphism_behaviour The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{calculate_morphological_distances} for details.
-#' @param distance_uncertainty_behaviour The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}. See \link{calculate_morphological_distances} for details.
-#' @param distance_inapplicable_behaviour The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"}. See \link{calculate_morphological_distances} for details.
-#' @param character_dependencies Only relevant if using \code{inapplicable.behaviour = "HSJ"}. Must be a two-column matrix with colnames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See \link{calculate_morphological_distances} for details.
-#' @param alpha The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{inapplicable.behaviour = "HSJ"}. See \link{calculate_morphological_distances} for details.
+#' @param cladistic_matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
+#' @param distance_metric See \link{calculate_morphological_distances}.
+#' @param ged_type See \link{calculate_morphological_distances}.
+#' @param distance_transformation See \link{calculate_morphological_distances}.
+#' @param distance_polymorphism_behaviour See \link{calculate_morphological_distances}.
+#' @param distance_uncertainty_behaviour See \link{calculate_morphological_distances}.
+#' @param distance_inapplicable_behaviour See \link{calculate_morphological_distances}.
+#' @param character_dependencies See \link{calculate_morphological_distances}.
+#' @param alpha See \link{calculate_morphological_distances}.
 #' @param correction The negative eigenvalue correction to use (one of "lingoes", "none", or "cailliez" - the default). See \link{pcoa} for more details.
 #' @param time_tree If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.
-#' @param estimate_all_nodes If including a tree whether you want to estinate ancestral states for all characters (default is FALSE). See \link{estimate_ancestral_states} for more details.
-#' @param estimate_tip_values If including a tree whether you want to estinate missing or polymorphic tip states (default is FALSE). See \link{estimate_ancestral_states} for more details.
+#' @param estimate_all_nodes See \link{estimate_ancestral_states}.
+#' @param estimate_tip_values See \link{estimate_ancestral_states}.
 #' @param inapplicables_as_missing See \link{estimate_ancestral_states}.
-#' @param ancestral_polymorphism_behaviour Behaviour for dealing with polymorphisms when producing ancestral state estimates - see \link{estimate_ancestral_states}.
-#' @param ancestral_uncertainty_behaviour Behaviour for dealing with uncertainties when producing ancestral state estimates - see \link{estimate_ancestral_states}.
-#' @param threshold threshold for ancestral state estimation of discrete characters - see \link{estimate_ancestral_states} for details.
-#' @param all_missing_allowed Logical to allow all missing character values - see \link{estimate_ancestral_states} for details.
+#' @param ancestral_polymorphism_behaviour See \link{estimate_ancestral_states}.
+#' @param ancestral_uncertainty_behaviour See \link{estimate_ancestral_states}.
+#' @param threshold See \link{estimate_ancestral_states}.
+#' @param all_missing_allowed See \link{estimate_ancestral_states}.
 #'
 #' @details
 #'
@@ -39,13 +39,15 @@
 #'
 #' IMPORTANT: The function can remove taxa (or if including a tree, nodes as well) if they lead to an incomplete distance matrix (see \link{trim_matrix} for more details).
 #'
-#' @return \item{time_tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{trim_matrix}.}
-#' @return \item{distance_matrix}{The distance matrix. Note this may be pruned by \link{trim_matrix} and thus not include all taxa.}
-#' @return \item{removed_taxa}{A vector of taxa and/or nodes removed by \link{trim_matrix}. Returns NULL if none were removed.}
-#' @return \item{note}{See \link{pcoa}.}
-#' @return \item{values}{See \link{pcoa}.}
-#' @return \item{vectors}{See \link{pcoa}. Note: this will be the same as \code{vectors.cor} from the \link{pcoa} output if a correction was applied.}
-#' @return \item{trace}{See \link{pcoa}. Note: this will be the same as \code{trace.cor} from the \link{pcoa} output if a correction was applied.}
+#' @return
+#'
+#' \item{time_tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{trim_matrix}.}
+#' \item{distance_matrix}{The distance matrix. Note this may be pruned by \link{trim_matrix} and thus not include all taxa.}
+#' \item{removed_taxa}{A vector of taxa and/or nodes removed by \link{trim_matrix}. Returns NULL if none were removed.}
+#' \item{note}{See \link{pcoa}.}
+#' \item{values}{See \link{pcoa}.}
+#' \item{vectors}{See \link{pcoa}. Note: this will be the same as \code{vectors.cor} from the \link{pcoa} output if a correction was applied.}
+#' \item{trace}{See \link{pcoa}. Note: this will be the same as \code{trace.cor} from the \link{pcoa} output if a correction was applied.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -57,10 +59,10 @@
 #'
 #' @examples
 #'
-#' # Run on Michaux (1989) data set with defaults:
+#' # Run on Michaux (1989) data set with default settings:
 #' x <- ordinate_cladistic_matrix(cladistic_matrix = michaux_1989)
 #'
-#' # Show output:
+#' # Show entire output:
 #' x
 #'
 #' # Generate a (made up) tree:
@@ -78,11 +80,12 @@
 #' # Show new output:
 #' y
 #' @export ordinate_cladistic_matrix
-ordinate_cladistic_matrix <- function(cladistic_matrix, distance_metric = "MORD", ged_type = "Wills", distance_transformation = "arcsine_sqrt", distance_polymorphism_behaviour = "min.difference", distance_uncertainty_behaviour = "min.difference", distance_inapplicable_behaviour = "missing", character_dependencies = NULL, alpha = 0.5, correction = "cailliez", time_tree = NULL, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, ancestral_polymorphism_behaviour = "equalp", ancestral_uncertainty_behaviour = "equalp", threshold = 0.01, all_missing_allowed = FALSE) {
+ordinate_cladistic_matrix <- function(cladistic_matrix, distance_metric = "mord", ged_type = "wills", distance_transformation = "arcsine_sqrt", distance_polymorphism_behaviour = "min_difference", distance_uncertainty_behaviour = "min_difference", distance_inapplicable_behaviour = "missing", character_dependencies = NULL, alpha = 0.5, correction = "cailliez", time_tree = NULL, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, ancestral_polymorphism_behaviour = "equalp", ancestral_uncertainty_behaviour = "equalp", threshold = 0.01, all_missing_allowed = FALSE) {
 
   # Add some top level conditionsl here to check input is valid.
-  # Allow other ordination types such as NMDS
-  # Allow the "bad" phylomorphospace type
+  # Allow other ordination types such as NMDS.
+  # Allow the "bad" phylomorphospace type (ordination axis continuous ancestors).
+  # Add scree values to output and use in plotting functions.
 
   # If no tree is supplied:
   if (is.null(time_tree)) {
@@ -141,9 +144,6 @@ ordinate_cladistic_matrix <- function(cladistic_matrix, distance_metric = "MORD"
     pcoa_results$trace.cor <- NULL
   }
 
-  # Compile output:
-  output <- c(time_tree = list(time_tree), distance_matrix = list(trimmed_distances$distance_matrix), removed_taxa = list(trimmed_distances$removed_taxa), pcoa_results)
-
-  # Return output invisibly:
-  invisible(output)
+  # Return compiled output:
+  invisible(c(time_tree = list(time_tree), distance_matrix = list(trimmed_distances$distance_matrix), removed_taxa = list(trimmed_distances$removed_taxa), pcoa_results))
 }

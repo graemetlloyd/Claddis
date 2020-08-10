@@ -75,7 +75,7 @@ match_tree_edges <- function(original_tree, pruned_tree) {
     for (i in (n_pruned_tips + 1):(n_pruned_tips + n_pruned_nodes)) {
 
       # Get descendants of node (members of clade):
-      clades <- c(clades, paste(pruned_tree$tip.label[strap::FindDescendants(i, pruned_tree)], collapse = "%%SpLiTtEr%%"))
+      clades <- c(clades, paste(pruned_tree$tip.label[strap::FindDescendants(n = i, tree = pruned_tree)], collapse = "%%SpLiTtEr%%"))
 
       # Update with node number:
       names(clades)[length(x = clades)] <- i
@@ -94,13 +94,13 @@ match_tree_edges <- function(original_tree, pruned_tree) {
     clades <- c(as.numeric(names(clades)), 1:n_pruned_tips)
 
     # Make edge matrix for pruned tree using corresponding nodes in original tree:
-    pruned.edges <- cbind(corresponding_nodes[match(pruned_tree$edge[, 1], clades)], corresponding_nodes[match(pruned_tree$edge[, 2], clades)])
+    pruned_edges <- cbind(corresponding_nodes[match(pruned_tree$edge[, 1], clades)], corresponding_nodes[match(pruned_tree$edge[, 2], clades)])
 
     # Find edges that match EXACTLY with the original tree:
-    matching_edges <- match(apply(pruned.edges, 1, paste, collapse = "%%"), apply(original_tree$edge, 1, paste, collapse = "%%"))
+    matching_edges <- match(apply(pruned_edges, 1, paste, collapse = "%%"), apply(original_tree$edge, 1, paste, collapse = "%%"))
 
     # List non-matching edges for further searching:
-    nonmatching_edges <- pruned.edges[is.na(matching_edges), ]
+    nonmatching_edges <- pruned_edges[is.na(matching_edges), ]
 
     # Only continue if there are non-matching edges (will be the case if only "outgroup(s)" are removed:
     if (length(x = nonmatching_edges) > 0) {
@@ -112,22 +112,22 @@ match_tree_edges <- function(original_tree, pruned_tree) {
       for (i in 1:nrow(nonmatching_edges)) {
 
         # Get start (ancestral) node:
-        start.node <- nonmatching_edges[i, 1]
+        start_node <- nonmatching_edges[i, 1]
 
         # Get end (terminal) node:
-        end.node <- nonmatching_edges[i, 2]
+        end_node <- nonmatching_edges[i, 2]
 
         # Create edges vector to store multiple edges that correspond to edge on pruned tree:
-        edges <- match(end.node, original_tree$edge[, 2])
+        edges <- match(end_node, original_tree$edge[, 2])
 
         # Keep going until start and end node are joined by contiguous edges:
-        while (length(x = sort(x = match(original_tree$edge[edges, 1], start.node))) == 0) {
+        while (length(x = sort(x = match(original_tree$edge[edges, 1], start_node))) == 0) {
 
           # Update end node:
-          end.node <- original_tree$edge[match(end.node, original_tree$edge[, 2]), 1]
+          end_node <- original_tree$edge[match(end_node, original_tree$edge[, 2]), 1]
 
           # Update edges:
-          edges <- c(edges, match(end.node, original_tree$edge[, 2]))
+          edges <- c(edges, match(end_node, original_tree$edge[, 2]))
         }
 
         # Update matching edges with multiple edges separated by a double-percent:
@@ -152,11 +152,8 @@ match_tree_edges <- function(original_tree, pruned_tree) {
   names(matching_edges) <- 1:nrow(pruned_tree$edge)
 
   # Make list of matching nodes:
-  node.matches <- cbind(Pruned_node = clades, Original_node = corresponding_nodes)
+  node_matches <- cbind(pruned_node = clades, original_node = corresponding_nodes)
 
-  # Compile output:
-  output <- list(matching_edges = matching_edges, matching_nodes = node.matches, removed_edges = removed_edges)
-
-  # Return output:
-  return(output)
+  # Return compiled output:
+  list(matching_edges = matching_edges, matching_nodes = node_matches, removed_edges = removed_edges)
 }

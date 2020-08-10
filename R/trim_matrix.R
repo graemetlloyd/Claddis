@@ -118,7 +118,7 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
       node_numbers <- as.character((n_tips + 1):(n_tips + n_nodes))
 
       # Rename distance_matrix rownames by descendant taxa that define them:
-      for (i in match(node_numbers, rownames(x = distance_matrix))) colnames(x = distance_matrix)[i] <- rownames(x = distance_matrix)[i] <- paste(sort(x = tree$tip.label[strap::FindDescendants(rownames(x = distance_matrix)[i], tree)]), collapse = "%%")
+      for (i in match(node_numbers, rownames(x = distance_matrix))) colnames(x = distance_matrix)[i] <- rownames(x = distance_matrix)[i] <- paste(sort(x = tree$tip.label[strap::FindDescendants(n = rownames(x = distance_matrix)[i], tree = tree)]), collapse = "%%")
 
       # Vector to store taxa and nodes that need removing:
       removes <- vector(mode = "character")
@@ -167,7 +167,7 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
         originating_node <- tree$edge[match(which(x = tree$tip.label == i), tree$edge[, 2]), 1]
 
         # Get name of originating node:
-        originating_node_name <- paste(sort(x = tree$tip.label[strap::FindDescendants(originating_node, tree)]), collapse = "%%")
+        originating_node_name <- paste(sort(x = tree$tip.label[strap::FindDescendants(n = originating_node, tree = tree)]), collapse = "%%")
 
         # Add to nodes to delete vector:
         tipname_nodes_to_remove <- unique(x = c(tipname_nodes_to_remove, originating_node_name))

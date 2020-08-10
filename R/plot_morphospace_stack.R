@@ -76,7 +76,9 @@
 #' time_slices <- seq(0, 100, length.out = 6)
 #'
 #' # Plot grid lines to show "shearing" effect is working:
-#' plot_morphospace_stack(ordination_axes = ordination_axes, ages = ages, time_slices = time_slices)
+#' plot_morphospace_stack(ordination_axes = ordination_axes,
+#'                        ages = ages, time_slices = time_slices
+#' )
 #'
 #' # Set random seed:
 #' set.seed(17)
@@ -99,7 +101,7 @@
 #' )
 #'
 #' # Create five 20 million year long time slices:
-#' time_slices <- seq(0, 100, length.out = 6)
+#' time_slices <- seq(from = 0, to = 100, length.out = 6)
 #'
 #' # Define groups for objects at random ("red" and "blue"):
 #' groups <- sample(x = c("red", "blue"), size = nrow(ordination_axes), replace = TRUE)
@@ -108,7 +110,9 @@
 #' names(groups) <- rownames(x = ordination_axes)
 #'
 #' # Make stacked ordination plot with convex hulls for groups:
-#' plot_morphospace_stack(ordination_axes, ages, groups, time_slices)
+#' plot_morphospace_stack(ordination_axes = ordination_axes, ages = ages,
+#'                        groups = groups, time_slices = time_slices
+#' )
 #' @export plot_morphospace_stack
 plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2, x_axis = 1, y_axis = 2, axis_label = "PC") {
 
@@ -117,7 +121,11 @@ plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_sl
   # Check axes asked for exist in data (top level conditional).
   # Add geologic time at left with geoscale at some point?
   # Am assuming PC axes, but could be Relative Warp...
-
+  
+  # 0, 0 lines?
+  
+  # Tick marks?
+  
   # Maybe let user set this later:
   plot_cushion <- 0.1
 
@@ -125,7 +133,7 @@ plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_sl
   time_bins <- sort(x = time_slices, decreasing = TRUE)
 
   # Record the number of stackes to plot:
-  N_stacks <- length(x = time_bins) - 1
+  n_stacks <- length(x = time_bins) - 1
 
   # Define x-axis label:
   xlab <- paste(axis_label, x_axis, " (", round((apply(ordination_axes, 2, var) / sum(apply(ordination_axes, 2, var)) * 100)[x_axis], 2), "% of total variance)", sep = "")
@@ -134,19 +142,19 @@ plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_sl
   ylab <- paste(axis_label, y_axis, " (", round((apply(ordination_axes, 2, var) / sum(apply(ordination_axes, 2, var)) * 100)[y_axis], 2), "% of total variance)", sep = "")
 
   # Set some margins before plotting:
-  par(mar = c(0, 0, 0, 0), oma = c(1, 1, 1, 1))
+  graphics::par(mar = c(0, 0, 0, 0), oma = c(1, 1, 1, 1))
 
   # Create basic (empty) plot)
-  plot(0:100, 0:100, type = "n", axes = FALSE, xlab = "", ylab = "")
+  graphics::plot(0:100, 0:100, type = "n", axes = FALSE, xlab = "", ylab = "")
 
   # Plot x-axis:
-  text(x = 50, y = -0.5, pos = 1, srt = 0, labels = xlab)
+  graphics::text(x = 50, y = -0.5, pos = 1, srt = 0, labels = xlab)
 
   # Plot y-axis:
-  text(x = 100.5, y = 50, pos = 1, srt = 90, labels = ylab)
+  graphics::text(x = 100.5, y = 50, pos = 1, srt = 90, labels = ylab)
 
   # For each stack:
-  for (i in 1:N_stacks) {
+  for (i in 1:n_stacks) {
 
     # Find taxa present in ith stack (using a range-through approach:
     taxa_in_bin <- intersect(which(x = ages[, "LAD"] < time_bins[i]), which(x = ages[, "FAD"] > time_bins[(i + 1)]))
@@ -173,10 +181,10 @@ plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_sl
     x_shear_additions <- points_to_plot[, 2] * (shear * (100 - shear))
 
     # Get maximum y-value for plotting:
-    max_y <- (100 / N_stacks) * i
+    max_y <- (100 / n_stacks) * i
 
     # Get minimum y-value for plotting:
-    min_y <- (100 / N_stacks) * (i - 1)
+    min_y <- (100 / n_stacks) * (i - 1)
 
     # Update x-axis values to final plotting value:
     points_to_plot[, 1] <- (points_to_plot[, 1] * (100 - (shear * 100))) + x_shear_additions
@@ -185,11 +193,7 @@ plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_sl
     points_to_plot[, 2] <- (points_to_plot[, 2] * (max_y - min_y)) + min_y
 
     # Draw bounding lines for ith stack:
-    polygon(x = c(0, shear * 100, 100, 100 - (shear * 100), 0), y = c((100 / N_stacks) * (i - 1), (100 / N_stacks) * i, (100 / N_stacks) * i, (100 / N_stacks) * (i - 1), (100 / N_stacks) * (i - 1)), col = "white")
-
-    # 0, 0 lines?
-
-    # Tick marks?
+    graphics::polygon(x = c(0, shear * 100, 100, 100 - (shear * 100), 0), y = c((100 / n_stacks) * (i - 1), (100 / n_stacks) * i, (100 / n_stacks) * i, (100 / n_stacks) * (i - 1), (100 / n_stacks) * (i - 1)), col = "white")
 
     # Case if groups are specified:
     if (!is.null(groups)) {
@@ -201,20 +205,20 @@ plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_sl
         edge_points <- names(which(x = groups[rownames(x = points_to_plot)] == j))[chull(x = points_to_plot[which(x = groups[rownames(x = points_to_plot)] == j), 1], y = points_to_plot[which(x = groups[rownames(x = points_to_plot)] == j), 2])]
 
         # Plot convex hull as polygon:
-        polygon(x = points_to_plot[edge_points, 1], y = points_to_plot[edge_points, 2], col = adjustcolor(j, alpha.f = 0.3), border = 0)
+        graphics::polygon(x = points_to_plot[edge_points, 1], y = points_to_plot[edge_points, 2], col = adjustcolor(j, alpha.f = 0.3), border = 0)
       }
 
       # Plot data points for ith stack:
-      points(x = points_to_plot[, 1], y = points_to_plot[, 2], pch = 21, bg = groups[rownames(x = points_to_plot)], col = groups[rownames(x = points_to_plot)], cex = 0.5)
+      graphics::points(x = points_to_plot[, 1], y = points_to_plot[, 2], pch = 21, bg = groups[rownames(x = points_to_plot)], col = groups[rownames(x = points_to_plot)], cex = 0.5)
 
       # Case if no groups are specified:
     } else {
 
       # Plot data points for ith stack:
-      points(x = points_to_plot[, 1], y = points_to_plot[, 2], pch = 21, bg = "black", cex = 0.5)
+      graphics::points(x = points_to_plot[, 1], y = points_to_plot[, 2], pch = 21, bg = "black", cex = 0.5)
     }
 
     # Plot ages of time slice at bottom left:
-    text(x = 0, y = min_y - 2, pos = 4, labels = paste(round(time_bins[i], 1), "-", round(time_bins[(i + 1)], 1), " Ma", sep = ""))
+    graphics::text(x = 0, y = min_y - 2, pos = 4, labels = paste(round(time_bins[i], 1), "-", round(time_bins[(i + 1)], 1), " Ma", sep = ""))
   }
 }

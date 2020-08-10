@@ -44,7 +44,7 @@
 plot_changes_on_tree <- function(character_changes, time_tree) {
 
   # Update tree edge lengths to number of character changes:
-  time_tree$edge.length <- rle(sort(x = c(character_changes[, "Edge"], 1:nrow(time_tree$edge))))$lengths - 1
+  time_tree$edge.length <- rle(sort(x = c(character_changes[, "edge"], 1:nrow(time_tree$edge))))$lengths - 1
 
   # Create empty edge labels vector:
   edge_labels <- rep(NA, nrow(time_tree$edge))
@@ -53,13 +53,13 @@ plot_changes_on_tree <- function(character_changes, time_tree) {
   for (i in 1:nrow(time_tree$edge)) {
 
     # Get rows for where changes occur:
-    change_rows <- which(x = character_changes[, "Edge"] == i)
+    change_rows <- which(x = character_changes[, "edge"] == i)
 
     # If there are changes on edge:
     if (length(x = change_rows) > 0) {
 
       # Compile all changes into edge label:
-      edge_labels[i] <- paste(paste(character_changes[change_rows, "Character"], ": ", character_changes[change_rows, "From"], " -> ", character_changes[change_rows, "To"], sep = ""), collapse = "\n")
+      edge_labels[i] <- paste(paste(character_changes[change_rows, "character"], ": ", character_changes[change_rows, "from"], " -> ", character_changes[change_rows, "to"], sep = ""), collapse = "\n")
     }
   }
 

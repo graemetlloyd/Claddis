@@ -119,7 +119,7 @@ plot_rates_tree <- function(test_rates_output, model_type, model_number, ...) {
   # If requesting branch partitions extract these from rate output:
   if (model_type == "branch") {
     edge_partitions <- lapply(X = test_rates_output$branch_test_results, function(x) {
-      lapply(X = strsplit(x$Partition, " \\| ")[[1]], function(y) {
+      lapply(X = strsplit(x$partition, " \\| ")[[1]], function(y) {
         unlist(x = lapply(X = y, function(z) {
           z <- as.list(x = strsplit(z, split = " ")[[1]])
           unlist(x = lapply(X = z, function(p) {
@@ -138,7 +138,7 @@ plot_rates_tree <- function(test_rates_output, model_type, model_number, ...) {
   # If requesting clade partitions extract these from rate output:
   if (model_type == "clade") {
     edge_partitions <- lapply(X = test_rates_output$clade_test_results, function(x) {
-      lapply(X = strsplit(x$Partition, " \\| ")[[1]], function(y) {
+      lapply(X = strsplit(x$partition, " \\| ")[[1]], function(y) {
         unlist(x = lapply(X = y, function(z) {
           z <- as.list(x = strsplit(z, split = " ")[[1]])
           unlist(x = lapply(X = z, function(p) {
@@ -155,10 +155,10 @@ plot_rates_tree <- function(test_rates_output, model_type, model_number, ...) {
   }
 
   # If requesting branch rates extract these from output:
-  if (model_type == "branch") edge_rates <- lapply(X = test_rates_output$branch_test_results, function(x) x$Rates)
+  if (model_type == "branch") edge_rates <- lapply(X = test_rates_output$branch_test_results, function(x) x$rates)
 
   # If requesting clade rates extract these from output:
-  if (model_type == "clade") edge_rates <- lapply(X = test_rates_output$clade_test_results, function(x) x$Rates)
+  if (model_type == "clade") edge_rates <- lapply(X = test_rates_output$clade_test_results, function(x) x$rates)
 
   # Get discretized vector of edge rates (needed for choosing plot colours):
   discretized_rate_values <- seq(from = 0, to = max(edge_rates[[model_number]]), length.out = resolution)

@@ -7,9 +7,9 @@
 map_dollo_changes(time_tree, tip_states)
 }
 \arguments{
-\item{time_tree}{A tree in phylo format with barnch lengths and a value for \code{$root.time}.}
+\item{time_tree}{A tree in phylo format with positive branch lengths and a value for \code{$root.time}.}
 
-\item{tip_states}{A vector of tip states (must be 0 or 1) with names matching \code{tree$tip.label}.}
+\item{tip_states}{A named vector of tip states (must be 0 or 1), where the names match \code{tree$tip.label}.}
 }
 \value{
 \item{changes}{A matrix of all changes (gains and losses).}
@@ -19,19 +19,17 @@ map_dollo_changes(time_tree, tip_states)
 Given a tree with binary tip states produces a stochastic Dollo character map.
 }
 \details{
-A non-ideal solution to the problem of generating a stochastic character map for a Dollo character (i.e., a single gain of the derived state (1) with any number of losses).
+The non-ideal solution from Tarver et al. (2018) to the problem of generating a stochastic character map for a Dollo character (i.e., a single gain of the derived state, 1) with any number of losses (1 -> 0).
 
 The function operates as follows:
 
-1) Establishes least inclusive clade exhibiting the derived state (1).
-2) Assumes single gain occurred on branch subtending this clade and with equal probability of occurring at any point along the branch.
-3) Treats inclusive clade as a subtree and places a strong prior on the root of the derived state (1).
+1) Establishes the least inclusive clade exhibiting the derived state (1).
+2) Assumes a single gain occurred with equal probability along the branch subtending this clade.
+3) Prunes the inclusive clade to generate a subtree with a strong root prior of the derived state (1).
 4) Calls \code{make.simmap} from the \code{phytools} package to generate a stochastic character map using a model where only losses are possible.
 5) Outputs both the stochastic character map (time spent in each state on each branch) and a matrix of state changes.
 
-(NB: As the map is stochastic the answer will be different each time the function is run and multiple replicates are strongly advised in order to ascertain uncertainty.)
-
-This was the method used in Tarver et al. (2018).
+NB: As the map is stochastic the answer will be different each time the function is run and multiple replicates are strongly advised in order to characterise this uncertainty.
 }
 \examples{
 

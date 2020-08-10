@@ -397,7 +397,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
     if (write.tree(pruned_tree) != write.tree(full_tree)) {
 
       # Get descendants of each node in pruned tree:
-      node_descendants <- lapply(X = as.list(x = node_numbers), function(x) pruned_tree$tip.label[strap::FindDescendants(x, tree = pruned_tree)])
+      node_descendants <- lapply(X = as.list(x = node_numbers), function(x) pruned_tree$tip.label[strap::FindDescendants(n = x, tree = pruned_tree)])
 
       # Get corresponding ancestral node in full tree:
       ancestral_nodes <- unlist(x = lapply(X = node_descendants, function(x) Claddis::find_mrca(descendant_names = x, tree = full_tree)))
@@ -481,7 +481,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   ancestral_state_matrix <- raw_cladistic_matrix
 
   # Add tree to output:
-  ancestral_state_matrix$topper$Tree <- time_tree
+  ancestral_state_matrix$topper$tree <- time_tree
 
   # Return ancestral state matrix:
   ancestral_state_matrix

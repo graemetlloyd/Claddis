@@ -6,11 +6,11 @@
 \usage{
 calculate_morphological_distances(
   cladistic_matrix,
-  distance_metric = "MORD",
-  ged_type = "Wills",
+  distance_metric = "mord",
+  ged_type = "wills",
   distance_transformation = "arcsine_sqrt",
-  polymorphism_behaviour = "min.difference",
-  uncertainty_behaviour = "min.difference",
+  polymorphism_behaviour = "min_difference",
+  uncertainty_behaviour = "min_difference",
   inapplicable_behaviour = "missing",
   character_dependencies = NULL,
   alpha = 0.5
@@ -19,25 +19,25 @@ calculate_morphological_distances(
 \arguments{
 \item{cladistic_matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}.}
 
-\item{distance_metric}{The distance metric to use. Must be one of \code{"GC"}, \code{"GED"}, \code{"RED"}, or \code{"MORD"} (the default).}
+\item{distance_metric}{The distance metric to use. Must be one of \code{"gc"}, \code{"ged"}, \code{"red"}, or \code{"mord"} (the default).}
 
-\item{ged_type}{The type of GED to use. Must be one of \code{"Legacy"}, \code{"Hybrid"}, or \code{"Wills"} (the default). See details for an explanation.}
+\item{ged_type}{The type of GED to use. Must be one of \code{"legacy"}, \code{"hybrid"}, or \code{"wills"} (the default). See details for an explanation.}
 
-\item{distance_transformation}{The type of distance transformation to perform. Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default). (Note: this is only really appropriate for the proportional distances, i.e., "GC" and "MORD".)}
+\item{distance_transformation}{The type of distance transformation to perform. Options are \code{"none"}, \code{"sqrt"}, or \code{"arcsine_sqrt"} (the default). (Note: this is only really appropriate for the proportional distances, i.e., "gc" and "mord".)}
 
-\item{polymorphism_behaviour}{The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}.}
+\item{polymorphism_behaviour}{The distance behaviour for dealing with polymorphisms. Must be one of \code{"mean_difference"}, \code{"min_difference"} (the default), or \code{"random"}.}
 
-\item{uncertainty_behaviour}{The distance behaviour for dealing with uncertainties. Must be one of \code{"mean.difference"}, \code{"min.difference"} (the default), or \code{"random"}.}
+\item{uncertainty_behaviour}{The distance behaviour for dealing with uncertainties. Must be one of \code{"mean_difference"}, \code{"min_difference"} (the default), or \code{"random"}.}
 
-\item{inapplicable_behaviour}{The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"HSJ"} (Hopkins and St John 2018; see details).}
+\item{inapplicable_behaviour}{The behaviour for dealing with inapplicables. Must be one of \code{"missing"} (default), or \code{"hsj"} (Hopkins and St John 2018; see details).}
 
-\item{character_dependencies}{Only relevant if using \code{inapplicable_behaviour = "HSJ"}. Must be a two-column matrix with colnames "DependentCharacter" and "IndependentCharacter" that specifies character hierarchies. See details.}
+\item{character_dependencies}{Only relevant if using \code{inapplicable_behaviour = "hsj"}. Must be a two-column matrix with colnames "dependent_character" and "independent_character" that specifies character hierarchies. See details.}
 
-\item{alpha}{The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{inapplicable_behaviour = "HSJ"}. See details.}
+\item{alpha}{The alpha value (sensu Hopkins and St John 2018). Only relevant if using \code{inapplicable_behaviour = "hsj"}. See details.}
 }
 \value{
 \item{distance_metric}{The distance metric used.}
-\item{distance_matrix}{The distance matrix returned.}
+\item{distance_matrix}{The pairwise distance matrix generated.}
 \item{comparable_character_matrix}{The matrix of characters that can be compared for each pairwise distance.}
 }
 \description{
@@ -46,26 +46,25 @@ Takes a cladistic morphological dataset and converts it into a set of pairwise d
 \details{
 There are many options to consider when generating a distance matrix from morphological data, including the metric to use, how to treat inapplicable, polymorphic (e.g., 0&1), or uncertain (e.g., 0/1) states, and whether the output should be transformed (e.g., by taking the square root so that the distances are - or approximate - Euclidean distances). Some of these issues have been discussed previously in the literature (e.g., Lloyd 2016; Hopkins and St John 2018), but all likely require further study.
 
-Claddis currently offers four different distance metrics: 1. Raw Euclidean Distance (\code{RED}) - this is only really applicable if there are no missing data, 2. The Gower Coefficient (\code{GC}; Gower 1971) - this rescales distances by the number of characters that can be coded for both taxa in each pairwise comparison thus correcting for missing data, 3. The Maximum Observable Rescaled Distance (\code{MORD}) - this was introduced by Lloyd (2016) as an extension of the \code{GC} designed to deal with the fact that multistate ordered characters can lead to \code{GC}s of greater than 1 and works by rescaling by the maximum possible distance that could be observed based on the number of characters codable in each pairwise comparison meaning all resulting distances are on a zero to one scale, and 4. The Generalised Euclidean Distance - this was introduced by Wills (1998) as a means of correcting for the fact that a \code{RED} metric will become increasingly non-Euclidean as the amount of missing data increases and works by filling in missing distances (for characters that are coded as missing in at least one taxon in the pairwise comparison) by using the mean pairwise dissimilarity for that taxon pair as a substitute. In effect then, \code{RED} makes no consideration of missing data, \code{GC} and \code{MORD} normalise by the available data (and are identical if there are no ordered multistate characters), and \code{GED} fills in missing distances by extrapolating from the available data.
+Claddis currently offers four different distance metrics: 1. Raw Euclidean Distance (\code{"red"}) - this is only really applicable if there are no missing data, 2. The Gower Coefficient (\code{"gc"}; Gower 1971) - this rescales distances by the number of characters that can be coded for both taxa in each pairwise comparison thus correcting for missing data, 3. The Maximum Observable Rescaled Distance (\code{"mord"}) - this was introduced by Lloyd (2016) as an extension of the \code{"gc"} designed to deal with the fact that multistate ordered characters can lead to \code{"gc"}s of greater than 1 and works by rescaling by the maximum possible distance that could be observed based on the number of characters codable in each pairwise comparison meaning all resulting distances are on a zero to one scale, and 4. The Generalised Euclidean Distance - this was introduced by Wills (1998) as a means of correcting for the fact that a \code{"red"} metric will become increasingly non-Euclidean as the amount of missing data increases and works by filling in missing distances (for characters that are coded as missing in at least one taxon in the pairwise comparison) by using the mean pairwise dissimilarity for that taxon pair as a substitute. In effect then, \code{"red"} makes no consideration of missing data, \code{"gc"} and \code{"mord"} normalise by the available data (and are identical if there are no ordered multistate characters), and \code{"ged"} fills in missing distances by extrapolating from the available data.
 
-Note that Lloyd (2016) misidentified the substitute dissimilarity for the \code{GED} as the mean for the whole data set (Hopkins and St John 2018) and this was the way the GED implementation of Claddis operated up to version 0.2. This has now been amended (as of version 0.3) so that the function produces the \code{GED} in the form that Wills (1998) intended. However, this implementation can still be accessed as the \code{Legacy} option for \code{ged_type}, with \code{Wills} being the WIlls (1998) implementation. An advantage of this misinterpreted form of \code{GED} is that it will always return a complete pairwise distance matrix, however it is not recommended (see Lloyd 2016). Instead a third option for \code{ged_type} - (\code{Hybrid}) - offers the same outcome but only uses the mean distance from the entire matrix in the case where there are no codable characters in common in a pairwise comparison. This new hybrid option has not been used in a published study.
+Note that Lloyd (2016) misidentified the substitute dissimilarity for the \code{"ged"} as the mean for the whole data set (Hopkins and St John 2018) and this was the way the GED implementation of Claddis operated up to version 0.2. This has now been amended (as of version 0.3) so that the function produces the \code{"ged"} in the form that Wills (1998) intended. However, this implementation can still be accessed as the \code{"legacy"} option for \code{ged_type}, with \code{"wills"} being the WIlls (1998) implementation. An advantage of this misinterpreted form of the GED is that it will always return a complete pairwise distance matrix, however it is not recommended (see Lloyd 2016). Instead a third option for \code{ged_type} - (\code{"hybrid"}) - offers the same outcome but only uses the mean distance from the entire matrix in the case where there are no codable characters in common in a pairwise comparison. This new hybrid option has not been used in a published study.
 
-Typically the resulting distance matrix will be used in an ordination procedure such as principal coordinates (effectively classical multidimensional scaling where k, the number of axes, is maximised at N - 1, where N is the number of rows (i.e., taxa) in the matrix). As such the distance should be - or approximate - Euclidean and hence a square root transformation is typically applied (\code{distance_transformation} with the \code{sqrt} option). However, if applying pre-ordination (i.e., ordination-free) disparity metrics (e.g., weighted mean pairwise distance) you may wish to avoid any transformation (\code{none} option). In particular the \code{MORD} will only fall on a zero to one scale if this is the case. However, if transforming the \code{MORD} for ordination this zero to one property may mean the arcsine square root (\code{arcsine_sqrt} option) is preferred. (Note that if using only unordered multistate or binary characters and the \code{GC} the zero to one scale will apply too.)
+Typically the resulting distance matrix will be used in an ordination procedure such as principal coordinates (effectively classical multidimensional scaling where k, the number of axes, is maximised at N - 1, where N is the number of rows (i.e., taxa) in the matrix). As such the distance should be - or approximate - Euclidean and hence a square root transformation is typically applied (\code{distance_transformation} with the \code{"sqrt"} option). However, if applying pre-ordination (i.e., ordination-free) disparity metrics (e.g., weighted mean pairwise distance) you may wish to avoid any transformation (\code{"none"} option). In particular the MORD will only fall on a zero to one scale if this is the case. However, if transforming the MORD for ordination this zero to one property may mean the arcsine square root (\code{"arcsine_sqrt"} option) is preferred. (Note that if using only unordered multistate or binary characters and the \code{"gc"} the zero to one scale will apply too.)
 
-An unexplored option in distance matrix construction is how to deal with polymorphisms (Lloyd 2016). Up to version 0.2 of Claddis all polymorphisms were treated the same regardless of whether they were true polymorphisms (multiple states are observed in the taxon) or uncertainties (multiple, but not all states, are posited for the taxon). Since version 0.3, however, these two forms can be distinguished by using the different #NEXUS forms (Maddison et al. 1997), i.e., (01) for polymorphisms and \{01\} for uncertainties and within Claddis these are represented as 0&1 or 0/1, respectively. Thus, since 0.3 Claddis allows these two forms to be treated separately, and hence differently (with \code{polymorphism_behaviour} and \code{uncertainty_behaviour}). Again, up to version 0.2 of Claddis no options for polymorphism behaviour were offered, instead only a minimum distance was employed. I.e., the distance between a taxon coded 0&1 and a taxon coded 2 would be the smaller of the comparisons 0 with 2 or 1 with 2. Since version 0.3 this is encoded in the \code{min.difference} option. Currentlly two alternatives (\code{mean.difference} and \code{random}) are offered. The first takes the mean of each possible difference and the second simply samples one of the states at random. Note this latter option makes the function stochastic and so it should be rerun multiple times (for example, with a \code{for} loop or \code{apply} function). In general this issue (and these options) are not explored in the literature and so no recommendation can be made beyond that users should think carefully about what this choice may mean for their individual data set(s) and question(s).
+An unexplored option in distance matrix construction is how to deal with polymorphisms (Lloyd 2016). Up to version 0.2 of Claddis all polymorphisms were treated the same regardless of whether they were true polymorphisms (multiple states are observed in the taxon) or uncertainties (multiple, but not all states, are posited for the taxon). Since version 0.3, however, these two forms can be distinguished by using the different #NEXUS forms (Maddison et al. 1997), i.e., (01) for polymorphisms and \{01\} for uncertainties and within Claddis these are represented as 0&1 or 0/1, respectively. Thus, since 0.3 Claddis allows these two forms to be treated separately, and hence differently (with \code{polymorphism_behaviour} and \code{uncertainty_behaviour}). Again, up to version 0.2 of Claddis no options for polymorphism behaviour were offered, instead only a minimum distance was employed. I.e., the distance between a taxon coded 0&1 and a taxon coded 2 would be the smaller of the comparisons 0 with 2 or 1 with 2. Since version 0.3 this is encoded in the \code{"min_difference"} option. Currently two alternatives (\code{"mean_difference"} and \code{"random"}) are offered. The first takes the mean of each possible difference and the second simply samples one of the states at random. Note this latter option makes the function stochastic and so it should be rerun multiple times (for example, with a \code{for} loop or \code{apply} function). In general this issue (and these options) are not explored in the literature and so no recommendation can be made beyond that users should think carefully about what this choice may mean for their individual data set(s) and question(s).
 
-A final consideration is how to deal with inapplicable characters. Up to version 0.2 Claddis treated inapplicable and missing characters the same (as NA values, i.e., missing data). However, since Claddis version 0.3 these can be imported separately, i.e., by using the "MISSING" and "GAP" states in #NEXUS format (Maddison et al. 1997), with the latter typically representing the inapplicable character. These appear as NA and empty strings (""), respectively, in Claddis format. Hopkins and St John (2018) showed how inapplicable characters - typically assumed to represent secondary characters - could be treated in generating distance matrices. These are usually hierarchical in form. E.g., a primary character might record the presence or absence of feathers and a secondary character whether those feathers are symmetric or asymmetric. The latter will generate inapplicable states for taxa without feathers and without correcting for this ranked distances can be incorrect (Hopkins and St John 2018). Unfortunately, however, the #NEXUS format (Maddison et al. 1997) does not really allow explicit linkage between primary and secondary characters and so this information must be provided separately to use the Hopkins and St John (2018) approach. This is done here with the \code{character_dependencies} option. This must be in the form of a two-column matrix with column headers of "DependentCharacter" and "IndependentCharacter". The former being secondary characters and the latter the corresponding primary character. (Note that characters are to be numbered across the whole matrix from 1 to N and do not restart with each block of the matrix.) If using \code{inapplicable_behaviour = "HSJ"} the user must also provide an \code{alpha} value between zero and one. When \code{alpha = 0} the secondary characters contribute nothing to the distance and when \code{alpha = 1} the primary character is not counted in the weight separately (see Hopkins and St John 2018). The default value (0.5) offers a compromise bteween these two extremes.
+A final consideration is how to deal with inapplicable characters. Up to version 0.2 Claddis treated inapplicable and missing characters the same (as NA values, i.e., missing data). However, since Claddis version 0.3 these can be imported separately, i.e., by using the "MISSING" and "GAP" states in #NEXUS format (Maddison et al. 1997), with the latter typically representing the inapplicable character. These appear as NA and empty strings (""), respectively, in Claddis format. Hopkins and St John (2018) showed how inapplicable characters - typically assumed to represent secondary characters - could be treated in generating distance matrices. These are usually hierarchical in form. E.g., a primary character might record the presence or absence of feathers and a secondary character whether those feathers are symmetric or asymmetric. The latter will generate inapplicable states for taxa without feathers and without correcting for this ranked distances can be incorrect (Hopkins and St John 2018). Unfortunately, however, the #NEXUS format (Maddison et al. 1997) does not really allow explicit linkage between primary and secondary characters and so this information must be provided separately to use the Hopkins and St John (2018) approach. This is done here with the \code{character_dependencies} option. This must be in the form of a two-column matrix with column headers of \code{"dependent_character"} and \code{"independent_character"}. The former being secondary characters and the latter the corresponding primary character. (Note that characters are to be numbered across the whole matrix from 1 to N and do not restart with each block of the matrix.) If using \code{inapplicable_behaviour = "hsj"} the user must also provide an \code{alpha} value between zero and one. When \code{alpha = 0} the secondary characters contribute nothing to the distance and when \code{alpha = 1} the primary character is not counted in the weight separately (see Hopkins and St John 2018). The default value (0.5) offers a compromise between these two extremes.
 
-Here the implementation of this approach differs somewhat from the code available in the supplementary materials to Hopkins and St John (2018). Specifically, this approach is incorporated (and used) regardless of the overriding distance metric (i.e., the \code{Distance} option). Additionally, the Hopkins and St John function specifically allows an extra level of dependency (secondary and tertary characters) with these being applied recursively (tertiary first then secondary). Here, though, additional levels of dependency do not need to be defined by the user as this information is already encoded in the \code{character_dependencies} option. Furthermore, because of this any level of dependency is possible (if unlikely).
+Here the implementation of this approach differs somewhat from the code available in the supplementary materials to Hopkins and St John (2018). Specifically, this approach is incorporated (and used) regardless of the overriding distance metric (i.e., the \code{distance_metric} option). Additionally, the Hopkins and St John function specifically allows an extra level of dependency (secondary and tertary characters) with these being applied recursively (tertiary first then secondary). Here, though, additional levels of dependency do not need to be defined by the user as this information is already encoded in the \code{character_dependencies} option. Furthermore, because of this any level of dependency is possible (if unlikely), e.g., quarternary etc.
 }
 \examples{
 
-# Get morphological distances for the Day et
-# al. (2016) data set:
-distances <- calculate_morphological_distances(day_2016)
+# Get morphological distances for the Day et al. (2016) data set:
+distances <- calculate_morphological_distances(cladistic_matrix = day_2016)
 
 # Show distance metric:
-distances$DistanceMetric
+distances$distance_metric
 
 # Show distance matrix:
 distances$distance_matrix
@@ -83,22 +82,22 @@ character_dependencies <- matrix(c(8, 7),
   byrow = TRUE, dimnames = list(
     c(),
     c(
-      "DependentCharacter",
-      "IndependentCharacter"
+      "dependent_character",
+      "independent_character"
     )
   )
 )
 
 # Get morphological distances for the Day et
 # al. (2016) data set using HSJ approach:
-distances <- calculate_morphological_distances(day_2016,
-  inapplicable_behaviour = "HSJ",
+distances <- calculate_morphological_distances(cladistic_matrix = day_2016,
+  inapplicable_behaviour = "hsj",
   character_dependencies = character_dependencies,
   alpha = 0.5
 )
 
 # Show distance metric:
-distances$DistanceMetric
+distances$distance_metric
 
 # Show distance matrix:
 distances$distance_matrix

@@ -17,7 +17,7 @@
 #'
 #' Uses output from \link{ordinate_cladistic_matrix} as input.
 #'
-#' Allows plotting of a third axis using the technique of Matthew Wills (Wills et al. 1994; their Figures 4 and 8; Wills 1998; his Figure 4), where black and white indicate positive and negative values respectovely, and the size of points there magnitudes.
+#' Allows plotting of a third axis using the technique of Wills et al. (1994; their Figures 4 and 8; Wills 1998; his Figure 4), where black and white indicate positive and negative values respectively, and the size of points there magnitudes.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Emma Sherratt \email{emma.sherratt@@gmail.com}
 #'
@@ -71,7 +71,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
   y_lab <- paste("PC", y_axis, " (", round(scree_values[y_axis], 2), "% of total variance)", sep = "")
 
   # Create the basic plot space (will be empty for now):
-  plot(pcoa_input$vectors[, x_axis], pcoa_input$vectors[, y_axis], type = "n", bg = "black", xlab = x_lab, ylab = y_lab, asp = TRUE)
+  graphics::plot(pcoa_input$vectors[, x_axis], pcoa_input$vectors[, y_axis], type = "n", bg = "black", xlab = x_lab, ylab = y_lab, asp = TRUE)
 
   # Case if no z-axis chosen:
   if (is.null(z_axis)) {
@@ -117,13 +117,13 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
     root_number <- n_tips + 1
 
     # If plotting internal nodes, plot internal nodes:
-    if (plot_internal_nodes) points(pcoa_input$vectors[node_numbers, x_axis], pcoa_input$vectors[node_numbers, y_axis], pch = 21, bg = z_colours[node_numbers], cex = z_sizes[node_numbers])
+    if (plot_internal_nodes) graphics::points(pcoa_input$vectors[node_numbers, x_axis], pcoa_input$vectors[node_numbers, y_axis], pch = 21, bg = z_colours[node_numbers], cex = z_sizes[node_numbers])
 
     # If plotting root separately, plot root:
-    if (plot_root) points(pcoa_input$vectors[root_number, x_axis], pcoa_input$vectors[root_number, y_axis], pch = 21, col = root_colour, bg = root_colour, cex = z_sizes[root_number])
+    if (plot_root) graphics::points(pcoa_input$vectors[root_number, x_axis], pcoa_input$vectors[root_number, y_axis], pch = 21, col = root_colour, bg = root_colour, cex = z_sizes[root_number])
 
     # Plot tip data:
-    points(pcoa_input$vectors[tip_numbers, x_axis], pcoa_input$vectors[tip_numbers, y_axis], pch = 21, bg = z_colours[tip_numbers], cex = z_sizes[tip_numbers])
+    graphics::points(pcoa_input$vectors[tip_numbers, x_axis], pcoa_input$vectors[tip_numbers, y_axis], pch = 21, bg = z_colours[tip_numbers], cex = z_sizes[tip_numbers])
 
     # If plotting taxon names:
     if (plot_taxon_names) {
@@ -135,7 +135,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
       x_positions[which(x = pcoa_input$vectors[, x_axis] < 0)] <- 4
 
       # Plot taxon names (for tips only):
-      text(x = pcoa_input$vectors[tip_numbers, x_axis], y = pcoa_input$vectors[tip_numbers, y_axis], labels = rownames(x = pcoa_input$vectors)[tip_numbers], pos = x_positions[tip_numbers], cex = 0.7)
+      graphics::text(x = pcoa_input$vectors[tip_numbers, x_axis], y = pcoa_input$vectors[tip_numbers, y_axis], labels = rownames(x = pcoa_input$vectors)[tip_numbers], pos = x_positions[tip_numbers], cex = 0.7)
     }
 
     # Case if no tree supplied:
@@ -154,7 +154,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
       x_positions[which(x = pcoa_input$vectors[, x_axis] < 0)] <- 4
 
       # Plot taxon names:
-      text(x = pcoa_input$vectors[, x_axis], y = pcoa_input$vectors[, y_axis], labels = rownames(x = pcoa_input$vectors), pos = x_positions, cex = 0.7)
+      graphics::text(x = pcoa_input$vectors[, x_axis], y = pcoa_input$vectors[, y_axis], labels = rownames(x = pcoa_input$vectors), pos = x_positions, cex = 0.7)
     }
   }
 }

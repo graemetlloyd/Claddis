@@ -7,7 +7,7 @@
 #' @param cladistic_matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
 #' @param time_tree A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{cladistic_matrix}.
 #' @param time_bins A vector of ages representing the boundaries of a series of time bins.
-#' @param n_simulations The number of simulations to perform (passed to \code{make.simmap}.
+#' @param n_simulations The number of simulations to perform (passed to \link{make.simmap}.
 #' @param polymorphism_behaviour What to do with polymorphic (&) characters. One of "equalp", "missing", or "random". See details.
 #' @param uncertainty_behaviour What to do with uncertain (/) characters. One of "equalp", "missing", or "random". See details.
 #' @param inapplicable_behaviour What to do with inapplicable characters. Only one option currently ("missing"). See details.
@@ -634,7 +634,7 @@ map_stochastic_changes <- function(cladistic_matrix, time_tree, time_bins, n_sim
         }
 
         # If character is variable, perform regular stochastic character mapping:
-        if (ncol(y) > 1) Output <- make.simmap(y, tree = tree, nsim = 1, model = model, pi = "estimated", message = FALSE)
+        if (ncol(y) > 1) Output <- phytools::make.simmap(tree = tree, x = y, nsim = 1, model = model, pi = "estimated", message = FALSE)
 
         # Return output:
         return(Output)

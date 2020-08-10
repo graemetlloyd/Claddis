@@ -4,7 +4,16 @@
 \alias{plot_chronophylomorphospace}
 \title{Chronophylomorphospace Plot}
 \usage{
-plot_chronophylomorphospace(pcoa_data, x_axis = 1, y_axis = 2, shadow = TRUE)
+plot_chronophylomorphospace(
+  pcoa_data,
+  x_axis = 1,
+  y_axis = 2,
+  plot_tips = TRUE,
+  plot_nodes = TRUE,
+  show_names = TRUE,
+  plot_branches = TRUE,
+  shadow = TRUE
+)
 }
 \arguments{
 \item{pcoa_data}{Principal coordinate data in the format output by  \link{ordinate_cladistic_matrix} that includes a tree and ancestral states.}
@@ -12,6 +21,14 @@ plot_chronophylomorphospace(pcoa_data, x_axis = 1, y_axis = 2, shadow = TRUE)
 \item{x_axis}{Which ordination axis to plot as the x-axis.}
 
 \item{y_axis}{Which ordination axis to plot as the y-axis.}
+
+\item{plot_tips}{Whether or not to plot the tip nodes (defaults to TRUE).}
+
+\item{plot_nodes}{Whether or not to plot the internal nodes (defaults to TRUE).}
+
+\item{show_names}{Whether or not to show the taxon nodes (defaults to TRUE).}
+
+\item{plot_branches}{Whether or not to plot the branches (defaults to TRUE).}
 
 \item{shadow}{Whether or not to plot a shadow (2D plot) on the bottom face of the 3D plot (defaults to TRUE).}
 }

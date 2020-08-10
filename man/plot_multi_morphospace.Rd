@@ -6,7 +6,7 @@
 \usage{
 plot_multi_morphospace(
   pcoa_input,
-  N_axes = 4,
+  n_axes = 4,
   plot_taxon_names = FALSE,
   plot_internal_nodes = FALSE,
   plot_root = TRUE,
@@ -16,7 +16,7 @@ plot_multi_morphospace(
 \arguments{
 \item{pcoa_input}{The main input in the format output from \link{ordinate_cladistic_matrix}.}
 
-\item{N_axes}{An integer indicating the total number of axes to plot (should minimally be three).}
+\item{n_axes}{An integer indicating the total number of axes to plot (should minimally be three).}
 
 \item{plot_taxon_names}{Optional to plot the names of the taxa (defaults to FALSE).}
 
@@ -40,7 +40,7 @@ Plots multiple bivariate plots of ordination axes starting with 1 and up to N, s
 pcoa_input <- ordinate_cladistic_matrix(michaux_1989)
 
 # Plot first three axes:
-plot_multi_morphospace(pcoa_input = pcoa_input, N_axes = 3)
+plot_multi_morphospace(pcoa_input = pcoa_input, n_axes = 3)
 }
 \author{
 Emma Sherratt \email{emma.sherratt@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@gmail.com}

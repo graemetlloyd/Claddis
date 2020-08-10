@@ -98,7 +98,7 @@ plot_rates_time <- function(test_rates_output, model_number, ...) {
 
   # Get partitions used from results output:
   time_bin_partitions <- lapply(X = test_rates_output$time_test_results, function(x) {
-    lapply(X = strsplit(x$Partition, " \\| ")[[1]], function(y) {
+    lapply(X = strsplit(x$partition, " \\| ")[[1]], function(y) {
       if (length(x = grep("-", y)) > 0) {
         z <- strsplit(y, split = "-")[[1]]
         y <- paste0(z[1]:z[2])
@@ -112,10 +112,10 @@ plot_rates_time <- function(test_rates_output, model_number, ...) {
     do.call(what = rbind, args = lapply(X = x, function(y) {
       xs <- c(test_rates_output$time_bins_used[y[1]], test_rates_output$time_bins_used[(y[length(x = y)] + 1)])
     }))
-  })[[1]], test_rates_output$time_test_results[[model_number]]$Rates, test_rates_output$time_test_results[[model_number]]$Rates)
+  })[[1]], test_rates_output$time_test_results[[model_number]]$rates, test_rates_output$time_test_results[[model_number]]$rates)
 
   # Create base plot of rates in each time bin with any other requested options paseed as ...:
-  geoscale::geoscalePlot(ages = time_bin_midpoints, data = test_rates_output$time_rates[, "Rate"], age.lim = c(max(test_rates_output$time_bins_used), min(test_rates_output$time_bins_used)), data.lim = c(0, max(test_rates_output$time_rates[, "Rate"]) * 1.1), pch = 20, cex.pt = 2, label = "Character changes per lineage million years", ...)
+  geoscale::geoscalePlot(ages = time_bin_midpoints, data = test_rates_output$time_rates[, "rate"], age.lim = c(max(test_rates_output$time_bins_used), min(test_rates_output$time_bins_used)), data.lim = c(0, max(test_rates_output$time_rates[, "rate"]) * 1.1), pch = 20, cex.pt = 2, label = "Character changes per lineage million years", ...)
 
   # Add lines representing clustering of requested model to plot:
   for (i in 1:nrow(time_rates)) lines(x = time_rates[i, 1:2], y = time_rates[i, 3:4])

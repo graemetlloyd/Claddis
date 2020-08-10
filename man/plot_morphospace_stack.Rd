@@ -83,7 +83,9 @@ ages <- matrix(c(rep(100, 8 * 101), rep(0, 8 * 101)),
 time_slices <- seq(0, 100, length.out = 6)
 
 # Plot grid lines to show "shearing" effect is working:
-plot_morphospace_stack(ordination_axes = ordination_axes, ages = ages, time_slices = time_slices)
+plot_morphospace_stack(ordination_axes = ordination_axes,
+                       ages = ages, time_slices = time_slices
+)
 
 # Set random seed:
 set.seed(17)
@@ -106,7 +108,7 @@ ncol = 2, byrow = TRUE, dimnames =
 )
 
 # Create five 20 million year long time slices:
-time_slices <- seq(0, 100, length.out = 6)
+time_slices <- seq(from = 0, to = 100, length.out = 6)
 
 # Define groups for objects at random ("red" and "blue"):
 groups <- sample(x = c("red", "blue"), size = nrow(ordination_axes), replace = TRUE)
@@ -115,7 +117,9 @@ groups <- sample(x = c("red", "blue"), size = nrow(ordination_axes), replace = T
 names(groups) <- rownames(x = ordination_axes)
 
 # Make stacked ordination plot with convex hulls for groups:
-plot_morphospace_stack(ordination_axes, ages, groups, time_slices)
+plot_morphospace_stack(ordination_axes = ordination_axes, ages = ages,
+                       groups = groups, time_slices = time_slices
+)
 }
 \references{
 Foote, M., 1993. Discordance and concordance between morphological and taxonomic diversity. \emph{Paleobiology}, \bold{19}, 185-204.

@@ -21,7 +21,7 @@ map_stochastic_changes(
 
 \item{time_bins}{A vector of ages representing the boundaries of a series of time bins.}
 
-\item{n_simulations}{The number of simulations to perform (passed to \code{make.simmap}.}
+\item{n_simulations}{The number of simulations to perform (passed to \link{make.simmap}.}
 
 \item{polymorphism_behaviour}{What to do with polymorphic (&) characters. One of "equalp", "missing", or "random". See details.}
 
