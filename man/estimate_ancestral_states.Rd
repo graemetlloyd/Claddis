@@ -36,7 +36,7 @@ estimate_ancestral_states(
 \item{all_missing_allowed}{Logical to allow all missing character values (generally not recommended, hence default is FALSE).}
 }
 \value{
-A matrix of nodes (hypothetical ancestors; rows) against characters (columns) listing the reconstructed ancestral states.
+The function will return the same \code{cladistic_matrix}, but with two key additions: 1. Internal nodes (numbered by \link{ape} formatting) will appear after taxa in each matrix block with estimated states coded for them, and 2. The time-scaled tree used will be added to \code{cladistic_matrix} as \code{cladistic_matrix$topper$tree}. Note that if using the \code{estimate_tip_values = TRUE} option then tip values may also be changed from those provided as input.
 }
 \description{
 Given a tree and a cladistic matrix uses likelihood to estimate the ancestral states for every character.
