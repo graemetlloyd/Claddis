@@ -33,6 +33,9 @@
 #' # Show matching edges:
 #' X$matching_edges
 #'
+#' # Show matching nodes:
+#' X$matching_nodes
+#'
 #' # Show removed edges:
 #' X$removed_edges
 #' @export match_tree_edges

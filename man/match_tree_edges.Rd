@@ -36,6 +36,9 @@ X <- match_tree_edges(original_tree, pruned_tree)
 # Show matching edges:
 X$matching_edges
 
+# Show matching nodes:
+X$matching_nodes
+
 # Show removed edges:
 X$removed_edges
 }
