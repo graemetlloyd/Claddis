@@ -22,10 +22,10 @@ Imports:
     geoscale,
     graphics,
     grDevices,
-    rgl,
     stats,
     utils
 Suggests: 
+    rgl,
     testthat
 Description: Measures morphological diversity from discrete character data and
     estimates evolutionary tempo on phylogenetic trees. Imports morphological
