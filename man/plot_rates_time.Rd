@@ -30,42 +30,20 @@ Calculated rates (changes per lineage million years) are plotted as filled circl
 }
 \examples{
 
-# Get first of three MPTs for day 2016 data set:
-tree <- ape::read.tree(text = "(Biarmosuchus_tener,
-  (((Hipposaurus_boonstrai,(Bullacephalus_jacksoni,
-  Pachydectes_elsi)),(Lemurosaurus_pricei,(Lobalopex_mordax,
-  ((Lophorhinus_willodenensis,(Proburnetia_viatkensis,
-  (Lende_chiweta,(Paraburnetia_sneeubergensis,
-  Burnetia_mirabilis)))),(BP_1_7098,
-  Niuksenitia_sukhonensis))))),(Ictidorhinus_martinsi,
-  (RC_20,(Herpetoskylax_hopsoni,Lycaenodon_longiceps)))));")
+# Make time-scaled first MPT for Day 2016 data set:
+time_tree <- ape::read.tree(text = paste0("(Biarmosuchus_tener:0.5,",
+  "(((Hipposaurus_boonstrai:3.5,(Bullacephalus_jacksoni:0.75,",
+  "Pachydectes_elsi:0.75):0.75):0.75,(Lemurosaurus_pricei:7.166666667",
+  "(Lobalopex_mordax:4.333333333,((Lophorhinus_willodenensis:3.666666667,",
+  "(Proburnetia_viatkensis:0.8333333333,(Lende_chiweta:2,",
+  "(Paraburnetia_sneeubergensis:1,Burnetia_mirabilis:2):1):1.833333333)",
+  ":0.8333333333):0.8333333333,(BP_1_7098:2.25,Niuksenitia_sukhonensis:",
+  "1.25):1.25):0.8333333333):0.8333333333):3.083333333):1.95,",
+  "(Ictidorhinus_martinsi:15.9,(RC_20:11.6,(Herpetoskylax_hopsoni:11.3,",
+  "Lycaenodon_longiceps:0.3):0.3):0.3):0.3):0.3);"))
 
-# Remove line breaks from tip names:
-tree$tip.label <- gsub(pattern = "\n", replacement = "", x = tree$tip.label)
-
-# Ages for day 2016 taxa:
-ages <- matrix(c(
-  269, 269, 263, 263, 265, 265, 265, 265, 257, 257, 259,
-  259, 258, 258, 260, 260, 257, 257, 257, 257, 256, 256, 259, 259, 260,
-  260, 253, 253, 257, 257, 257, 257, 268, 268
-),
-ncol = 2, byrow = TRUE,
-dimnames = list(c(
-  "Biarmosuchus_tener", "Hipposaurus_boonstrai",
-  "Bullacephalus_jacksoni", "Pachydectes_elsi", "Lemurosaurus_pricei",
-  "Lobalopex_mordax", "Lophorhinus_willodenensis",
-  "Proburnetia_viatkensis", "Lende_chiweta",
-  "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098",
-  "Niuksenitia_sukhonensis", "Ictidorhinus_martinsi", "RC_20",
-  "Herpetoskylax_hopsoni", "Lycaenodon_longiceps"
-), c("FAD", "LAD"))
-)
-
-# Time-scale tree using equal method:
-time_tree <- strap::DatePhylo(
-  tree = tree, ages = ages, method = "equal",
-  rlen = 0.5
-)
+# Add root age to tree:
+time_tree$root.time <- 269.5
 
 # Prune continuous block from day 2016:
 cladistic_matrix <- prune_cladistic_matrix(
