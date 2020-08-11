@@ -30,7 +30,6 @@ map_stochastic_changes(
 \item{inapplicable_behaviour}{What to do with inapplicable characters. Only one option currently ("missing"). See details.}
 }
 \value{
-\item{root_states}{A matrix of the root states for each character (column) and simulation (rows).}
 \item{all_state_changes}{A matrix of rows for each change with columns corresponding to the character, the simulation number, the edge number, the time the change occurred, and the start and end states.}
 \item{character_times}{A vector of the sampled tree-length (in Ma) for each character.}
 \item{binned_edge_lengths}{A matrix of time bins (columns) and characters (rows) indicating the sampled tree-length (in Ma).}
@@ -89,14 +88,13 @@ state_changes <-
 # View matrix of all stochstic character changes:
 state_changes$all_state_changes
 
-# View vector of sampled time for each
-# character:
+# View vector of sampled time for each character:
 state_changes$character_times
 
 # View matrix of edge lengths in each time bin:
 state_changes$binned_edge_lengths
 
-# View matrix of termnial edge lengths in each time bin:
+# View matrix of terminal edge lengths in each time bin:
 state_changes$binned_terminal_edge_lengths
 
 # View matrix of internal edge lengths in each time bin:
