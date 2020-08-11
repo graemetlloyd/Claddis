@@ -19,7 +19,7 @@ Returns a vector of node ages (terminal and internal) labelled by their node num
 
 # Create simple four-taxon tree with edge lengths all
 # set to 1 Ma:
-time_tree <- read.tree(text = "(A:1,(B:1,(C:1,D:1):1):1);")
+time_tree <- ape::read.tree(text = "(A:1,(B:1,(C:1,D:1):1):1);")
 
 # Set root.time as 10 Ma:
 time_tree$root.time <- 10

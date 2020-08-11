@@ -23,7 +23,7 @@ Intended for use as an internal function for \link{trim_matrix}, but potentially
 \examples{
 
 # Create a simple four-taxon tree:
-tree <- read.tree(text = "(A,(B,(C,D)));")
+tree <- ape::read.tree(text = "(A,(B,(C,D)));")
 
 # Plot the tree:
 ape::plot.phylo(tree)
