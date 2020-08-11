@@ -6,6 +6,7 @@
 #'
 #' @param character_changes A matrix of character changes.
 #' @param time_tree Tree on which character changes occur.
+#' @param label_size The size of the text for the barnch labels. Default is 0.5.
 #'
 #' @details
 #'
@@ -20,14 +21,12 @@
 #' # Set random seed:
 #' set.seed(17)
 #'
-#' # Generate a random tree for the Michaux data set:
-#' time_tree <- ape::rtree(n = nrow(michaux_1989$matrix_1$matrix))
+#' # Get first MPT for the Michaux data set:
+#' time_tree <- ape::read.tree(text = paste0("(Ancilla:31.6,(Turrancilla:102.7,",
+#'   "(Ancillista:1,Amalda:63.5):1):1);"))
 #'
-#' # Update taxon names to match those in the data matrix:
-#' time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
-#'
-#' # Set root time by making youngest taxon extant:
-#' time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
+#' # Set root time for tree:
+#' time_tree$root.time <- 103.7
 #'
 #' # Get discrete character rates (includes changes):
 #' out <- test_rates(time_tree, michaux_1989,
@@ -41,10 +40,10 @@
 #'   time_tree
 #' )
 #' @export plot_changes_on_tree
-plot_changes_on_tree <- function(character_changes, time_tree) {
+plot_changes_on_tree <- function(character_changes, time_tree, label_size = 0.5) {
 
   # Update tree edge lengths to number of character changes:
-  time_tree$edge.length <- rle(sort(x = c(character_changes[, "edge"], 1:nrow(time_tree$edge))))$lengths - 1
+  time_tree$edge.length <- rle(sort(x = c(character_changes[, "edge"], 1:nrow(time_tree$edge))))$lengths - 0.5
 
   # Create empty edge labels vector:
   edge_labels <- rep(NA, nrow(time_tree$edge))
@@ -69,7 +68,7 @@ plot_changes_on_tree <- function(character_changes, time_tree) {
   plot(time_tree, direction = "upwards")
 
   # Add edge labels for changes:
-  edgelabels(text = edge_labels, bg = "white", cex = 0.3)
+  edgelabels(text = edge_labels, bg = "white", cex = label_size)
 
   # NEED TO LADDERISE LEFT IF WRITING ON RIGHT OF BRANCHES...
 }

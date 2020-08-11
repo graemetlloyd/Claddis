@@ -4,12 +4,14 @@
 \alias{plot_changes_on_tree}
 \title{Plots character changes on branches}
 \usage{
-plot_changes_on_tree(character_changes, time_tree)
+plot_changes_on_tree(character_changes, time_tree, label_size = 0.5)
 }
 \arguments{
 \item{character_changes}{A matrix of character changes.}
 
 \item{time_tree}{Tree on which character changes occur.}
+
+\item{label_size}{The size of the text for the barnch labels. Default is 0.5.}
 }
 \value{
 A plot of character changes on a tree.
@@ -25,14 +27,12 @@ Takes the \code{character_changes} output from \link{test_rates} and plots it on
 # Set random seed:
 set.seed(17)
 
-# Generate a random tree for the Michaux data set:
-time_tree <- ape::rtree(n = nrow(michaux_1989$matrix_1$matrix))
+# Get first MPT for the Michaux data set:
+time_tree <- ape::read.tree(text = paste0("(Ancilla:31.6,(Turrancilla:102.7,",
+  "(Ancillista:1,Amalda:63.5):1):1);"))
 
-# Update taxon names to match those in the data matrix:
-time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
-
-# Set root time by making youngest taxon extant:
-time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
+# Set root time for tree:
+time_tree$root.time <- 103.7
 
 # Get discrete character rates (includes changes):
 out <- test_rates(time_tree, michaux_1989,
