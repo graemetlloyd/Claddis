@@ -28,10 +28,10 @@
 #' time_tree <- ape::rtree(n = 10)
 #'
 #' # Add root age:
-#' time_tree$root.time <- 100
+#' time_tree$root.time <- max(diag(ape::vcv(time_tree)))
 #'
 #' # Create time bins:
-#' time_bins <- seq(from = 100, to = 0, length.out = 11)
+#' time_bins <- seq(from = time_tree$root.time, to = 0, length.out = 11)
 #'
 #' # Get edge lengths for each bin:
 #' bin_edge_lengths(time_tree = time_tree, time_bins = time_bins)
