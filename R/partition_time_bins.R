@@ -38,16 +38,13 @@ partition_time_bins <- function(n_time_bins, partition_sizes_to_include = "all")
   if (length(x = time_bins) < 2) stop("There must be at least two time bins.")
 
   # Format partition_sizes_to_include as a vector of all possible numbers if input is "all":
-  if (any(partition_sizes_to_include == "all")) partition_sizes_to_include <- 0:(length(x = time_bins) - 1)
+  if (any(partition_sizes_to_include == "all")) partition_sizes_to_include <- 1:n_time_bins
 
   # Get number of possible "switches", i.e., positions where a partition can (1) or cannot (0) be:
   n_switches <- length(x = time_bins) - 1
 
-  # Calculate expeted number of paritions (if large can stop adn warn user):
-  n_partitions <- sum(unlist(x = lapply(X = as.list(x = partition_sizes_to_include), function(x) ncol(combn(n_switches, x)))))
-
-  # Small correction if zero is included (no partitions or rather a partition of one):
-  if (any(partition_sizes_to_include == 0)) n_partitions <- n_partitions + 1
+  # Calculate expeted number of partitions (if large can stop and warn user):
+  n_partitions <- sum(unlist(x = lapply(X = as.list(x = partition_sizes_to_include - 1), function(x) ncol(combn(n_switches, x)))))
 
   # Generate starting splitsiwtches vector:
   split_switches <- as.character(0:1)
@@ -56,7 +53,7 @@ partition_time_bins <- function(n_time_bins, partition_sizes_to_include = "all")
   while (nchar(x = split_switches[1]) < (length(x = time_bins) - 1)) split_switches <- apply(expand.grid(split_switches, as.character(0:1)), 1, paste, collapse = "")
 
   # Work out partition sizes for subsetting below:
-  partition_sizes <- unlist(x = lapply(X = strsplit(split_switches, split = ""), function(x) sum(as.numeric(x))))
+  partition_sizes <- unlist(x = lapply(X = strsplit(split_switches, split = ""), function(x) sum(as.numeric(x)))) + 1
 
   # Collpase switches vector to just those of the reequired input size:
   split_switches <- split_switches[!is.na(match(partition_sizes, partition_sizes_to_include))]
@@ -87,12 +84,9 @@ partition_time_bins <- function(n_time_bins, partition_sizes_to_include = "all")
     }
 
     # Return list of vectors:
-    return(output)
+    output
   }
 
-  # Convert split siwtch strings to lists of vectors of partition elements:
-  partition_position_list <- lapply(X = as.list(x = split_switches), function(x) set_partition_positions(x))
-
-  # Return list of vectors of partition elements:
-  return(partition_position_list)
+  # Convert split switch strings to lists of vectors of partition elements and return:
+  lapply(X = as.list(x = split_switches), function(x) set_partition_positions(x))
 }
