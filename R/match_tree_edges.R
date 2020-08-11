@@ -37,10 +37,10 @@
 #' X$removed_edges
 #' @export match_tree_edges
 match_tree_edges <- function(original_tree, pruned_tree) {
-  
+
   # Get number of pruned tips:
   n_pruned_tips <- ape::Ntip(phy = pruned_tree)
-  
+
   # Get number of pruned nodes:
   n_pruned_nodes <- ape::Nnode(phy = pruned_tree)
 

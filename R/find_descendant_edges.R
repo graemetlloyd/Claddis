@@ -33,7 +33,7 @@
 #' find_descendant_edges(n = 7, tree = tree)
 #' @export find_descendant_edges
 find_descendant_edges <- function(n, tree) {
-  
+
   # Find number of tips:
   n_tips <- ape::Ntip(phy = tree)
 

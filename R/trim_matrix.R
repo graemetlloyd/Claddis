@@ -92,10 +92,10 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
 
     # Case if there is a tree:
   } else {
-    
+
     # Get tip count:
     n_tips <- ape::Ntip(phy = tree)
-    
+
     # Get node count:
     n_nodes <- ape::Nnode(phy = tree)
 

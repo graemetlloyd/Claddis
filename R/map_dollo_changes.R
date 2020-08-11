@@ -21,7 +21,7 @@
 #'
 #' NB: As the map is stochastic the answer will be different each time the function is run and multiple replicates are strongly advised in order to characterise this uncertainty.
 #'
-#' @return 
+#' @return
 #'
 #' \item{changes}{A matrix of all changes (gains and losses).}
 #' \item{stochastic_character_map}{The stochastic character map.}
@@ -58,10 +58,10 @@
 map_dollo_changes <- function(time_tree, tip_states) {
 
   # Output of this should match other stochastic character map function and ultimately be a format that can be handed to test_rates or disparity functions
-  
+
   # Find number of tips:
   n_tips <- ape::Ntip(phy = time_tree)
-  
+
   # Find number of nodes:
   n_nodes <- ape::Nnode(phy = time_tree)
 
@@ -140,40 +140,40 @@ map_dollo_changes <- function(time_tree, tip_states) {
       acquisition_branch <- match(which(x = tip_states == 1), time_tree$edge[, 2])
 
       # Get bounds for acquisition times:
-      acquisition.bounds <- date_nodes(time_tree = time_tree)[time_tree$edge[acquisition_branch, ]]
+      acquisition_bounds <- date_nodes(time_tree = time_tree)[time_tree$edge[acquisition_branch, ]]
 
       # Draw an acusition time from a uniform distribution between the bounds:
-      acquisition_time <- stats::runif(n = 1, min = acquisition.bounds[2], max = acquisition.bounds[1])
+      acquisition_time <- stats::runif(n = 1, min = acquisition_bounds[2], max = acquisition_bounds[1])
 
       # Create an SCM branch for the acquisition:
-      acquisition_branch.SCM <- c(acquisition.bounds[1] - acquisition_time, acquisition_time - acquisition.bounds[2])
+      acquisition_branch_stochastic_character_map <- c(acquisition_bounds[1] - acquisition_time, acquisition_time - acquisition_bounds[2])
 
       # Add labels to the acquisition branch:
-      names(acquisition_branch.SCM) <- c("0", "1")
+      names(acquisition_branch_stochastic_character_map) <- c("0", "1")
 
       # Add acquisition branch to the SCM:
-      stochastic_character_map[[acquisition_branch]] <- acquisition_branch.SCM
+      stochastic_character_map[[acquisition_branch]] <- acquisition_branch_stochastic_character_map
 
       # Case if at least two taxa exhibit the derived state:
     } else {
 
       # Find members of the least inclusive clade:
-      clade.members <- time_tree$tip.label[strap::FindDescendants(n = new_root, tree = time_tree)]
+      clade_members <- time_tree$tip.label[strap::FindDescendants(n = new_root, tree = time_tree)]
 
       # Find non-members of the least inclusive clade:
-      nonclade.members <- setdiff(x = time_tree$tip.label, y = clade.members)
+      nonclade_members <- setdiff(x = time_tree$tip.label, y = clade_members)
 
       # Case if only two members in clade:
-      if (length(x = clade.members) == 2) {
+      if (length(x = clade_members) == 2) {
 
         # Get branch along which (single) acqusition of derived state occurs:
         acquisition_branch <- match(new_root, time_tree$edge[, 2])
 
         # Get bounds for acquisition times:
-        acquisition.bounds <- date_nodes(time_tree = time_tree)[time_tree$edge[acquisition_branch, ]]
+        acquisition_bounds <- date_nodes(time_tree = time_tree)[time_tree$edge[acquisition_branch, ]]
 
         # Draw an acusition time from a uniform distribution between the bounds:
-        acquisition_time <- stats::runif(n = 1, min = acquisition.bounds[2], max = acquisition.bounds[1])
+        acquisition_time <- stats::runif(n = 1, min = acquisition_bounds[2], max = acquisition_bounds[1])
 
         # Create base stochastic character map (SCM):
         stochastic_character_map <- as.list(x = c(1:nrow(time_tree$edge)))
@@ -192,40 +192,40 @@ map_dollo_changes <- function(time_tree, tip_states) {
         }
 
         # Create an SCM branch for the acquisition:
-        acquisition_branch.SCM <- c(acquisition.bounds[1] - acquisition_time, acquisition_time - acquisition.bounds[2])
+        acquisition_branch_stochastic_character_map <- c(acquisition_bounds[1] - acquisition_time, acquisition_time - acquisition_bounds[2])
 
         # Add labels to the acqusition branch:
-        names(acquisition_branch.SCM) <- c("0", "1")
+        names(acquisition_branch_stochastic_character_map) <- c("0", "1")
 
         # Add acquisition branch to the SCM:
-        stochastic_character_map[[acquisition_branch]] <- acquisition_branch.SCM
+        stochastic_character_map[[acquisition_branch]] <- acquisition_branch_stochastic_character_map
 
         # Get two descending edges:
-        descendant.edges <- find_descendant_edges(new_root, time_tree)
+        descendant_edges <- find_descendant_edges(new_root, time_tree)
 
         # Update state of descending edges to derived (1):
-        for (i in descendant.edges) names(SCM[[i]]) <- "1"
+        for (i in descendant_edges) names(SCM[[i]]) <- "1"
 
         # Case if at least three members in clade:
       } else {
 
         # Prune taxa external to least inclusive clade to create a pruned tree:
-        new.tree <- ape::drop.tip(phy = time_tree, tip = nonclade.members)
+        new_tree <- ape::drop.tip(phy = time_tree, tip = nonclade_members)
 
         # Ensure root time is correct:
-        new.tree <- fix_root_time(time_tree, new.tree)
+        new_tree <- fix_root_time(time_tree, new_tree)
 
         # Update tip states for new pruned tree:
-        new.tips <- tip_states[clade.members]
+        new_tips <- tip_states[clade_members]
 
         # Get branch along which (single) acqusition of derived state occurs:
         acquisition_branch <- match(new_root, time_tree$edge[, 2])
 
         # Get bounds for acquisition times:
-        acquisition.bounds <- date_nodes(time_tree = time_tree)[time_tree$edge[acquisition_branch, ]]
+        acquisition_bounds <- date_nodes(time_tree = time_tree)[time_tree$edge[acquisition_branch, ]]
 
         # Draw an acusition time from a uniform distribution between the bounds:
-        acquisition_time <- stats::runif(n = 1, min = acquisition.bounds[2], max = acquisition.bounds[1])
+        acquisition_time <- stats::runif(n = 1, min = acquisition_bounds[2], max = acquisition_bounds[1])
 
         # Create base stochastic character map (SCM):
         stochastic_character_map <- as.list(x = c(1:nrow(time_tree$edge)))
@@ -244,104 +244,104 @@ map_dollo_changes <- function(time_tree, tip_states) {
         }
 
         # Create an SCM branch for the acquisition:
-        acquisition_branch.SCM <- c(acquisition.bounds[1] - acquisition_time, acquisition_time - acquisition.bounds[2])
+        acquisition_branch_stochastic_character_map <- c(acquisition_bounds[1] - acquisition_time, acquisition_time - acquisition_bounds[2])
 
         # Add labels to the acqusition branch:
-        names(acquisition_branch.SCM) <- c("0", "1")
+        names(acquisition_branch_stochastic_character_map) <- c("0", "1")
 
         # Add acquisition branch to the SCM:
-        stochastic_character_map[[acquisition_branch]] <- acquisition_branch.SCM
+        stochastic_character_map[[acquisition_branch]] <- acquisition_branch_stochastic_character_map
 
         # If tip states vary:
-        if (length(x = unique(x = new.tips)) > 1) {
+        if (length(x = unique(x = new_tips)) > 1) {
 
           # Now do real SCM on pruned tree using Dollo model and a strong root prior of one:
-          SCM_real <- phytools::make.simmap(tree = new.tree, x = new.tips[new.tree$tip.label], model = dollo_model, pi = c(0, 1), message = FALSE)$maps
+          real_stochastic_character_map <- phytools::make.simmap(tree = new_tree, x = new_tips[new_tree$tip.label], model = dollo_model, pi = c(0, 1), message = FALSE)$maps
 
           # If tip state is constant:
         } else {
 
           # Create SCM with no losses:
-          SCM_real <- as.list(x = new.tree$edge.length)
+          real_stochastic_character_map <- as.list(x = new_tree$edge.length)
 
           # Label all states as derived:
-          for (i in 1:length(x = SCM_real)) names(SCM_real[[i]]) <- "1"
+          for (i in 1:length(x = real_stochastic_character_map)) names(real_stochastic_character_map[[i]]) <- "1"
         }
 
         # Create edge matrix for original tree:
-        orig.edges <- time_tree$edge
+        original_edges <- time_tree$edge
 
         # Create edge matrix for pruned tree:
-        new.edges <- new.tree$edge
+        new_edges <- new_tree$edge
 
         # Update tip names for original tree edge matrix:
-        for (i in 1:n_tips) orig.edges[which(x = orig.edges[, 2] == i), 2] <- time_tree$tip.label[i]
+        for (i in 1:n_tips) original_edges[which(x = original_edges[, 2] == i), 2] <- time_tree$tip.label[i]
 
         # Update tip names for pruned tree edge matrix:
-        for (i in 1:n_new_tips) new.edges[which(x = new.edges[, 2] == i), 2] <- new.tree$tip.label[i]
+        for (i in 1:n_new_tips) new_edges[which(x = new_edges[, 2] == i), 2] <- new_tree$tip.label[i]
 
         # Update node names for original tree edge matrix:
-        for (i in (n_tips + 1):(n_tips + n_nodes)) orig.edges[which(x = orig.edges == i)] <- paste(sort(x = time_tree$tip.label[strap::FindDescendants(n = i, tree = time_tree)]), collapse = "")
-        
-        n_new_tips <- ape::Ntip(phy = new.tree)
-        n_new_nodes <- ape::Nnode(phy = new.tree)
+        for (i in (n_tips + 1):(n_tips + n_nodes)) original_edges[which(x = original_edges == i)] <- paste(sort(x = time_tree$tip.label[strap::FindDescendants(n = i, tree = time_tree)]), collapse = "")
+
+        n_new_tips <- ape::Ntip(phy = new_tree)
+        n_new_nodes <- ape::Nnode(phy = new_tree)
 
         # Update node names for pruned tree edge matrix:
-        for (i in ( + 1):(n_new_tips + n_new_nodes)) new.edges[which(x = new.edges == i)] <- paste(sort(x = new.tree$tip.label[strap::FindDescendants(n = i, tree = new.tree)]), collapse = "")
+        for (i in (+1):(n_new_tips + n_new_nodes)) new_edges[which(x = new_edges == i)] <- paste(sort(x = new_tree$tip.label[strap::FindDescendants(n = i, tree = new_tree)]), collapse = "")
 
         # Collapse original edge matrix to from-to straings for matching:
-        orig.edges <- apply(orig.edges, 1, paste, collapse = "%%TO%%")
+        original_edges <- apply(original_edges, 1, paste, collapse = "%%TO%%")
 
         # Collapse pruned edge matrix to from-to straings for matching:
-        new.edges <- apply(new.edges, 1, paste, collapse = "%%TO%%")
+        new_edges <- apply(new_edges, 1, paste, collapse = "%%TO%%")
 
         # Match edges between pruned and original trees:
-        edge.matches <- match(new.edges, orig.edges)
+        edge_matches <- match(new_edges, original_edges)
 
         # Store real SCM in SCM for full tree:
-        stochastic_character_map[edge.matches] <- SCM_real
+        stochastic_character_map[edge_matches] <- real_stochastic_character_map
       }
     }
   }
 
   # Get node ages for tree in advance of establishing character change times:
-  all.node.ages <- date_nodes(time_tree = time_tree)
+  all_node_ages <- date_nodes(time_tree = time_tree)
 
   # Create changes matrix:
-  changes.matrix <- matrix(nrow = 0, ncol = 4, dimnames = list(c(), c("Branch", "From", "To", "Time")))
+  changes_matrix <- matrix(nrow = 0, ncol = 4, dimnames = list(c(), c("branch", "from", "to", "time")))
 
   # Get branches that record changes:
-  change.branches <- which(x = lapply(X = stochastic_character_map, length) > 1)
+  change_branches <- which(x = lapply(X = stochastic_character_map, length) > 1)
 
   # Special case of acquisition occurring prior to root (add extra line to changes matrix):
-  if (acquisition_branch == 0) changes.matrix <- rbind(changes.matrix, c(acquisition_branch, 0, 1, acquisition_time))
+  if (acquisition_branch == 0) changes_matrix <- rbind(changes_matrix, c(acquisition_branch, 0, 1, acquisition_time))
 
   # As long as there are changes to record (i.e., it is not a constant character):
-  if (length(x = change.branches) > 0) {
+  if (length(x = change_branches) > 0) {
 
     # For each change branch:
-    for (i in change.branches) {
+    for (i in change_branches) {
 
       # Record branch number:
-      change.branch <- i
+      change_branch <- i
 
       # Record from and to states:
-      change.states <- as.numeric(names(stochastic_character_map[[i]]))
+      change_states <- as.numeric(names(stochastic_character_map[[i]]))
 
       # Record change time:
-      change.time <- all.node.ages[time_tree$edge[i, 1]] - stochastic_character_map[[i]][1]
+      change_time <- all_node_ages[time_tree$edge[i, 1]] - stochastic_character_map[[i]][1]
 
       # Make changes line ready for inserting into matrix:
-      change.line <- c(change.branch, change.states, change.time)
+      change_line <- c(change_branch, change_states, change_time)
 
       # Add changes to matrix:
-      changes.matrix <- rbind(changes.matrix, change.line)
+      changes_matrix <- rbind(changes_matrix, change_line)
     }
   }
 
   # Clean up row names:
-  rownames(x = changes.matrix) <- NULL
+  rownames(x = changes_matrix) <- NULL
 
   # Return output as list:
-  list(changes = changes.matrix, stochastic_character_map = stochastic_character_map)
+  list(changes = changes_matrix, stochastic_character_map = stochastic_character_map)
 }

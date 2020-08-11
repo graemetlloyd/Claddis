@@ -76,8 +76,9 @@
 #' time_slices <- seq(0, 100, length.out = 6)
 #'
 #' # Plot grid lines to show "shearing" effect is working:
-#' plot_morphospace_stack(ordination_axes = ordination_axes,
-#'                        ages = ages, time_slices = time_slices
+#' plot_morphospace_stack(
+#'   ordination_axes = ordination_axes,
+#'   ages = ages, time_slices = time_slices
 #' )
 #'
 #' # Set random seed:
@@ -110,8 +111,9 @@
 #' names(groups) <- rownames(x = ordination_axes)
 #'
 #' # Make stacked ordination plot with convex hulls for groups:
-#' plot_morphospace_stack(ordination_axes = ordination_axes, ages = ages,
-#'                        groups = groups, time_slices = time_slices
+#' plot_morphospace_stack(
+#'   ordination_axes = ordination_axes, ages = ages,
+#'   groups = groups, time_slices = time_slices
 #' )
 #' @export plot_morphospace_stack
 plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2, x_axis = 1, y_axis = 2, axis_label = "PC") {
@@ -121,11 +123,11 @@ plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_sl
   # Check axes asked for exist in data (top level conditional).
   # Add geologic time at left with geoscale at some point?
   # Am assuming PC axes, but could be Relative Warp...
-  
+
   # 0, 0 lines?
-  
+
   # Tick marks?
-  
+
   # Maybe let user set this later:
   plot_cushion <- 0.1
 

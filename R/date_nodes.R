@@ -25,12 +25,12 @@
 #' date_nodes(time_tree = time_tree)
 #' @export date_nodes
 date_nodes <- function(time_tree) {
-  
+
   # Need input checks
-  
+
   # Get N tips:
   n_tips <- ape::Ntip(phy = time_tree)
-  
+
   # Get N nodes:
   n_nodes <- ape::Nnode(phy = time_tree)
 

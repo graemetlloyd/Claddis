@@ -64,7 +64,7 @@
 #' @export estimate_ancestral_states
 estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, polymorphism_behaviour = "equalp", uncertainty_behaviour = "equalp", threshold = 0.01, all_missing_allowed = FALSE) {
 
-  # How to get tip states for a continuous character? (Phytools answer: http://blog.phytools.org/2013/11/reconstructed-ancestral-tip-states-for.html)
+  # How to get predicted tip states for a continuous character? (Phytools answer: http://blog.phytools.org/2013/11/reconstructed-ancestral-tip-states-for.html)
   #   - So basically under ML just inherit state from ancestral node (really this is mean of distribution where sd would grow with duration of branch so to allow the possibility of variance this could also be sampled stochastically
   # How to deal with step matrices?
   # How to deal with models where intermediate tip states are not even in sample
@@ -73,17 +73,13 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   # Handle only two tips case properly
   # Add Liam Revell polymorphism options
   # Finish trailing off help file!
-  # Add Lloyd citation
-  
-  
-  
+  # Add Lloyd 2018 citation
+
   # Get number of tips in tree:
   n_tips <- ape::Ntip(phy = time_tree)
-  
+
   # Get number of nodes in tree:
   n_nodes <- ape::Nnode(phy = time_tree)
-
-
 
   # Catch problem with trees with no branch lengths:
   if (is.null(time_tree$edge.length)) stop("time_tree must have branch lengths.")
@@ -155,7 +151,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   if (!all_missing_allowed && length(x = dataless_characters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(dataless_characters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using Claddis::prune_cladistic_matrix) or because of the chosen options for inapplicables_as_missing, polymorphism_behaviour, and/or uncertainty_behaviour (in which case the user may wish to chose different values for these)."))
 
   # Convert tip states into a list:
-  data_list <- apply(cladistic_matrix, 2, function(x) list(TipStates = x))
+  data_list <- apply(cladistic_matrix, 2, function(x) list(tip_states = x))
 
   # For each character:
   for (i in 1:length(x = data_list)) {
@@ -170,30 +166,30 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
     data_list[[i]]$ordering <- unname(ordering[i])
 
     # Add tree to list:
-    data_list[[i]]$Tree <- time_tree
+    data_list[[i]]$tree <- time_tree
   }
 
   # If estimating values for all characters (need to set dummy tip states for missing values):
   if (estimate_all_nodes) {
 
     # Subfunction to fill missing values (and inapplicables if desired):
-    fill_missing <- function(TipStates) {
+    fill_missing <- function(tip_states) {
 
       # Find which rows correspond to missing states:
-      missingRows <- which(x = is.na(TipStates$TipStates))
+      missingRows <- which(x = is.na(tip_states$tip_states))
 
       # If missing states found:
       if (length(x = missingRows) > 0) {
 
         # Build missing state by either forming a polymorphism of all possible tip states, or if continuous the midpoint value:
-        FillStates <- ifelse(TipStates$ordering == "cont", (TipStates$minimum_values + TipStates$maximum_values) / 2, paste(TipStates$minimum_values:TipStates$maximum_values, collapse = "/"))
+        fill_states <- ifelse(tip_states$ordering == "cont", (tip_states$minimum_values + tip_states$maximum_values) / 2, paste(tip_states$minimum_values:tip_states$maximum_values, collapse = "/"))
 
         # Insert missing values:
-        TipStates$TipStates[missingRows] <- FillStates
+        tip_states$tip_states[missingRows] <- fill_states
       }
 
       # Return tip states with missing values replaced:
-      return(TipStates)
+      tip_states
     }
 
     # Apply fill missing function across all characters:
@@ -204,26 +200,26 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   prune_tips <- function(x) {
 
     # Find all missing or inapplicable value tip names:
-    missing <- names(sort(x = c(which(x = x$TipStates == ""), which(x = is.na(x$TipStates)))))
+    missing <- names(sort(x = c(which(x = x$tip_states == ""), which(x = is.na(x$tip_states)))))
 
     # Work out how many tips will be left after pruning:
-    NTipsRemaining <- length(x = setdiff(x = names(x$TipStates), y = missing))
+    n_tips_remaining <- length(x = setdiff(x = names(x$tip_states), y = missing))
 
     # If there is at least one missing value:
     if (length(x = missing) > 0) {
 
       # If less than two tips will remain then set tree as NULL:
-      if (NTipsRemaining < 2) x$Tree <- NULL
+      if (n_tips_remaining < 2) x$tree <- NULL
 
       # If at least two tips will remain prune missing values from tree:
-      if (NTipsRemaining > 1) x$Tree <- ape::drop.tip(phy = x$Tree, tip = missing)
+      if (n_tips_remaining > 1) x$tree <- ape::drop.tip(phy = x$tree, tip = missing)
 
       # Collapse tip states:
-      x$TipStates <- x$TipStates[setdiff(x = names(x$TipStates), y = missing)]
+      x$tip_states <- x$tip_states[setdiff(x = names(x$tip_states), y = missing)]
     }
 
     # Return pruned output:
-    return(x)
+    x
   }
 
   # Prune out missing and inapplicable tips:
@@ -233,41 +229,41 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   convert_tip_states_to_matrix <- function(x) {
 
     # As long asthere is at least one tip state:
-    if (length(x = x$TipStates) > 0) {
+    if (length(x = x$tip_states) > 0) {
 
       # If the character is not continuous (i.e., it is some form of discrete character):
       if (x$ordering != "cont") {
 
         # Temporarily store tip states so matrix format can overwrite the stored version below:
-        TipStates <- x$TipStates
+        tip_states <- x$tip_states
 
         # Create matrix of tip state probabilities:
-        x$TipStates <- matrix(0, nrow = length(x = x$TipStates), ncol = x$maximum_values - x$minimum_values + 1, dimnames = list(names(x$TipStates), x$minimum_values:x$maximum_values))
+        x$tip_states <- matrix(0, nrow = length(x = x$tip_states), ncol = x$maximum_values - x$minimum_values + 1, dimnames = list(names(x$tip_states), x$minimum_values:x$maximum_values))
 
         # For each character state if a single state is coded store probability as 1:
-        for (i in colnames(x = x$TipStates)) x$TipStates[TipStates == i, i] <- 1
+        for (i in colnames(x = x$tip_states)) x$tip_states[tip_states == i, i] <- 1
 
         # If there are polymorphisms and/or uncertainties:
-        if (length(x = grep("&|/", TipStates)) > 0) {
+        if (length(x = grep("&|/", tip_states)) > 0) {
 
           # Get polymorphism locations:
-          Polymorphisms <- grep("&", TipStates)
+          polymorphisms <- grep("&", tip_states)
 
           # Get uncertainty locations:
-          Uncertainties <- grep("/", TipStates)
+          uncertainties <- grep("/", tip_states)
 
           # If there are polymorphisms and using the "equalp" (equal probability of each state) option:
-          if (length(x = Polymorphisms) > 0 && polymorphism_behaviour == "equalp") {
+          if (length(x = polymorphisms) > 0 && polymorphism_behaviour == "equalp") {
 
             # For each polymorphisms set each state as equally probable:
-            for (i in Polymorphisms) x$TipStates[i, strsplit(TipStates[i], split = "&")[[1]]] <- 1 / length(x = strsplit(TipStates[i], split = "&")[[1]])
+            for (i in polymorphisms) x$tip_states[i, strsplit(tip_states[i], split = "&")[[1]]] <- 1 / length(x = strsplit(tip_states[i], split = "&")[[1]])
           }
 
           # If there are uncertainties and using the "equalp" (equal probability of each state) option:
-          if (length(x = Uncertainties) > 0 && uncertainty_behaviour == "equalp") {
+          if (length(x = uncertainties) > 0 && uncertainty_behaviour == "equalp") {
 
             # For each uncertainty set each state as equally probable:
-            for (i in Uncertainties) x$TipStates[i, strsplit(TipStates[i], split = "/")[[1]]] <- 1 / length(x = strsplit(TipStates[i], split = "/")[[1]])
+            for (i in uncertainties) x$tip_states[i, strsplit(tip_states[i], split = "/")[[1]]] <- 1 / length(x = strsplit(tip_states[i], split = "/")[[1]])
           }
         }
 
@@ -275,18 +271,18 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
       } else {
 
         # Simply make tip states the numeric values (should never be a polymorphism) as a vector:
-        x$TipStates <- as.numeric(x$TipStates)
+        x$tip_states <- as.numeric(x$tip_states)
       }
 
       # If tip state has no length (all values are missing):
     } else {
 
       # Create row-less tip states matrix:
-      x$TipStates <- matrix(nrow = 0, ncol = 1, dimnames = list(c(), "0"))
+      x$tip_states <- matrix(nrow = 0, ncol = 1, dimnames = list(c(), "0"))
     }
 
     # Return the revised input in the same list format:
-    return(x)
+    x
   }
 
   # Reformat tip states ready for ancestral estimation:
@@ -296,23 +292,23 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   build_character_model <- function(x) {
 
     # Set default model to equal rates (works for all binary or unordered characters):
-    x$Model <- "ER"
+    x$model <- "ER"
 
     # If a character is both ordered and has at least three states:
     if ((x$maximum_values - x$minimum_values) > 1 && x$ordering == "ord") {
 
       # Get number of states:
-      NStates <- (x$maximum_values - x$minimum_values) + 1
+      n_states <- (x$maximum_values - x$minimum_values) + 1
 
       # Build all zero matrix to begin with:
-      x$Model <- matrix(0, nrow = NStates, ncol = NStates, dimnames = list(x$minimum_values:x$maximum_values, x$minimum_values:x$maximum_values))
+      x$model <- matrix(0, nrow = n_states, ncol = n_states, dimnames = list(x$minimum_values:x$maximum_values, x$minimum_values:x$maximum_values))
 
       # for each (just) off-diagonal value store 1 (i.e., N steps to move between adjacent states):
-      for (i in 2:NStates) x$Model[(i - 1), i] <- x$Model[i, (i - 1)] <- 1
+      for (i in 2:n_states) x$model[(i - 1), i] <- x$model[i, (i - 1)] <- 1
     }
 
     # Return full output:
-    return(x)
+    x
   }
 
   # Add ancestral state model for each character:
@@ -322,29 +318,29 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   estimate_ancestral_state <- function(x, estimate_tip_values, threshold) {
 
     # As long as there is a tree:
-    if (!is.null(x$Tree)) {
+    if (!is.null(x$tree)) {
 
       # If character is continuous:
       if (x$ordering == "cont") {
 
         # Get ancestral states using ace:
-        x$ancestral_states <- ace(x = x$TipStates, phy = x$Tree)$ace
+        x$ancestral_states <- ace(x = x$tip_states, phy = x$tree)$ace
 
         # If character is discrete:
       } else {
 
         # If invariant character:
-        if (ncol(x$TipStates) == 1) {
+        if (ncol(x$tip_states) == 1) {
 
-          # <U+00A0>Get number of tips:
-          NTreeTips <- ape::Ntip(phy = x$Tree)
+          # Get number of tips:
+          n_tips <- ape::Ntip(phy = x$tree)
 
           # Set ancestral states as all the same:
-          x$ancestral_states <- matrix(rep(x = 1, times = (NTreeTips + x$Tree$Nnode)), ncol = 1, dimnames = list(c(x$Tree$tip.label, (NTreeTips + 1):(NTreeTips + x$Tree$Nnode)), colnames(x = x$TipStates)))
+          x$ancestral_states <- matrix(rep(x = 1, times = (n_tips + x$tree$Nnode)), ncol = 1, dimnames = list(c(x$tree$tip.label, (n_tips + 1):(n_tips + x$tree$Nnode)), colnames(x = x$tip_states)))
         }
 
         # If variant character then get ancestral states using rerooting method:
-        if (ncol(x$TipStates) > 1) x$ancestral_states <- rerootingMethod(tree = x$Tree, x = x$TipStates, model = x$Model)$marginal.anc
+        if (ncol(x$tip_states) > 1) x$ancestral_states <- phytools::rerootingMethod(tree = x$tree, x = x$tip_states, model = x$model)$marginal.anc
 
         # Reformat to most likely state
         x$ancestral_states <- unlist(x = lapply(X = lapply(X = apply(x$ancestral_states, 1, list), unlist), function(x) {
@@ -352,7 +348,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
         }))
 
         # If not estimating tip values then prune these:
-        if (!estimate_tip_values) x$ancestral_states <- x$ancestral_states[-match(x$Tree$tip.label, names(x$ancestral_states))]
+        if (!estimate_tip_values) x$ancestral_states <- x$ancestral_states[-match(x$tree$tip.label, names(x$ancestral_states))]
       }
 
       # If no tree:
@@ -363,14 +359,14 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
     }
 
     # Return full output of x:
-    return(x)
+    x
   }
 
   # Get ancestral states for each character:
   data_list <- lapply(X = data_list, estimate_ancestral_state, estimate_tip_values, threshold)
 
   # Get Newick strings of all sampled subtrees (to use to avoid redundancy in tree node mapping):
-  newick_strings <- unlist(x = lapply(X = data_list, function(x) ifelse(is.null(x$Tree), NA, ape::write.tree(x$Tree))))
+  newick_strings <- unlist(x = lapply(X = data_list, function(x) ifelse(is.null(x$tree), NA, ape::write.tree(x$tree))))
 
   # Get just unique strings (i.e., the minimum set needded to map everything to the full tree):
   unique_newick_strings <- unique(x = newick_strings[!is.na(newick_strings)])
@@ -410,7 +406,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
     }
 
     # Output matrix matching node numbers of pruned tree to full tree:
-    return(matrix(c(node_numbers, ancestral_nodes), ncol = 2, dimnames = list(c(), c("pruned_node", "full_node"))))
+    matrix(c(node_numbers, ancestral_nodes), ncol = 2, dimnames = list(c(), c("pruned_node", "full_node")))
   }
 
   # Get pruned node to full node for each unique tree:
@@ -423,7 +419,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   for (i in 1:length(x = data_list)) data_list[[i]]$node_maps <- node_maps[[i]]
 
   # Get all node names and numbers:
-  Nodes <- c(rownames(x = original_matrix), (n_tips + 1):(n_tips + n_nodes))
+  nodes <- c(rownames(x = original_matrix), (n_tips + 1):(n_tips + n_nodes))
 
   # Renumber nodes of ancestral states:
   data_list <- lapply(X = data_list, function(x) {
@@ -432,20 +428,20 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
     names(x$ancestral_states)[match(as.character(x$node_maps[, "pruned_node"]), names(x$ancestral_states))] <- as.character(x$node_maps[, "full_node"])
 
     # Return renumbered nodes:
-    return(x)
+    x
   })
 
   # Collapse down to an ancestral state matrix ready for output:
   ancestral_state_matrix <- do.call(what = cbind, args = lapply(X = data_list, function(x) {
 
     # Get ancestral states for nodes:
-    x$ancestral_states <- x$ancestral_states[Nodes]
+    x$ancestral_states <- x$ancestral_states[nodes]
 
     # Add node names:
-    names(x$ancestral_states) <- Nodes
+    names(x$ancestral_states) <- nodes
 
     # Return output:
-    return(x$ancestral_states)
+    x$ancestral_states
   }))
 
   # Isolate estimated tip values:
@@ -455,26 +451,26 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   if (any(is.na(tip_matrix))) {
 
     # Isolate missing values:
-    missingTipStates <- which(x = is.na(tip_matrix))
+    missing_tip_states <- which(x = is.na(tip_matrix))
 
     # Replace missing values with original (unmodified) input values:
-    tip_matrix[missingTipStates] <- original_matrix[missingTipStates]
+    tip_matrix[missing_tip_states] <- original_matrix[missing_tip_states]
 
     # Add tip values back into full output:
     ancestral_state_matrix[rownames(x = original_matrix), ] <- tip_matrix
   }
 
   # Get column (character) count for each matrix block:
-  MatrixColumns <- unlist(x = lapply(X = lapply(X = raw_cladistic_matrix[2:length(x = raw_cladistic_matrix)], "[[", "matrix"), ncol))
+  matrix_columns <- unlist(x = lapply(X = lapply(X = raw_cladistic_matrix[2:length(x = raw_cladistic_matrix)], "[[", "matrix"), ncol))
 
   # For each matrix block:
-  for (i in 1:length(x = MatrixColumns)) {
+  for (i in 1:length(x = matrix_columns)) {
 
     # Insert portion of ancestral state estimate into block:
-    raw_cladistic_matrix[[(i + 1)]]$matrix <- ancestral_state_matrix[, 1:MatrixColumns[i], drop = FALSE]
+    raw_cladistic_matrix[[(i + 1)]]$matrix <- ancestral_state_matrix[, 1:matrix_columns[i], drop = FALSE]
 
     # Remove that portion from the block:
-    ancestral_state_matrix <- ancestral_state_matrix[, -(1:MatrixColumns[i]), drop = FALSE]
+    ancestral_state_matrix <- ancestral_state_matrix[, -(1:matrix_columns[i]), drop = FALSE]
   }
 
   # Overwrite ancestral state output with updated raw input:

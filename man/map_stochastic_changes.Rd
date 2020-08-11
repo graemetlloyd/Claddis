@@ -78,7 +78,7 @@ time_tree$tip.label <- rownames(x = day_2016$matrix_1$matrix)
 time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
 
 # Get all state changes for two simulations:
-StateChanges <-
+state_changes <-
   map_stochastic_changes(
     cladistic_matrix = cladistic_matrix,
     time_tree = time_tree, time_bins = seq(time_tree$root.time, 0,
@@ -87,20 +87,20 @@ StateChanges <-
   )
 
 # View matrix of all stochstic character changes:
-StateChanges$all_state_changes
+state_changes$all_state_changes
 
 # View vector of sampled time for each
 # character:
-StateChanges$character_times
+state_changes$character_times
 
 # View matrix of edge lengths in each time bin:
-StateChanges$binned_edge_lengths
+state_changes$binned_edge_lengths
 
 # View matrix of termnial edge lengths in each time bin:
-StateChanges$binned_terminal_edge_lengths
+state_changes$binned_terminal_edge_lengths
 
 # View matrix of internal edge lengths in each time bin:
-StateChanges$binned_internal_edge_lengths
+state_changes$binned_internal_edge_lengths
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

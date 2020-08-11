@@ -60,7 +60,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
   # col.gp <- rainbow(length(x = levels(gp))) # generates a set of different colors length p
   # names(col.gp) <- levels(gp) # assign those colurs to the p groups
   # col.gp <- col.gp[match(gp, names(col.gp))] # creates a vector length n with a group and colour for each
-  
+
   # Get vector of values that correspond to scree plot:
   scree_values <- apply(pcoa_input$vectors, 2, var) / sum(apply(pcoa_input$vectors, 2, var)) * 100
 
@@ -97,7 +97,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
 
   # Case if tree supplied:
   if (!is.null(pcoa_input$time_tree)) {
-    
+
     # Get number of tips:
     n_tips <- ape::Ntip(phy = pcoa_input$time_tree)
 

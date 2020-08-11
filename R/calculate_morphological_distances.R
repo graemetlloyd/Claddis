@@ -82,7 +82,8 @@
 #'
 #' # Get morphological distances for the Day et
 #' # al. (2016) data set using HSJ approach:
-#' distances <- calculate_morphological_distances(cladistic_matrix = day_2016,
+#' distances <- calculate_morphological_distances(
+#'   cladistic_matrix = day_2016,
 #'   inapplicable_behaviour = "hsj",
 #'   character_dependencies = character_dependencies,
 #'   alpha = 0.5
@@ -109,7 +110,7 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
   # CONSIDER DISTANCES FOR POLYMORPHISMS IN SAME WAY PHYTOOLS DOES WITH POLYMK
   # ADD TRANSORMATION USED TO OUTPUT (AS MAY CHANGE IF OPTIONS COLLIDE)
   # ALLOW WMPD SOMEHOW? MAYBE A SEPARATE FUNCTION WITH GROUPS (WHICH NEEDS TO BE IMPLEMENTED ACROSS THE PACKAGE FOR DISPARITY PLOTS ETC.)
-  # RETOOL AROUND STOCHASTIC CHARACTER MAPS IF DOING PHYLOGENY TOO
+  # <U+00A0>RETOOL AROUND STOCHASTIC CHARACTER MAPS IF DOING PHYLOGENY TOO
 
   # Subfunction to find comparable characters for a pairwise taxon comparison:
   find_comparable <- function(taxon_pair, cladistic_matrix) {

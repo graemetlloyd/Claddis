@@ -37,7 +37,7 @@
 #' bin_edge_lengths(time_tree = time_tree, time_bins = time_bins)
 #' @export bin_edge_lengths
 bin_edge_lengths <- function(time_tree, time_bins, pruned_tree = NULL) {
-  
+
   # Find number of tips in tree:
   n_tips <- ape::Ntip(phy = time_tree)
 

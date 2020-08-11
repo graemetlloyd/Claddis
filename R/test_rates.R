@@ -199,7 +199,7 @@
 test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions = NULL, character_partitions = NULL, clade_partitions = NULL, time_partitions = NULL, change_times = "random", test_type = "aic", alpha = 0.01, multiple_comparison_correction = "benjaminihochberg", polymorphism_state = "missing", uncertainty_state = "missing", inapplicable_state = "missing", time_binning_approach = "lloyd", all_weights_integers = FALSE, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, polymorphism_behaviour = "equalp", uncertainty_behaviour = "equalp", threshold = 0.01, all_missing_allowed = FALSE) {
 
   # ADD EXAMPLES OF VISUALISED OUTPUT (MENTION IN MANUAL AN ADD PLOT FUNCTIONS TO SEALSO_
-  
+
   # TO EXCLUDE OUTGROUP CAN JUST SET UP PARTITIONS THAT EXCLUDE THESE (REQUIRES REMOVING PARTITION FIXER AS STANDARD)
   # COULD ALSO DO INTERNAL AND TERMINAL BRANCHES SEPARATELY THIS WAY
   # ALLOW NAMING OF PARTITIONS AND POTENTIALLY CALLING NAME FOR PLOTS
@@ -259,10 +259,10 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
 
   # Check partitions are not all NULL values:
   if (is.null(branch_partitions) && is.null(character_partitions) && is.null(clade_partitions) && is.null(time_partitions)) stop("No partitions are requested. Set at least one of branch_partitions, character_partitions, clade_partitions, or time_partitions to a list of appropriate values. Type \"?test_rates\" for help.")
-  
+
   # Get tip number:
   n_tips <- ape::Ntip(phy = time_tree)
-  
+
   # Get node number:
   n_nodes <- ape::Nnode(phy = time_tree)
 
@@ -926,7 +926,6 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
 
     # Add packed partitions to results:
     for (i in 1:length(x = character_test_results)) character_test_results[[i]]$partition <- packed_character_partitions[i]
-
 
     # If performing branch partition tests:
   } else {

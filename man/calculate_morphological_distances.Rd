@@ -90,7 +90,8 @@ character_dependencies <- matrix(c(8, 7),
 
 # Get morphological distances for the Day et
 # al. (2016) data set using HSJ approach:
-distances <- calculate_morphological_distances(cladistic_matrix = day_2016,
+distances <- calculate_morphological_distances(
+  cladistic_matrix = day_2016,
   inapplicable_behaviour = "hsj",
   character_dependencies = character_dependencies,
   alpha = 0.5
