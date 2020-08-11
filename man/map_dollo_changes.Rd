@@ -33,26 +33,24 @@ NB: As the map is stochastic the answer will be different each time the function
 }
 \examples{
 
-# Create a random 10-taxon tree:
-time_tree <- ape::rtree(n = 10)
+# Build example ten-tip tree:
+time_tree <- ape::read.tree(text = paste0("(A:1,(B:1,((C:1,(D:1,(E:1,F:1):1):1):1,",
+  "((G:1,H:1):1,(I:1,J:1):1):1):1):1);"))
 
 # Arbitrarily add a root.time value of 100 Ma:
 time_tree$root.time <- 100
 
-# Generate random tip states (0s and 1s):
-tip_states <- sample(c(0, 1), 10, replace = TRUE)
+# Build example tip state values:
+tip_states <- c(A = 0, B = 0, C = 1, D = 1, E = 0, F = 1, G = 1, H = 1, I = 0, J = 1)
 
-# Add labels to tip states:
-names(tip_states) <- time_tree$tip.label
-
-# Get a single stochastic character map:
+# Run map_dollo_changes on data and store output:
 out <- map_dollo_changes(time_tree, tip_states)
 
 # View matrix of changes:
 out$changes
 
 # View stochastic character map (time spent in each state on each branch):
-out$scm
+out$stochastic_character_map
 }
 \references{
 Tarver, J. E., Taylor, R. S., Puttick, M. N., Lloyd, G. T., Pett, W., Fromm, B., Schirrmeister, B. E., Pisani, D., Peterson, K. J. and Donoghue, P. C. J., 2018. Well-annotated microRNAomes do not evidence pervasive miRNA loss. \emph{Genome Biology and Evolution}, \bold{6}, 1457-1470.

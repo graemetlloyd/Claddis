@@ -34,26 +34,24 @@
 #'
 #' @examples
 #'
-#' # Create a random 10-taxon tree:
-#' time_tree <- ape::rtree(n = 10)
+#' # Build example ten-tip tree:
+#' time_tree <- ape::read.tree(text = paste0("(A:1,(B:1,((C:1,(D:1,(E:1,F:1):1):1):1,",
+#'   "((G:1,H:1):1,(I:1,J:1):1):1):1):1);"))
 #'
 #' # Arbitrarily add a root.time value of 100 Ma:
 #' time_tree$root.time <- 100
 #'
-#' # Generate random tip states (0s and 1s):
-#' tip_states <- sample(c(0, 1), 10, replace = TRUE)
+#' # Build example tip state values:
+#' tip_states <- c(A = 0, B = 0, C = 1, D = 1, E = 0, F = 1, G = 1, H = 1, I = 0, J = 1)
 #'
-#' # Add labels to tip states:
-#' names(tip_states) <- time_tree$tip.label
-#'
-#' # Get a single stochastic character map:
+#' # Run map_dollo_changes on data and store output:
 #' out <- map_dollo_changes(time_tree, tip_states)
 #'
 #' # View matrix of changes:
 #' out$changes
 #'
 #' # View stochastic character map (time spent in each state on each branch):
-#' out$scm
+#' out$stochastic_character_map
 #' @export map_dollo_changes
 map_dollo_changes <- function(time_tree, tip_states) {
 
@@ -214,6 +212,10 @@ map_dollo_changes <- function(time_tree, tip_states) {
 
         # Ensure root time is correct:
         new_tree <- fix_root_time(time_tree, new_tree)
+        
+        # Get tip and node counts for new tree:
+        n_new_tips <- ape::Ntip(phy = new_tree)
+        n_new_nodes <- ape::Nnode(phy = new_tree)
 
         # Update tip states for new pruned tree:
         new_tips <- tip_states[clade_members]
@@ -283,11 +285,8 @@ map_dollo_changes <- function(time_tree, tip_states) {
         # Update node names for original tree edge matrix:
         for (i in (n_tips + 1):(n_tips + n_nodes)) original_edges[which(x = original_edges == i)] <- paste(sort(x = time_tree$tip.label[strap::FindDescendants(n = i, tree = time_tree)]), collapse = "")
 
-        n_new_tips <- ape::Ntip(phy = new_tree)
-        n_new_nodes <- ape::Nnode(phy = new_tree)
-
         # Update node names for pruned tree edge matrix:
-        for (i in (+1):(n_new_tips + n_new_nodes)) new_edges[which(x = new_edges == i)] <- paste(sort(x = new_tree$tip.label[strap::FindDescendants(n = i, tree = new_tree)]), collapse = "")
+        for (i in (n_new_tips + 1):(n_new_tips + n_new_nodes)) new_edges[which(x = new_edges == i)] <- paste(sort(x = new_tree$tip.label[strap::FindDescendants(n = i, tree = new_tree)]), collapse = "")
 
         # Collapse original edge matrix to from-to straings for matching:
         original_edges <- apply(original_edges, 1, paste, collapse = "%%TO%%")
