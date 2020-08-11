@@ -31,7 +31,7 @@
 #' # Make time-scaled first MPT for Day 2016 data set:
 #' time_tree <- ape::read.tree(text = paste0("(Biarmosuchus_tener:0.5,",
 #'   "(((Hipposaurus_boonstrai:3.5,(Bullacephalus_jacksoni:0.75,",
-#'   "Pachydectes_elsi:0.75):0.75):0.75,(Lemurosaurus_pricei:7.166666667",
+#'   "Pachydectes_elsi:0.75):0.75):0.75,(Lemurosaurus_pricei:7.166666667,",
 #'   "(Lobalopex_mordax:4.333333333,((Lophorhinus_willodenensis:3.666666667,",
 #'   "(Proburnetia_viatkensis:0.8333333333,(Lende_chiweta:2,",
 #'   "(Paraburnetia_sneeubergensis:1,Burnetia_mirabilis:2):1):1.833333333)",
