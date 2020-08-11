@@ -16,11 +16,13 @@
 #'
 #' @details
 #'
-#' At its' core the function uses either the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package (for discrete characters) or the \link{ace} function in the \link{ape} package (for continuous characters) to make ancestral state estimates. For discrete characters these are collapsed to the most likely state (or states, given equal likelihoods or likelihood within a defined threshold value). In the latter case the resulting states are represented as an uncertainty (i.e., states separated by a slash, e.g., 0/1. This is the method used by Brusatte et al. (2014).
+#' At its' core the function uses either the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package (for discrete characters) or the \link{ace} function in the \link{ape} package (for continuous characters) to make ancestral state estimates. For discrete characters these are collapsed to the most likely state (or states, given equal likelihoods or likelihood within a defined \code{threshold} value). In the latter case the resulting states are represented as an uncertainty (i.e., states separated by a slash, e.g., 0/1). This is the method developed for Brusatte et al. (2014).
 #'
-#' The method can deal with ordered or unordered characters and does so by allowing only indirect transitions (from 0 to 2 must pass through 1) or direct transitions (from 0 straight to 2), respectively. However, more complex step matrix transitions are not currently supported.
+#' The function can deal with ordered or unordered characters and does so by allowing only indirect transitions (from 0 to 2 must pass through 1) or direct transitions (from 0 straight to 2), respectively. However, more complex step matrix transitions are not currently supported.
 #'
-#' Ancestral state estimation is complicated where polymorphic or
+#' Ancestral state estimation is complicated where polymorphic or uncertain tip values exist. These are not currently well handled here, although see the \code{fitpolyMk} function in \link{phytools} for a way these could be dealt with in future. The only available options right now are to either treat multiple states as being equally probable of the "true" tip state (i.e., a uniform prior) or to avoid dealing with them completely by treating them as missing (NA) values.
+#'
+#' It is also possible to try to use phylogenetic information to infer missing states, both for internal nodes (e.g., those leading to missing tip states) and for tips. This is captured by the \code{estimate_all_nodes} and \code{estimate_tip_values} options. These have been partially explored by Lloyd (2018), who cuationed against their use.
 #'
 #' @return
 #'
@@ -30,9 +32,11 @@
 #'
 #' @references
 #'
-#' Brusatte, S. L., Lloyd, G. T., Wang, S. C. and Norell, M. A., 2014. Gradual assembly of avian body plan culminated in rapid rates of evolution across dinosaur-bird transition. Current Biology, 24, 2386-2392.
+#' Brusatte, S. L., Lloyd, G. T., Wang, S. C. and Norell, M. A., 2014. Gradual assembly of avian body plan culminated in rapid rates of evolution across dinosaur-bird transition. \emph{Current Biology}, 24, 2386-2392.
 #'
-#' Yang, Z., Kumar, S. and Nei, M., 1995. A new method of inference of ancestral nucleotide and amino acid sequences. Genetics, 141, 1641-1650.
+#' Lloyd, G. T., 2018. Journeys through discrete-character morphospace: synthesizing phylogeny, tempo, and disparity. \emph{Palaeontology}, \bold{61}, 637-645.
+#'
+#' Yang, Z., Kumar, S. and Nei, M., 1995. A new method of inference of ancestral nucleotide and amino acid sequences. \emph{Genetics}, \bold{141}, 1641-1650.
 #'
 #' @examples
 #'
@@ -72,8 +76,6 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   # Handle all missing/inapplicable case properly
   # Handle only two tips case properly
   # Add Liam Revell polymorphism options
-  # Finish trailing off help file!
-  # Add Lloyd 2018 citation
 
   # Get number of tips in tree:
   n_tips <- ape::Ntip(phy = time_tree)
