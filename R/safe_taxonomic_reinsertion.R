@@ -11,13 +11,17 @@
 #'
 #' @details
 #'
-#' TEXT NEEDED!
+#' The problem with Safe Taxonomic Reduction (\link{safe_taxonomic_reduction}) is that it generates trees without the safely removed taxa, but typically the user will ultimately want to include these taxa and thus there is also a need to perform "Safe Taxonomic Reinsertion".
 #'
-#' OPERATES ON TEXT FILES, NOT APE IMPORTED TREES AS ASSUMES VERY LARGE FILES AND HENCE WILL BE SLOW IF RUN ON APE FORMAT TREES
+#' This function performs that task, given a Newick-formatted tree file and a list of the taxa that were safely removed and the senior taxon and rule used to do so (i.e., the \code{$str_taxa} part of the output from \link{safe_taxonomic_reduction}).
+#'
+#' Note that this function operates on tree files rather than reading the trees directly into R (e.g., with \link{ape}'s \linkl{read.tree} or \link{read.nexus} functions) as in practice this turned out to be impractically slow for the types of data sets this function is intended for (supertrees or metatrees). Importantly this means the function operates on raw Newick text strings and hence will only work on data where there is no extraneous information encoded in the Newick string, such as node labels or branch lengths.
+#'
+#' Furthermore, in some cases safely removed taxa will have multiple taxa with which they can be safely placed. These come in two forms. Firstly, the multiple taxa can already form a clade, in which case the safely removed taxon will be reinserted in a polytomy with these taxa. In other words, the user should be aware that the function can result in non-bifurcating trees even if the input trees are all fully bifurcating. Secondly, the safely removed taxon can have multiple positions on the tree where it can be safely reinserted. As this generates ambiguity, by default (\code{multiple_placement_option = "exclude"}) these taxa will simply not be reinserted. However, the user may wish to still incorporate these taxa and so an additional option (\code{multiple_placement_option = "random"}) allows these taxa to be inserted at any of its' possible positions, chosen at random for each input topology (to give a realistic sense of phylognetic uncertainty. (Note that an exhaustive list of all possible combinations of positions is not implemented as, again, in practice this turned out to generate unfeasibly large numbers of topologies for the types of applications this function is intended for.)
 #'
 #' @return
 #'
-#' Nothing is returned, but a new file (\code{output_filename}) is written.
+#' A vector of taxa which were not reinserted is returned (will be empty if all taxa have been reinserted) and a file is written to (\code{output_filename}).
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -27,17 +31,56 @@
 #'
 #' @examples
 #'
-#' # Nothing yet
+#' # Generate dummy four taxon trees (where taxa B, D and F were
+#' # previously safely excluded):
+#' trees <- ape::read.tree(text = c("(A,(C,(E,G)));", "(A,(E,(C,G)));"))
+#'
+#' # Write trees to file:
+#' ape::write.tree(phy = trees, file = "test_in.tre")
+#'
+#' # Make dummy safe taxonomic reduction taxon list:
+#' str_taxa <- matrix(data = c("B", "A", "rule_2b", "D", "C", "rule_2b",
+#'   "F", "A", "rule_2b", "F", "C", "rule_2b"), byrow = TRUE, ncol = 3,
+#'   dimnames = list(c(), c("junior", "senior", "rule")))
+#'
+#' # Show that taxa B and D have a single possible resinsertion position,
+#' # but that taxon F has two possible positions (with A or with C):
+#' str_taxa
+#'
+#' # Resinsert taxa safely (F will be excluded due to the ambiguity of
+#' # its' position - multiple_placement_option = "exclude"):
+#' safe_taxonomic_reinsertion(input_filename = "test_in.tre",
+#'   output_filename = "test_out.tre", str_taxa = str_taxa,
+#'   multiple_placement_option = "exclude")
+#'
+#' # Read in trees with F excluded:
+#' exclude_str_trees <- ape::read.tree(file = "test_out.tre")
+#'
+#' # Show first tree with B and D reinserted:
+#' ape::plot.phylo(x = exclude_str_trees[[1]])
+#'
+#' # Repeat, but now with F also reinserted with its' position (with
+#' # A or with C) chosen at random:
+#' safe_taxonomic_reinsertion(input_filename = "test_in.tre",
+#'   output_filename = "test_out.tre", str_taxa = str_taxa,
+#'   multiple_placement_option = "random")
+#'
+#' # Read in trees with F included:
+#' random_str_trees <- ape::read.tree(file = "test_out.tre")
+#'
+#' # Confirm F has now also been reinserted:
+#' ape::plot.phylo(x = random_str_trees[[1]])
+#'
+#' # Clean up example files:
+#' file.remove(file1 = "test_in.tre", file2 = "test_out.tre")
+#'
 #' @export safe_taxonomic_reinsertion
 safe_taxonomic_reinsertion <- function(input_filename, output_filename, str_taxa, multiple_placement_option = "exclude") {
 
   # Add some data checks!!!!!
 
-  # Ensure str list is formatted as characters:
-  str_taxa <- cbind(as.character(str_taxa[, "junior"]), as.character(str_taxa[, "senior"]), as.character(str_taxa[, "rule"]))
-
-  # Re-add column names:
-  colnames(x = str_taxa) <- c("junior", "senior", "rule")
+  # Ensure str taxa is formatted as characters:
+  str_taxa <- cbind(junior = as.character(str_taxa[, "junior"]), as.character(senior = str_taxa[, "senior"]), rule = as.character(str_taxa[, "rule"]))
 
   # Read in tree file as raw_text:
   raw_text <- readLines(input_filename)
@@ -194,5 +237,5 @@ safe_taxonomic_reinsertion <- function(input_filename, output_filename, str_taxa
   write(raw_text, output_filename)
 
   # Return non_reinserted_taxa:
-  list(non_reinserted_taxa = non_reinserted_taxa)
+  non_reinserted_taxa
 }
