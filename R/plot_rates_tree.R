@@ -7,7 +7,7 @@
 #' @param test_rates_output Rate output from \link{test_rates}.
 #' @param model_type The type of model to plot. Must be one of "branch" or "clade".
 #' @param model_number The number of the model you wish to visualise from the rate output.
-#' @param ... Other options to be passed to \link{geoscalePlot}.
+#' @param ... Other options to be passed to \link{plot}.
 #'
 #' @details
 #'

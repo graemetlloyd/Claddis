@@ -11,7 +11,7 @@ plot_rates_character(test_rates_output, model_number, ...)
 
 \item{model_number}{The number of the model you wish to visualise from the rate output.}
 
-\item{...}{Other options to be passed to \link{geoscalePlot}.}
+\item{...}{Other options to be passed to \link{plot}.}
 }
 \value{
 Nothing is returned, but a plot is produced.
