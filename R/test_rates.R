@@ -415,10 +415,10 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
   }
 
   # Get ages for each (tip and internal) node:
-  date_nodes <- date_nodes(time_tree = time_tree)
+  node_dates <- date_nodes(time_tree = time_tree)
 
   # Get branch ages (from and to):
-  branch_ages <- unname(cbind(date_nodes[as.character(time_tree$edge[, 1])], date_nodes[as.character(time_tree$edge[, 2])]))
+  branch_ages <- unname(cbind(node_dates[as.character(time_tree$edge[, 1])], node_dates[as.character(time_tree$edge[, 2])]))
 
   # Build edge list from node numbers (from-to) for each branch:
   edge_list <- lapply(X = apply(time_tree$edge, 1, list), function(x) {
@@ -442,7 +442,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
   for (i in 1:length(x = edge_list)) edge_list[[i]]$branch_type <- branch_types[i]
 
   # Find descendant edges for each internal node:
-  find_descendant_edgesForEachInternalNode <- lapply(X = as.list(x = node_numbers), find_descendant_edges, tree = time_tree)
+  find_descendant_edges_for_each_internal_node <- lapply(X = as.list(x = node_numbers), find_descendant_edges, tree = time_tree)
 
   # Get ancestral character states:
   ancestral_states <- estimate_ancestral_states(cladistic_matrix = cladistic_matrix, time_tree = time_tree, estimate_all_nodes = estimate_all_nodes, estimate_tip_values = estimate_tip_values, inapplicables_as_missing = inapplicables_as_missing, polymorphism_behaviour = polymorphism_behaviour, uncertainty_behaviour = uncertainty_behaviour, threshold = threshold, all_missing_allowed = all_missing_allowed)
@@ -630,7 +630,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
         character_changes[, "time"] <- unname(unlist(x = lapply(X = as.list(x = unique(x = character_changes[, "character"])), function(x) sort(x = character_changes[which(x = character_changes[, "character"] == x), "time"], decreasing = TRUE))))
 
         # Return sorted character changes:
-        return(character_changes)
+        character_changes
       }
 
       # Re-sort character change times so they occur in correct order:
@@ -770,7 +770,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
         # Build partitioned data for AIC:
         partitioned_data <- lapply(X = branch_partitions, function(x) {
           y <- cbind(partition = rep(NA, length(x = time_tree$edge.length)), rate = rep(NA, length(x = time_tree$edge.length)), changes = edge_changes, completeness = edge_completeness, duration = edge_durations)
-          y[, "rate"] <- as.numeric(gsub(pattern = NaN, replacement = 0, x = unlist(x = lapply(X = x, function(x) rep(sum(y[x, "changes"]) / (sum(y[x, "completeness"]) * sum(y[x, "duration"])), length(x = x))))[order(unlist(x = x))]))
+          y[, "rate"] <- as.numeric(gsub(pattern = NaN, replacement = 0, x = unlist(x = lapply(X = x, function(z) rep(sum(y[z, "changes"]) / (sum(y[z, "completeness"] * y[z, "duration"])), length(x = z))))[order(unlist(x = x))]))
           y[, "partition"] <- rep(1:length(x = x), unlist(x = lapply(X = x, length)))[order(unlist(x = x))]
           y
         })
@@ -824,7 +824,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
         # Build partitioned data for AIC:
         partitioned_data <- lapply(X = clade_partitions, function(x) {
           y <- cbind(partition = rep(NA, length(x = time_tree$edge.length)), rate = rep(NA, length(x = time_tree$edge.length)), changes = edge_changes, completeness = edge_completeness, duration = edge_durations)
-          y[, "rate"] <- as.numeric(gsub(pattern = NaN, replacement = 0, x = unlist(x = lapply(X = x, function(x) rep(sum(y[x, "changes"]) / (sum(y[x, "completeness"]) * sum(y[x, "duration"])), length(x = x))))[order(unlist(x = x))]))
+          y[, "rate"] <- as.numeric(gsub(pattern = NaN, replacement = 0, x = unlist(x = lapply(X = x, function(x) rep(sum(y[x, "changes"]) / (sum(y[x, "completeness"] * y[x, "duration"])), length(x = x))))[order(unlist(x = x))]))
           y[, "partition"] <- rep(1:length(x = x), unlist(x = lapply(X = x, length)))[order(unlist(x = x))]
           y
         })
@@ -912,7 +912,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
       # Build partitioned data for AIC:
       partitioned_data <- lapply(X = character_partitions, function(x) {
         y <- cbind(partition = rep(NA, max(character_numbers)), rate = rep(NA, max(character_numbers)), changes = character_changes, completeness = character_completeness, duration = character_durations)
-        y[, "rate"] <- as.numeric(gsub(pattern = NaN, replacement = 0, x = unlist(x = lapply(X = x, function(x) rep(sum(y[x, "changes"]) / (sum(y[x, "completeness"]) * sum(y[x, "duration"])), length(x = x))))[order(unlist(x = x))]))
+        y[, "rate"] <- as.numeric(gsub(pattern = NaN, replacement = 0, x = unlist(x = lapply(X = x, function(x) rep(sum(y[x, "changes"]) / (sum(y[x, "completeness"] * y[x, "duration"])), length(x = x))))[order(unlist(x = x))]))
         y[, "partition"] <- rep(1:length(x = x), unlist(x = lapply(X = x, length)))[order(unlist(x = x))]
         y
       })
@@ -1069,12 +1069,12 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
 #
 # time_tree <- time_tree[sample(1:100000, 100)]
 # time_tree <- lapply(X = time_tree, function(x) strap::DatePhylo(x, Ages, rlen = 2, method = "equal"))
-# class(Tree) <- "multiPhylo"
+# class(time_tree) <- "multiPhylo"
 #
-# time_tree <- Tree[[1]]
+# time_tree <- time_tree[[1]]
 # cladistic_matrix <- Matrix
 # time_bins <- time_bins
-# branch_partitions <- lapply(X = as.list(x = 1:nrow(tree$edge)), as.list)
+# branch_partitions <- lapply(X = as.list(x = 1:nrow(time_tree$edge)), as.list)
 # character_partitions <- list(list(1:91), list(Cranial = 1:81, Postcranial = 82:91))
 # clade_partitions <- lapply(X = as.list(x = ape::Ntip(phy = time_tree) + (2:ape::Nnode(phy = time_tree))), as.list)
 # time_partitions <- partition_time_bins(7)
@@ -1093,3 +1093,4 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
 # polymorphism_behaviour = "equalp"
 # uncertainty_behaviour = "equalp"
 # threshold = 0.01
+# all_missing_allowed = FALSE
