@@ -1,3 +1,19 @@
+Version - 0.6.0 - 2020-12-08
+
+- Fixed bug in write_tnt_matrix that would have thrown an error previously.
+- Finished renaming subvariables and subfunctions to meet tidyverse style guide formatting.
+- Ran styler on code.
+- Fixed example in edge length binning function so it makes more sense (no change to users).
+- Fixed bug in Dollo mapping function that would have thrown an error previously.
+- Fixed stochastic character mapping function manual which incorrectly listed root states output which is no encoded in changes matrix instead as a "zero" edge subtending teh whole tree.
+- Some minor tweaks to improve the character change plotting function.
+- Completed basic manual for ancestral state estimation function.
+- Made better examples for rate visualisation functions.
+- Fixed minor bug in write to NEXUS function that was adding weird spaces.
+- Fixed minor bug in matrix pruning function to ensure blocks are consistently numbered.
+- Added example and proper help file for safe taxonomic reinsertion function.
+- Fixed bug in rates test function that had partitions in wrong order.
+
 Version - 0.5.6 - 2020-05-08
 
 - Added testthat to Claddis (no change to users).
