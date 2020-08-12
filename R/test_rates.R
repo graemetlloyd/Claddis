@@ -776,7 +776,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
         })
 
         # Get AIC, AICc and rate results:
-        branch_test_results <- lapply(X = partitioned_data, function(x) list(rates = unname(unlist(x = lapply(X = as.list(x = unique(x = x[, "partition"])), function(y) x[x[, "partition"] == y, "rate"][1]))), aic = calculate_partition_aic(x), aicc = calculate_partition_aic(x, aicc = TRUE)))
+        branch_test_results <- lapply(X = partitioned_data, function(x) list(rates = unname(unlist(x = lapply(X = as.list(x = unique(x = sort(x = x[, "partition"]))), function(y) x[x[, "partition"] == y, "rate"][1]))), aic = calculate_partition_aic(x), aicc = calculate_partition_aic(x, aicc = TRUE)))
       }
 
       # Pack branch partitions to test into single strings for output:
@@ -830,7 +830,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
         })
 
         # Get AIC, AICc and rate results:
-        clade_test_results <- lapply(X = partitioned_data, function(x) list(rates = unname(unlist(x = lapply(X = as.list(x = unique(x = x[, "partition"])), function(y) x[x[, "partition"] == y, "rate"][1]))), aic = calculate_partition_aic(x), aicc = calculate_partition_aic(x, aicc = TRUE)))
+        clade_test_results <- lapply(X = partitioned_data, function(x) list(rates = unname(unlist(x = lapply(X = as.list(x = unique(x = sort(x = x[, "partition"]))), function(y) x[x[, "partition"] == y, "rate"][1]))), aic = calculate_partition_aic(x), aicc = calculate_partition_aic(x, aicc = TRUE)))
       }
 
       # Pack clade partitions to test into single strings for output:
@@ -918,7 +918,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
       })
 
       # Get AIC, AICc and rate results:
-      character_test_results <- lapply(X = partitioned_data, function(x) list(rates = unname(unlist(x = lapply(X = as.list(x = unique(x = x[, "partition"])), function(y) x[x[, "partition"] == y, "rate"][1]))), aic = calculate_partition_aic(x), aicc = calculate_partition_aic(x, aicc = TRUE)))
+      character_test_results <- lapply(X = partitioned_data, function(x) list(rates = unname(unlist(x = lapply(X = as.list(x = unique(x = sort(x = x[, "partition"]))), function(y) x[x[, "partition"] == y, "rate"][1]))), aic = calculate_partition_aic(x), aicc = calculate_partition_aic(x, aicc = TRUE)))
     }
 
     # Pack character partitions to test into single strings for output:
@@ -994,7 +994,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
       })
 
       # Get AIC, AICc and rate results:
-      time_test_results <- lapply(X = partitioned_data, function(x) list(rates = unname(unlist(x = lapply(X = as.list(x = unique(x = x[, "partition"])), function(y) x[x[, "partition"] == y, "rate"][1]))), aic = calculate_partition_aic(x), aicc = calculate_partition_aic(x, aicc = TRUE)))
+      time_test_results <- lapply(X = partitioned_data, function(x) list(rates = unname(unlist(x = lapply(X = as.list(x = unique(x = sort(x = x[, "partition"]))), function(y) x[x[, "partition"] == y, "rate"][1]))), aic = calculate_partition_aic(x), aicc = calculate_partition_aic(x, aicc = TRUE)))
     }
 
     # Pack time bin partitions to test into single strings for output:
