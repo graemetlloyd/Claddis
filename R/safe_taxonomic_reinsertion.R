@@ -80,7 +80,7 @@ safe_taxonomic_reinsertion <- function(input_filename, output_filename, str_taxa
   # Add some data checks!!!!!
 
   # Ensure str taxa is formatted as characters:
-  str_taxa <- cbind(junior = as.character(str_taxa[, "junior"]), as.character(senior = str_taxa[, "senior"]), rule = as.character(str_taxa[, "rule"]))
+  str_taxa <- cbind(junior = as.character(str_taxa[, "junior"]), senior = as.character(str_taxa[, "senior"]), rule = as.character(str_taxa[, "rule"]))
 
   # Read in tree file as raw_text:
   raw_text <- readLines(input_filename)
