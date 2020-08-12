@@ -155,11 +155,11 @@ prune_cladistic_matrix <- function(cladistic_matrix, blocks2prune = c(), charact
 
     # Remove blocks to be rpuned:
     cladistic_matrix <- cladistic_matrix[-(new_blocks_to_delete + 1)]
-
-    # Rename (renumber) remaining matrix blocks:
-    names(cladistic_matrix[2:length(x = cladistic_matrix)]) <- paste("matrix_", 1:(length(x = cladistic_matrix) - 1), sep = "")
   }
+  
+  # Rename (renumber) matrix blocks to ensure consistent output:
+  names(cladistic_matrix[2:length(x = cladistic_matrix)]) <- paste("matrix_", 1:(length(x = cladistic_matrix) - 1), sep = "")
 
   # Return pruned matrix:
-  return(cladistic_matrix)
+  cladistic_matrix
 }
