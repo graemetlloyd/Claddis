@@ -30,6 +30,7 @@ Calculated rates (changes per lineage million years) are plotted as filled circl
 }
 \examples{
 
+\donttest{
 # Make time-scaled first MPT for Day 2016 data set:
 time_tree <- ape::read.tree(text = paste0("(Biarmosuchus_tener:0.5,",
   "(((Hipposaurus_boonstrai:3.5,(Bullacephalus_jacksoni:0.75,",
@@ -65,6 +66,7 @@ plot_rates_time(
   model_number = 97, units = "Stage", cex.ts = 1, cex.age = 1,
   abbrev = "Stage"
 )
+}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

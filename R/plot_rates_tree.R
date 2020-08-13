@@ -29,6 +29,7 @@
 #'
 #' @examples
 #'
+#' \donttest{
 #' # Make time-scaled first MPT for Day 2016 data set:
 #' time_tree <- ape::read.tree(text = paste0("(Biarmosuchus_tener:0.5,",
 #'   "(((Hipposaurus_boonstrai:3.5,(Bullacephalus_jacksoni:0.75,",
@@ -76,6 +77,7 @@
 #'   test_rates_output = test_rates_output,
 #'   model_type = "clade", model_number = 3
 #' )
+#' }
 #' @export plot_rates_tree
 plot_rates_tree <- function(test_rates_output, model_type, model_number, ...) {
 
