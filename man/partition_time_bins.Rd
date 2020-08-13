@@ -20,7 +20,7 @@ Generates all possible contiguous partitions of N time bins.
 \details{
 This function is designed for use with the \link{test_rates} function and generates all possible contiguous partitions of N time bins. This allows use of an information criterion like AIC to pick a "best" partition, weighing fit and partition number simultaneously.
 
-You can also ask for only partitions of a specific number using the \code{partition_sizes_to_include} option. For example, \code{partition_sizes_to_include = c(0, 1, 2)} will only return partitions of 1, 2, or 3 sets of elements.
+You can also ask for only partitions of a specific number using the \code{partition_sizes_to_include} option. For example, \code{partition_sizes_to_include = c(1, 2, 3)} will only return partitions of 1, 2, or 3 sets of elements.
 }
 \examples{
 
