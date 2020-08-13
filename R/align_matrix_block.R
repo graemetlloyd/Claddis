@@ -46,7 +46,7 @@
 #' x
 #'
 #' # Align block and place on clipboard:
-#' \donttest{
+#' \dontrun{
 #' align_matrix_block(x)
 #' }
 #'
