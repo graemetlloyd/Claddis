@@ -22,7 +22,7 @@ You can install Claddis in R via CRAN with:
 install.packages("Claddis", dependencies = TRUE)
 ```
 
-Or from github with:
+Or from GitHub with:
 
 ```r
 devtools::install_github("graemetlloyd/Claddis")
