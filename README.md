@@ -8,6 +8,14 @@ version](https://www.r-pkg.org/badges/version/Claddis)](https://cran.r-project.o
 
 Claddis is an R package designed to import cladistic-type data sets (#NEXUS format) into R and perform disparity and rate tests.
 
+# Version
+
+Claddis is on [CRAN](https://cran.r-project.org/package=Claddis) (version 0.3.4) but is currently (13/08/20) far behind the latest GitHub version (version 0.6.0). It is recommended that you install from GitHub presently.
+
+Please also consult the CHANGELOG file for all updates (including new functions, features and bug fixes) to Claddis.
+
+# Installation
+
 You can install Claddis in R via CRAN with:
 
 ```r
@@ -26,6 +34,8 @@ And load it into memory using:
 library(Claddis)
 ```
 
+# Help
+
 Basic help can be found with:
 
 ```r
@@ -34,15 +44,16 @@ Basic help can be found with:
 
 And clicking on the Index link at the base of the help file will reveal links to every available function.
 
-Note that I have previously produced various tutorials for the package, but that current substantial reworking of the core code means these will no longer work and so the example code in each function's help file is the current best substitute for this.
+# Tutorials
 
-Citation
-========
+Note that I have previously linked to tutorials for the package here, but substantial reworking of the core code means these will no longer work and so currently the example code in each function's help file is the best substitute for this. New tutorials will eventually be produced and shared here.
 
-Claddis is on [CRAN](https://cran.r-project.org/package=Claddis) (version 0.3.4) but is currently (03.08/20) far behind the latest GitHub version (version 0.5.5).
+# Citation
 
-The first formal paper describing Claddis was published as Lloyd (2016), with further discussion in Lloyd (2018):
+The first formal paper describing Claddis was published as Lloyd (2016):
 
 Lloyd, G. T., 2016. Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. *Biological Journal of the Linnean Society*, **118**, 131-151.
+
+The effects of ancestral state estimation choices on phylomorphospaces was discussed in Lloyd (2018):
 
 Lloyd, G. T., 2018. Journeys through discrete-character morphospace: synthesizing phylogeny, tempo, and disparity. *Palaeontology*, **61**, 637-645.
