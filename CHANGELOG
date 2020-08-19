@@ -1,3 +1,6 @@
+- Major upgrades to basic morphospace plotting function, including more options, cleaner plotting, better manual and examples.
+- Added rgb to imports list (no change to user).
+
 Version - 0.6.0 - 2020-12-08
 
 - Fixed bug in write to TNT function that would have thrown an error previously.
