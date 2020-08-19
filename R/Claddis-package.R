@@ -33,7 +33,7 @@
 #' @importFrom gdata trim
 #' @importFrom geoscale geoscalePlot
 #' @importFrom graphics layout legend lines par plot points polygon text
-#' @importFrom grDevices adjustcolor chull hcl.colors
+#' @importFrom grDevices adjustcolor chull hcl.colors rgb
 # @importFrom rgl plot3d lines3d points3d text3d view3d # Still breaks Claddis so moved to suggests for now
 #' @importFrom stats as.dist dist dpois pchisq runif var
 #' @importFrom utils combn
