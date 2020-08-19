@@ -9,10 +9,18 @@ plot_morphospace(
   x_axis = 1,
   y_axis = 2,
   z_axis = NULL,
+  taxon_groups = NULL,
   plot_taxon_names = FALSE,
+  plot_convex_hulls = FALSE,
   plot_internal_nodes = FALSE,
+  plot_edges = TRUE,
   plot_root = TRUE,
-  root_colour = "grey"
+  root_colour = "red",
+  palette = "viridis",
+  plot_group_legend = TRUE,
+  group_legend_position = "top_right",
+  plot_z_legend = TRUE,
+  z_legend_position = "bottom_right"
 )
 }
 \arguments{
@@ -24,38 +32,109 @@ plot_morphospace(
 
 \item{z_axis}{Which ordination axis to plot as the z-axis (defaults to NULL, i.e., is not plotted).}
 
-\item{plot_taxon_names}{Optional to plot the names of the taxa (defaults to FALSE).}
+\item{taxon_groups}{A named list of groups to which taxa are assigned (optional). This is used to plot points or convex hulls in different colours corresponding to each group. As the user names the groups these can represent any grouping of interest (e.g., taxonomic, ecological, temporal, spatial).}
 
-\item{plot_internal_nodes}{Optional to plot the internal nodes of the tree (if included in \code{pcoa_input}) (defaults to FALSE).}
+\item{plot_taxon_names}{Logical indicating whether to plot the names of the taxa (defaults to FALSE).}
 
-\item{plot_root}{Optional to plot the root separately (defaults to FALSE).}
+\item{plot_convex_hulls}{Logical indicating whether to plot convex hulls around any taxon_groups (if used).}
+
+\item{plot_internal_nodes}{Logical indicating whether to plot the internal nodes of the tree (if included in \code{pcoa_input}) (defaults to FALSE).}
+
+\item{plot_edges}{Logical indicating whether to plot the branches of the tree (if included in \code{pcoa_input}) (defaults to TRUE).}
+
+\item{plot_root}{Logical indicating whether to plot the root separately (defaults to FALSE).}
 
 \item{root_colour}{If plotting the root separately (previous option) sets the root colour.}
+
+\item{palette}{The palette to use for plotting each element of taxon_groups. See \link[grDevices]{palette}.}
+
+\item{plot_group_legend}{Logical indicating whether to plot a legend for taxon_groups. (Default is TRUE.)}
+
+\item{group_legend_position}{Position to plot the group legend. Must be one of \code{bottom_left}, \code{bottom_right}, \code{top_left}, or \code{top_right} (the default).}
+
+\item{plot_z_legend}{Logical indicating whether to plot a legend for the z-axis. (Default is TRUE.)}
+
+\item{z_legend_position}{Position to plot the group legend. Must be one of \code{bottom_left}, \code{bottom_right} (the default), \code{top_left}, or \code{top_right}.}
 }
 \description{
 Plots a morphospace using the output from ordinate_cladistic_matrix.
 }
 \details{
-Uses output from \link{ordinate_cladistic_matrix} as input.
+Uses output from \link{ordinate_cladistic_matrix} to make morphospace plots.
 
-Allows plotting of a third axis using the technique of Wills et al. (1994; their Figures 4 and 8; Wills 1998; his Figure 4), where black and white indicate positive and negative values respectively, and the size of points there magnitudes.
+Allows plotting of a third axis using the technique of Wills et al. (1994; their Figures 4 and 8; Wills 1998; his Figure 4), where solid and open indicate positive and negative values respectively, and the size of points their magnitudes.
+
+Will automatically generate phylomorphospaces if a tree was included in the ordination.
+
+Can also plot groups of points - whether they represent taxonomic, ecological, temporal, or spatial groupings - in different colours as well as plot translucent convex hulls around these groups, by using the \code{taxon_groups} and \code{plot_convex_hulls = TRUE} options, respectively. Note that \code{taxon_groups} should be in the form of a named list (see example below for how these should be formatted).
+
+Various other options allow toggling of particular features on or off. For example, the taxon names can be shown with \code{plot_taxon_names = TRUE}.
+
+Note that some features will generate legends that may initially appear to disappear off the sides of the plot, but simple resizing of the plot window (or increasing the width:height ratio if outputting to a file) should fix this.
 }
 \examples{
 
-# Set random seed:
-set.seed(4)
+\donttest{
+# Perform a PCoA ordination on the day_2016 data set:
+pcoa_input <- ordinate_cladistic_matrix(cladistic_matrix = day_2016)
 
-# Generate a random tree for the Michaux 1989 data set:
-time_tree <- ape::rtree(n = length(x = rownames(x = michaux_1989$matrix_1$matrix)))
+# Plot this as a simple bivarate morphospace:
+plot_morphospace(pcoa_input)
 
-# Add taxon names to the tree:
-time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
+# Use the Wills technique to add a third axis (PC3):
+plot_morphospace(pcoa_input, z_axis = 3)
 
-# Perform a phylogenetic Principal Coordinates Analysis:
-pcoa_input <- ordinate_cladistic_matrix(cladistic_matrix = michaux_1989, time_tree = time_tree)
+# You may need to resize the plot to see the legend for the z-axis
 
-# Plot the results:
-plot_morphospace(pcoa_input = pcoa_input, plot_taxon_names = TRUE)
+# Add taxon names as well:
+plot_morphospace(pcoa_input, z_axis = 3, plot_taxon_names = TRUE)
+
+# Define some simple taxon groups for the data as a named list:
+taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener",
+  "Hipposaurus_boonstrai", "Bullacephalus_jacksoni", "Pachydectes_elsi",
+  "Niuksenitia_sukhonensis", "Ictidorhinus_martinsi", "RC_20",
+  "Herpetoskylax_hopsoni", "Lycaenodon_longiceps"),
+  Burnetiamorpha = c("Lemurosaurus_pricei", "Lobalopex_mordax",
+  "Lophorhinus_willodenensis", "Proburnetia_viatkensis", "Lende_chiweta",
+  "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098"))
+
+# Plot taxon groups including convex hulls:
+plot_morphospace(pcoa_input, z_axis = 3, plot_taxon_names = TRUE,
+  taxon_groups = taxon_groups, plot_convex_hulls = TRUE)
+
+# Make time-scaled first MPT for Day 2016 data set:
+time_tree <- ape::read.tree(text = paste0("(Biarmosuchus_tener:0.5,",
+  "(((Hipposaurus_boonstrai:3.5,(Bullacephalus_jacksoni:0.75,",
+  "Pachydectes_elsi:0.75):0.75):0.75,(Lemurosaurus_pricei:7.166666667,",
+  "(Lobalopex_mordax:4.333333333,((Lophorhinus_willodenensis:3.666666667,",
+  "(Proburnetia_viatkensis:0.8333333333,(Lende_chiweta:2,",
+  "(Paraburnetia_sneeubergensis:1,Burnetia_mirabilis:2):1):1.833333333)",
+  ":0.8333333333):0.8333333333,(BP_1_7098:2.25,Niuksenitia_sukhonensis:",
+  "1.25):1.25):0.8333333333):0.8333333333):3.083333333):1.95,",
+  "(Ictidorhinus_martinsi:15.9,(RC_20:11.6,(Herpetoskylax_hopsoni:11.3,",
+  "Lycaenodon_longiceps:0.3):0.3):0.3):0.3):0.3);"))
+
+# Add root age to tree:
+time_tree$root.time <- 269.5
+
+# Make new ordination with tree included (enabling phylomorphospace):
+pcoa_input <- ordinate_cladistic_matrix(cladistic_matrix = day_2016, time_tree = time_tree)
+
+# Plot this as a simple bivarate phylomorphospace:
+plot_morphospace(pcoa_input)
+
+# Use the Wills technique to add a third axis (PC3):
+plot_morphospace(pcoa_input, z_axis = 3)
+
+# You may need to resize the plot to see the legend for the z-axis
+
+# Add taxon names as well:
+plot_morphospace(pcoa_input, z_axis = 3, plot_taxon_names = TRUE)
+
+# Add taxon groups including convex hulls:
+plot_morphospace(pcoa_input, z_axis = 3, plot_taxon_names = TRUE,
+  taxon_groups = taxon_groups, plot_convex_hulls = TRUE)
+}
 }
 \references{
 Wills, M. A., 1998. Cambrian and Recent disparity: the picture from priapulids. \emph{Paleobiology}, \bold{24}, 177-199.
