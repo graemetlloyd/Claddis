@@ -1,6 +1,8 @@
 - Major upgrades to basic morphospace plotting function, including more options, cleaner plotting, better manual and examples.
 - Added rgb to imports list (no change to user).
 - Major upgrades to multiple morphospace function, including applying a universal scale so aspect ratio is preserved across all plots, allowing plotting of a group legend and betetr example and manual sections.
+- Addition of new function to assign taxa to a series of time bins. This allows automated assignment to temporal groups for use with the disparity plotting functions.
+- Added see also sections to the various disparity plotting functions to better communicate plotting options.
 
 Version - 0.6.0 - 2020-12-08
 
