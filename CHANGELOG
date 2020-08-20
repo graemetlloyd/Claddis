@@ -1,5 +1,6 @@
 - Major upgrades to basic morphospace plotting function, including more options, cleaner plotting, better manual and examples.
 - Added rgb to imports list (no change to user).
+- Major upgrades to multiple morphospace function, including applying a universal scale so aspect ratio is preserved across all plots, allowing plotting of a group legend and betetr example and manual sections.
 
 Version - 0.6.0 - 2020-12-08
 
