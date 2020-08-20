@@ -7,40 +7,87 @@
 plot_multi_morphospace(
   pcoa_input,
   n_axes = 4,
+  taxon_groups = NULL,
   plot_taxon_names = FALSE,
+  plot_convex_hulls = FALSE,
   plot_internal_nodes = FALSE,
+  plot_edges = TRUE,
   plot_root = TRUE,
-  root_colour = "grey"
+  root_colour = "red",
+  palette = "viridis",
+  plot_group_legend = TRUE
 )
 }
 \arguments{
-\item{pcoa_input}{The main input in the format output from \link{ordinate_cladistic_matrix}.}
+\item{pcoa_input}{The main input in the format outputted from \link{ordinate_cladistic_matrix}.}
 
 \item{n_axes}{An integer indicating the total number of axes to plot (should minimally be three).}
 
-\item{plot_taxon_names}{Optional to plot the names of the taxa (defaults to FALSE).}
+\item{taxon_groups}{See \link{plot_morphospace}.}
 
-\item{plot_internal_nodes}{Optional to plot the internal nodes of the tree (if included in \code{pcoa_input}) (defaults to FALSE).}
+\item{plot_taxon_names}{See \link{plot_morphospace}.}
 
-\item{plot_root}{Optional to plot the root separately (defaults to FALSE).}
+\item{plot_convex_hulls}{See \link{plot_morphospace}.}
 
-\item{root_colour}{If plotting the root separately (previous option) sets the root colour.}
+\item{plot_internal_nodes}{See \link{plot_morphospace}.}
+
+\item{plot_edges}{See \link{plot_morphospace}.}
+
+\item{plot_root}{See \link{plot_morphospace}.}
+
+\item{root_colour}{See \link{plot_morphospace}.}
+
+\item{palette}{See \link{plot_morphospace}.}
+
+\item{plot_group_legend}{See \link{plot_morphospace}.}
 }
 \description{
-Plots morphospaces for any number of axes.
+Plots multiple morphospaces up to a given number of ordination axes.
 }
 \details{
-Takes output from \link{ordinate_cladistic_matrix} as input and serves as a wrapper function for \link{plot_morphospace}.
+Takes the output from \link{ordinate_cladistic_matrix} and uses \link{plot_morphospace} to plot the first N ordination axes.
 
-Plots multiple bivariate plots of ordination axes starting with 1 and up to N, such that every possible bivariate plot is produced.
+This allows the user a better appreciation of how variance is distributed across multiple axes and all plots are scaled the saem way to further aid visualisation. Data will seem to "shrink" towards the centre of the space on higher axes as variance decreases.
+
+Most of the options are simply passed to \link{plot_morphospace}, but the full range is not available as many will be inappropriate here (e.g., adding a z-axis).
 }
 \examples{
 
-# Create PCOA data:
-pcoa_input <- ordinate_cladistic_matrix(michaux_1989)
+# Make PCoA for Day 2016 data set:
+pcoa_input <- ordinate_cladistic_matrix(cladistic_matrix = day_2016)
 
-# Plot first three axes:
-plot_multi_morphospace(pcoa_input = pcoa_input, n_axes = 3)
+# Define some simple taxon groups for the data as a named list:
+taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener",
+   "Hipposaurus_boonstrai", "Bullacephalus_jacksoni", "Pachydectes_elsi",
+   "Niuksenitia_sukhonensis", "Ictidorhinus_martinsi", "RC_20",
+   "Herpetoskylax_hopsoni", "Lycaenodon_longiceps"),
+   Burnetiamorpha = c("Lemurosaurus_pricei", "Lobalopex_mordax",
+   "Lophorhinus_willodenensis", "Proburnetia_viatkensis", "Lende_chiweta",
+   "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098"))
+
+# Plot taxon groups including convex hulls:
+plot_multi_morphospace(pcoa_input, n_axes = 5, taxon_groups = taxon_groups,
+  plot_convex_hulls = TRUE)
+
+# Make time-scaled first MPT for Day 2016 data set:
+time_tree <- ape::read.tree(text = paste0("(Biarmosuchus_tener:0.5,",
+  "(((Hipposaurus_boonstrai:3.5,(Bullacephalus_jacksoni:0.75,",
+  "Pachydectes_elsi:0.75):0.75):0.75,(Lemurosaurus_pricei:7.166666667,",
+  "(Lobalopex_mordax:4.333333333,((Lophorhinus_willodenensis:3.666666667,",
+  "(Proburnetia_viatkensis:0.8333333333,(Lende_chiweta:2,",
+  "(Paraburnetia_sneeubergensis:1,Burnetia_mirabilis:2):1):1.833333333)",
+  ":0.8333333333):0.8333333333,(BP_1_7098:2.25,Niuksenitia_sukhonensis:",
+  "1.25):1.25):0.8333333333):0.8333333333):3.083333333):1.95,",
+  "(Ictidorhinus_martinsi:15.9,(RC_20:11.6,(Herpetoskylax_hopsoni:11.3,",
+  "Lycaenodon_longiceps:0.3):0.3):0.3):0.3):0.3);"))
+
+# Add root age to tree:
+time_tree$root.time <- 269.5
+
+# Make same plot as before but with a phylogeny:
+plot_multi_morphospace(pcoa_input, n_axes = 5, taxon_groups = taxon_groups,
+  plot_convex_hulls = TRUE)
+
 }
 \author{
 Emma Sherratt \email{emma.sherratt@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@gmail.com}
