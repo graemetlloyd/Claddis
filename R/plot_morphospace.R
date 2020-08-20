@@ -100,7 +100,7 @@
 #'   "Niuksenitia_sukhonensis"))
 #'
 #' # Prune incomplete taxa from cladistic matrix:
-#' prune_cladistic_matrix(cladistic_matrix = day_2016,
+#' cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix = day_2016,
 #'   taxa2prune = c("Lycaenodon_longiceps", "Niuksenitia_sukhonensis"))
 #'
 #' # Note: the above pruning is simply to run this example and should not be
