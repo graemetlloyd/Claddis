@@ -8,7 +8,7 @@
 #' @param x_axis Which ordination axis to plot as the x-axis (defaults to 1).
 #' @param y_axis Which ordination axis to plot as the y-axis (defaults to 2).
 #' @param z_axis Which ordination axis to plot as the z-axis (defaults to NULL, i.e., is not plotted).
-#' @param taxon_groups A named list of groups to which taxa are assigned (optional). This is used to plot points or convex hulls in different colours corresponding to each group. As the user names the groups these can represent any grouping of interest (e.g., taxonomic, ecological, temporal, spatial).
+#' @param taxon_groups A named list of groups to which taxa are assigned (optional). This is used to plot points or convex hulls in different colours corresponding to each group. As the user names the groups these can represent any grouping of interest (e.g., taxonomic, ecological, temporal, spatial). \link{assign_taxa_to_bins} can automate temporal assignments.
 #' @param plot_taxon_names Logical indicating whether to plot the names of the taxa (defaults to FALSE).
 #' @param plot_convex_hulls Logical indicating whether to plot convex hulls around any taxon_groups (if used).
 #' @param plot_internal_nodes Logical indicating whether to plot the internal nodes of the tree (if included in \code{pcoa_input}) (defaults to FALSE).
