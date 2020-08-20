@@ -7,7 +7,9 @@
 assign_taxa_to_bins(taxon_ages, named_time_bins)
 }
 \arguments{
-\item{matrix_block}{The matrix block as raw input text.}
+\item{taxon_ages}{A matrix of taxon ages, with columns for first (\code{"fad"}) and last (\code{"lad"}) appearances and rownames correspodning to taxon names.}
+
+\item{named_time_bins}{A similar matrix of time bins, with columns for bottom (\code{"fad"}) and top (\code{"lad"}) ages and rownames corresponding to time bin names (e.g., geologic stages or other unit names).}
 }
 \value{
 A named list of taxa assigned to time bins.

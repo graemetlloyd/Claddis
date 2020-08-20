@@ -4,7 +4,8 @@
 #'
 #' Given a set of first and last appearances assigns a set of taxa to a series of time bins.
 #'
-#' @param matrix_block The matrix block as raw input text.
+#' @param taxon_ages A matrix of taxon ages, with columns for first (\code{"fad"}) and last (\code{"lad"}) appearances and rownames correspodning to taxon names.
+#' @param named_time_bins A similar matrix of time bins, with columns for bottom (\code{"fad"}) and top (\code{"lad"}) ages and rownames corresponding to time bin names (e.g., geologic stages or other unit names).
 #'
 #' @details
 #'
