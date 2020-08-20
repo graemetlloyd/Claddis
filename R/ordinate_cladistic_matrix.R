@@ -51,6 +51,10 @@
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
+#' @seealso
+#'
+#' \link{assign_taxa_to_bins}, \link{plot_chronophylomorphospace}, \link{plot_morphospace_stack}, \link{plot_morphospace}, \link{plot_multi_morphospace}
+#'
 #' @references
 #'
 #' Cailliez, F., 1983. The analytical solution of the additive constant problem. \emph{Psychometrika}, \bold{48}, 305-308.

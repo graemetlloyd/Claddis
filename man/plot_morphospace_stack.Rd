@@ -18,7 +18,7 @@ plot_morphospace_stack(
 \arguments{
 \item{ordination_axes}{A matrix of the ordination axes supplied (rownames should be object names). First column should be values for first axis, second for second axis and so on.}
 
-\item{ages}{A two-column matrix of the first and last apperance dates for the taxa in the same format supplied to \link{DatePhylo}.}
+\item{ages}{A two-column matrix of the first and last apperance dates for the taxa in the same format supplied to \link[strap]{DatePhylo}.}
 
 \item{groups}{A vector of colours (for plotting) for each object name.}
 
@@ -36,11 +36,11 @@ plot_morphospace_stack(
 Plots a stack of ordination spaces representing multiple time-slices.
 }
 \details{
-This style of plot is taken from various papers by Michael Foote (Foote 1993; his Figures 2, 4, 6, 8, 10, 12, and 14; Foote 1994; his Figure 2; Foote 1995; his Figure 3; Foote 1999; his Figure 22), and can be seen elsehwere in the litarture (e.g., Friedman and Coates 2006; their Figure 2c).
+This style of plot is taken from various papers by Michael Foote (Foote 1993; his Figures 2, 4, 6, 8, 10, 12, and 14; Foote 1994; his Figure 2; Foote 1995; his Figure 3; Foote 1999; his Figure 22), and can be seen elsewhere in the literature (e.g., Friedman and Coates 2006; their Figure 2c).
 
-Here multiple ordination (or morpho-) spaces are plotted as a seriours of successive "stacks" representing specific intervals of time. Following geologic conventions the oldest time-slice is plotted at the base and the sequence gets younger towards the top.
+Here multiple ordination (or morpho-) spaces are plotted as a series of successive "stacks" representing specific intervals of time. Following geologic conventions the oldest time-slice is plotted at the base and the sequence gets younger towards the top.
 
-Note that the user needs to supply three pieces of data: 1) a matrix representing the ordination axes (NB: these can come from any source, they do not have to be from \link{Claddis} functions), 2) a set of ages (first adn last appearances) in the same format as required by the \link{DatePhylo} function in the \link{strap} library, and 3) a vector of ages marking the boundaries of the time-slices.
+Note that the user needs to supply three pieces of data: 1) a matrix representing the ordination axes (NB: these can come from any source, they do not have to be from \link{Claddis} functions), 2) a set of ages (first and last appearances) in the same format as required by the \link[strap]{DatePhylo} function, and 3) a vector of ages marking the boundaries of the time-slices.
 }
 \examples{
 
@@ -133,6 +133,9 @@ Foote, M., 1995. Morphological diversification of Paleozoic crinoids. \emph{Pale
 Foote, M., 1999. Morphological diversity in the evolutionary radiation of Paleozoic and post-Paleozoic crinoids. \emph{Paleobiology}, \bold{25}, 1-115.
 
 Friedman, M. and Coates, M. I., 2006. A newly recognized fossil coelacanth highlights the early morphological diversification of the clade. \emph{Proceedings of the Royal Society of London B}, \bold{273}, 245-250.
+}
+\seealso{
+\link{assign_taxa_to_bins}, \link{plot_chronophylomorphospace}, \link{plot_morphospace}, \link{plot_multi_morphospace}, \link{ordinate_cladistic_matrix}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Emma Sherratt \email{emma.sherratt@gmail.com}

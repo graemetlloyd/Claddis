@@ -5,7 +5,7 @@
 #' Plots a stack of ordination spaces representing multiple time-slices.
 #'
 #' @param ordination_axes A matrix of the ordination axes supplied (rownames should be object names). First column should be values for first axis, second for second axis and so on.
-#' @param ages A two-column matrix of the first and last apperance dates for the taxa in the same format supplied to \link{DatePhylo}.
+#' @param ages A two-column matrix of the first and last apperance dates for the taxa in the same format supplied to \link[strap]{DatePhylo}.
 #' @param groups A vector of colours (for plotting) for each object name.
 #' @param time_slices A vector of the boundaries (beginning and ending) for a series of time slices.
 #' @param shear A single value (0 to 1) for the degree of shearing in the stacked ordination spaces.
@@ -15,14 +15,18 @@
 #'
 #' @details
 #'
-#' This style of plot is taken from various papers by Michael Foote (Foote 1993; his Figures 2, 4, 6, 8, 10, 12, and 14; Foote 1994; his Figure 2; Foote 1995; his Figure 3; Foote 1999; his Figure 22), and can be seen elsehwere in the litarture (e.g., Friedman and Coates 2006; their Figure 2c).
+#' This style of plot is taken from various papers by Michael Foote (Foote 1993; his Figures 2, 4, 6, 8, 10, 12, and 14; Foote 1994; his Figure 2; Foote 1995; his Figure 3; Foote 1999; his Figure 22), and can be seen elsewhere in the literature (e.g., Friedman and Coates 2006; their Figure 2c).
 #'
-#' Here multiple ordination (or morpho-) spaces are plotted as a seriours of successive "stacks" representing specific intervals of time. Following geologic conventions the oldest time-slice is plotted at the base and the sequence gets younger towards the top.
+#' Here multiple ordination (or morpho-) spaces are plotted as a series of successive "stacks" representing specific intervals of time. Following geologic conventions the oldest time-slice is plotted at the base and the sequence gets younger towards the top.
 #'
-#' Note that the user needs to supply three pieces of data: 1) a matrix representing the ordination axes (NB: these can come from any source, they do not have to be from \link{Claddis} functions), 2) a set of ages (first adn last appearances) in the same format as required by the \link{DatePhylo} function in the \link{strap} library, and 3) a vector of ages marking the boundaries of the time-slices.
+#' Note that the user needs to supply three pieces of data: 1) a matrix representing the ordination axes (NB: these can come from any source, they do not have to be from \link{Claddis} functions), 2) a set of ages (first and last appearances) in the same format as required by the \link[strap]{DatePhylo} function, and 3) a vector of ages marking the boundaries of the time-slices.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Emma Sherratt \email{emma.sherratt@@gmail.com}
-
+#'
+#' @seealso
+#'
+#' \link{assign_taxa_to_bins}, \link{plot_chronophylomorphospace}, \link{plot_morphospace}, \link{plot_multi_morphospace}, \link{ordinate_cladistic_matrix}
+#'
 #' @references
 #'
 #' Foote, M., 1993. Discordance and concordance between morphological and taxonomic diversity. \emph{Paleobiology}, \bold{19}, 185-204.
@@ -117,6 +121,26 @@
 #' )
 #' @export plot_morphospace_stack
 plot_morphospace_stack <- function(ordination_axes, ages, groups = NULL, time_slices, shear = 0.2, x_axis = 1, y_axis = 2, axis_label = "PC") {
+
+
+# Ages for day 2016 taxa:
+#ages <- matrix(c(
+#  269, 269, 263, 263, 265, 265, 265, 265, 257, 257, 259, 259, 258, 258,
+#  260, 260, 257, 257, 257, 257, 256, 256, 259, 259, 260, 260, 253, 253,
+#  257, 257, 257, 257, 268, 268
+#),
+#ncol = 2, byrow = TRUE,
+#dimnames = list(c(
+#  "Biarmosuchus_tener", "Hipposaurus_boonstrai",
+#  "Bullacephalus_jacksoni", "Pachydectes_elsi", "Lemurosaurus_pricei",
+#  "Lobalopex_mordax", "Lophorhinus_willodenensis",
+#  "Proburnetia_viatkensis", "Lende_chiweta",
+#  "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098",
+#  "Niuksenitia_sukhonensis", "Ictidorhinus_martinsi", "RC_20",
+#  "Herpetoskylax_hopsoni", "Lycaenodon_longiceps"
+#), c("FAD", "LAD"))
+#)
+
 
   # Other options for treatment of age data than just ranges?
   # Add spaces between stacks? Could even have this be negative to allow overlapping of highly sheared plots.

@@ -26,6 +26,10 @@
 #'
 #' @author Emma Sherratt \email{emma.sherratt@@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
+#' @seealso
+#'
+#' \link{assign_taxa_to_bins}, \link{plot_chronophylomorphospace}, \link{plot_morphospace_stack}, \link{plot_morphospace}, \link{ordinate_cladistic_matrix}
+#'
 #' @examples
 #'
 #' # Make PCoA for Day 2016 data set:

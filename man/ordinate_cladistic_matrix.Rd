@@ -117,6 +117,9 @@ Cailliez, F., 1983. The analytical solution of the additive constant problem. \e
 
 Gower, J. C., 1966. Some distance properties of latent root and vector methods used in multivariate analysis. \emph{Biometrika}, \bold{53}, 325-338.
 }
+\seealso{
+\link{assign_taxa_to_bins}, \link{plot_chronophylomorphospace}, \link{plot_morphospace_stack}, \link{plot_morphospace}, \link{plot_multi_morphospace}
+}
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }

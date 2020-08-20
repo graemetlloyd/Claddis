@@ -89,6 +89,9 @@ plot_multi_morphospace(pcoa_input, n_axes = 5, taxon_groups = taxon_groups,
   plot_convex_hulls = TRUE)
 
 }
+\seealso{
+\link{assign_taxa_to_bins}, \link{plot_chronophylomorphospace}, \link{plot_morphospace_stack}, \link{plot_morphospace}, \link{ordinate_cladistic_matrix}
+}
 \author{
 Emma Sherratt \email{emma.sherratt@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }

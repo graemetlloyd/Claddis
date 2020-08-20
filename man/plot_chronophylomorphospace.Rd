@@ -70,6 +70,9 @@ plot_chronophylomorphospace(pcoa_data)
 \references{
 Sakamoto, M. and Ruta, M. 2012. Convergence and divergence in the evolution of cat skulls: temporal and spatial patterns of morphological diversity. \emph{PLoS ONE}, \bold{7}, e39752.
 }
+\seealso{
+\link{assign_taxa_to_bins}, \link{plot_morphospace_stack}, \link{plot_morphospace}, \link{plot_multi_morphospace}, \link{ordinate_cladistic_matrix}
+}
 \author{
 Emma Sherratt \email{emma.sherratt@gmail.com} and Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
