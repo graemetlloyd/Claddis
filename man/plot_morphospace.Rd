@@ -102,7 +102,7 @@ plot_morphospace(pcoa_input, z_axis = 3, plot_taxon_names = TRUE)
 taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener",
   "Hipposaurus_boonstrai", "Bullacephalus_jacksoni", "Pachydectes_elsi",
   "Niuksenitia_sukhonensis", "Ictidorhinus_martinsi", "RC_20",
-  "Herpetoskylax_hopsoni", "Lycaenodon_longiceps"),
+  "Herpetoskylax_hopsoni"),
   Burnetiamorpha = c("Lemurosaurus_pricei", "Lobalopex_mordax",
   "Lophorhinus_willodenensis", "Proburnetia_viatkensis", "Lende_chiweta",
   "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098"))
@@ -126,8 +126,21 @@ time_tree <- ape::read.tree(text = paste0("(Biarmosuchus_tener:0.5,",
 # Add root age to tree:
 time_tree$root.time <- 269.5
 
+# Prune incomplete taxa from tree:
+time_tree <- ape::drop.tip(phy = time_tree, tip = c("Lycaenodon_longiceps",
+  "Niuksenitia_sukhonensis"))
+
+# Prune incomplete taxa from cladistic matrix:
+prune_cladistic_matrix(cladistic_matrix = day_2016,
+  taxa2prune = c("Lycaenodon_longiceps", "Niuksenitia_sukhonensis"))
+
+# Note: the above pruning is simply to run this example and should not be
+# done manually as a matter of course as the functions will automatically
+# prune tips and nodes as required.
+
 # Make new ordination with tree included (enabling phylomorphospace):
-pcoa_input <- ordinate_cladistic_matrix(cladistic_matrix = day_2016, time_tree = time_tree)
+pcoa_input <- ordinate_cladistic_matrix(cladistic_matrix = cladistic_matrix,
+  time_tree = time_tree)
 
 # Plot this as a simple bivarate phylomorphospace:
 plot_morphospace(pcoa_input)
