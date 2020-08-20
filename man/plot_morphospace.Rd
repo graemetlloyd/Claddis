@@ -20,7 +20,10 @@ plot_morphospace(
   plot_group_legend = TRUE,
   group_legend_position = "top_right",
   plot_z_legend = TRUE,
-  z_legend_position = "bottom_right"
+  z_legend_position = "bottom_right",
+  inform = TRUE,
+  x_limits = NULL,
+  y_limits = NULL
 )
 }
 \arguments{
@@ -55,6 +58,12 @@ plot_morphospace(
 \item{plot_z_legend}{Logical indicating whether to plot a legend for the z-axis. (Default is TRUE.)}
 
 \item{z_legend_position}{Position to plot the group legend. Must be one of \code{bottom_left}, \code{bottom_right} (the default), \code{top_left}, or \code{top_right}.}
+
+\item{inform}{Logical indicating whether to inform the user of any taxon pruning. (Default is TRUE.)}
+
+\item{x_limits}{Plot limits to use for x-axis. Only intended for use by \link{plot_multi_morphospace}.}
+
+\item{y_limits}{Plot limits to use for y-axis. Only intended for use by \link{plot_multi_morphospace}.}
 }
 \description{
 Plots a morphospace using the output from ordinate_cladistic_matrix.

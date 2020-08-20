@@ -20,6 +20,9 @@
 #' @param group_legend_position Position to plot the group legend. Must be one of \code{bottom_left}, \code{bottom_right}, \code{top_left}, or \code{top_right} (the default).
 #' @param plot_z_legend Logical indicating whether to plot a legend for the z-axis. (Default is TRUE.)
 #' @param z_legend_position Position to plot the group legend. Must be one of \code{bottom_left}, \code{bottom_right} (the default), \code{top_left}, or \code{top_right}.
+#' @param inform Logical indicating whether to inform the user of any taxon pruning. (Default is TRUE.)
+#' @param x_limits Plot limits to use for x-axis. Only intended for use by \link{plot_multi_morphospace}.
+#' @param y_limits Plot limits to use for y-axis. Only intended for use by \link{plot_multi_morphospace}.
 #'
 #' @details
 #'
@@ -107,7 +110,7 @@
 #'   taxon_groups = taxon_groups, plot_convex_hulls = TRUE)
 #' }
 #' @export plot_morphospace
-plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, taxon_groups = NULL, plot_taxon_names = FALSE, plot_convex_hulls = FALSE, plot_internal_nodes = FALSE, plot_edges = TRUE, plot_root = TRUE, root_colour = "red", palette = "viridis", plot_group_legend = TRUE, group_legend_position = "top_right", plot_z_legend = TRUE, z_legend_position = "bottom_right") {
+plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, taxon_groups = NULL, plot_taxon_names = FALSE, plot_convex_hulls = FALSE, plot_internal_nodes = FALSE, plot_edges = TRUE, plot_root = TRUE, root_colour = "red", palette = "viridis", plot_group_legend = TRUE, group_legend_position = "top_right", plot_z_legend = TRUE, z_legend_position = "bottom_right", inform = TRUE, x_limits = NULL, y_limits = NULL) {
   
   # TO DO:
   #
@@ -151,10 +154,14 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
       })
       
       # Warn user that this has happened in case it is an error:
-      print(paste0("Warning: The following taxa were removed from taxon_groups as they do not appear in pcoa_input: ", paste(taxa_to_prune, collapse = ", "), ". You may wish to double check this makes sense (e.g., because of incomplete taxa being removed by trim_matrix) and is not due to a typographical or oher error which means names are not an exact match."))
+      if (inform) print(paste0("Warning: The following taxa were removed from taxon_groups as they do not appear in pcoa_input: ", paste(taxa_to_prune, collapse = ", "), ". You may wish to double check this makes sense (e.g., because of incomplete taxa being removed by trim_matrix) and is not due to a typographical or oher error which means names are not an exact match."))
     }
     
   }
+  
+  # If plot limits aren't set use x and y ranges to set them:
+  if (is.null(x_limits)) x_limits <- range(pcoa_input$vectors[, x_axis])
+  if (is.null(y_limits)) y_limits <- range(pcoa_input$vectors[, y_axis])
   
   # Set default tip numbers as just 1 to N:
   tip_numbers <- 1:nrow(x = pcoa_input$vectors)
@@ -218,7 +225,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
   names(x = point_sizes) <- rownames(x = pcoa_input$vectors)
   
   # Create the basic plot space (will be empty for now):
-  graphics::plot(x = pcoa_input$vectors[, x_axis], y = pcoa_input$vectors[, y_axis], type = "n", bg = "black", xlab = x_lab, ylab = y_lab, asp = TRUE)
+  graphics::plot(x = pcoa_input$vectors[, x_axis], y = pcoa_input$vectors[, y_axis], type = "n", bg = "black", xlab = x_lab, ylab = y_lab, asp = TRUE, xlim = x_limits, ylim = y_limits)
   
   # Sort vectors by node number (1:N):
   if (tree_used) pcoa_input$vectors <- pcoa_input$vectors[c(pcoa_input$time_tree$tip.label, setdiff(x = rownames(x = pcoa_input$vectors), y = pcoa_input$time_tree$tip.label)), ]
@@ -269,10 +276,10 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
   if(taxon_groups_used && plot_group_legend) {
     
     # Add groups legend to plot:
-    if(group_legend_position == "bottom_left") legend(x = min(pcoa_input$vectors[, x_axis]), y = min(pcoa_input$vectors[, y_axis]), legend = names(taxon_groups), fill = solid_colours, bg = "white", xjust = 1, yjust = 0)
-    if(group_legend_position == "bottom_right") legend(x = max(pcoa_input$vectors[, x_axis]), y = min(pcoa_input$vectors[, y_axis]), legend = names(taxon_groups), fill = solid_colours, bg = "white", xjust = 0, yjust = 0)
-    if(group_legend_position == "top_left") legend(x = min(pcoa_input$vectors[, x_axis]), y = max(pcoa_input$vectors[, y_axis]), legend = names(taxon_groups), fill = solid_colours, bg = "white", xjust = 1, yjust = 1)
-    if(group_legend_position == "top_right") legend(x = max(pcoa_input$vectors[, x_axis]), y = max(pcoa_input$vectors[, y_axis]), legend = names(taxon_groups), fill = solid_colours, bg = "white", xjust = 0, yjust = 1)
+    if(group_legend_position == "bottom_left") graphics::legend(x = min(pcoa_input$vectors[, x_axis]), y = min(pcoa_input$vectors[, y_axis]), legend = names(taxon_groups), fill = solid_colours, bg = "white", xjust = 1, yjust = 0)
+    if(group_legend_position == "bottom_right") graphics::legend(x = max(pcoa_input$vectors[, x_axis]), y = min(pcoa_input$vectors[, y_axis]), legend = names(taxon_groups), fill = solid_colours, bg = "white", xjust = 0, yjust = 0)
+    if(group_legend_position == "top_left") graphics::legend(x = min(pcoa_input$vectors[, x_axis]), y = max(pcoa_input$vectors[, y_axis]), legend = names(taxon_groups), fill = solid_colours, bg = "white", xjust = 1, yjust = 1)
+    if(group_legend_position == "top_right") graphics::legend(x = max(pcoa_input$vectors[, x_axis]), y = max(pcoa_input$vectors[, y_axis]), legend = names(taxon_groups), fill = solid_colours, bg = "white", xjust = 0, yjust = 1)
   }
   
   # If plotting a z-axis legend:
@@ -285,10 +292,10 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
     z_sizes <- abs(x = z_values) / max(abs(x = z_values)) * 3
     
     # Add z legend to plot:
-    if(z_legend_position == "bottom_left") legend(x = min(pcoa_input$vectors[, x_axis]), y = min(pcoa_input$vectors[, y_axis]), legend = signif(x = z_values, digits = 4), pch = 21, bg = "white", xjust = 1, yjust = 0, pt.cex = z_sizes, pt.bg = unlist(lapply(X = as.list(x = z_values), FUN = function(y) ifelse(test = y > 0, yes = "black", no = "white"))), col = "black")
-    if(z_legend_position == "bottom_right") legend(x = max(pcoa_input$vectors[, x_axis]), y = min(pcoa_input$vectors[, y_axis]), legend = signif(x = z_values, digits = 4), pch = 21, bg = "white", xjust = 0, yjust = 0, pt.cex = z_sizes, pt.bg = unlist(lapply(X = as.list(x = z_values), FUN = function(y) ifelse(test = y > 0, yes = "black", no = "white"))), col = "black")
-    if(z_legend_position == "top_left") legend(x = min(pcoa_input$vectors[, x_axis]), y = max(pcoa_input$vectors[, y_axis]), legend = signif(x = z_values, digits = 4), pch = 21, bg = "white", xjust = 1, yjust = 1, pt.cex = z_sizes, pt.bg = unlist(lapply(X = as.list(x = z_values), FUN = function(y) ifelse(test = y > 0, yes = "black", no = "white"))), col = "black")
-    if(z_legend_position == "top_right") legend(x = max(pcoa_input$vectors[, x_axis]), y = max(pcoa_input$vectors[, y_axis]), legend = signif(x = z_values, digits = 4), pch = 21, bg = "white", xjust = 0, yjust = 1, pt.cex = z_sizes, pt.bg = unlist(lapply(X = as.list(x = z_values), FUN = function(y) ifelse(test = y > 0, yes = "black", no = "white"))), col = "black")
+    if(z_legend_position == "bottom_left") graphics::legend(x = min(pcoa_input$vectors[, x_axis]), y = min(pcoa_input$vectors[, y_axis]), legend = signif(x = z_values, digits = 4), pch = 21, bg = "white", xjust = 1, yjust = 0, pt.cex = z_sizes, pt.bg = unlist(lapply(X = as.list(x = z_values), FUN = function(y) ifelse(test = y > 0, yes = "black", no = "white"))), col = "black")
+    if(z_legend_position == "bottom_right") graphics::legend(x = max(pcoa_input$vectors[, x_axis]), y = min(pcoa_input$vectors[, y_axis]), legend = signif(x = z_values, digits = 4), pch = 21, bg = "white", xjust = 0, yjust = 0, pt.cex = z_sizes, pt.bg = unlist(lapply(X = as.list(x = z_values), FUN = function(y) ifelse(test = y > 0, yes = "black", no = "white"))), col = "black")
+    if(z_legend_position == "top_left") graphics::legend(x = min(pcoa_input$vectors[, x_axis]), y = max(pcoa_input$vectors[, y_axis]), legend = signif(x = z_values, digits = 4), pch = 21, bg = "white", xjust = 1, yjust = 1, pt.cex = z_sizes, pt.bg = unlist(lapply(X = as.list(x = z_values), FUN = function(y) ifelse(test = y > 0, yes = "black", no = "white"))), col = "black")
+    if(z_legend_position == "top_right") graphics::legend(x = max(pcoa_input$vectors[, x_axis]), y = max(pcoa_input$vectors[, y_axis]), legend = signif(x = z_values, digits = 4), pch = 21, bg = "white", xjust = 0, yjust = 1, pt.cex = z_sizes, pt.bg = unlist(lapply(X = as.list(x = z_values), FUN = function(y) ifelse(test = y > 0, yes = "black", no = "white"))), col = "black")
   }
   
   # If using a z-axis add label as plot title:
