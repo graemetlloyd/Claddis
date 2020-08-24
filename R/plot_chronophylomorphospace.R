@@ -4,14 +4,16 @@
 #'
 #' Plots a three-dimensional chronophylomorphospace.
 #'
-#' @param pcoa_data Principal coordinate data in the format output by  \link{ordinate_cladistic_matrix} that includes a tree and ancestral states.
+#' @param pcoa_input Principal coordinate data in the format output by  \link{ordinate_cladistic_matrix} that includes a tree and ancestral states.
 #' @param x_axis Which ordination axis to plot as the x-axis.
 #' @param y_axis Which ordination axis to plot as the y-axis.
+#' @param taxon_groups A named list of groups to which taxa are assigned (optional). This is used to plot points or convex hulls in different colours corresponding to each group. As the user names the groups these can represent any grouping of interest (e.g., taxonomic, ecological, temporal, spatial). \link{assign_taxa_to_bins} can automate temporal assignments.
 #' @param plot_tips Whether or not to plot the tip nodes (defaults to TRUE).
 #' @param plot_nodes Whether or not to plot the internal nodes (defaults to TRUE).
-#' @param show_names Whether or not to show the taxon nodes (defaults to TRUE).
-#' @param plot_branches Whether or not to plot the branches (defaults to TRUE).
+#' @param plot_taxon_names Whether or not to show the taxon nodes (defaults to TRUE).
+#' @param plot_edges Whether or not to plot the branches (defaults to TRUE).
 #' @param shadow Whether or not to plot a shadow (2D plot) on the bottom face of the 3D plot (defaults to TRUE).
+#' @param palette The palette to use for plotting each element of taxon_groups. See \link[grDevices]{palette}.
 #'
 #' @details
 #'
@@ -47,18 +49,67 @@
 #' time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
 #'
 #' # Perform a phylogenetic Principal Coordinates Analysis:
-#' pcoa_data <- ordinate_cladistic_matrix(michaux_1989,
+#' pcoa_input <- ordinate_cladistic_matrix(
+#'   cladistic_matrix = michaux_1989,
 #'   time_tree = time_tree
 #' )
 #'
 #' # Plot a chronophylomorphospace:
-#' plot_chronophylomorphospace(pcoa_data)
+#' plot_chronophylomorphospace(pcoa_input = pcoa_input)
+#'
+#' # Make time-scaled first MPT for Day 2016 data set:
+#' time_tree <- ape::read.tree(text = paste0("(Biarmosuchus_tener:0.5,",
+#'   "(((Hipposaurus_boonstrai:3.5,(Bullacephalus_jacksoni:0.75,",
+#'   "Pachydectes_elsi:0.75):0.75):0.75,(Lemurosaurus_pricei:7.166666667,",
+#'   "(Lobalopex_mordax:4.333333333,((Lophorhinus_willodenensis:3.666666667,",
+#'   "(Proburnetia_viatkensis:0.8333333333,(Lende_chiweta:2,",
+#'   "(Paraburnetia_sneeubergensis:1,Burnetia_mirabilis:2):1):1.833333333)",
+#'   ":0.8333333333):0.8333333333,(BP_1_7098:2.25,Niuksenitia_sukhonensis:",
+#'   "1.25):1.25):0.8333333333):0.8333333333):3.083333333):1.95,",
+#'   "(Ictidorhinus_martinsi:15.9,(RC_20:11.6,(Herpetoskylax_hopsoni:11.3,",
+#'   "Lycaenodon_longiceps:0.3):0.3):0.3):0.3):0.3);"))
+#'
+#' # Add root age to tree:
+#' time_tree$root.time <- 269.5
+#'
+#' # Prune incomplete taxa from tree:
+#' time_tree <- ape::drop.tip(phy = time_tree, tip = c("Lycaenodon_longiceps",
+#'   "Niuksenitia_sukhonensis"))
+#'
+#' # Prune incomplete taxa from cladistic matrix:
+#' cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix = day_2016,
+#'   taxa2prune = c("Lycaenodon_longiceps", "Niuksenitia_sukhonensis"))
+#'
+#' # Perform a phylogenetic Principal Coordinates Analysis:
+#' pcoa_input <- ordinate_cladistic_matrix(
+#'   cladistic_matrix = cladistic_matrix,
+#'   time_tree = time_tree
+#' )
+#'
+#' # Define some simple taxon groups for the data as a named list:
+#' taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener",
+#'   "Hipposaurus_boonstrai", "Bullacephalus_jacksoni", "Pachydectes_elsi",
+#'   "Niuksenitia_sukhonensis", "Ictidorhinus_martinsi", "RC_20",
+#'   "Herpetoskylax_hopsoni"),
+#'   Burnetiamorpha = c("Lemurosaurus_pricei", "Lobalopex_mordax",
+#'   "Lophorhinus_willodenensis", "Proburnetia_viatkensis", "Lende_chiweta",
+#'   "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098"))
+#'
+#' # Plot a chronophylomorphospace:
+#' plot_chronophylomorphospace(
+#'   pcoa_input = pcoa_input,
+#'   taxon_groups = taxon_groups,
+#' )
 #' }
 #'
 #' @export plot_chronophylomorphospace
-plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, plot_tips = TRUE, plot_nodes = TRUE, show_names = TRUE, plot_branches = TRUE, shadow = TRUE) {
+plot_chronophylomorphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, taxon_groups = NULL, plot_tips = TRUE, plot_nodes = TRUE, plot_taxon_names = TRUE, plot_edges = TRUE, shadow = TRUE, palette = "viridis") {
 
   # Add top level conditionals to check for a tree etc.
+  # Add legend somehow?
+  
+  # ONLY ADD TAXON NAMES TO TIPS!!!!
+  # MAKE CUBE-LIKE NOT SQUASHED!!!!!
 
   # Check user has rgl and stop and warn if not:
   if (!requireNamespace("rgl", quietly = TRUE)) {
@@ -67,18 +118,62 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, plot_
       "\n install.packages('lattice')"
     ))
   }
+  
+  # If using taxon_groups:
+  if (methods::hasArg(name = "taxon_groups")) {
+    
+    # Find any taxa duplicated across taxon_group:
+    duplicated_taxa <- sort(x = unique(x = unname(obj = unlist(x = taxon_groups))[duplicated(x = unname(obj = unlist(x = taxon_groups)))]))
+    
+    # If these exist stop and warn user:
+    if (length(x = duplicated_taxa) > 0) paste0("The following taxa are duplicted in taxon_groups: ", paste(duplicated_taxa, collapse = ", "), ". Taxa can only be in one group.")
+    
+  }
+
+  
+  
+  
+  
+  
+  
+  
+
+# Set default solid colour for each taxon to black:
+solid_colours <- rep(x = "black", length.out = nrow(x = pcoa_input$vectors))
+names(solid_colours) <- rownames(x = pcoa_input$vectors)
+
+# If using taxon groups (need different colours for each one):
+if (methods::hasArg(name = "taxon_groups")) {
+  
+  # Build new solid colours with different colours for each group:
+  solid_colours <- unlist(x = lapply(X = as.list(1:length(x = taxon_groups)), function(x) {
+    
+    # Build vector of group colour:
+    group_solid_colours <- rep(x = grDevices::hcl.colors(n = length(x = taxon_groups), palette = palette, alpha = 1)[x], length.out = length(x = taxon_groups[[x]]))
+    
+    # Add taxon names to colours:
+    names(group_solid_colours) <- taxon_groups[[x]]
+    
+    # Return new group colours vector:
+    group_solid_colours
+  }))
+}
+
+
+
+
 
   # Default plotting parameters for a 2D morphospace. Need to change node colour for 3D using rgl
-  plotting_parameters <- list(tip_colour = "black", tip_symbol = 21, tip_size = 2, node_colour = "white", node_symbol = 21, node_size = 1.25, branch_colour = "black", branch_width = 3, tiplabel_adjustment = c(-.1, -.1), tiplabel_colour = "black", tiplabel_size = 1)
+  plotting_parameters <- list(tip_colour = solid_colours, tip_symbol = 21, tip_size = 2, node_colour = "white", node_symbol = 21, node_size = 1.25, branch_colour = "black", branch_width = 3, tiplabel_adjustment = c(-.1, -.1), tiplabel_colour = "black", tiplabel_size = 1)
 
   # Isolate Tree:
-  time_tree <- pcoa_data$time_tree
+  time_tree <- pcoa_input$time_tree
 
   # Record number of tips:
   n_tips <- ape::Ntip(phy = time_tree)
 
   # Isolate pcoa axes:
-  pcoa_data <- pcoa_data$vectors
+  pcoa_input <- pcoa_input$vectors
 
   # Little function to set limits for plotting (make it cube-like):
   set_plot_limits <- function(x, scale_factor) {
@@ -104,10 +199,10 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, plot_
 
   # Make empty plot:
   rgl::plot3d(
-    pcoa_data,
+    pcoa_input,
     type = "n",
-    xlim = set_plot_limits(pcoa_data[, x_axis], scale_factor = 1.5),
-    ylim = set_plot_limits(pcoa_data[, y_axis], scale_factor = 1.5),
+    xlim = set_plot_limits(pcoa_input[, x_axis], scale_factor = 1.5),
+    ylim = set_plot_limits(pcoa_input[, y_axis], scale_factor = 1.5),
     zlim = set_plot_limits(z_axis, 0),
     asp = c(1, 1, 0.5),
     xlab = xlab, ylab = ylab,
@@ -118,10 +213,10 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, plot_
   # If requested plots tips
   if (plot_tips) {
     rgl::points3d(
-      pcoa_data[1:n_tips, 1],
-      pcoa_data[1:n_tips, 2],
+      pcoa_input[1:n_tips, 1],
+      pcoa_input[1:n_tips, 2],
       z_axis[1:n_tips],
-      col = plotting_parameters$tip_colour,
+      col = plotting_parameters$tip_colour[rownames(pcoa_input)],
       size = plotting_parameters$tip_size * 4
     )
   }
@@ -129,20 +224,20 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, plot_
   # If requested plot nodes
   if (plot_nodes) {
     rgl::points3d(
-      pcoa_data[(n_tips + 1):nrow(pcoa_data), 1],
-      pcoa_data[(n_tips + 1):nrow(pcoa_data), 2],
-      z_axis[(n_tips + 1):nrow(pcoa_data)],
+      pcoa_input[(n_tips + 1):nrow(pcoa_input), 1],
+      pcoa_input[(n_tips + 1):nrow(pcoa_input), 2],
+      z_axis[(n_tips + 1):nrow(pcoa_input)],
       col = plotting_parameters$node_colour,
       size = plotting_parameters$node_size * 4
     )
   }
 
   # If requested plot branches
-  if (plot_branches) {
+  if (plot_edges) {
     for (i in 1:nrow(time_tree$edge)) {
       rgl::lines3d(
-        pcoa_data[(time_tree$edge[i, ]), 1],
-        pcoa_data[(time_tree$edge[i, ]), 2],
+        pcoa_input[(time_tree$edge[i, ]), 1],
+        pcoa_input[(time_tree$edge[i, ]), 2],
         z_axis[(time_tree$edge[i, ])],
         lwd = plotting_parameters$branch_width
       )
@@ -150,12 +245,12 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, plot_
   }
 
   # If requested plot taxa labels
-  if (show_names) {
+  if (plot_taxon_names) {
     rgl::text3d(
-      pcoa_data[, x_axis],
-      pcoa_data[, y_axis],
+      pcoa_input[, x_axis],
+      pcoa_input[, y_axis],
       z_axis,
-      rownames(x = pcoa_data),
+      rownames(x = pcoa_input),
       col = plotting_parameters$tiplabel_colour,
       cex = plotting_parameters$tiplabel_size,
       adj = plotting_parameters$tiplabel_adjustment
@@ -168,8 +263,8 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, plot_
     # Plot branches:
     for (i in 1:nrow(time_tree$edge)) {
       rgl::lines3d(
-        pcoa_data[(time_tree$edge[i, ]), 1],
-        pcoa_data[(time_tree$edge[i, ]), 2],
+        pcoa_input[(time_tree$edge[i, ]), 1],
+        pcoa_input[(time_tree$edge[i, ]), 2],
         time_tree$root.time,
         lwd = 2,
         alpha = 0.5
@@ -178,8 +273,8 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, plot_
 
     # Plot internal nodes:
     rgl::points3d(
-      pcoa_data[(n_tips + 1):nrow(pcoa_data), 1],
-      pcoa_data[(n_tips + 1):nrow(pcoa_data), 2],
+      pcoa_input[(n_tips + 1):nrow(pcoa_input), 1],
+      pcoa_input[(n_tips + 1):nrow(pcoa_input), 2],
       time_tree$root.time,
       col = plotting_parameters$node_colour,
       size = plotting_parameters$node_size * 4,
@@ -187,8 +282,8 @@ plot_chronophylomorphospace <- function(pcoa_data, x_axis = 1, y_axis = 2, plot_
     )
 
     # Plot tips:
-    rgl::points3d(pcoa_data[1:n_tips, 1],
-      pcoa_data[1:n_tips, 2],
+    rgl::points3d(pcoa_input[1:n_tips, 1],
+      pcoa_input[1:n_tips, 2],
       time_tree$root.time,
       col = plotting_parameters$tip_colour,
       size = plotting_parameters$tip_size * 4,
