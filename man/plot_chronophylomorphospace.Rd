@@ -5,32 +5,38 @@
 \title{Chronophylomorphospace Plot}
 \usage{
 plot_chronophylomorphospace(
-  pcoa_data,
+  pcoa_input,
   x_axis = 1,
   y_axis = 2,
+  taxon_groups = NULL,
   plot_tips = TRUE,
   plot_nodes = TRUE,
-  show_names = TRUE,
-  plot_branches = TRUE,
-  shadow = TRUE
+  plot_taxon_names = TRUE,
+  plot_edges = TRUE,
+  shadow = TRUE,
+  palette = "viridis"
 )
 }
 \arguments{
-\item{pcoa_data}{Principal coordinate data in the format output by  \link{ordinate_cladistic_matrix} that includes a tree and ancestral states.}
+\item{pcoa_input}{Principal coordinate data in the format output by  \link{ordinate_cladistic_matrix} that includes a tree and ancestral states.}
 
 \item{x_axis}{Which ordination axis to plot as the x-axis.}
 
 \item{y_axis}{Which ordination axis to plot as the y-axis.}
 
+\item{taxon_groups}{A named list of groups to which taxa are assigned (optional). This is used to plot points or convex hulls in different colours corresponding to each group. As the user names the groups these can represent any grouping of interest (e.g., taxonomic, ecological, temporal, spatial). \link{assign_taxa_to_bins} can automate temporal assignments.}
+
 \item{plot_tips}{Whether or not to plot the tip nodes (defaults to TRUE).}
 
 \item{plot_nodes}{Whether or not to plot the internal nodes (defaults to TRUE).}
 
-\item{show_names}{Whether or not to show the taxon nodes (defaults to TRUE).}
+\item{plot_taxon_names}{Whether or not to show the taxon nodes (defaults to TRUE).}
 
-\item{plot_branches}{Whether or not to plot the branches (defaults to TRUE).}
+\item{plot_edges}{Whether or not to plot the branches (defaults to TRUE).}
 
 \item{shadow}{Whether or not to plot a shadow (2D plot) on the bottom face of the 3D plot (defaults to TRUE).}
+
+\item{palette}{The palette to use for plotting each element of taxon_groups. See \link[grDevices]{palette}.}
 }
 \description{
 Plots a three-dimensional chronophylomorphospace.
@@ -58,12 +64,57 @@ time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
 time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
 
 # Perform a phylogenetic Principal Coordinates Analysis:
-pcoa_data <- ordinate_cladistic_matrix(michaux_1989,
+pcoa_input <- ordinate_cladistic_matrix(
+  cladistic_matrix = michaux_1989,
   time_tree = time_tree
 )
 
 # Plot a chronophylomorphospace:
-plot_chronophylomorphospace(pcoa_data)
+plot_chronophylomorphospace(pcoa_input = pcoa_input)
+
+# Make time-scaled first MPT for Day 2016 data set:
+time_tree <- ape::read.tree(text = paste0("(Biarmosuchus_tener:0.5,",
+  "(((Hipposaurus_boonstrai:3.5,(Bullacephalus_jacksoni:0.75,",
+  "Pachydectes_elsi:0.75):0.75):0.75,(Lemurosaurus_pricei:7.166666667,",
+  "(Lobalopex_mordax:4.333333333,((Lophorhinus_willodenensis:3.666666667,",
+  "(Proburnetia_viatkensis:0.8333333333,(Lende_chiweta:2,",
+  "(Paraburnetia_sneeubergensis:1,Burnetia_mirabilis:2):1):1.833333333)",
+  ":0.8333333333):0.8333333333,(BP_1_7098:2.25,Niuksenitia_sukhonensis:",
+  "1.25):1.25):0.8333333333):0.8333333333):3.083333333):1.95,",
+  "(Ictidorhinus_martinsi:15.9,(RC_20:11.6,(Herpetoskylax_hopsoni:11.3,",
+  "Lycaenodon_longiceps:0.3):0.3):0.3):0.3):0.3);"))
+
+# Add root age to tree:
+time_tree$root.time <- 269.5
+
+# Prune incomplete taxa from tree:
+time_tree <- ape::drop.tip(phy = time_tree, tip = c("Lycaenodon_longiceps",
+  "Niuksenitia_sukhonensis"))
+
+# Prune incomplete taxa from cladistic matrix:
+cladistic_matrix <- prune_cladistic_matrix(cladistic_matrix = day_2016,
+  taxa2prune = c("Lycaenodon_longiceps", "Niuksenitia_sukhonensis"))
+
+# Perform a phylogenetic Principal Coordinates Analysis:
+pcoa_input <- ordinate_cladistic_matrix(
+  cladistic_matrix = cladistic_matrix,
+  time_tree = time_tree
+)
+
+# Define some simple taxon groups for the data as a named list:
+taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener",
+  "Hipposaurus_boonstrai", "Bullacephalus_jacksoni", "Pachydectes_elsi",
+  "Niuksenitia_sukhonensis", "Ictidorhinus_martinsi", "RC_20",
+  "Herpetoskylax_hopsoni"),
+  Burnetiamorpha = c("Lemurosaurus_pricei", "Lobalopex_mordax",
+  "Lophorhinus_willodenensis", "Proburnetia_viatkensis", "Lende_chiweta",
+  "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098"))
+
+# Plot a chronophylomorphospace:
+plot_chronophylomorphospace(
+  pcoa_input = pcoa_input,
+  taxon_groups = taxon_groups,
+)
 }
 
 }

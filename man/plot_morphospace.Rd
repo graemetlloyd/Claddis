@@ -88,15 +88,15 @@ Note that some features will generate legends that may initially appear to disap
 pcoa_input <- ordinate_cladistic_matrix(cladistic_matrix = day_2016)
 
 # Plot this as a simple bivarate morphospace:
-plot_morphospace(pcoa_input)
+plot_morphospace(pcoa_input = pcoa_input)
 
 # Use the Wills technique to add a third axis (PC3):
-plot_morphospace(pcoa_input, z_axis = 3)
+plot_morphospace(pcoa_input = pcoa_input, z_axis = 3)
 
 # You may need to resize the plot to see the legend for the z-axis
 
 # Add taxon names as well:
-plot_morphospace(pcoa_input, z_axis = 3, plot_taxon_names = TRUE)
+plot_morphospace(pcoa_input = pcoa_input, z_axis = 3, plot_taxon_names = TRUE)
 
 # Define some simple taxon groups for the data as a named list:
 taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener",
@@ -108,7 +108,7 @@ taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener",
   "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098"))
 
 # Plot taxon groups including convex hulls:
-plot_morphospace(pcoa_input, z_axis = 3, plot_taxon_names = TRUE,
+plot_morphospace(pcoa_input = pcoa_input, z_axis = 3, plot_taxon_names = TRUE,
   taxon_groups = taxon_groups, plot_convex_hulls = TRUE)
 
 # Make time-scaled first MPT for Day 2016 data set:
@@ -143,18 +143,18 @@ pcoa_input <- ordinate_cladistic_matrix(cladistic_matrix = cladistic_matrix,
   time_tree = time_tree)
 
 # Plot this as a simple bivarate phylomorphospace:
-plot_morphospace(pcoa_input)
+plot_morphospace(pcoa_input = pcoa_input)
 
 # Use the Wills technique to add a third axis (PC3):
-plot_morphospace(pcoa_input, z_axis = 3)
+plot_morphospace(pcoa_input = pcoa_input, z_axis = 3)
 
 # You may need to resize the plot to see the legend for the z-axis
 
 # Add taxon names as well:
-plot_morphospace(pcoa_input, z_axis = 3, plot_taxon_names = TRUE)
+plot_morphospace(pcoa_input = pcoa_input, z_axis = 3, plot_taxon_names = TRUE)
 
 # Add taxon groups including convex hulls:
-plot_morphospace(pcoa_input, z_axis = 3, plot_taxon_names = TRUE,
+plot_morphospace(pcoa_input = pcoa_input, z_axis = 3, plot_taxon_names = TRUE,
   taxon_groups = taxon_groups, plot_convex_hulls = TRUE)
 }
 }
