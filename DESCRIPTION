@@ -22,6 +22,7 @@ Imports:
     geoscale,
     graphics,
     grDevices,
+    methods,
     stats,
     utils
 Suggests: 
