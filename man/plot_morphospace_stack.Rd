@@ -5,123 +5,122 @@
 \title{Plot stacked ordination spaces}
 \usage{
 plot_morphospace_stack(
-  ordination_axes,
-  ages,
-  groups = NULL,
-  time_slices,
+  pcoa_input,
+  taxon_ages,
+  taxon_groups,
+  time_bins,
   shear = 0.2,
   x_axis = 1,
   y_axis = 2,
-  axis_label = "PC"
+  palette = "viridis",
+  plot_cushion = 0.3,
+  platform_size = 0.95,
+  plot_pillars = TRUE,
+  plot_crosshair = TRUE,
+  plot_grid_cells = TRUE,
+  plot_convex_hulls = TRUE,
+  plot_timebin_names = TRUE,
+  plot_tickmarks = TRUE,
+  plot_group_legend = TRUE,
+  group_legend_position = "bottom_right",
+  point_size = 1.5
 )
 }
 \arguments{
-\item{ordination_axes}{A matrix of the ordination axes supplied (rownames should be object names). First column should be values for first axis, second for second axis and so on.}
+\item{pcoa_input}{The main input in the format output from \link{ordinate_cladistic_matrix}.}
 
-\item{ages}{A two-column matrix of the first and last apperance dates for the taxa in the same format supplied to \link[strap]{DatePhylo}.}
+\item{taxon_ages}{A two-column matrix of the first and last apperance dates (columns; \code{"fad"} and \code{"lad"}) for the taxa (as rownames) from \code{pcoa_input}.}
 
-\item{groups}{A vector of colours (for plotting) for each object name.}
+\item{taxon_groups}{A named list of groups to which taxa are assigned (optional). This is used to plot points or convex hulls in different colours corresponding to each group. As the user names the groups these can represent any grouping of interest (e.g., taxonomic, ecological, temporal, spatial).}
 
-\item{time_slices}{A vector of the boundaries (beginning and ending) for a series of time slices.}
+\item{time_bins}{Another two-column matrix of the first and last appearance dates (columns; \code{"fad"} and \code{"lad"}), this time for named (rownames) time-slices .}
 
-\item{shear}{A single value (0 to 1) for the degree of shearing in the stacked ordination spaces.}
+\item{shear}{A single value (between 0 and 1) that determines the "sheared" visual appearance of the platforms.}
 
 \item{x_axis}{The ordination axis to plot on the x-axis.}
 
 \item{y_axis}{The ordination axis to plot nn the y-axis.}
 
-\item{axis_label}{The text used to precede the axis number. Here "PC" (for principal components/coordinates) is the assumed default, but the user may wish to use something else like "RW" instead.}
+\item{palette}{The palette to use for plotting each element of \code{taxon_groups}. See \link[grDevices]{palette}.}
+
+\item{plot_cushion}{A number determining the "cushion" around the edge of each stack in which no data will be plotted. This should be larger than zero or points will "hang" over the edge. Additionally, if using a \code{platform_size} value in excess of one this will avoid points being hidden under overlying platforms. Note that this effectively adds empty plot space around the data, it does not remove anything.}
+
+\item{platform_size}{The size of each platform as a proportion. Values of less than one will show slight gaps between platforms, whereas values in excess of one will mean platforms will appear to overlap.}
+
+\item{plot_pillars}{Logical indicating whether or not to plot the pillars linking the corners of each platform.}
+
+\item{plot_crosshair}{Logical indicating whether or not to plot the "crosshair" (i.e., the zero-zero lines that run through the origin of the morphospace).}
+
+\item{plot_grid_cells}{Logical indicating whether or not to plot grid cells that help visualise the distorted aspect ratio of the plot. Each cell is a square in the ordination space.}
+
+\item{plot_convex_hulls}{Logical indicating whether or not to plot convex hulls around the taxonomic groupings. Only relevant if \code{taxon_groups} is in use.}
+
+\item{plot_timebin_names}{Logical indicating whether or not to plot the names of each time bin next to each platform. I.e., the rownames from \code{time_bins}. Note if these are long they may disappear behind overlying platforms. To avoid this try using a smaller \code{platform_size} value, a larger \code{shear} value, or simply shorter or abbreviated names.}
+
+\item{plot_tickmarks}{Logical indicating whether or not to plot tickmarks next to the bottom platform.}
+
+\item{plot_group_legend}{Logical indicating whether or not to plot a legend. Only relevant if using \code{taxon_groups}. Note this may obscure some points so use with caution and try picking different values for \code{group_legend_position} to avoid this.}
+
+\item{group_legend_position}{The position the group legend should be plotted. Only relevant if using \code{taxon_groups} and \code{plot_group_legend = TRUE}. Options are: \code{"bottom_left"}, \code{"bottom_right"}, \code{"top_left"}, and \code{"top_right"}.}
+
+\item{point_size}{The size at which the points should be plotted. Note that here points are custom polygons and hence are not editable by normal plot options, e.g., \code{pch} or \code{cex}. At present all points are plotted as circles.}
 }
 \description{
 Plots a stack of ordination spaces representing multiple time-slices.
 }
 \details{
-This style of plot is taken from various papers by Michael Foote (Foote 1993; his Figures 2, 4, 6, 8, 10, 12, and 14; Foote 1994; his Figure 2; Foote 1995; his Figure 3; Foote 1999; his Figure 22), and can be seen elsewhere in the literature (e.g., Friedman and Coates 2006; their Figure 2c).
+This style of plot is taken from various papers by Michael Foote (Foote 1993; his Figures 2, 4, 6, 8, 10, 12, and 14; Foote 1994; his Figure 2; Foote 1995; his Figure 3; Foote 1999; his Figure 22), and can be seen elsewhere in the literature (e.g., Friedman and Coates 2006; their Figure 2c). Here multiple ordination (or morpho-) spaces are plotted in stratigraphic order (oldest at bottom) as a stacked series of "platforms" representing named time bins.
 
-Here multiple ordination (or morpho-) spaces are plotted as a series of successive "stacks" representing specific intervals of time. Following geologic conventions the oldest time-slice is plotted at the base and the sequence gets younger towards the top.
+The user needs to supply three main pieces of information to use the function: 1) ordination data that includes rows (taxa) and columns (ordination axes), 2) the ages (first and last appearance dates) of the taxa sampled, and 3) the ages (first and last appearance dates) of the named time bins used.
 
-Note that the user needs to supply three pieces of data: 1) a matrix representing the ordination axes (NB: these can come from any source, they do not have to be from \link{Claddis} functions), 2) a set of ages (first and last appearances) in the same format as required by the \link[strap]{DatePhylo} function, and 3) a vector of ages marking the boundaries of the time-slices.
+Note that since version 0.6.1 this function has been completely rewritten to better reflect the usage of these type of figures (see citations above) as well as allow additional features. This was also done in part to standardise the function to fit the style of the other major disparity plotting functions in Claddis, such as \link{plot_morphospace}. This means the input data is now assumed to come directly from \link{ordinate_cladistic_matrix}, but the user could easily still bring in data from elsewhere (the way the function worked previously) by reformatting it using something like:
+
+\code{pcoa_input <- list(vectors = my_imported_data)}
+
+Where my_imported_data has columns representing ordination axes (1 to N) and rownames corresponding to taxon names.
 }
 \examples{
 
-# Create x-values that will form a grid:
-x <- c(
-  c(
-    seq(0, 100, length.out = 101), seq(0, 100, length.out = 101),
-    seq(0, 100, length.out = 101), seq(0, 100, length.out = 101)
-  ),
-  c(rep(20, 101), rep(40, 101), rep(60, 101), rep(80, 101))
-)
+# Build taxon ages matrix for Day et al 2016 data:
+taxon_ages <- matrix(c(269, 267, 263, 260, 265, 265, 265, 265, 257, 255, 259, 259, 258, 258, 260,
+  257, 257, 255, 257, 257, 255, 252, 259, 259, 260, 258, 253, 252, 257, 255, 257, 255), ncol = 2,
+  byrow = TRUE, dimnames = list(c("Biarmosuchus_tener", "Hipposaurus_boonstrai",
+  "Bullacephalus_jacksoni", "Pachydectes_elsi", "Lemurosaurus_pricei", "Lobalopex_mordax",
+  "Lophorhinus_willodenensis", "Proburnetia_viatkensis", "Lende_chiweta",
+  "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098", "Niuksenitia_sukhonensis",
+  "Ictidorhinus_martinsi", "RC_20", "Herpetoskylax_hopsoni"), c("FAD", "LAD")))
 
-# Create y-values that will form grid:
-y <- c(
-  c(rep(20, 101), rep(40, 101), rep(60, 101), rep(80, 101)),
-  c(
-    seq(0, 100, length.out = 101), seq(0, 100, length.out = 101),
-    seq(0, 100, length.out = 101), seq(0, 100, length.out = 101)
-  )
-)
+# Ordinate Day et al 2016 data set:
+pcoa_input <- ordinate_cladistic_matrix(cladistic_matrix = prune_cladistic_matrix(
+  cladistic_matrix = day_2016,
+  taxa2prune = "Lycaenodon_longiceps"))
 
-# Combine x and y values into
-ordination_axes <- matrix(c(x, y),
-  ncol = 2, dimnames =
-    list(as.list(x = apply(matrix(sample(LETTERS, 8 * 8 * 101,
-      replace = TRUE
-    ), nrow = 8 * 101), 1, paste, collapse = "")), NULL)
-)
+# Build simple taxonomic groups fro Day et al 2016 daat set:
+taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener", "Hipposaurus_boonstrai",
+  "Bullacephalus_jacksoni", "Pachydectes_elsi", "Niuksenitia_sukhonensis", "Ictidorhinus_martinsi",
+  "RC_20", "Herpetoskylax_hopsoni"), Burnetiamorpha = c("Lemurosaurus_pricei", "Lobalopex_mordax",
+  "Lophorhinus_willodenensis", "Proburnetia_viatkensis", "Lende_chiweta",
+  "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098"))
 
-# Assign ages as though taxa range through entire interval (100-0 Ma):
-ages <- matrix(c(rep(100, 8 * 101), rep(0, 8 * 101)),
+# Build a sequence of equally spaced time bins spanning Day et al. 2016 data:
+time_sequence <- seq(from = 270, to = 252, length.out = 6)
+
+# Reformt this sequence into named time bin matrix:
+time_bins <- matrix(
+  data = c(time_sequence[1:(length(x = time_sequence) - 1)],
+  time_sequence[2:length(x = time_sequence)]),
   ncol = 2,
-  dimnames = list(as.list(x = rownames(x = ordination_axes)), as.list(x = c(
-    "FAD",
-    "LAD"
-  )))
+  dimnames = list(c("Bin 1", "Bin 2", "Bin 3", "Bin 4", "Bin 5"), c("fad", "lad"))
 )
 
-# Create five 20 million year time slices:
-time_slices <- seq(0, 100, length.out = 6)
-
-# Plot grid lines to show "shearing" effect is working:
+# Plot morphospace stack using named time bins:
 plot_morphospace_stack(
-  ordination_axes = ordination_axes,
-  ages = ages, time_slices = time_slices
+  pcoa_input = pcoa_input,
+  taxon_ages = taxon_ages,
+  taxon_groups = taxon_groups,
+  time_bins = time_bins,
 )
 
-# Set random seed:
-set.seed(17)
-
-# Create random values to represent ordination axes:
-ordination_axes <- matrix(rnorm(10000),
-  nrow = 100, dimnames =
-    list(as.list(x = apply(matrix(sample(LETTERS, 8 * 100, replace = TRUE), nrow = 100),
-      1, paste,
-      collapse = ""
-    )), NULL)
-)
-
-# Create random first and last appearance dates for objects:
-ages <- matrix(as.vector(apply(matrix(stats::runif(n = 200, min = 0, max = 100), ncol = 2), 1, sort,
-  decreasing = TRUE
-)),
-ncol = 2, byrow = TRUE, dimnames =
-  list(as.list(x = rownames(x = ordination_axes)), as.list(x = c("FAD", "LAD")))
-)
-
-# Create five 20 million year long time slices:
-time_slices <- seq(from = 0, to = 100, length.out = 6)
-
-# Define groups for objects at random ("red" and "blue"):
-groups <- sample(x = c("red", "blue"), size = nrow(ordination_axes), replace = TRUE)
-
-# Randomly assign objects to groups:
-names(groups) <- rownames(x = ordination_axes)
-
-# Make stacked ordination plot with convex hulls for groups:
-plot_morphospace_stack(
-  ordination_axes = ordination_axes, ages = ages,
-  groups = groups, time_slices = time_slices
-)
 }
 \references{
 Foote, M., 1993. Discordance and concordance between morphological and taxonomic diversity. \emph{Paleobiology}, \bold{19}, 185-204.
