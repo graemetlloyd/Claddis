@@ -82,9 +82,9 @@ Where my_imported_data has columns representing ordination axes (1 to N) and row
 \examples{
 
 # Build taxon ages matrix for Day et al 2016 data:
-taxon_ages <- matrix(c(269, 267, 263, 260, 265, 265, 265, 265, 257, 255, 259, 259, 258, 258, 260,
-  257, 257, 255, 257, 257, 255, 252, 259, 259, 260, 258, 253, 252, 257, 255, 257, 255), ncol = 2,
-  byrow = TRUE, dimnames = list(c("Biarmosuchus_tener", "Hipposaurus_boonstrai",
+taxon_ages <- matrix(data = c(269, 267, 263, 260, 265, 265, 265, 265, 257, 255, 259, 259, 258, 258,
+  260, 257, 257, 255, 257, 257, 255, 252, 259, 259, 260, 258, 253, 252, 257, 255, 257, 255),
+  ncol = 2, byrow = TRUE, dimnames = list(c("Biarmosuchus_tener", "Hipposaurus_boonstrai",
   "Bullacephalus_jacksoni", "Pachydectes_elsi", "Lemurosaurus_pricei", "Lobalopex_mordax",
   "Lophorhinus_willodenensis", "Proburnetia_viatkensis", "Lende_chiweta",
   "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098", "Niuksenitia_sukhonensis",
