@@ -114,7 +114,7 @@ plot_chronophylomorphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, taxo
   # Check user has rgl and stop and warn if not:
   if (!requireNamespace("rgl", quietly = TRUE)) {
     stop(paste0(
-      "To plot three-dimensional chrono-phylo-morphospaces, please install package rgl",
+      "To plot three-dimensional chronophylomorphospaces, please install package rgl",
       "\n install.packages('lattice')"
     ))
   }
@@ -127,7 +127,6 @@ plot_chronophylomorphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, taxo
     
     # If these exist stop and warn user:
     if (length(x = duplicated_taxa) > 0) paste0("The following taxa are duplicted in taxon_groups: ", paste(duplicated_taxa, collapse = ", "), ". Taxa can only be in one group.")
-    
   }
 
   
@@ -201,9 +200,9 @@ if (methods::hasArg(name = "taxon_groups")) {
   rgl::plot3d(
     pcoa_input,
     type = "n",
-    xlim = set_plot_limits(pcoa_input[, x_axis], scale_factor = 1.5),
-    ylim = set_plot_limits(pcoa_input[, y_axis], scale_factor = 1.5),
-    zlim = set_plot_limits(z_axis, 0),
+    xlim = set_plot_limits(x = pcoa_input[, x_axis], scale_factor = 1.5),
+    ylim = set_plot_limits(x = pcoa_input[, y_axis], scale_factor = 1.5),
+    zlim = set_plot_limits(x = z_axis, scale_factor = 1.5),
     asp = c(1, 1, 0.5),
     xlab = xlab, ylab = ylab,
     zlab = "Time (Ma)",
