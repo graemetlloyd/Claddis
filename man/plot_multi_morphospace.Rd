@@ -85,8 +85,12 @@ time_tree <- ape::read.tree(text = paste0("(Biarmosuchus_tener:0.5,",
 time_tree$root.time <- 269.5
 
 # Make same plot as before but with a phylogeny:
-plot_multi_morphospace(pcoa_input, n_axes = 5, taxon_groups = taxon_groups,
-  plot_convex_hulls = TRUE)
+plot_multi_morphospace(
+  pcoa_input = pcoa_input,
+  n_axes = 5,
+  taxon_groups = taxon_groups,
+  plot_convex_hulls = TRUE
+)
 
 }
 \seealso{

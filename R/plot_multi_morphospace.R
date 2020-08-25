@@ -64,8 +64,12 @@
 #' time_tree$root.time <- 269.5
 #'
 #' # Make same plot as before but with a phylogeny:
-#' plot_multi_morphospace(pcoa_input, n_axes = 5, taxon_groups = taxon_groups,
-#'   plot_convex_hulls = TRUE)
+#' plot_multi_morphospace(
+#'   pcoa_input = pcoa_input,
+#'   n_axes = 5,
+#'   taxon_groups = taxon_groups,
+#'   plot_convex_hulls = TRUE
+#' )
 #'
 #' @export plot_multi_morphospace
 plot_multi_morphospace <- function(pcoa_input, n_axes = 4, taxon_groups = NULL, plot_taxon_names = FALSE, plot_convex_hulls = FALSE, plot_internal_nodes = FALSE, plot_edges = TRUE, plot_root = TRUE, root_colour = "red", palette = "viridis", plot_group_legend = TRUE) {
