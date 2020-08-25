@@ -14,6 +14,8 @@ plot_chronophylomorphospace(
   plot_taxon_names = TRUE,
   plot_edges = TRUE,
   shadow = TRUE,
+  plot_group_legend = TRUE,
+  group_legend_position = "top_right",
   palette = "viridis"
 )
 }
@@ -36,6 +38,10 @@ plot_chronophylomorphospace(
 
 \item{shadow}{Whether or not to plot a shadow (2D plot) on the bottom face of the 3D plot (defaults to TRUE).}
 
+\item{plot_group_legend}{Whether or not to add a legend to identify the groups. Only relevant if using \code{"taxon_groups"}.}
+
+\item{group_legend_position}{Position to plot the group legend. Must be one of \code{bottom_left}, \code{bottom_right}, \code{top_left}, or \code{top_right} (the default).}
+
 \item{palette}{The palette to use for plotting each element of taxon_groups. See \link[grDevices]{palette}.}
 }
 \description{
@@ -49,28 +55,8 @@ This function aims to mimic the data visualisation of Sakamoto and Ruta (2012; t
 \examples{
 
 \dontrun{
+# Require rgl library to use:
 require(rgl)
-
-# Set random seed:
-set.seed(4)
-
-# Generate a random tree for the Michaux 1989 data set:
-time_tree <- ape::rtree(n = nrow(michaux_1989$matrix_1$matrix))
-
-# Set root time so latest tip terminates at the present:
-time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
-
-# Add taxon names to the tree:
-time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
-
-# Perform a phylogenetic Principal Coordinates Analysis:
-pcoa_input <- ordinate_cladistic_matrix(
-  cladistic_matrix = michaux_1989,
-  time_tree = time_tree
-)
-
-# Plot a chronophylomorphospace:
-plot_chronophylomorphospace(pcoa_input = pcoa_input)
 
 # Make time-scaled first MPT for Day 2016 data set:
 time_tree <- ape::read.tree(text = paste0("(Biarmosuchus_tener:0.5,",

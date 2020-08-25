@@ -13,6 +13,8 @@
 #' @param plot_taxon_names Whether or not to show the taxon nodes (defaults to TRUE).
 #' @param plot_edges Whether or not to plot the branches (defaults to TRUE).
 #' @param shadow Whether or not to plot a shadow (2D plot) on the bottom face of the 3D plot (defaults to TRUE).
+#' @param plot_group_legend Whether or not to add a legend to identify the groups. Only relevant if using \code{"taxon_groups"}.
+#' @param group_legend_position Position to plot the group legend. Must be one of \code{bottom_left}, \code{bottom_right}, \code{top_left}, or \code{top_right} (the default).
 #' @param palette The palette to use for plotting each element of taxon_groups. See \link[grDevices]{palette}.
 #'
 #' @details
@@ -34,28 +36,8 @@
 #' @examples
 #'
 #' \dontrun{
+#' # Require rgl library to use:
 #' require(rgl)
-#'
-#' # Set random seed:
-#' set.seed(4)
-#'
-#' # Generate a random tree for the Michaux 1989 data set:
-#' time_tree <- ape::rtree(n = nrow(michaux_1989$matrix_1$matrix))
-#'
-#' # Set root time so latest tip terminates at the present:
-#' time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
-#'
-#' # Add taxon names to the tree:
-#' time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
-#'
-#' # Perform a phylogenetic Principal Coordinates Analysis:
-#' pcoa_input <- ordinate_cladistic_matrix(
-#'   cladistic_matrix = michaux_1989,
-#'   time_tree = time_tree
-#' )
-#'
-#' # Plot a chronophylomorphospace:
-#' plot_chronophylomorphospace(pcoa_input = pcoa_input)
 #'
 #' # Make time-scaled first MPT for Day 2016 data set:
 #' time_tree <- ape::read.tree(text = paste0("(Biarmosuchus_tener:0.5,",
@@ -103,13 +85,9 @@
 #' }
 #'
 #' @export plot_chronophylomorphospace
-plot_chronophylomorphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, taxon_groups = NULL, plot_tips = TRUE, plot_nodes = TRUE, plot_taxon_names = TRUE, plot_edges = TRUE, shadow = TRUE, palette = "viridis") {
+plot_chronophylomorphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, taxon_groups = NULL, plot_tips = TRUE, plot_nodes = TRUE, plot_taxon_names = TRUE, plot_edges = TRUE, shadow = TRUE, plot_group_legend = TRUE, group_legend_position = "top_right", palette = "viridis") {
 
   # Add top level conditionals to check for a tree etc.
-  # Add legend somehow?
-  
-  # ONLY ADD TAXON NAMES TO TIPS!!!!
-  # MAKE CUBE-LIKE NOT SQUASHED!!!!!
 
   # Check user has rgl and stop and warn if not:
   if (!requireNamespace("rgl", quietly = TRUE)) {
@@ -128,42 +106,33 @@ plot_chronophylomorphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, taxo
     # If these exist stop and warn user:
     if (length(x = duplicated_taxa) > 0) paste0("The following taxa are duplicted in taxon_groups: ", paste(duplicated_taxa, collapse = ", "), ". Taxa can only be in one group.")
   }
-
   
+  # Check group_legend_position is a valid value and stop and warn user if not:
+  if (!group_legend_position %in% c("bottom_left", "bottom_right", "top_left", "top_right")) stop("group_legend_position must be one of \"bottom_left\", \"bottom_right\", \"top_left\", or \"top_right\".")
   
+  # Set default solid colour for each taxon to black:
+  solid_colours <- rep(x = "black", length.out = nrow(x = pcoa_input$vectors))
+  names(solid_colours) <- rownames(x = pcoa_input$vectors)
   
-  
-  
-  
-  
-
-# Set default solid colour for each taxon to black:
-solid_colours <- rep(x = "black", length.out = nrow(x = pcoa_input$vectors))
-names(solid_colours) <- rownames(x = pcoa_input$vectors)
-
-# If using taxon groups (need different colours for each one):
-if (methods::hasArg(name = "taxon_groups")) {
-  
-  # Build new solid colours with different colours for each group:
-  solid_colours <- unlist(x = lapply(X = as.list(1:length(x = taxon_groups)), function(x) {
+  # If using taxon groups (need different colours for each one):
+  if (methods::hasArg(name = "taxon_groups")) {
     
-    # Build vector of group colour:
-    group_solid_colours <- rep(x = grDevices::hcl.colors(n = length(x = taxon_groups), palette = palette, alpha = 1)[x], length.out = length(x = taxon_groups[[x]]))
-    
-    # Add taxon names to colours:
-    names(group_solid_colours) <- taxon_groups[[x]]
-    
-    # Return new group colours vector:
-    group_solid_colours
-  }))
-}
-
-
-
-
+    # Build new solid colours with different colours for each group:
+    solid_colours <- unlist(x = lapply(X = as.list(1:length(x = taxon_groups)), function(x) {
+      
+      # Build vector of group colour:
+      group_solid_colours <- rep(x = grDevices::hcl.colors(n = length(x = taxon_groups), palette = palette, alpha = 1)[x], length.out = length(x = taxon_groups[[x]]))
+      
+      # Add taxon names to colours:
+      names(group_solid_colours) <- taxon_groups[[x]]
+      
+      # Return new group colours vector:
+      group_solid_colours
+    }))
+  }
 
   # Default plotting parameters for a 2D morphospace. Need to change node colour for 3D using rgl
-  plotting_parameters <- list(tip_colour = solid_colours, tip_symbol = 21, tip_size = 2, node_colour = "white", node_symbol = 21, node_size = 1.25, branch_colour = "black", branch_width = 3, tiplabel_adjustment = c(-.1, -.1), tiplabel_colour = "black", tiplabel_size = 1)
+  plotting_parameters <- list(tip_colour = solid_colours, tip_symbol = 21, tip_size = 2, node_colour = "grey", node_symbol = 21, node_size = 1.5, branch_colour = grDevices::rgb(red = 0, blue = 0, green = 0, alpha = 1), branch_width = 1, tiplabel_adjustment = c(-.1, -.1), tiplabel_colour = "black", tiplabel_size = 1)
 
   # Isolate Tree:
   time_tree <- pcoa_input$time_tree
@@ -174,7 +143,7 @@ if (methods::hasArg(name = "taxon_groups")) {
   # Isolate pcoa axes:
   pcoa_input <- pcoa_input$vectors
 
-  # Little function to set limits for plotting (make it cube-like):
+  # Little function to set limits for plotting (to make it cube-like):
   set_plot_limits <- function(x, scale_factor) {
 
     # Get range of x:
@@ -184,7 +153,7 @@ if (methods::hasArg(name = "taxon_groups")) {
     rescaled_x_range <- scale(x_range, scale = FALSE)
 
     # Return plot limits:
-    mean(x_range) + scale_factor * rescaled_x_range
+    mean(x = x_range) + scale_factor * rescaled_x_range
   }
 
   # Get node ages for z-axis in plotting:
@@ -198,13 +167,17 @@ if (methods::hasArg(name = "taxon_groups")) {
 
   # Make empty plot:
   rgl::plot3d(
-    pcoa_input,
+    x = pcoa_input[, x_axis],
+    y = pcoa_input[, y_axis],
+    z = z_axis,
     type = "n",
     xlim = set_plot_limits(x = pcoa_input[, x_axis], scale_factor = 1.5),
     ylim = set_plot_limits(x = pcoa_input[, y_axis], scale_factor = 1.5),
-    zlim = set_plot_limits(x = z_axis, scale_factor = 1.5),
-    asp = c(1, 1, 0.5),
-    xlab = xlab, ylab = ylab,
+    zlim = rev(set_plot_limits(x = z_axis, scale_factor = 1.5)),
+    #zlim = rev(x = range(z_axis)),
+    asp = c(1, 1, 1),
+    xlab = xlab,
+    ylab = ylab,
     zlab = "Time (Ma)",
     rgl::view3d(phi = 90, fov = 30)
   )
@@ -212,9 +185,9 @@ if (methods::hasArg(name = "taxon_groups")) {
   # If requested plots tips
   if (plot_tips) {
     rgl::points3d(
-      pcoa_input[1:n_tips, 1],
-      pcoa_input[1:n_tips, 2],
-      z_axis[1:n_tips],
+      x = pcoa_input[1:n_tips, x_axis],
+      y = pcoa_input[1:n_tips, y_axis],
+      z = z_axis[1:n_tips],
       col = plotting_parameters$tip_colour[rownames(pcoa_input)],
       size = plotting_parameters$tip_size * 4
     )
@@ -223,9 +196,9 @@ if (methods::hasArg(name = "taxon_groups")) {
   # If requested plot nodes
   if (plot_nodes) {
     rgl::points3d(
-      pcoa_input[(n_tips + 1):nrow(pcoa_input), 1],
-      pcoa_input[(n_tips + 1):nrow(pcoa_input), 2],
-      z_axis[(n_tips + 1):nrow(pcoa_input)],
+      x = pcoa_input[(n_tips + 1):nrow(x = pcoa_input), x_axis],
+      y = pcoa_input[(n_tips + 1):nrow(x = pcoa_input), y_axis],
+      z = z_axis[(n_tips + 1):nrow(x = pcoa_input)],
       col = plotting_parameters$node_colour,
       size = plotting_parameters$node_size * 4
     )
@@ -233,12 +206,13 @@ if (methods::hasArg(name = "taxon_groups")) {
 
   # If requested plot branches
   if (plot_edges) {
-    for (i in 1:nrow(time_tree$edge)) {
+    for (i in 1:nrow(x = time_tree$edge)) {
       rgl::lines3d(
-        pcoa_input[(time_tree$edge[i, ]), 1],
-        pcoa_input[(time_tree$edge[i, ]), 2],
-        z_axis[(time_tree$edge[i, ])],
-        lwd = plotting_parameters$branch_width
+        x = pcoa_input[(time_tree$edge[i, ]), 1],
+        y = pcoa_input[(time_tree$edge[i, ]), 2],
+        z = z_axis[(time_tree$edge[i, ])],
+        lwd = plotting_parameters$branch_width,
+        col = plotting_parameters$branch_colour
       )
     }
   }
@@ -246,10 +220,10 @@ if (methods::hasArg(name = "taxon_groups")) {
   # If requested plot taxa labels
   if (plot_taxon_names) {
     rgl::text3d(
-      pcoa_input[, x_axis],
-      pcoa_input[, y_axis],
-      z_axis,
-      rownames(x = pcoa_input),
+      x = pcoa_input[time_tree$tip.label, x_axis],
+      y = pcoa_input[time_tree$tip.label, y_axis],
+      z = z_axis,
+      texts = time_tree$tip.label,
       col = plotting_parameters$tiplabel_colour,
       cex = plotting_parameters$tiplabel_size,
       adj = plotting_parameters$tiplabel_adjustment
@@ -260,33 +234,42 @@ if (methods::hasArg(name = "taxon_groups")) {
   if (shadow) {
 
     # Plot branches:
-    for (i in 1:nrow(time_tree$edge)) {
+    for (i in 1:nrow(x = time_tree$edge)) {
       rgl::lines3d(
-        pcoa_input[(time_tree$edge[i, ]), 1],
-        pcoa_input[(time_tree$edge[i, ]), 2],
-        time_tree$root.time,
-        lwd = 2,
-        alpha = 0.5
+        x = pcoa_input[(time_tree$edge[i, ]), x_axis],
+        y = pcoa_input[(time_tree$edge[i, ]), y_axis],
+        z = time_tree$root.time,
+        lwd = 1,
+        col = grDevices::rgb(red = 0.5, blue = 0.5, green = 0.5, alpha = 0.5)
       )
     }
 
     # Plot internal nodes:
     rgl::points3d(
-      pcoa_input[(n_tips + 1):nrow(pcoa_input), 1],
-      pcoa_input[(n_tips + 1):nrow(pcoa_input), 2],
-      time_tree$root.time,
-      col = plotting_parameters$node_colour,
-      size = plotting_parameters$node_size * 4,
-      alpha = 0.5
+      x = pcoa_input[(n_tips + 1):nrow(x = pcoa_input), x_axis],
+      y = pcoa_input[(n_tips + 1):nrow(x = pcoa_input), y_axis],
+      z = time_tree$root.time,
+      size = plotting_parameters$node_size,
+      col = grDevices::rgb(red = 0.5, blue = 0.5, green = 0.5, alpha = 0.5)
     )
 
     # Plot tips:
-    rgl::points3d(pcoa_input[1:n_tips, 1],
-      pcoa_input[1:n_tips, 2],
-      time_tree$root.time,
-      col = plotting_parameters$tip_colour,
-      size = plotting_parameters$tip_size * 4,
-      alpha = 0.5
+    rgl::points3d(
+      x = pcoa_input[1:n_tips, x_axis],
+      y = pcoa_input[1:n_tips, y_axis],
+      z = time_tree$root.time,
+      size = plotting_parameters$tip_size,
+      col = grDevices::rgb(red = 0.5, blue = 0.5, green = 0.5, alpha = 0.5)
     )
+  }
+  
+  # If plotting a group legend:
+  if(methods::hasArg(name = "taxon_groups") && plot_group_legend) {
+    
+    # Add groups legend to plot in requested position:
+    if(group_legend_position == "bottom_left") rgl::legend3d("bottomleft", legend = names(taxon_groups), fill = grDevices::hcl.colors(n = length(x = taxon_groups), palette = palette, alpha = 1), bg = "white")
+    if(group_legend_position == "bottom_right") rgl::legend3d("bottommright", legend = names(taxon_groups), fill = grDevices::hcl.colors(n = length(x = taxon_groups), palette = palette, alpha = 1), bg = "white")
+    if(group_legend_position == "top_left") rgl::legend3d("topleft", legend = names(taxon_groups), fill = grDevices::hcl.colors(n = length(x = taxon_groups), palette = palette, alpha = 1), bg = "white")
+    if(group_legend_position == "top_right") rgl::legend3d("topright", legend = names(taxon_groups), fill = grDevices::hcl.colors(n = length(x = taxon_groups), palette = palette, alpha = 1), bg = "white")
   }
 }
