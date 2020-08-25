@@ -171,7 +171,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
       })
       
       # Warn user that this has happened in case it is an error:
-      if (inform) print(paste0("Warning: The following taxa were removed from taxon_groups as they do not appear in pcoa_input: ", paste(taxa_to_prune, collapse = ", "), ". You may wish to double check this makes sense (e.g., because of incomplete taxa being removed by trim_matrix) and is not due to a typographical or oher error which means names are not an exact match."))
+      if (inform) print(paste0("Warning: The following taxa were removed from taxon_groups as they do not appear in pcoa_input: ", paste(taxa_to_prune, collapse = ", "), ". You may wish to double check this makes sense (e.g., because of incomplete taxa being removed by trim_matrix) and is not due to a typographical or other error which means names are not an exact match."))
     }
     
   }
