@@ -323,7 +323,7 @@ plot_morphospace_stack <- function(pcoa_input, taxon_ages, taxon_groups, time_bi
     }
 
     # Plot points as coloured polygons:
-    plotted_points <- lapply(X = plot_parameters$point_coordinates, FUN = function(z) lapply(X = z, FUN = function(q) graphics::polygon(x = q[, "x"], y = q[, "y"] + y_addition, border = NA, col = solid_colours[names(z)])))
+    plotted_points <- lapply(X = plot_parameters$point_coordinates, FUN = function(z) lapply(X = z, FUN = function(q) graphics::polygon(x = q[, "x"], y = q[, "y"] + y_addition, border = "black", lwd = 0.5, col = solid_colours[names(z)])))
     
     # If plotting time bin names, add these at back right of each platform:
     if (plot_timebin_names) graphics::text(x = plot_parameters$text_coordinates[, "x"] - 1, y = plot_parameters$text_coordinates[, "y"] + y_addition + 2, labels = plot_parameters$bin_name, adj = 1, xpd = NA)
