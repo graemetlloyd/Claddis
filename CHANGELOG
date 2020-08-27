@@ -1,3 +1,6 @@
+- Fixed bug in assign_taxa_to_bins where no taxa were being returned because a names field was blank.
+- Tweaked plotting of points in plot_morphospace_stack to include a black outline to make them more visible.
+
 Version - 0.6.1 - 2020-25-08
 
 - Major upgrades to basic morphospace plotting function, including more options, cleaner plotting, better manual and examples.
@@ -7,6 +10,7 @@ Version - 0.6.1 - 2020-25-08
 - Added see also sections to the various disparity plotting functions to better communicate plotting options.
 - Completely rewritten morphospace stacked plot function, including renaming many input values to standardise this with other disparity plotting functions. New options include plotting of crosshairs, tickmarks, gridcells, pillars, and a group legend, as well as options to overlap or space out each platform and to choose the point size. Improvements include better convex hull plotting, a better functioning "cushion" option around points, better platform naming options, and points are now plotted "sheared" along with everything else, to make overall plotting style consistent.
 - Made some tweaks to chronophylomorphospace plotting function to bring it more in line with other disparity plotting functions, including renaming variables and adding option to assign tips to different groups and colour them accordingly as well as add a legend depicting this.
+- Successfully submitted version to CRAN.
 
 Version - 0.6.0 - 2020-12-08
 
