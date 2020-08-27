@@ -5,12 +5,21 @@ Claddis
 Status](https://travis-ci.org/graemetlloyd/Claddis.svg?branch=master)](https://travis-ci.org/graemetlloyd/Claddis)
 [![cran
 version](https://www.r-pkg.org/badges/version/Claddis)](https://cran.r-project.org/package=Claddis)
+[![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/grand-total/Claddis)](https://github.com/metacran/cranlogs.app)
+![](http://cranlogs.r-pkg.org/badges/Claddis)
 
-Claddis is an R package designed to import cladistic-type data sets (#NEXUS format) into R and perform disparity and rate tests.
+Claddis is an R package designed to import cladistic-type data sets (#NEXUS format) into R and perform disparity analysis and rate tests.
 
 # Version
 
-Claddis is on [CRAN](https://cran.r-project.org/package=Claddis) (version 0.3.4) but is currently (13/08/20) far behind the latest GitHub version (version 0.6.0). It is recommended that you install from GitHub presently.
+Claddis is on [CRAN](https://cran.r-project.org/package=Claddis) (version 0.6.1) but is also being developed on GitHub. To get the absolute latest version you can use:
+
+```r
+if(!require(devtools)) install.packages("devtools", dependencies = TRUE)
+devtools::install_github("graemetlloyd/Claddis", ref = "master")
+```
+
+However, installing a development version of a package is only recommended for expert users.
 
 Please also consult the CHANGELOG file for all updates (including new functions, features and bug fixes) to Claddis.
 
@@ -25,7 +34,8 @@ install.packages("Claddis", dependencies = TRUE)
 Or from GitHub with:
 
 ```r
-devtools::install_github("graemetlloyd/Claddis")
+if(!require(devtools)) install.packages("devtools", dependencies = TRUE)
+devtools::install_github("graemetlloyd/Claddis", ref = "CRAN")
 ```
 
 And load it into memory using:
@@ -47,6 +57,8 @@ And clicking on the Index link at the base of the help file will reveal links to
 # Tutorials
 
 Note that I have previously linked to tutorials for the package here, but substantial reworking of the core code means these will no longer work and so currently the example code in each function's help file is the best substitute for this. New tutorials will eventually be produced and shared here.
+
+Users should also be aware of the [dispRity](https://cran.r-project.org/package=dispRity) R package, that can form the end of a Claddis disparity pipeline.
 
 # Citation
 
