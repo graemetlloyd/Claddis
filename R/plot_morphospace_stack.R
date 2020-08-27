@@ -132,8 +132,11 @@ plot_morphospace_stack <- function(pcoa_input, taxon_ages, taxon_groups, time_bi
     cbind(x = unlist(x = lapply(X = as.list(1:resolution), FUN = function(z) x + (radius * cos(2 * pi * z / resolution)))), y = unlist(x = lapply(X = as.list(1:resolution), FUN = function(z) y + (radius * sin(2 * pi * z / resolution)))))
   }
   
+  # If using taxon_groups set to TRUE, else FALSE:
+  taxon_groups_used <- ifelse(test = methods::hasArg(name = "taxon_groups"), yes = TRUE, no = FALSE)
+  
   # If using taxon_groups:
-  if (methods::hasArg(name = "taxon_groups")) {
+  if (taxon_groups_used) {
 
     # Find any taxa duplicated across taxon_group:
     duplicated_taxa <- sort(x = unique(x = unname(obj = unlist(x = taxon_groups))[duplicated(x = unname(obj = unlist(x = taxon_groups)))]))
@@ -158,7 +161,7 @@ plot_morphospace_stack <- function(pcoa_input, taxon_ages, taxon_groups, time_bi
   names(solid_colours) <- rownames(x = pcoa_input$vectors)
   
   # If using taxon groups (need different colours for each one):
-  if (methods::hasArg(name = "taxon_groups")) {
+  if (taxon_groups_used) {
     
     # Build new solid colours with different colours for each group:
     solid_colours <- unlist(x = lapply(X = as.list(1:length(x = taxon_groups)), function(x) {
@@ -175,6 +178,12 @@ plot_morphospace_stack <- function(pcoa_input, taxon_ages, taxon_groups, time_bi
     
     # Set transparent colours (for use with plotting convex hulls):
     transparent_colours <- grDevices::hcl.colors(n = length(x = taxon_groups), palette = palette, alpha = 0.5)
+  
+  # If no taxon_groups were used:
+  } else {
+    
+    # Make single vector of everything so plotting functions below work fine:
+    taxon_groups <- list(All = rownames(x = pcoa_input$vectors))
   }
   
   # Record the number of stacks to plot:
@@ -309,7 +318,7 @@ plot_morphospace_stack <- function(pcoa_input, taxon_ages, taxon_groups, time_bi
     if (plot_grid_cells) plotted_gridlines <- lapply(X = plot_parameters$horizontal_gridlines, FUN = function(z) graphics::lines(x = z[, "x"], y = z[, "y"] + y_addition, lwd = 0.5, lty = 3))
     
     # If user has requested convex hulls (and their are groups that make these logical):
-    if (plot_convex_hulls && !is.null(taxon_groups)) {
+    if (plot_convex_hulls && taxon_groups_used) {
       
       # Go through group polygons:
       lapply(X = as.list(1:length(x = plot_parameters$group_polygon_coordinates)), FUN = function(z) {
@@ -372,7 +381,7 @@ plot_morphospace_stack <- function(pcoa_input, taxon_ages, taxon_groups, time_bi
   }
   
   # If plotting a group legend:
-  if (methods::hasArg("taxon_groups") && plot_group_legend) {
+  if (taxon_groups_used && plot_group_legend) {
     
     # Amount to nudge legend away from croners of plot:
     legend_adjustment <- 1
