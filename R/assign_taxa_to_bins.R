@@ -103,7 +103,7 @@ assign_taxa_to_bins <- function(taxon_ages, named_time_bins) {
   colnames(x = named_time_bins) <- tolower(x = colnames(x = named_time_bins))
   
   # Assign taxa to bins:
-  taxa_assigned_to_bins <- lapply(X = as.list(x = rownames(x = named_time_bins)), FUN = function(x) names(x = which(x = c(taxon_ages[, "fad"] > named_time_bins[x, "lad"]) + c(taxon_ages[, "lad"] < named_time_bins[x, "fad"]) == 2)))
+  taxa_assigned_to_bins <- lapply(X = as.list(x = rownames(x = named_time_bins)), FUN = function(x) rownames(x = taxon_ages)[(c(taxon_ages[, "fad"] > named_time_bins[x, "lad"]) + c(taxon_ages[, "lad"] < named_time_bins[x, "fad"])) == 2])
   
   # Add group names from time bins:
   names(x = taxa_assigned_to_bins) <- rownames(x = named_time_bins)
