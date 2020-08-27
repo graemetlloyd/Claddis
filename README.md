@@ -4,11 +4,11 @@ Claddis is an R package designed to import cladistic-type data sets (#NEXUS form
 
 # Package status
 
-Travis release: [![Build Status](https://travis-ci.org/TGuillerme/Claddis.svg?branch=CRAN)](https://travis-ci.org/graemetlloyd/Claddis)
+### Travis release version [![Build Status](https://travis-ci.org/TGuillerme/Claddis.svg?branch=CRAN)](https://travis-ci.org/graemetlloyd/Claddis)
 
-Travis master: [![Build Status](https://travis-ci.org/TGuillerme/Claddis.svg?branch=master)](https://travis-ci.org/graemetlloyd/Claddis)
+### Travis development version [![Build Status](https://travis-ci.org/TGuillerme/Claddis.svg?branch=master)](https://travis-ci.org/graemetlloyd/Claddis)
 
-CRAN: [![minimal R version](https://img.shields.io/badge/R%3E%3D-3.3.3-6666ff.svg)](https://cran.r-project.org/)
+### CRAN [![minimal R version](https://img.shields.io/badge/R%3E%3D-3.3.3-6666ff.svg)](https://cran.r-project.org/)
 [![cran
 version](https://www.r-pkg.org/badges/version/Claddis)](https://cran.r-project.org/package=Claddis)
 [![rstudio mirror downloads](http://cranlogs.r-pkg.org/badges/grand-total/Claddis)](https://github.com/metacran/cranlogs.app)
