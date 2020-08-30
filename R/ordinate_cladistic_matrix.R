@@ -91,6 +91,9 @@ ordinate_cladistic_matrix <- function(cladistic_matrix, distance_metric = "mord"
   # Allow the "bad" phylomorphospace type (ordination axis continuous ancestors).
   # Add scree values to output and use in plotting functions.
 
+  # Check cladistic_matrix has class cladisticMatrix and stop and warn user if not:
+  if (!inherits(x = cladistic_matrix, what = "cladisticMatrix")) stop("cladistic_matrix must be an object of class \"cladisticMatrix\".")
+
   # If no tree is supplied:
   if (is.null(time_tree)) {
 

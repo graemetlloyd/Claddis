@@ -42,6 +42,9 @@ compactify_matrix <- function(cladistic_matrix, message = TRUE) {
 
   # FUTURE COULD CHECK FOR UNORD AND ORD WHEN BINARY AND HENCE MEANINGLESS
 
+  # Check cladistic_matrix has class cladisticMatrix and stop and warn user if not:
+  if (!inherits(x = cladistic_matrix, what = "cladisticMatrix")) stop("cladistic_matrix must be an object of class \"cladisticMatrix\".")
+
   # List any zero weight characters:
   zero_weight_characters <- which(x = unlist(x = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], "[[", "character_weights")) == 0)
 

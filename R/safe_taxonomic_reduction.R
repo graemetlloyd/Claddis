@@ -44,6 +44,9 @@
 #' @export safe_taxonomic_reduction
 safe_taxonomic_reduction <- function(cladistic_matrix) {
 
+  # Check cladistic_matrix has class cladisticMatrix and stop and warn user if not:
+  if (!inherits(x = cladistic_matrix, what = "cladisticMatrix")) stop("cladistic_matrix must be an object of class \"cladisticMatrix\".")
+
   # Store unaltered version of matrix to return to later:
   clean_matrix <- cladistic_matrix
 

@@ -33,6 +33,9 @@
 #' @export write_nexus_matrix
 write_nexus_matrix <- function(cladistic_matrix, file_name) {
 
+  # Check cladistic_matrix has class cladisticMatrix and stop and warn user if not:
+  if (!inherits(x = cladistic_matrix, what = "cladisticMatrix")) stop("cladistic_matrix must be an object of class \"cladisticMatrix\".")
+
   # Subfunction to convert matrices back to symbols, missing and gap characters:
   convert_matrix <- function(data_matrix) {
 

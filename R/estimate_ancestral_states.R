@@ -77,6 +77,9 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   # Handle only two tips case properly
   # Add Liam Revell polymorphism options
 
+  # Check cladistic_matrix has class cladisticMatrix and stop and warn user if not:
+  if (!inherits(x = cladistic_matrix, what = "cladisticMatrix")) stop("cladistic_matrix must be an object of class \"cladisticMatrix\".")
+
   # Get number of tips in tree:
   n_tips <- ape::Ntip(phy = time_tree)
 

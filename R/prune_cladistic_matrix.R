@@ -36,6 +36,9 @@ prune_cladistic_matrix <- function(cladistic_matrix, blocks2prune = c(), charact
 
   # How do blocks and characters to prune interact? (explain to user in manual)
 
+  # Check cladistic_matrix has class cladisticMatrix and stop and warn user if not:
+  if (!inherits(x = cladistic_matrix, what = "cladisticMatrix")) stop("cladistic_matrix must be an object of class \"cladisticMatrix\".")
+
   # Subfunction to find length of character types for each character (i.e., unique values excluding polymorphisms but included inapplicables):
   find_length <- function(x) {
 

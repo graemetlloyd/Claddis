@@ -101,6 +101,9 @@ map_stochastic_changes <- function(cladistic_matrix, time_tree, time_bins, n_sim
   # SMEARING BACK AND SMEARING FORWARD SOMETHIG TO NITHING AND NOTHING TO SOMETHING CHANGES MAY BE DIFFERENT. PERHAPS HAVE OPTION TO TREAT TIMESTAMP FOR THESE TO VARY.
   # IF ADDING TREES TO OUTPUT CONVERT THEM TO CLASS MULTIPHYLO, E.G. STOCHASTIC CHARACTER MAPS WITH NAS - NOTE THIS IN MANUAL TOO AS AN EXTENSION OF WHAT PHTTOOLS DOES.
 
+  # Check cladistic_matrix has class cladisticMatrix and stop and warn user if not:
+  if (!inherits(x = cladistic_matrix, what = "cladisticMatrix")) stop("cladistic_matrix must be an object of class \"cladisticMatrix\".")
+
   # Check for continuous and step matrices and stop and warn user if found:
   if (length(x = setdiff(x = unique(x = unlist(x = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], function(x) x$ordering))), y = c("unord", "ord"))) > 0) stop("cladistic_matrix can only contain characters of type \"ord\" or \"unord\" (i.e., no step matrices or continuous characters).")
 

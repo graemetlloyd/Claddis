@@ -40,7 +40,7 @@
 #'
 #' @references
 #'
-#' Gower, J. C., 1971. A general coefficient of similarity and some of its properties. \emph{Biometrika}, \bold{27}, 857<U+2013>871.
+#' Gower, J. C., 1971. A general coefficient of similarity and some of its properties. \emph{Biometrika}, \bold{27}, 857-871.
 #'
 #' Hopkins, M. J. and St John, K., 2018. A new family of dissimilarity metrics for discrete character matrices that include inapplicable characters and its importance for disparity studies. \emph{Proceedings of the Royal Society of London B}, \bold{285}, 20181784.
 #'
@@ -110,7 +110,10 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
   # CONSIDER DISTANCES FOR POLYMORPHISMS IN SAME WAY PHYTOOLS DOES WITH POLYMK
   # ADD TRANSORMATION USED TO OUTPUT (AS MAY CHANGE IF OPTIONS COLLIDE)
   # ALLOW WMPD SOMEHOW? MAYBE A SEPARATE FUNCTION WITH GROUPS (WHICH NEEDS TO BE IMPLEMENTED ACROSS THE PACKAGE FOR DISPARITY PLOTS ETC.)
-  # <U+00A0>RETOOL AROUND STOCHASTIC CHARACTER MAPS IF DOING PHYLOGENY TOO
+  # RETOOL AROUND STOCHASTIC CHARACTER MAPS IF DOING PHYLOGENY TOO
+
+  # Check cladistic_matrix has class cladisticMatrix and stop and warn user if not:
+  if (!inherits(x = cladistic_matrix, what = "cladisticMatrix")) stop("cladistic_matrix must be an object of class \"cladisticMatrix\".")
 
   # Subfunction to find comparable characters for a pairwise taxon comparison:
   find_comparable <- function(taxon_pair, cladistic_matrix) {

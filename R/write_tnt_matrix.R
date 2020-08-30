@@ -40,6 +40,9 @@
 #' @export write_tnt_matrix
 write_tnt_matrix <- function(cladistic_matrix, file_name, add_analysis_block = FALSE) {
 
+  # Check cladistic_matrix has class cladisticMatrix and stop and warn user if not:
+  if (!inherits(x = cladistic_matrix, what = "cladisticMatrix")) stop("cladistic_matrix must be an object of class \"cladisticMatrix\".")
+
   # Subfunction to convert matrices back to symbols, missing and gap characters:
   convert_matrix <- function(cladistic_matrix) {
 

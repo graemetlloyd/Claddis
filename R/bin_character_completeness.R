@@ -57,6 +57,9 @@ bin_character_completeness <- function(cladistic_matrix, time_tree, time_bins, p
   # - Add an aphylogenetic option
   # - Allow binning in other ways. E.g., by character grouping.
 
+  # Check cladistic_matrix has class cladisticMatrix and stop and warn user if not:
+  if (!inherits(x = cladistic_matrix, what = "cladisticMatrix")) stop("cladistic_matrix must be an object of class \"cladisticMatrix\".")
+  
   # Subfunction for getting missing and inapplicable characters:
   find_missing_and_inapplicable <- function(x) {
 
