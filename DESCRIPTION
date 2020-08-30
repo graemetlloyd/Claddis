@@ -1,8 +1,8 @@
 Package: Claddis
 Type: Package
 Title: Measuring Morphological Diversity and Evolutionary Tempo
-Version: 0.6.1
-Date: 2020-08-25
+Version: 0.6.2
+Date: 2020-08-30
 Authors@R: c(
     person(given = "Graeme T.", family = "Lloyd",
     email = "graemetlloyd@gmail.com", role = c("aut", "cre", "cph")),
