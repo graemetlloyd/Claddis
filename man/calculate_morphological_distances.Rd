@@ -108,7 +108,7 @@ distances$distance_matrix
 distances$comparable_character_matrix
 }
 \references{
-Gower, J. C., 1971. A general coefficient of similarity and some of its properties. \emph{Biometrika}, \bold{27}, 857<U+2013>871.
+Gower, J. C., 1971. A general coefficient of similarity and some of its properties. \emph{Biometrika}, \bold{27}, 857-871.
 
 Hopkins, M. J. and St John, K., 2018. A new family of dissimilarity metrics for discrete character matrices that include inapplicable characters and its importance for disparity studies. \emph{Proceedings of the Royal Society of London B}, \bold{285}, 20181784.
 
