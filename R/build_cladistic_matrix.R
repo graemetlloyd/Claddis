@@ -194,6 +194,12 @@ build_cladistic_matrix <- function(character_taxon_matrix, header = "", characte
   # Build matrix_1 list:
   matrix_1 <- list(block_name = NA, datatype = "STANDARD", matrix = character_taxon_matrix, ordering = ordering, character_weights = character_weights, minimum_values = minimum_values, maximum_values = maximum_values, characters = characters)
 
-  # Return assimilated output:
-  list(topper = topper, matrix_1 = matrix_1)
+  # Combine output:
+  cladistic_matrix <- list(topper = topper, matrix_1 = matrix_1)
+  
+  # Assign class to cladistic_matrix:
+  class(cladistic_matrix) <- "cladisticMatrix"
+  
+  # Return cladistic_matrix:
+  invisible(cladistic_matrix)
 }

@@ -1216,6 +1216,9 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
     names(cladistic_matrix)[(i + 1)] <- paste("matrix_", i, sep = "")
     
   }
+  
+  # Assign class to cladistic_matrix:
+  class(cladistic_matrix) <- "cladisticMatrix"
 
   # Return cladistic_matrix invisibly:
   invisible(cladistic_matrix)
