@@ -1,3 +1,5 @@
+Version - 0.6.2 - 2020-30-08
+
 - Fixed bug in assign_taxa_to_bins where no taxa were being returned because a names field was blank.
 - Tweaked plotting of points in plot_morphospace_stack to include a black outline to make them more visible.
 
