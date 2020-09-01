@@ -201,5 +201,5 @@ build_cladistic_matrix <- function(character_taxon_matrix, header = "", characte
   class(cladistic_matrix) <- "cladisticMatrix"
   
   # Return cladistic_matrix:
-  invisible(cladistic_matrix)
+  cladistic_matrix
 }

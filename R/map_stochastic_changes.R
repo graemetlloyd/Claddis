@@ -987,5 +987,5 @@ map_stochastic_changes <- function(cladistic_matrix, time_tree, time_bins, n_sim
   output <- list(all_state_changes = all_state_changes, character_times = character_times, binned_edge_lengths = binned_edge_lengths, binned_terminal_edge_lengths = binned_terminal_edge_lengths, binned_internal_edge_lengths = binned_internal_edge_lengths)
 
   # Return output:
-  return(invisible(output))
+  invisible(output)
 }

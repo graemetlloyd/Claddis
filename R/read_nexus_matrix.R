@@ -1221,6 +1221,5 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   class(cladistic_matrix) <- "cladisticMatrix"
 
   # Return cladistic_matrix invisibly:
-  invisible(cladistic_matrix)
-
+  cladistic_matrix
 }
