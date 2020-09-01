@@ -10,7 +10,7 @@
 \item{cladistic_matrix}{An object of class \code{"cladisticMatrix"}.}
 }
 \value{
-Nothing is directly retrned, instead a text summary describing the dimensions and nature of an object of class \code{"cladisticMatrix"} is printed to the console.
+Nothing is directly returned, instead a text summary describing the dimensions and nature of an object of class \code{"cladisticMatrix"} is printed to the console.
 }
 \description{
 Displays a compact summary of the dimensions and nature of a cladistic matrix object.

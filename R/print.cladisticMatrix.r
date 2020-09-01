@@ -12,7 +12,7 @@
 #'
 #' @return
 #'
-#' Nothing is directly retrned, instead a text summary describing the dimensions and nature of an object of class \code{"cladisticMatrix"} is printed to the console.
+#' Nothing is directly returned, instead a text summary describing the dimensions and nature of an object of class \code{"cladisticMatrix"} is printed to the console.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
