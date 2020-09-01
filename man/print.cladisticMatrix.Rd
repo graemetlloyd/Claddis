@@ -10,13 +10,13 @@
 \item{cladistic_matrix}{An object of class \code{"cladisticMatrix"}.}
 }
 \value{
-A summary describing the dimensions and nature of an object of class \code{"cladisticMatrix"}.
+Nothing is directly retrned, instead a text summary describing the dimensions and nature of an object of class \code{"cladisticMatrix"} is printed to the console.
 }
 \description{
 Displays a compact summary of the dimensions and nature of a cladistic matrix object.
 }
 \details{
-TO ADD.
+Displays some basic summary information on a cladistic matrix object, including number and type of characters, information about ordering, and whether variable weights are used.
 }
 \examples{
 
@@ -27,7 +27,7 @@ print.cladisticMatrix(cladistic_matrix = michaux_1989)
 
 }
 \seealso{
-TO ADD
+\link{build_cladistic_matrix}, \link{compactify_matrix}, \link{prune_cladistic_matrix}, \link{read_nexus_matrix}, \link{safe_taxonomic_reduction}, \link{write_nexus_matrix}, \link{write_tnt_matrix}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
