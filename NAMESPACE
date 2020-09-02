@@ -1,3 +1,5 @@
+# This fiel no longer genearted by roxygen as that cannot handle the S3 methods properly
+
 # Exports:
 export(align_matrix_block)
 export(assign_taxa_to_bins)
