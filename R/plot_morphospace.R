@@ -70,8 +70,7 @@
 #' # Define some simple taxon groups for the data as a named list:
 #' taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener",
 #'   "Hipposaurus_boonstrai", "Bullacephalus_jacksoni", "Pachydectes_elsi",
-#'   "Niuksenitia_sukhonensis", "Ictidorhinus_martinsi", "RC_20",
-#'   "Herpetoskylax_hopsoni"),
+#'   "Ictidorhinus_martinsi", "RC_20", "Herpetoskylax_hopsoni"),
 #'   Burnetiamorpha = c("Lemurosaurus_pricei", "Lobalopex_mordax",
 #'   "Lophorhinus_willodenensis", "Proburnetia_viatkensis", "Lende_chiweta",
 #'   "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098"))
