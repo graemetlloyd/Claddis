@@ -286,7 +286,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
     while(length(x = grep("  ", lines_to_edit)) > 0) lines_to_edit <- gsub(pattern = "  ", replacement = " ", x = lines_to_edit, fixed = TRUE)
 
     # Now isolate names within single quotes:
-    names_in_single_quotes <- unique(x = gsub(pattern = "'", replacement = "", x = strsplit(gdata::trim(paste(lines_to_edit, collapse = "")), "' '")[[1]]))
+    names_in_single_quotes <- unique(x = gsub(pattern = "'", replacement = "", x = strsplit(trim_marginal_whitespace(paste(lines_to_edit, collapse = "")), "' '")[[1]]))
 
     # Make sure nothing "" is not in this list:
     names_in_single_quotes <- which(x = !names_in_single_quotes == "")
