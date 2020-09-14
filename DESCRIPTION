@@ -18,7 +18,6 @@ Depends:
     R (>= 3.5.0)
 Imports:
     clipr,
-    gdata,
     geoscale,
     graphics,
     grDevices,

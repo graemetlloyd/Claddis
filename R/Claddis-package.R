@@ -30,7 +30,6 @@
 
 
 #' @importFrom clipr write_clip
-#' @importFrom gdata trim
 #' @importFrom geoscale geoscalePlot
 #' @importFrom graphics layout legend lines par plot points polygon text
 #' @importFrom grDevices adjustcolor chull hcl.colors rgb
