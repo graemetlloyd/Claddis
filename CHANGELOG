@@ -7,6 +7,8 @@ Version - 0.6.3 - 2020-14-09
 - Made output of read_nexus_matrix and build_cladistic_matrix no longer invisible (now the output will appear more compact if printed to screen).
 - Added new trim_marginal_whitespace function to replace defunct gdata::trim function (no noticeable change for users).
 - Removed gdata from imports (no noticeable chage to users).
+- Fixed bug in compactify_matrix that was stripping out taxon names.
+- Updated read_nexus_matrix to use new trim_marginal_whitespace function.
 
 Version - 0.6.2 - 2020-30-08
 
