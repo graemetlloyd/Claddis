@@ -18,29 +18,39 @@
 #'
 #' @examples
 #'
-#' #
+#' # Example string:
 #' x <- "   \td s f\t s  "
 #'
-#' #
+#' # Trim only marginal whitespace:
 #' trim_marginal_whitespace(x)
 #'
 #' @export trim_marginal_whitespace
-trim_marginal_whitespace <- function(x) { 
-
-  # Split string into individual characters/whitespace:
-  split_string <- strsplit(x = x, split = "")[[1]]
-
-  # Find positions of any whitespace:
-  position_is_whitespace <- apply(X = rbind(split_string == " ", split_string == "\t"), MARGIN = 2, FUN = any)
+trim_marginal_whitespace <- function(x) {
   
-  # Find first non-whitesapce position:
-  first_non_qwhitespace_position <- min(which(position_is_whitespace == FALSE))
+  # As long as the string has positive length:
+  if (nchar(x = x) > 0) {
+    
+    # Split string into individual characters/whitespace:
+    split_string <- strsplit(x = x, split = "")[[1]]
+    
+    # Find positions of any whitespace:
+    position_is_whitespace <- apply(X = rbind(split_string == " ", split_string == "\t"), MARGIN = 2, FUN = any)
+    
+    # Find first non-whitesapce position:
+    first_non_qwhitespace_position <- min(which(position_is_whitespace == FALSE))
+    
+    # Find last non-whitesapce position:
+    last_non_whitespace_position <- max(which(position_is_whitespace == FALSE))
+    
+    # Return trimmed string:
+    return(value = paste(split_string[first_non_qwhitespace_position:last_non_whitespace_position], collapse = ""))
   
-  # Find last non-whitesapce position:
-  last_non_whitespace_position <- max(which(position_is_whitespace == FALSE))
-  
-  # Return trimmed string:
-  paste(split_string[first_non_qwhitespace_position:last_non_whitespace_position], collapse = "")
+  # If string has no length:
+  } else {
+    
+    # Return string as is:
+    return(value = x)
+  }
 
 }
 
