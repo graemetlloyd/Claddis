@@ -304,9 +304,12 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
 
   # Remove weird characters (may need to add to the list or not if Sys.setlocale fixes the issues):
   raw_nexus <- gsub(pattern = "\x94|\x93|\xd5|\xd4|\xd3|\xd2|'", replacement = "", x = raw_nexus)
+  
+  # Replace all tabs with spaces:
+  raw_nexus <- gsub(pattern = "\t", replacement = " ", x = raw_nexus)
 
   # Replace tabs with spaces and trim leading and trailing spaces from each line:
-  raw_nexus <- apply(matrix(gsub(pattern = "\t", replacement = " ", x = raw_nexus)), 2, trim_marginal_whitespace)
+  raw_nexus <- unlist(x = lapply(X = as.list(raw_nexus), FUN = trim_marginal_whitespace))
 
   # Delete any empty lines (if present):
   if (length(x = which(x = raw_nexus == "")) > 0) raw_nexus <- raw_nexus[-which(x = raw_nexus == "")]
