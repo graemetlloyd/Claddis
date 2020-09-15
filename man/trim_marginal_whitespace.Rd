@@ -10,13 +10,13 @@ trim_marginal_whitespace(x)
 \item{x}{A character string}
 }
 \value{
-A character string with any leading or trailing whitespace removed.
+A vector of character string(s) with any leading or trailing whitespace removed.
 }
 \description{
-Trims any marginal whitespace from a character string.
+Trims any marginal whitespace from a vector of character string(s).
 }
 \details{
-Trims any marginal whitespace (spaces or tabs) from a character string.
+Trims any marginal whitespace (spaces or tabs) from a vector of character string(s).
 }
 \examples{
 
