@@ -20,10 +20,10 @@ Trims any marginal whitespace (spaces or tabs) from a character string.
 }
 \examples{
 
-#
+# Example string:
 x <- "   \td s f\t s  "
 
-#
+# Trim only marginal whitespace:
 trim_marginal_whitespace(x)
 
 }
