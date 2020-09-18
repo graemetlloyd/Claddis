@@ -197,6 +197,8 @@
 #' )
 #' @export test_rates
 test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions = NULL, character_partitions = NULL, clade_partitions = NULL, time_partitions = NULL, change_times = "random", test_type = "aic", alpha = 0.01, multiple_comparison_correction = "benjaminihochberg", polymorphism_state = "missing", uncertainty_state = "missing", inapplicable_state = "missing", time_binning_approach = "lloyd", all_weights_integers = FALSE, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, polymorphism_behaviour = "equalp", uncertainty_behaviour = "equalp", threshold = 0.01, all_missing_allowed = FALSE) {
+  
+  # MAKE RATES OUTPUT MAKE SENSE BY PROELRY SEPARATING COMPLETENESS AND DURATION
 
   # ADD EXAMPLES OF VISUALISED OUTPUT (MENTION IN MANUAL AN ADD PLOT FUNCTIONS TO SEALSO_
 
