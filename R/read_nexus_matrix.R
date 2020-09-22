@@ -630,7 +630,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
       if (length(x = datatype_row) > 0) {
         
         # Store datatype:
-        datatype <- strsplit(strsplit(toupper(raw_nexus[datatype_row]), split = "DATATYPE=")[[1]][2], split = " ")[[1]][1]
+        datatype <- strsplit(strsplit(toupper(x[datatype_row]), split = "DATATYPE=")[[1]][2], split = " ")[[1]][1]
         
       # If datatype is not specified:
       } else {
