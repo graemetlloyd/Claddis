@@ -9,6 +9,7 @@ Version - 0.6.3 - 2020-14-09
 - Removed gdata from imports (no noticeable chage to users).
 - Fixed bug in compactify_matrix that was stripping out taxon names.
 - Updated read_nexus_matrix to use new trim_marginal_whitespace function.
+- Fixed bug with reading symbols for continuous characters in read_nexus_matrix.
 
 Version - 0.6.2 - 2020-30-08
 
