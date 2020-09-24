@@ -4,7 +4,8 @@
 #'
 #' Displays a compact summary of the dimensions and nature of a cladistic matrix object.
 #'
-#' @param cladistic_matrix An object of class \code{"cladisticMatrix"}.
+#' @param x An object of class \code{"cladisticMatrix"}.
+#' @param ... Further arguments passed to or from other methods.
 #'
 #' @details
 #'
@@ -23,25 +24,25 @@
 #' @examples
 #'
 #' # Show print.cladisticMatrix version of each included data sets:
-#' print.cladisticMatrix(cladistic_matrix = day_2016)
-#' print.cladisticMatrix(cladistic_matrix = gauthier_1986)
-#' print.cladisticMatrix(cladistic_matrix = michaux_1989)
+#' print.cladisticMatrix(x = day_2016)
+#' print.cladisticMatrix(x = gauthier_1986)
+#' print.cladisticMatrix(x = michaux_1989)
 #'
 #' @export print.cladisticMatrix
 #' @exportClass cladisticMatrix
-print.cladisticMatrix <- function(cladistic_matrix) {
+print.cladisticMatrix <- function(x, ...) {
   
   # Check cladistic_matrix has class cladisticMatrix and stop and warn user if not:
-  if (!inherits(x = cladistic_matrix, what = "cladisticMatrix")) stop("cladistic_matrix must be an object of class \"cladisticMatrix\".")
+  if (!inherits(x = x, what = "cladisticMatrix")) stop("cladistic_matrix must be an object of class \"cladisticMatrix\".")
   
   # Gather basic data about the cladistic matrix:
-  n_blocks <- length(x = cladistic_matrix) - 1
-  n_taxa <- nrow(x = cladistic_matrix$matrix_1$matrix)
-  block_sizes <- unname(obj = unlist(x = lapply(X = cladistic_matrix[2:length(cladistic_matrix)], FUN = function(x) ncol(x = x$matrix))))
+  n_blocks <- length(x = x) - 1
+  n_taxa <- nrow(x = x$matrix_1$matrix)
+  block_sizes <- unname(obj = unlist(x = lapply(X = x[2:length(x)], FUN = function(x) ncol(x = x$matrix))))
   n_characters <- sum(block_sizes)
-  data_types <- sort(x = tolower(x = unique(x = unname(obj = unlist(x = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(x) x$datatype))))))
-  character_ordering <- unname(obj = unlist(x = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(x) x$ordering)))
-  character_weights <- unname(obj = unlist(x = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(x) x$character_weights)))
+  data_types <- sort(x = tolower(x = unique(x = unname(obj = unlist(x = lapply(X = x[2:length(x = x)], FUN = function(x) x$datatype))))))
+  character_ordering <- unname(obj = unlist(x = lapply(X = x[2:length(x = x)], FUN = function(x) x$ordering)))
+  character_weights <- unname(obj = unlist(x = lapply(X = x[2:length(x = x)], FUN = function(x) x$character_weights)))
   n_unordered_characters <- sum(character_ordering == "unord")
   n_ordered_characters <- sum(character_ordering == "ord")
   n_continuous_characters <- sum(character_ordering == "cont")

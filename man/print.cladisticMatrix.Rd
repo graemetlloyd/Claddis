@@ -4,10 +4,12 @@
 \alias{print.cladisticMatrix}
 \title{Compact display of a cladistic matrix}
 \usage{
-\method{print}{cladisticMatrix}(cladistic_matrix)
+\method{print}{cladisticMatrix}(x, ...)
 }
 \arguments{
-\item{cladistic_matrix}{An object of class \code{"cladisticMatrix"}.}
+\item{x}{An object of class \code{"cladisticMatrix"}.}
+
+\item{...}{Further arguments passed to or from other methods.}
 }
 \value{
 Nothing is directly returned, instead a text summary describing the dimensions and nature of an object of class \code{"cladisticMatrix"} is printed to the console.
@@ -21,9 +23,9 @@ Displays some basic summary information on a cladistic matrix object, including 
 \examples{
 
 # Show print.cladisticMatrix version of each included data sets:
-print.cladisticMatrix(cladistic_matrix = day_2016)
-print.cladisticMatrix(cladistic_matrix = gauthier_1986)
-print.cladisticMatrix(cladistic_matrix = michaux_1989)
+print.cladisticMatrix(x = day_2016)
+print.cladisticMatrix(x = gauthier_1986)
+print.cladisticMatrix(x = michaux_1989)
 
 }
 \seealso{
