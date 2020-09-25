@@ -29,7 +29,6 @@
 #' print.cladisticMatrix(x = michaux_1989)
 #'
 #' @export print.cladisticMatrix
-#' @exportClass cladisticMatrix
 print.cladisticMatrix <- function(x, ...) {
   
   # Check cladistic_matrix has class cladisticMatrix and stop and warn user if not:
