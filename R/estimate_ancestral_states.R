@@ -153,7 +153,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   dataless_characters <- which(x = apply(cladistic_matrix, 2, function(x) all(is.na(x))))
 
   # Look for all missing characters and stop and wanr user if found:
-  if (!all_missing_allowed && length(x = dataless_characters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(dataless_characters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using Claddis::prune_cladistic_matrix) or because of the chosen options for inapplicables_as_missing, polymorphism_behaviour, and/or uncertainty_behaviour (in which case the user may wish to chose different values for these)."))
+  if (!all_missing_allowed && length(x = dataless_characters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(dataless_characters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using prune_cladistic_matrix) or because of the chosen options for inapplicables_as_missing, polymorphism_behaviour, and/or uncertainty_behaviour (in which case the user may wish to chose different values for these)."))
 
   # Convert tip states into a list:
   data_list <- apply(cladistic_matrix, 2, function(x) list(tip_states = x))
@@ -401,7 +401,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
       node_descendants <- lapply(X = as.list(x = node_numbers), function(x) pruned_tree$tip.label[strap::FindDescendants(n = x, tree = pruned_tree)])
 
       # Get corresponding ancestral node in full tree:
-      ancestral_nodes <- unlist(x = lapply(X = node_descendants, function(x) Claddis::find_mrca(descendant_names = x, tree = full_tree)))
+      ancestral_nodes <- unlist(x = lapply(X = node_descendants, function(x) find_mrca(descendant_names = x, tree = full_tree)))
 
       # If pruned tree is identical to full tree (not pruned at all):
     } else {
