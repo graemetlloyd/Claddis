@@ -1,3 +1,5 @@
+- Removed redundant Claddis:: calls from estimate_ancestral_states (no noticeable change to user). Thanks to Phil Novack-Gottshall for the heads up.
+
 Version - 0.6.3 - 2020-14-09
 
 - Starting to add "cladisticMatrix" class to functions (no change to users yet).
