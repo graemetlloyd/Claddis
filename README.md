@@ -12,7 +12,7 @@ Claddis is an R package designed to import cladistic-type data sets (#NEXUS form
 
 # Version
 
-Claddis is on [CRAN](https://cran.r-project.org/package=Claddis) (version 0.6.1) but is also being developed on GitHub. To get the absolute latest version you can use:
+Claddis is on [CRAN](https://cran.r-project.org/package=Claddis) (version 0.6.3) but is also being developed on GitHub. To get the absolute latest version you can use:
 
 ```r
 if(!require(devtools)) install.packages("devtools", dependencies = TRUE)
