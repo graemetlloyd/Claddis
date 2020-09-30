@@ -95,7 +95,7 @@ pcoa_input <- ordinate_cladistic_matrix(cladistic_matrix = prune_cladistic_matri
   cladistic_matrix = day_2016,
   taxa2prune = "Lycaenodon_longiceps"))
 
-# Build simple taxonomic groups fro Day et al 2016 daat set:
+# Build simple taxonomic groups for Day et al 2016 daat set:
 taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener", "Hipposaurus_boonstrai",
   "Bullacephalus_jacksoni", "Pachydectes_elsi", "Niuksenitia_sukhonensis", "Ictidorhinus_martinsi",
   "RC_20", "Herpetoskylax_hopsoni"), Burnetiamorpha = c("Lemurosaurus_pricei", "Lobalopex_mordax",
@@ -105,7 +105,7 @@ taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener", "Hipposaurus_bo
 # Build a sequence of equally spaced time bins spanning Day et al. 2016 data:
 time_sequence <- seq(from = 270, to = 252, length.out = 6)
 
-# Reformt this sequence into named time bin matrix:
+# Reformat this sequence into named time bin matrix:
 time_bins <- matrix(
   data = c(time_sequence[1:(length(x = time_sequence) - 1)],
   time_sequence[2:length(x = time_sequence)]),

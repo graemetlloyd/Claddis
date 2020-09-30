@@ -64,7 +64,7 @@ partition_time_bins <- function(n_time_bins, partition_sizes_to_include = "all")
     # How long should the output vector be?:
     vector_length <- nchar(x = switch_sequence) + 1
 
-    # Turn siwtches into split after points (adding end in to complete sequence):
+    # Turn switches into split after points (adding end in to complete sequence):
     split_after <- c(which(x = as.numeric(strsplit(switch_sequence, split = "")[[1]]) == 1), vector_length)
 
     # Seed start position:
