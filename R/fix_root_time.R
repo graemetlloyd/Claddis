@@ -19,6 +19,10 @@
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
+#' @seealso
+#'
+#' \link{drop_time_tip}
+#'
 #' @examples
 #'
 #' # Create a simple four-taxon tree with branch lengths:
