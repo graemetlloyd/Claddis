@@ -240,12 +240,9 @@ trim_matrix <- function(distance_matrix, tree = NULL) {
 
       # Store tree prior to any pruning:
       full_tree <- tree
-
-      # Remove pruned taxa from tree:
-      tree <- ape::drop.tip(phy = tree, tip = tips_to_remove)
-
-      # Correct root time (if necessary):
-      tree <- fix_root_time(original_tree = full_tree, pruned_tree = tree)
+      
+      # Remove pruned taxa from time tree:
+      tree <- drop_time_tip(time_tree = tree, tip_names = tips_to_remove)
 
       # Find node names:
       node_names <- rownames(x = distance_matrix)[grep("%%", rownames(x = distance_matrix))]

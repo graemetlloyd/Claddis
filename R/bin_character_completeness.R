@@ -108,12 +108,9 @@ bin_character_completeness <- function(cladistic_matrix, time_tree, time_bins, p
 
       # Check that there are still enough taxa left for a tree to exist:
       if (length(x = setdiff(x = time_tree$tip.label, y = taxa_to_prune)) > 1) {
-
-        # Remove tips with missing data from tree:
-        pruned_tree <- ape::drop.tip(phy = time_tree, tip = taxa_to_prune)
-
-        # Need to correct root time to make sure time binning makes sense:
-        pruned_tree <- fix_root_time(original_tree = time_tree, pruned_tree = pruned_tree)
+        
+        # Remove tips with missing data from time tree:
+        pruned_tree <- drop_time_tip(time_tree = time_tree, tip_names = taxa_to_prune)
 
         # If there is one or fewer taxa:
       } else {

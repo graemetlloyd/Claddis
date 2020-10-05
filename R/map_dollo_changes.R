@@ -206,12 +206,9 @@ map_dollo_changes <- function(time_tree, tip_states) {
 
         # Case if at least three members in clade:
       } else {
-
-        # Prune taxa external to least inclusive clade to create a pruned tree:
-        new_tree <- ape::drop.tip(phy = time_tree, tip = nonclade_members)
-
-        # Ensure root time is correct:
-        new_tree <- fix_root_time(time_tree, new_tree)
+        
+        # Prune taxa external to least inclusive clade to create a pruned time tree:
+        new_tree <- drop_time_tip(time_tree = time_tree, tip_names = nonclade_members)
         
         # Get tip and node counts for new tree:
         n_new_tips <- ape::Ntip(phy = new_tree)

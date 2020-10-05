@@ -354,12 +354,9 @@ map_stochastic_changes <- function(cladistic_matrix, time_tree, time_bins, n_sim
 
       # If at least three tips will remain:
       if ((n_tips - length(x = tips_to_drop)) > 2) {
-
-        # Prune tree and store:
-        x$pruned_tree <- ape::drop.tip(phy = x$full_tree, tip = tips_to_drop)
-
-        # Ensure pruned trees $root.time value is correct:
-        x$pruned_tree <- fix_root_time(time_tree, x$pruned_tree)
+        
+        # Prune time tree and store:
+        x$pruned_tree <- drop_time_tip(time_tree = x$full_tree, tip_names = tips_to_drop)
       }
 
       # If no tips need to be dropped:
