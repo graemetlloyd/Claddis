@@ -47,7 +47,7 @@
 #' @export drop_time_tip
 drop_time_tip <- function(time_tree, tip_names) {
   
-  # Add some top-level conditional checks in future.
+  # Add some top-level conditional checks in future (including checking that root.time is even there).
   
   # First generate pruned time tree:
   pruned_time_tree <- ape::drop.tip(phy = time_tree, tip = tip_names, ...)
