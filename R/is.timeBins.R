@@ -42,6 +42,15 @@
 #' is.timeBins(x = time_bins)
 #'
 #' @export is.timeBins
+is.timeBins <- function(x) {
+  
+  # Get any error messages for time_bins:
+  messages <- check_time_bins(time_bins = x)
+  
+  # Return logical indicating whether object is a valid timeBins object or not:
+  ifelse(test = length(x = messages) > 0, yes = FALSE, no = TRUE)
+}
+
 check_time_bins <- function(time_bins) {
   
   # Create empty vector to store error messages:
@@ -91,13 +100,4 @@ check_time_bins <- function(time_bins) {
   
   # Return messages:
   messages
-}
-
-is.timeBins <- function(x) {
-  
-  # Get any error messages for time_bins:
-  messages <- check_time_bins(time_bins = x)
-  
-  # Return logical indicating whether object is a valid timeBins object or not:
-  ifelse(test = length(x = messages) > 0, yes = FALSE, no = TRUE)
 }
