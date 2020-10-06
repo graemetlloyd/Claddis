@@ -45,7 +45,7 @@
 #' pruned_tree$root.time
 #'
 #' @export drop_time_tip
-drop_time_tip <- function(time_tree, tip_names) {
+drop_time_tip <- function(time_tree, tip_names, ...) {
   
   # Add some top-level conditional checks in future (including checking that root.time is even there).
   

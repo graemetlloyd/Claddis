@@ -4,7 +4,7 @@
 \alias{drop_time_tip}
 \title{Drop tips from a time-scaled tree}
 \usage{
-drop_time_tip(time_tree, tip_names)
+drop_time_tip(time_tree, tip_names, ...)
 }
 \arguments{
 \item{time_tree}{A time-scaled tree in phylo format where branch lengths are durations and where a \code{$root.time} value indicates the root age.}
