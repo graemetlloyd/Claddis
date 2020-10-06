@@ -39,7 +39,7 @@
 #'
 #' # Check that this is a valid timeBins object (will succeed as format and
 #' # class are correct):
-#' is.timeBins(time_bins = time_bins)
+#' is.timeBins(x = time_bins)
 #'
 #' @export is.timeBins
 check_time_bins <- function(time_bins) {
