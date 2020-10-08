@@ -5,7 +5,7 @@
 #' Given a set of first and last appearances assigns a set of taxa to a series of time bins.
 #'
 #' @param taxon_ages A matrix of taxon ages, with columns for first (\code{"fad"}) and last (\code{"lad"}) appearances and rownames correspodning to taxon names.
-#' @param named_time_bins A similar matrix of time bins, with columns for bottom (\code{"fad"}) and top (\code{"lad"}) ages and rownames corresponding to time bin names (e.g., geologic stages or other unit names).
+#' @param time_bins An object of class \code{timeBins}.
 #'
 #' @details
 #'
@@ -29,12 +29,15 @@
 #'
 #' @examples
 #'
-#' # Build example named time bins:
-#' named_time_bins <- matrix(data = c(443.8, 358.9, 358.9, 298.9, 298.9, 251.9,
+#' # Build example time bins:
+#' time_bins <- matrix(data = c(443.8, 358.9, 358.9, 298.9, 298.9, 251.9,
 #'   251.9, 201.3, 201.3, 145.0, 145.0, 65.5, 65.5, 23.03), ncol = 2,
 #'   byrow = TRUE, dimnames = list(c("Silurodevonian", "Carboniferous",
 #'   "Permian", "Triassic", "Jurassic", "Cretaceous", "Paleogene"),
 #'   c("fad", "lad")))
+#'
+#' # Set class as timeBins:
+#' class(time_bins) <- "timeBins"
 #'
 #' # Build example taxon ages:
 #' taxon_ages <- matrix(data = c(385.3, 374.5, 407, 374.5, 251, 228, 385.3,
@@ -89,26 +92,28 @@
 #'   "Westollrhynchus_lehmanni"), c("fad", "lad")))
 #'
 #' # Assign taxa to time bins:
-#' assign_taxa_to_bins(taxon_ages = taxon_ages, named_time_bins = named_time_bins)
+#' assign_taxa_to_bins(taxon_ages = taxon_ages, time_bins = time_bins)
 #'
 #' @export assign_taxa_to_bins
-assign_taxa_to_bins <- function(taxon_ages, named_time_bins) {
+assign_taxa_to_bins <- function(taxon_ages, time_bins) {
   
   # CHECK FOR TAXA NOT IN RANGE OF TIME BINS (SMALLEST TAXON FAD LESS THAN OLDEST TIME BIN LAD AND VICE VERSA
   # ENSURE TIME BINS DO NOT OVERLAP AND ARE CONTIGUOUS
   
+  # Check time_bins is in a valid format and stop and warn user if not:
+  if (!is.timeBins(x = time_bins)) stop(check_time_bins(time_bins = time_bins))
+  
   # Ensure column names are lower case so will get called correctly later
   # (for consistency with paleotree and strap formats):
   colnames(x = taxon_ages) <- tolower(x = colnames(x = taxon_ages))
-  colnames(x = named_time_bins) <- tolower(x = colnames(x = named_time_bins))
+  colnames(x = time_bins) <- tolower(x = colnames(x = time_bins))
   
   # Assign taxa to bins:
-  taxa_assigned_to_bins <- lapply(X = as.list(x = rownames(x = named_time_bins)), FUN = function(x) rownames(x = taxon_ages)[(c(taxon_ages[, "fad"] > named_time_bins[x, "lad"]) + c(taxon_ages[, "lad"] < named_time_bins[x, "fad"])) == 2])
+  taxa_assigned_to_bins <- lapply(X = as.list(x = rownames(x = time_bins)), FUN = function(x) rownames(x = taxon_ages)[(c(taxon_ages[, "fad"] > time_bins[x, "lad"]) + c(taxon_ages[, "lad"] < time_bins[x, "fad"])) == 2])
   
   # Add group names from time bins:
-  names(x = taxa_assigned_to_bins) <- rownames(x = named_time_bins)
+  names(x = taxa_assigned_to_bins) <- rownames(x = time_bins)
   
   # Return taxa assigned to bins:
   taxa_assigned_to_bins
-  
 }

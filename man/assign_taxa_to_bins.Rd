@@ -4,12 +4,12 @@
 \alias{assign_taxa_to_bins}
 \title{Assign taxa to time bins}
 \usage{
-assign_taxa_to_bins(taxon_ages, named_time_bins)
+assign_taxa_to_bins(taxon_ages, time_bins)
 }
 \arguments{
 \item{taxon_ages}{A matrix of taxon ages, with columns for first (\code{"fad"}) and last (\code{"lad"}) appearances and rownames correspodning to taxon names.}
 
-\item{named_time_bins}{A similar matrix of time bins, with columns for bottom (\code{"fad"}) and top (\code{"lad"}) ages and rownames corresponding to time bin names (e.g., geologic stages or other unit names).}
+\item{time_bins}{An object of class \code{timeBins}.}
 }
 \value{
 A named list of taxa assigned to time bins.
@@ -26,12 +26,15 @@ Note that it is recommended that time bins be named without special characters b
 }
 \examples{
 
-# Build example named time bins:
-named_time_bins <- matrix(data = c(443.8, 358.9, 358.9, 298.9, 298.9, 251.9,
+# Build example time bins:
+time_bins <- matrix(data = c(443.8, 358.9, 358.9, 298.9, 298.9, 251.9,
   251.9, 201.3, 201.3, 145.0, 145.0, 65.5, 65.5, 23.03), ncol = 2,
   byrow = TRUE, dimnames = list(c("Silurodevonian", "Carboniferous",
   "Permian", "Triassic", "Jurassic", "Cretaceous", "Paleogene"),
   c("fad", "lad")))
+
+# Set class as timeBins:
+class(time_bins) <- "timeBins"
 
 # Build example taxon ages:
 taxon_ages <- matrix(data = c(385.3, 374.5, 407, 374.5, 251, 228, 385.3,
@@ -86,7 +89,7 @@ taxon_ages <- matrix(data = c(385.3, 374.5, 407, 374.5, 251, 228, 385.3,
   "Westollrhynchus_lehmanni"), c("fad", "lad")))
 
 # Assign taxa to time bins:
-assign_taxa_to_bins(taxon_ages = taxon_ages, named_time_bins = named_time_bins)
+assign_taxa_to_bins(taxon_ages = taxon_ages, time_bins = time_bins)
 
 }
 \seealso{

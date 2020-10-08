@@ -9,7 +9,7 @@ bin_changes(change_times, time_bins)
 \arguments{
 \item{change_times}{A vector of ages in millions of years at which character changes are hypothesised to have occurred.}
 
-\item{time_bins}{A vector of ages in millions of years of time bin boundaries in old-to-young order.}
+\item{time_bins}{An object of class \code{timeBins}.}
 }
 \value{
 A vector giving the number of changes for each time bin. Names indicate the maximum and minimum (bottom and top) values for each time bin.
@@ -26,10 +26,15 @@ Calculates the total number of evolutionary changes in a series of time bins. Th
 change_times <- stats::runif(n = 100, min = 0, max = 100)
 
 # Create 10 equal-length time bins:
-time_bins <- seq(100, 0, length.out = 11)
+time_bins <- matrix(data = c(seq(from = 100, to = 10, length.out = 10),
+  seq(from = 90, to = 0, length.out = 10)), ncol = 2,
+  dimnames = list(LETTERS[1:10], c("fad", "lad")))
+
+# Set class as timeBins:
+class(time_bins) <- "timeBins"
 
 # Get N changes for each bin:
-bin_changes(change_times, time_bins)
+bin_changes(change_times = change_times, time_bins = time_bins)
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
