@@ -1,4 +1,11 @@
+Version - 0.6.4 - 2020-08-10
+
 - Removed redundant Claddis:: calls from estimate_ancestral_states (no noticeable change to user). Thanks to Phil Novack-Gottshall for the heads up.
+- Added new drop_time_tip function to safely prune tips from a time-scaled tree.
+- Replaced all drop.tip calls with drop_time_tip across package (no noticeable change to users).
+- Added new timeBins class for time bins objects.
+- Added is.timeBins function to check timeBins class objects are formatted in a valid way.
+- Added find_time_bin_midpoints function to get midpoints of time bins from a timeBins object.
 
 Version - 0.6.3 - 2020-14-09
 
