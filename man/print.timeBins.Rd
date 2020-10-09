@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{x}{An object of class \code{"timeBins"}.}
+
+\item{...}{Further arguments passed to or from other methods.}
 }
 \value{
 Nothing is directly returned, instead a text summary describing a \code{"timeBins"} object is printed to the console.
