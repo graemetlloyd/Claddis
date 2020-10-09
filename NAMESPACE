@@ -32,6 +32,7 @@ export(plot_rates_character)
 export(plot_rates_time)
 export(plot_rates_tree)
 export(print.cladisticMatrix)
+export(print.timeBins)
 export(prune_cladistic_matrix)
 export(read_nexus_matrix)
 export(safe_taxonomic_reduction)
@@ -74,3 +75,4 @@ importFrom(utils,combn)
 
 # S3:
 S3method(print, cladisticMatrix)
+S3method(print, timeBins)
