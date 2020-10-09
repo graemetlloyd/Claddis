@@ -37,5 +37,5 @@ print.timeBins <- function(x, ...) {
   if (!is.timeBins(x = x)) stop(check_time_bins(time_bins = x)[1])
   
   # Return summary information about object:
-  cat(paste0("timeBins object composed of ", nrow(x = x), " bins:"), "\n ", paste0(unname(obj = unlist(x = apply(X = cbind(rownames(x = x), x), MARGIN = 1, FUN = function(y) paste0(y[1], paste0(rep(x = " ", times = max(nchar(x = rownames(x = x))) - nchar(x = y[1]) + 1)), " (", y[2], "-", y[3], " Ma)")))), collapse = "\n  "))
+  cat(paste0("timeBins object composed of ", nrow(x = x), " bins:"), "\n ", paste0(unname(obj = unlist(x = apply(X = cbind(rownames(x = x), x), MARGIN = 1, FUN = function(y) paste0(y[1], paste0(rep(x = " ", times = max(nchar(x = rownames(x = x))) - nchar(x = y[1]) + 1), collapse = ""), " (", y[2], "-", y[3], " Ma)")))), collapse = "\n  "))
 }
