@@ -6,7 +6,7 @@
 #'
 #' @param cladistic_matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}.
 #' @param time_tree A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{cladistic_matrix}.
-#' @param time_bins A vector of ages representing the boundaries of a series of time bins.
+#' @param time_bins An object of class \code{timeBins}.
 #' @param n_simulations The number of simulations to perform (passed to \link{make.simmap}.
 #' @param polymorphism_behaviour What to do with polymorphic (&) characters. One of "equalp", "missing", or "random". See details.
 #' @param uncertainty_behaviour What to do with uncertain (/) characters. One of "equalp", "missing", or "random". See details.
@@ -40,15 +40,15 @@
 #'
 #' # Prune out continuous characters:
 #' cladistic_matrix <- prune_cladistic_matrix(
-#'   cladistic_matrix =
-#'     cladistic_matrix, blocks2prune = 1
+#'   cladistic_matrix = cladistic_matrix,
+#'   blocks2prune = 1
 #' )
 #'
 #' # Prune out majority of characters so
 #' # example runs quickly:
 #' cladistic_matrix <- prune_cladistic_matrix(
-#'   cladistic_matrix =
-#'     cladistic_matrix, characters2prune = 1:32
+#'   cladistic_matrix = cladistic_matrix,
+#'   characters2prune = 1:32
 #' )
 #'
 #' # Generete random tree for matrix taxa:
@@ -60,14 +60,21 @@
 #' # Add root age to tree:
 #' time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
 #'
+#' # Generate set of two equal length time bins:
+#' time_bins <- matrix(data = c(seq(time_tree$root.time, 0, length.out = 3)[1:2],
+#'   seq(time_tree$root.time, 0, length.out = 3)[2:3]), ncol = 2,
+#'   dimnames = list(LETTERS[1:2], c("fad", "lad")))
+#'
+#' # Set class as timeBins:
+#' class(time_bins) <- "timeBins"
+#'
 #' # Get all state changes for two simulations:
-#' state_changes <-
-#'   map_stochastic_changes(
-#'     cladistic_matrix = cladistic_matrix,
-#'     time_tree = time_tree, time_bins = seq(time_tree$root.time, 0,
-#'       length.out = 3
-#'     ), n_simulations = 2
-#'   )
+#' state_changes <- map_stochastic_changes(
+#'   cladistic_matrix = cladistic_matrix,
+#'   time_tree = time_tree,
+#'   time_bins = time_bins,
+#'   n_simulations = 2
+#' )
 #'
 #' # View matrix of all stochstic character changes:
 #' state_changes$all_state_changes
@@ -116,6 +123,9 @@ map_stochastic_changes <- function(cladistic_matrix, time_tree, time_bins, n_sim
   # Check time_tree has root age:
   if (is.null(time_tree$root.time)) stop("time_tree is missing $root.time. Try setting this before continuing, e.g., time_tree$root.time <- 104.2.")
 
+  # Check time_bins is in a valid format and stop and warn user if not:
+  if (!is.timeBins(x = time_bins)) stop(check_time_bins(time_bins = time_bins))
+
   # Check polymorphism_behaviour is correctly formatted or stop and warn user:
   if (length(x = setdiff(x = polymorphism_behaviour, y = c("equalp", "missing", "random"))) > 0) stop("polymorphism_behaviour must be one of must be one of \"equalp\", \"missing\" or \"random\".")
 
@@ -124,9 +134,6 @@ map_stochastic_changes <- function(cladistic_matrix, time_tree, time_bins, n_sim
 
   # Check inapplicable_behaviour is correctly formatted or stop and warn user:
   if (length(x = setdiff(x = inapplicable_behaviour, y = c("missing"))) > 0) stop("inapplicable_behaviour must be \"missing\".")
-
-  # Ensure time bins are in correct order:
-  time_bins <- sort(x = unique(x = time_bins), decreasing = TRUE)
 
   # Get tree node ages:
   node_ages <- date_nodes(time_tree = time_tree)

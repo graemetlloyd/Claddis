@@ -49,7 +49,7 @@ bin_changes <- function(change_times, time_bins) {
   for (i in 1:nrow(x = time_bins)) {
 
     # Find out which edges (if any) are present in the bin:
-    binned_changes[(i - 1)] <- length(x = intersect(which(x = change_times > time_bins[i, "lad"]), which(x = change_times <= time_bins[i, "fad"])))
+    binned_changes[i] <- length(x = intersect(which(x = change_times > time_bins[i, "lad"]), which(x = change_times <= time_bins[i, "fad"])))
   }
 
   # Add time bin names to binned changes:

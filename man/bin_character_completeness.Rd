@@ -17,7 +17,7 @@ bin_character_completeness(
 
 \item{time_tree}{A time-scaled phylogenetic tree containing all the taxa in \code{cladistic_matrix}.}
 
-\item{time_bins}{A set of time bin boundaries (oldest to youngest) in millions of years.}
+\item{time_bins}{An object of class \code{timeBins}.}
 
 \item{plot}{An optional choice to plot the results (default is \code{FALSE}).}
 
@@ -41,25 +41,30 @@ day_2016tree <- ape::rtree(n = nrow(day_2016$matrix_1$matrix))
 day_2016tree$tip.label <- rownames(x = day_2016$matrix_1$matrix)
 day_2016tree$root.time <- max(diag(x = ape::vcv(phy = day_2016tree)))
 
+# Build ten equal-length time bins spanning the tree:
+time_bins <- matrix(data = c(seq(from = day_2016tree$root.time,
+  to = day_2016tree$root.time - max(diag(x = ape::vcv(phy = day_2016tree))),
+  length.out = 11)[1:10], seq(from = day_2016tree$root.time,
+  to = day_2016tree$root.time - max(diag(x = ape::vcv(phy = day_2016tree))),
+  length.out = 11)[2:11]), ncol = 2, dimnames = list(LETTERS[1:10], c("fad", "lad")))
+
+# Set class as timeBins:
+class(time_bins) <- "timeBins"
+
 # Get proportional phylogenetic character completeness in ten equal-length
 # time bins:
 bin_character_completeness(
   cladistic_matrix = day_2016,
-  time_tree = day_2016tree, time_bins = seq(
-    from =
-      day_2016tree$root.time, to = day_2016tree$root.time -
-      max(diag(x = ape::vcv(phy = day_2016tree))), length.out = 11
-  )
+  time_tree = day_2016tree,
+  time_bins = time_bins
 )
 
 # Same, but with a plot:
 bin_character_completeness(
   cladistic_matrix = day_2016,
-  time_tree = day_2016tree, time_bins = seq(
-    from =
-      day_2016tree$root.time, to = day_2016tree$root.time -
-      max(diag(x = ape::vcv(phy = day_2016tree))), length.out = 11
-  ), plot = TRUE
+  time_tree = day_2016tree,
+  time_bins = time_bins,
+  plot = TRUE
 )
 }
 \author{

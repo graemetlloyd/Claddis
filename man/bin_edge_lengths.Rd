@@ -9,7 +9,7 @@ bin_edge_lengths(time_tree, time_bins, pruned_tree = NULL)
 \arguments{
 \item{time_tree}{A time-scaled tree in phylo format with a \code{$root.time} value.}
 
-\item{time_bins}{A vector of ages in millions of years of time bin boundaries in old-to-young order.}
+\item{time_bins}{An object of class \code{timeBins}.}
 
 \item{pruned_tree}{A time-scaled tree in phylo format with a \code{$root.time} value that is a subset of \code{time_tree}.}
 }
@@ -35,7 +35,13 @@ time_tree <- ape::rtree(n = 10)
 time_tree$root.time <- max(diag(ape::vcv(time_tree)))
 
 # Create time bins:
-time_bins <- seq(from = time_tree$root.time, to = 0, length.out = 11)
+time_bins <- matrix(data = c(seq(from = time_tree$root.time, to = 0,
+  length.out = 11)[1:10], seq(from = time_tree$root.time, to = 0,
+  length.out = 11)[2:11]), ncol = 2, dimnames = list(LETTERS[1:10],
+  c("fad", "lad")))
+
+# Set class:
+class(time_bins) <- "timeBins"
 
 # Get edge lengths for each bin:
 bin_edge_lengths(time_tree = time_tree, time_bins = time_bins)

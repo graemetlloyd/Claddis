@@ -33,7 +33,7 @@ plot_morphospace_stack(
 
 \item{taxon_groups}{A named list of groups to which taxa are assigned (optional). This is used to plot points or convex hulls in different colours corresponding to each group. As the user names the groups these can represent any grouping of interest (e.g., taxonomic, ecological, temporal, spatial).}
 
-\item{time_bins}{Another two-column matrix of the first and last appearance dates (columns; \code{"fad"} and \code{"lad"}), this time for named (rownames) time-slices .}
+\item{time_bins}{An object of class \code{timeBins}.}
 
 \item{shear}{A single value (between 0 and 1) that determines the "sheared" visual appearance of the platforms.}
 
@@ -112,6 +112,9 @@ time_bins <- matrix(
   ncol = 2,
   dimnames = list(c("Bin 1", "Bin 2", "Bin 3", "Bin 4", "Bin 5"), c("fad", "lad"))
 )
+
+# Set class as timeBins:
+class(time_bins) <- "timeBins"
 
 # Plot morphospace stack using named time bins:
 plot_morphospace_stack(

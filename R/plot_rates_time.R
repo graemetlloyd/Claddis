@@ -50,12 +50,20 @@
 #'   blocks2prune = 1
 #' )
 #'
+#' # Generate nine two million year time bins:
+#' time_bins <- matrix(data = c(seq(from = 270, to = 252, length.out = 10)[1:9],
+#'   seq(from = 270, to = 252, length.out = 10)[2:10]), ncol = 2,
+#'   dimnames = list(LETTERS[1:9], c("fad", "lad")))
+#'
+#' # Set class as timeBins:
+#' class(time_bins) <- "timeBins"
+#'
 #' # Run test rates function for each time bin partition:
 #' test_rates_output <- test_rates(
 #'   time_tree = time_tree,
 #'   cladistic_matrix = cladistic_matrix,
 #'   time_partitions = partition_time_bins(n_time_bins = 9),
-#'   time_bins = seq(from = 270, to = 252, length.out = 10)
+#'   time_bins = time_bins
 #' )
 #'
 #' # Plot 97th time bin partition model:
@@ -74,7 +82,7 @@ plot_rates_time <- function(test_rates_output, model_number, ...) {
   # - Add better example that runs.
 
   # Build vector of time bin midpoints for plotting:
-  time_bin_midpoints <- (test_rates_output$time_bins_used[2:length(x = test_rates_output$time_bins_used)] + test_rates_output$time_bins_used[1:(length(x = test_rates_output$time_bins_used) - 1)]) / 2
+  time_bin_midpoints <- find_time_bin_midpoints(time_bins = test_rates_output$time_bins_used)
 
   # Get partitions used from results output:
   time_bin_partitions <- lapply(X = test_rates_output$time_test_results, function(x) {

@@ -6,7 +6,7 @@
 #'
 #' @param cladistic_matrix A cladistic matrix in the form imported by \link{read_nexus_matrix}.
 #' @param time_tree A time-scaled phylogenetic tree containing all the taxa in \code{cladistic_matrix}.
-#' @param time_bins A set of time bin boundaries (oldest to youngest) in millions of years.
+#' @param time_bins An object of class \code{timeBins}.
 #' @param plot An optional choice to plot the results (default is \code{FALSE}).
 #' @param confidence.interval The confidence interval to be used as a proportion (0 to 1). Default is 0.95 (i.e., 95\%).
 #'
@@ -29,25 +29,30 @@
 #' day_2016tree$tip.label <- rownames(x = day_2016$matrix_1$matrix)
 #' day_2016tree$root.time <- max(diag(x = ape::vcv(phy = day_2016tree)))
 #'
+#' # Build ten equal-length time bins spanning the tree:
+#' time_bins <- matrix(data = c(seq(from = day_2016tree$root.time,
+#'   to = day_2016tree$root.time - max(diag(x = ape::vcv(phy = day_2016tree))),
+#'   length.out = 11)[1:10], seq(from = day_2016tree$root.time,
+#'   to = day_2016tree$root.time - max(diag(x = ape::vcv(phy = day_2016tree))),
+#'   length.out = 11)[2:11]), ncol = 2, dimnames = list(LETTERS[1:10], c("fad", "lad")))
+#'
+#' # Set class as timeBins:
+#' class(time_bins) <- "timeBins"
+#'
 #' # Get proportional phylogenetic character completeness in ten equal-length
 #' # time bins:
 #' bin_character_completeness(
 #'   cladistic_matrix = day_2016,
-#'   time_tree = day_2016tree, time_bins = seq(
-#'     from =
-#'       day_2016tree$root.time, to = day_2016tree$root.time -
-#'       max(diag(x = ape::vcv(phy = day_2016tree))), length.out = 11
-#'   )
+#'   time_tree = day_2016tree,
+#'   time_bins = time_bins
 #' )
 #'
 #' # Same, but with a plot:
 #' bin_character_completeness(
 #'   cladistic_matrix = day_2016,
-#'   time_tree = day_2016tree, time_bins = seq(
-#'     from =
-#'       day_2016tree$root.time, to = day_2016tree$root.time -
-#'       max(diag(x = ape::vcv(phy = day_2016tree))), length.out = 11
-#'   ), plot = TRUE
+#'   time_tree = day_2016tree,
+#'   time_bins = time_bins,
+#'   plot = TRUE
 #' )
 #' @export bin_character_completeness
 bin_character_completeness <- function(cladistic_matrix, time_tree, time_bins, plot = FALSE, confidence.interval = 0.95) {
@@ -59,6 +64,9 @@ bin_character_completeness <- function(cladistic_matrix, time_tree, time_bins, p
 
   # Check cladistic_matrix has class cladisticMatrix and stop and warn user if not:
   if (!inherits(x = cladistic_matrix, what = "cladisticMatrix")) stop("cladistic_matrix must be an object of class \"cladisticMatrix\".")
+  
+  # Check time_bins is in a valid format and stop and warn user if not:
+  if (!is.timeBins(x = time_bins)) stop(check_time_bins(time_bins = time_bins))
   
   # Subfunction for getting missing and inapplicable characters:
   find_missing_and_inapplicable <- function(x) {
@@ -77,10 +85,10 @@ bin_character_completeness <- function(cladistic_matrix, time_tree, time_bins, p
   }
 
   # Create vector of time bin mid-points:
-  time_bin_midpoints <- time_bins[1:(length(x = time_bins) - 1)] + abs(diff(time_bins)) / 2
+  time_bin_midpoints <- find_time_bin_midpoints(time_bins = time_bins)
 
-  # Create time bin names:
-  time_bin_names <- paste(round(time_bins[1:(length(x = time_bins) - 1)], 1), round(time_bins[2:length(x = time_bins)], 1), sep = "-")
+  # Set time bin names:
+  time_bin_names <- rownames(time_bins)
 
   # Get total number of characters:
   n_characters <- sum(unlist(x = lapply(X = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = "[[", "matrix"), FUN = ncol)))
@@ -95,7 +103,7 @@ bin_character_completeness <- function(cladistic_matrix, time_tree, time_bins, p
   if (any(unlist(x = lapply(X = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], "[[", "matrix"), is.na))) || any(unlist(x = lapply(X = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], "[[", "matrix"), "==", "")))) missing_values <- unname(unlist(x = lapply(X = lapply(X = lapply(X = lapply(X = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], "[[", "matrix"), find_missing_and_inapplicable), apply, 2, "==", 1), apply, 2, which), lapply, paste, collapse = "%%")))
 
   # Set up matrix to store edge lengths in each character bin (columns) per character (rows):
-  binned_edges_by_character <- matrix(data = 0, ncol = length(x = time_bins) - 1, nrow = n_characters)
+  binned_edges_by_character <- matrix(data = 0, ncol = nrow(x = time_bins), nrow = n_characters)
 
   # For each unique missing value combination (no point repeating those that are the same):
   for (i in unique(x = missing_values)) {
@@ -126,10 +134,10 @@ bin_character_completeness <- function(cladistic_matrix, time_tree, time_bins, p
       pruned_tree <- time_tree
     }
 
-    # As long as the tree exists (i.e., it is not pruend down to one or zero taxa) store edge lengths in bin:
+    # As long as the tree exists (i.e., it is not pruned down to one or zero taxa) store edge lengths in bin:
     if (!is.na(pruned_tree)[1]) binned_edges_by_character[which(x = missing_values == i), ] <- matrix(rep(bin_edge_lengths(time_tree = pruned_tree, time_bins = time_bins)$binned_edge_lengths, length(x = which(x = missing_values == i))), ncol = ncol(binned_edges_by_character), byrow = TRUE)
   }
-
+  
   # Calculate and store proportional character completeness:
   binned_character_completeness <- binned_edges_by_character / matrix(rep(binned_edge_lengths, n_characters), nrow = n_characters, byrow = TRUE)
 
@@ -180,8 +188,5 @@ bin_character_completeness <- function(cladistic_matrix, time_tree, time_bins, p
   names(mean_binned_completeness) <- names(upper_binned_completeness) <- names(lower_binned_completeness) <- colnames(x = binned_character_completeness) <- time_bin_names
 
   # Return compiled output:
-  output <- list(mean_completeness = mean_binned_completeness, upper_completeness = upper_binned_completeness, lower_completeness = lower_binned_completeness, completeness_by_character = binned_character_completeness)
-
-  #  output:
-  return(output)
+  list(mean_completeness = mean_binned_completeness, upper_completeness = upper_binned_completeness, lower_completeness = lower_binned_completeness, completeness_by_character = binned_character_completeness)
 }

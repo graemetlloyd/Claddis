@@ -35,7 +35,7 @@ test_rates(
 
 \item{cladistic_matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}.}
 
-\item{time_bins}{A vector of ages (in millions of years) indicating the boundaries of a series of time bins in order from oldest to youngest.}
+\item{time_bins}{An object of class \code{timeBins}.}
 
 \item{branch_partitions}{A list of branch(es) (edge number) partitions to test as N-rate parameter model (where N is the total number of partitions). If NULL (the default) then no partition test(s) will be made.}
 
@@ -201,29 +201,31 @@ time_tree$tip.label <- rownames(x = michaux_1989$matrix_1$matrix)
 # Set root time by making youngest taxon extant:
 time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
 
+# Set four equal ength time bins spanning range of tree:
+time_bins <- matrix(data = c(seq(from = time_tree$root.time, to = 0,
+  length.out = 5)[1:4], seq(from = time_tree$root.time, to = 0,
+  length.out = 5)[2:5]), ncol = 2, dimnames = list(LETTERS[1:4],
+  c("fad", "lad")))
+
+# Set class as timeBins:
+class(time_bins) <- "timeBins"
+
 # Get discrete character rates:
 x <- test_rates(
-  time_tree = time_tree, cladistic_matrix =
-    michaux_1989, time_bins = seq(
-    from = time_tree$root.time,
-    to = 0, length.out = 5
-  ), branch_partitions =
-    lapply(X = as.list(x = 1:nrow(time_tree$edge)), as.list),
-  character_partitions = lapply(
-    X =
-      as.list(x = 1:3),
-    as.list
-  ), clade_partitions =
-    lapply(
-      X =
-        as.list(x = ape::Ntip(phy = time_tree) + (2:ape::Nnode(phy = time_tree))),
-      as.list
-    ), time_partitions =
-    lapply(X = as.list(x = 1:4), as.list), change_times =
-    "random", alpha = 0.01, polymorphism_state =
-    "missing", uncertainty_state = "missing",
-  inapplicable_state = "missing", time_binning_approach =
-    "lloyd"
+  time_tree = time_tree,
+  cladistic_matrix = michaux_1989,
+  time_bins = time_bins,
+  branch_partitions = lapply(X = as.list(x = 1:nrow(time_tree$edge)), as.list),
+  character_partitions = lapply(X = as.list(x = 1:3), as.list),
+  clade_partitions = lapply(X = as.list(x = ape::Ntip(phy = time_tree) +
+    (2:ape::Nnode(phy = time_tree))), as.list),
+  time_partitions = lapply(X = as.list(x = 1:4), as.list),
+  change_times = "random",
+  alpha = 0.01,
+  polymorphism_state = "missing",
+  uncertainty_state = "missing",
+  inapplicable_state = "missing",
+  time_binning_approach = "lloyd"
 )
 }
 \references{

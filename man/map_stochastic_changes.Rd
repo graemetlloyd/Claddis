@@ -19,7 +19,7 @@ map_stochastic_changes(
 
 \item{time_tree}{A time-scaled tree (phylo object) that represents the relationships of the taxa in \code{cladistic_matrix}.}
 
-\item{time_bins}{A vector of ages representing the boundaries of a series of time bins.}
+\item{time_bins}{An object of class \code{timeBins}.}
 
 \item{n_simulations}{The number of simulations to perform (passed to \link{make.simmap}.}
 
@@ -56,15 +56,15 @@ cladistic_matrix <- day_2016
 
 # Prune out continuous characters:
 cladistic_matrix <- prune_cladistic_matrix(
-  cladistic_matrix =
-    cladistic_matrix, blocks2prune = 1
+  cladistic_matrix = cladistic_matrix,
+  blocks2prune = 1
 )
 
 # Prune out majority of characters so
 # example runs quickly:
 cladistic_matrix <- prune_cladistic_matrix(
-  cladistic_matrix =
-    cladistic_matrix, characters2prune = 1:32
+  cladistic_matrix = cladistic_matrix,
+  characters2prune = 1:32
 )
 
 # Generete random tree for matrix taxa:
@@ -76,14 +76,21 @@ time_tree$tip.label <- rownames(x = day_2016$matrix_1$matrix)
 # Add root age to tree:
 time_tree$root.time <- max(diag(x = ape::vcv(phy = time_tree)))
 
+# Generate set of two equal length time bins:
+time_bins <- matrix(data = c(seq(time_tree$root.time, 0, length.out = 3)[1:2],
+  seq(time_tree$root.time, 0, length.out = 3)[2:3]), ncol = 2,
+  dimnames = list(LETTERS[1:2], c("fad", "lad")))
+
+# Set class as timeBins:
+class(time_bins) <- "timeBins"
+
 # Get all state changes for two simulations:
-state_changes <-
-  map_stochastic_changes(
-    cladistic_matrix = cladistic_matrix,
-    time_tree = time_tree, time_bins = seq(time_tree$root.time, 0,
-      length.out = 3
-    ), n_simulations = 2
-  )
+state_changes <- map_stochastic_changes(
+  cladistic_matrix = cladistic_matrix,
+  time_tree = time_tree,
+  time_bins = time_bins,
+  n_simulations = 2
+)
 
 # View matrix of all stochstic character changes:
 state_changes$all_state_changes

@@ -39,7 +39,7 @@
 #'
 #' @export find_time_bin_midpoints
 find_time_bin_midpoints <- function(time_bins) {
-  
+
   # Check time_bins has class timeBins and stop and warn user if not:
   if (!inherits(x = time_bins, what = "timeBins")) stop("time_bins must be an object of class \"timeBins\".")
   

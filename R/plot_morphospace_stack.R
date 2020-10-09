@@ -7,7 +7,7 @@
 #' @param pcoa_input The main input in the format output from \link{ordinate_cladistic_matrix}.
 #' @param taxon_ages A two-column matrix of the first and last apperance dates (columns; \code{"fad"} and \code{"lad"}) for the taxa (as rownames) from \code{pcoa_input}.
 #' @param taxon_groups A named list of groups to which taxa are assigned (optional). This is used to plot points or convex hulls in different colours corresponding to each group. As the user names the groups these can represent any grouping of interest (e.g., taxonomic, ecological, temporal, spatial).
-#' @param time_bins Another two-column matrix of the first and last appearance dates (columns; \code{"fad"} and \code{"lad"}), this time for named (rownames) time-slices .
+#' @param time_bins An object of class \code{timeBins}.
 #' @param shear A single value (between 0 and 1) that determines the "sheared" visual appearance of the platforms.
 #' @param x_axis The ordination axis to plot on the x-axis.
 #' @param y_axis The ordination axis to plot nn the y-axis.
@@ -88,6 +88,9 @@
 #'   dimnames = list(c("Bin 1", "Bin 2", "Bin 3", "Bin 4", "Bin 5"), c("fad", "lad"))
 #' )
 #'
+#' # Set class as timeBins:
+#' class(time_bins) <- "timeBins"
+#'
 #' # Plot morphospace stack using named time bins:
 #' plot_morphospace_stack(
 #'   pcoa_input = pcoa_input,
@@ -113,7 +116,10 @@ plot_morphospace_stack <- function(pcoa_input, taxon_ages, taxon_groups, time_bi
   # - Maybe move this all to plot3D in future (or rgl or an optional choice between them)
   # - Option to plot isometric style view so bottom corner Vs away from viewer? (Will require mainly an edit to translation function, but also y_addition)
   # - Do named time bins (matrix with rownames rather than vector) instead and push this throughout the rest of the code.
-
+  
+  # Check time_bins is in a valid format and stop and warn user if not:
+  if (!is.timeBins(x = time_bins)) stop(check_time_bins(time_bins = time_bins))
+  
   # Subfunction to translate input ordination coordinates to stack plotting coordinates:
   translate_to_stack_coordinates <- function(x, y, x_range, y_range, shear, n_stacks, platform_size) {
     if (length(x = x) > 0) {
