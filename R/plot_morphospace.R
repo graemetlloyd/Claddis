@@ -324,7 +324,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
 #pcoa_input <- ordinate_cladistic_matrix(cladistic_matrix = cladistic_matrix, time_tree = time_tree)
 #x_axis = 1
 #y_axis = 2
-#taxon_groups = assign_taxa_to_bins(taxon_ages, named_time_bins) ### NEW PARAM
+#taxon_groups = assign_taxa_to_bins(taxon_ages, time_bins) ### NEW PARAM
 #plot_taxon_names = TRUE
 #plot_internal_nodes = TRUE
 #plot_root = TRUE

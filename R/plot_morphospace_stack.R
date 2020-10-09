@@ -160,7 +160,7 @@ plot_morphospace_stack <- function(pcoa_input, taxon_ages, taxon_groups, time_bi
   y_lab <- paste("PC", y_axis, " (", round(scree_values[y_axis], 2), "% of total variance)", sep = "")
   
   # Find the taxa assigned to each time bin:
-  taxa_assigned_to_bins <- assign_taxa_to_bins(taxon_ages = taxon_ages, named_time_bins = time_bins)
+  taxa_assigned_to_bins <- assign_taxa_to_bins(taxon_ages = taxon_ages, time_bins = time_bins)
   
   # Set default solid colour for each taxon to black:
   solid_colours <- rep(x = "black", length.out = nrow(x = pcoa_input$vectors))

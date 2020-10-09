@@ -670,7 +670,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
     lad <- x$node_age_from_to[2]
 
     # Get any time bin boundaries crossed (can be empty if none are):
-    boundaries_crossed <- time_bins[, "lad"][intersect(which(x = time_bins[, "lad"] > lad), which(x = time_bins[, "lad"] < fad))]
+    boundaries_crossed <- unname(obj = time_bins[, "lad"][intersect(which(x = time_bins[, "lad"] > lad), which(x = time_bins[, "lad"] < fad))])
 
     # If boundaries are crossed:
     if (length(x = boundaries_crossed) > 0) {
@@ -686,7 +686,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
     branch_sections <- rbind(fad, lad)
 
     # Add bin number present in to column names:
-    colnames(x = branch_sections) <- unlist(x = lapply(X = lapply(X = lapply(X = as.list(x = branch_sections["fad", ]), "<=", time_bins[, "lad"]), which), max))
+    colnames(x = branch_sections) <- unlist(x = lapply(X = as.list(x = branch_sections["fad", ]), function(x) max(which(x = x <= time_bins[, "fad"]))))
 
     # Add new list section for branch (edge) sections binned by time:
     x$binned_edge_sections <- branch_sections

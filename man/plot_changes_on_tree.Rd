@@ -34,16 +34,27 @@ time_tree <- ape::read.tree(text = paste0("(Ancilla:31.6,(Turrancilla:102.7,",
 # Set root time for tree:
 time_tree$root.time <- 103.7
 
+# Generate two equal length time bins:
+time_bins <- matrix(data = c(seq(time_tree$root.time, 0, length.out = 3)[1:2],
+  seq(time_tree$root.time, 0, length.out = 3)[2:3]), ncol = 2, dimnames = list(LETTERS[1:2],
+  c("fad", "lad")))
+
+# Set class as timeBins:
+class(time_bins) <- "timeBins"
+
 # Get discrete character rates (includes changes):
-out <- test_rates(time_tree, michaux_1989,
-  seq(time_tree$root.time, 0, length.out = 3),
-  branch_partitions = list(list(1)), alpha = 0.01
+out <- test_rates(
+  time_tree = time_tree,
+  cladistic_matrix = michaux_1989,
+  time_bins = time_bins,
+  branch_partitions = list(list(1)),
+  alpha = 0.01
 )
 
 # Plot character changes on the tree:
 plot_changes_on_tree(
-  out$inferred_character_changes,
-  time_tree
+  character_changes = out$inferred_character_changes,
+  time_tree = time_tree
 )
 }
 \author{
