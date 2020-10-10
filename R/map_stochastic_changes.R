@@ -124,7 +124,7 @@ map_stochastic_changes <- function(cladistic_matrix, time_tree, time_bins, n_sim
   if (is.null(time_tree$root.time)) stop("time_tree is missing $root.time. Try setting this before continuing, e.g., time_tree$root.time <- 104.2.")
 
   # Check time_bins is in a valid format and stop and warn user if not:
-  if (!is.timeBins(x = time_bins)) stop(check_time_bins(time_bins = time_bins))
+  if (!is.timeBins(x = time_bins)) stop(check_timeBins(time_bins = time_bins))
 
   # Check polymorphism_behaviour is correctly formatted or stop and warn user:
   if (length(x = setdiff(x = polymorphism_behaviour, y = c("equalp", "missing", "random"))) > 0) stop("polymorphism_behaviour must be one of must be one of \"equalp\", \"missing\" or \"random\".")

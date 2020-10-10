@@ -44,7 +44,7 @@ find_time_bin_midpoints <- function(time_bins) {
   if (!inherits(x = time_bins, what = "timeBins")) stop("time_bins must be an object of class \"timeBins\".")
   
   # If not a valid timeBins object then stop and provide feedback to user on what is wrong:
-  if (!is.timeBins(time_bins)) stop(check_time_bins(time_bins = time_bins)[1])
+  if (!is.timeBins(time_bins)) stop(check_timeBins(time_bins = time_bins)[1])
   
   # Return time bin midpoints:
   apply(X = time_bins, MARGIN = 1, FUN = mean)

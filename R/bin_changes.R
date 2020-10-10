@@ -40,7 +40,7 @@ bin_changes <- function(change_times, time_bins) {
   # ADD BOUNDARY TIME OPTION? I.E., WHICH BIN SHOULD THEY BE ASSIGNED TO?
 
   # Check time_bins is in a valid format and stop and warn user if not:
-  if (!is.timeBins(x = time_bins)) stop(check_time_bins(time_bins = time_bins))
+  if (!is.timeBins(x = time_bins)) stop(check_timeBins(time_bins = time_bins))
 
   # Create all-zero vector to store ouput in:
   binned_changes <- rep(x = 0, times = nrow(x = time_bins))

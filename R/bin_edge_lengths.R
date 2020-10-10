@@ -45,7 +45,7 @@
 bin_edge_lengths <- function(time_tree, time_bins, pruned_tree = NULL) {
 
   # Check time_bins is in a valid format and stop and warn user if not:
-  if (!is.timeBins(x = time_bins)) stop(check_time_bins(time_bins = time_bins))
+  if (!is.timeBins(x = time_bins)) stop(check_timeBins(time_bins = time_bins))
 
   # Find number of tips in tree:
   n_tips <- ape::Ntip(phy = time_tree)

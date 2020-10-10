@@ -45,7 +45,7 @@
 is.timeBins <- function(x) {
   
   # Get any error messages for time_bins:
-  messages <- Claddis::check_time_bins(time_bins = x)
+  messages <- Claddis::check_timeBins(time_bins = x)
   
   # Return logical indicating whether object is a valid timeBins object or not:
   ifelse(test = length(x = messages) > 0, yes = FALSE, no = TRUE)

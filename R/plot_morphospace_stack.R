@@ -118,7 +118,7 @@ plot_morphospace_stack <- function(pcoa_input, taxon_ages, taxon_groups, time_bi
   # - Do named time bins (matrix with rownames rather than vector) instead and push this throughout the rest of the code.
   
   # Check time_bins is in a valid format and stop and warn user if not:
-  if (!is.timeBins(x = time_bins)) stop(check_time_bins(time_bins = time_bins))
+  if (!is.timeBins(x = time_bins)) stop(check_timeBins(time_bins = time_bins))
   
   # Subfunction to translate input ordination coordinates to stack plotting coordinates:
   translate_to_stack_coordinates <- function(x, y, x_range, y_range, shear, n_stacks, platform_size) {

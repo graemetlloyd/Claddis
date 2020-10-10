@@ -66,7 +66,7 @@ bin_character_completeness <- function(cladistic_matrix, time_tree, time_bins, p
   if (!inherits(x = cladistic_matrix, what = "cladisticMatrix")) stop("cladistic_matrix must be an object of class \"cladisticMatrix\".")
   
   # Check time_bins is in a valid format and stop and warn user if not:
-  if (!is.timeBins(x = time_bins)) stop(check_time_bins(time_bins = time_bins))
+  if (!is.timeBins(x = time_bins)) stop(check_timeBins(time_bins = time_bins))
   
   # Subfunction for getting missing and inapplicable characters:
   find_missing_and_inapplicable <- function(x) {

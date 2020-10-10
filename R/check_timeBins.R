@@ -21,10 +21,10 @@
 #'
 #' # Check that this is a valid timeBins object (will return error message as class
 #' # is not set):
-#' check_time_bins(time_bins = time_bins)
+#' check_timeBins(time_bins = time_bins)
 #'
-#' @export check_time_bins
-check_time_bins <- function(time_bins) {
+#' @export check_timeBins
+check_timeBins <- function(time_bins) {
   
   # Check time_bins has class timeBins and add error message to output if true:
   if (!inherits(x = time_bins, what = "timeBins")) return("time_bins must be an object of class \"timeBins\".")

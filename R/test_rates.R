@@ -283,7 +283,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
   character_numbers <- 1:sum(unlist(x = lapply(X = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], "[[", "matrix"), ncol)))
   
   # Check time_bins is in a valid format and stop and warn user if not:
-  if (!is.timeBins(x = time_bins)) stop(check_time_bins(time_bins = time_bins))
+  if (!is.timeBins(x = time_bins)) stop(check_timeBins(time_bins = time_bins))
   
   # Find the Time bin midpoints:
   time_bin_midpoints <- find_time_bin_midpoints(time_bins = time_bins)

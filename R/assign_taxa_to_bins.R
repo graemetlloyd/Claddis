@@ -101,7 +101,7 @@ assign_taxa_to_bins <- function(taxon_ages, time_bins) {
   # ENSURE TIME BINS DO NOT OVERLAP AND ARE CONTIGUOUS
   
   # Check time_bins is in a valid format and stop and warn user if not:
-  if (!is.timeBins(x = time_bins)) stop(check_time_bins(time_bins = time_bins))
+  if (!is.timeBins(x = time_bins)) stop(check_timeBins(time_bins = time_bins))
   
   # Ensure column names are lower case so will get called correctly later
   # (for consistency with paleotree and strap formats):
