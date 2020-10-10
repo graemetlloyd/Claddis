@@ -39,6 +39,7 @@ calculate_morphological_distances(
 \item{distance_metric}{The distance metric used.}
 \item{distance_matrix}{The pairwise distance matrix generated.}
 \item{comparable_character_matrix}{The matrix of characters that can be compared for each pairwise distance.}
+\item{comparable_weights_matrix}{The matrix of weights for each pairwise distance.}
 }
 \description{
 Takes a cladistic morphological dataset and converts it into a set of pairwise distances.

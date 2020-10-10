@@ -35,6 +35,7 @@
 #' \item{distance_metric}{The distance metric used.}
 #' \item{distance_matrix}{The pairwise distance matrix generated.}
 #' \item{comparable_character_matrix}{The matrix of characters that can be compared for each pairwise distance.}
+#' \item{comparable_weights_matrix}{The matrix of weights for each pairwise distance.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Thomas Guillerme \email{guillert@@tcd.ie}
 #'
@@ -688,9 +689,12 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
 
   # Build comparable characters matrix:
   comparable_character_matrix <- convert_list_to_matrix(lapply(X = comparable_character_list, length), cladistic_matrix, diag = apply(cladistic_matrix, 1, count_complete))
-
+  
+  # Build comparable weights matrix:
+  comparable_weights_matrix <- convert_list_to_matrix(lapply(X = comparable_character_list, FUN = function(x) sum(x = character_weights[x])), cladistic_matrix, diag = unname(obj = apply(X = cladistic_matrix, MARGIN = 1, FUN = function(x) sum(x = character_weights[which(x = !is.na(x = x))]))))
+  
   # Add row and column names (taxa) to distance matrices:
-  rownames(x = distance_matrix) <- colnames(x = distance_matrix) <- rownames(x = comparable_character_matrix) <- colnames(x = comparable_character_matrix) <- rownames(x = cladistic_matrix)
+  rownames(x = distance_matrix) <- colnames(x = distance_matrix) <- rownames(x = comparable_character_matrix) <- colnames(x = comparable_character_matrix) <- rownames(x = comparable_weights_matrix) <- colnames(x = comparable_weights_matrix) <- rownames(x = cladistic_matrix)
 
   # If there are any NaNs replace with NAs:
   if (any(is.nan(distance_matrix))) distance_matrix[is.nan(distance_matrix)] <- NA
@@ -723,5 +727,5 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
   }
 
   # Return compiled output:
-  list(distance_metric = distance_metric, distance_matrix = distance_matrix, comparable_character_matrix = comparable_character_matrix)
+  list(distance_metric = distance_metric, distance_matrix = distance_matrix, comparable_character_matrix = comparable_character_matrix, comparable_weights_matrix = comparable_weights_matrix)
 }
