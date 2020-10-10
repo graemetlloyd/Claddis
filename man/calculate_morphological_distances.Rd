@@ -107,6 +107,10 @@ distances$distance_matrix
 # Show number of characters that can be scored for
 # each pairwise comparison:
 distances$comparable_character_matrix
+
+# Show weighting of each calculable pairwise distance:
+distances$comparable_weights_matrix
+
 }
 \references{
 Gower, J. C., 1971. A general coefficient of similarity and some of its properties. \emph{Biometrika}, \bold{27}, 857-871.

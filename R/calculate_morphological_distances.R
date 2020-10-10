@@ -99,6 +99,10 @@
 #' # Show number of characters that can be scored for
 #' # each pairwise comparison:
 #' distances$comparable_character_matrix
+#'
+#' # Show weighting of each calculable pairwise distance:
+#' distances$comparable_weights_matrix
+#'
 #' @export calculate_morphological_distances
 calculate_morphological_distances <- function(cladistic_matrix, distance_metric = "mord", ged_type = "wills", distance_transformation = "arcsine_sqrt", polymorphism_behaviour = "min_difference", uncertainty_behaviour = "min_difference", inapplicable_behaviour = "missing", character_dependencies = NULL, alpha = 0.5) {
 
