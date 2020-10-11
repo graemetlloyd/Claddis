@@ -1,3 +1,14 @@
+Version - 0.6.5 - 2020-08-11
+
+- Pushing new timeBins class through Claddis.
+- Adding print.timeBins to further support timeBins class.
+- Renamed check_time_bins to check_timeBins.
+- Added weights output to calculate_morphological_distances to enable weighted mean pairwise distances.
+- Added calculate_WMPD function to calculate weighted mean pairwise distances.
+- Added calculate_MPD function to calculate mean pairwise distances.
+- Added check_taxonGroups, is.taxonGroups, and print.taxonGroups to support a taxonGroups class.
+- Pushing new taxonGroups class through Claddis.
+
 Version - 0.6.4 - 2020-08-10
 
 - Removed redundant Claddis:: calls from estimate_ancestral_states (no noticeable change to user). Thanks to Phil Novack-Gottshall for the heads up.
