@@ -103,6 +103,9 @@ plot_chronophylomorphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, taxo
   # If using taxon_groups:
   if (methods::hasArg(name = "taxon_groups")) {
     
+    # If not a valid taxonGroups object then stop and provide feedback to user on what is wrong:
+    if (!is.taxonGroups(x = x)) stop(check_taxonGroups(taxon_groups = x)[1])
+    
     # Find any taxa duplicated across taxon_group:
     duplicated_taxa <- sort(x = unique(x = unname(obj = unlist(x = taxon_groups))[duplicated(x = unname(obj = unlist(x = taxon_groups)))]))
     
