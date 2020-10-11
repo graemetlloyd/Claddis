@@ -77,6 +77,9 @@
 #'   "Lophorhinus_willodenensis", "Proburnetia_viatkensis", "Lende_chiweta",
 #'   "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098"))
 #'
+#' # Set class as taxonGroups:
+#' class(taxon_groups) <- "taxonGroups"
+#'
 #' # Plot a chronophylomorphospace:
 #' plot_chronophylomorphospace(
 #'   pcoa_input = pcoa_input,

@@ -106,6 +106,9 @@ taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener",
   "Lophorhinus_willodenensis", "Proburnetia_viatkensis", "Lende_chiweta",
   "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098"))
 
+# Set class as taxonGroups:
+class(taxon_groups) <- "taxonGroups"
+
 # Plot taxon groups including convex hulls:
 plot_morphospace(pcoa_input = pcoa_input, z_axis = 3, plot_taxon_names = TRUE,
   taxon_groups = taxon_groups, plot_convex_hulls = TRUE)

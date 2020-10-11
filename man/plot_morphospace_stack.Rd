@@ -102,6 +102,9 @@ taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener", "Hipposaurus_bo
   "Lophorhinus_willodenensis", "Proburnetia_viatkensis", "Lende_chiweta",
   "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098"))
 
+# Set class as taxonGroups:
+class(taxon_groups) <- "taxonGroups"
+
 # Build a sequence of equally spaced time bins spanning Day et al. 2016 data:
 time_sequence <- seq(from = 270, to = 252, length.out = 6)
 

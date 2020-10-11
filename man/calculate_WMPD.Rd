@@ -38,6 +38,9 @@ taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener", "Hipposaurus_bo
   "Lophorhinus_willodenensis", "Proburnetia_viatkensis", "Lende_chiweta",
   "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098"))
 
+# Set class as taxonGroups:
+class(taxon_groups) <- "taxonGroups"
+
 # Calculate mean pairiwise distances:
 calculate_MPD(distances, taxon_groups)
 
