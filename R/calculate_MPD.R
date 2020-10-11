@@ -1,0 +1,44 @@
+#' Calculate mean pairwise distances
+#'
+#' @description
+#'
+#' Given distanceMatrices and taxonGroups objects calculates their mean pairwise distances.
+#'
+#' @param distances An object of class \code{distanceMatrices}.
+#' @param taxon_groups An object of class \code{taxonGroups}.
+#'
+#' @details
+#'
+#' Not all measures of disparity (morphological distance) require an ordination space. For example, the pariwise distances between taxa are themselves a disparity metric. This function takes the output from \link{calculate_morphological_distances} and a set of taxon groups and returns the mean pairwise distance for each of those groups.
+#'
+#' @return
+#'
+#' A labelled vector of weighted mean pairwise distances.
+#'
+#' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Thomas Guillerme \email{guillert@@tcd.ie}
+#'
+#' @examples
+#'
+#' # Get morphological distances for the Day et al. (2016) data set:
+#' distances <- calculate_morphological_distances(
+#'   cladistic_matrix = day_2016,
+#'   distance_metric = "mord",
+#'   distance_transformation = "none"
+#' )
+#'
+#' # Build simple taxonomic groups for Day et al. (2016) data set:
+#' taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener", "Hipposaurus_boonstrai",
+#'   "Bullacephalus_jacksoni", "Pachydectes_elsi", "Niuksenitia_sukhonensis", "Ictidorhinus_martinsi",
+#'   "RC_20", "Herpetoskylax_hopsoni"), Burnetiamorpha = c("Lemurosaurus_pricei", "Lobalopex_mordax",
+#'   "Lophorhinus_willodenensis", "Proburnetia_viatkensis", "Lende_chiweta",
+#'   "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098"))
+#'
+#' # Calculate mean pairwise distances:
+#' calculate_MPD(distances, taxon_groups)
+#'
+#' @export calculate_MPD
+calculate_MPD <- function(distances, taxon_groups) {
+
+  # Calculate and return mean pairwise distance for each taxon group:
+  unlist(x = lapply(X = taxon_groups, FUN = function(x) mean(x = as.dist(m = distances$distance_matrix[x, x]))))
+}

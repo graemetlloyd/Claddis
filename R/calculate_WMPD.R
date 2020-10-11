@@ -26,7 +26,11 @@
 #' @examples
 #'
 #' # Get morphological distances for the Day et al. (2016) data set:
-#' distances <- calculate_morphological_distances(cladistic_matrix = day_2016)
+#' distances <- calculate_morphological_distances(
+#'   cladistic_matrix = day_2016,
+#'   distance_metric = "mord",
+#'   distance_transformation = "none"
+#' )
 #'
 #' # Build simple taxonomic groups for Day et al. (2016) data set:
 #' taxon_groups <- list(nonBurnetiamorpha = c("Biarmosuchus_tener", "Hipposaurus_boonstrai",
@@ -36,8 +40,7 @@
 #'   "Paraburnetia_sneeubergensis", "Burnetia_mirabilis", "BP_1_7098"))
 #'
 #' # Calculate mean pairiwise distances:
-#' unlist(x = lapply(X = taxon_groups, FUN = function(x)
-#'   mean(x = as.dist(m = distances$distance_matrix[x, x]))))
+#' calculate_MPD(distances, taxon_groups)
 #'
 #' # Now calculate weighted mean pairwise distances:
 #' calculate_WMPD(distances, taxon_groups)
