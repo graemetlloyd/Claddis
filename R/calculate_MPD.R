@@ -43,7 +43,7 @@
 calculate_MPD <- function(distances, taxon_groups) {
   
   # If not a valid taxonGroups object then stop and provide feedback to user on what is wrong:
-  if (!is.taxonGroups(x = taxon_groups)) stop(check_taxonGroups(taxon_groups = x)[1])
+  if (!is.taxonGroups(x = taxon_groups)) stop(check_taxonGroups(taxon_groups = taxon_groups)[1])
   
   # Calculate and return mean pairwise distance for each taxon group:
   unlist(x = lapply(X = taxon_groups, FUN = function(x) mean(x = as.dist(m = distances$distance_matrix[x, x]))))
