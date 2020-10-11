@@ -84,7 +84,7 @@ plot_multi_morphospace <- function(pcoa_input, n_axes = 4, taxon_groups = NULL, 
   # Never plot taxon names!
   
   # If not a valid taxonGroups object then stop and provide feedback to user on what is wrong:
-  if (!is.null(x = taxon_groups) && !is.taxonGroups(x = x)) stop(check_taxonGroups(taxon_groups = x)[1])
+  if (!is.null(x = taxon_groups) && !is.taxonGroups(x = taxon_groups)) stop(check_taxonGroups(taxon_groups = x)[1])
   
   # Set x and y limits (to ensure all plots are scaled the same way):
   x_limits <- y_limits <- range(c(pcoa_input$vectors[, 1:n_axes]))

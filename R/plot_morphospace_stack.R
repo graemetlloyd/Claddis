@@ -124,7 +124,7 @@ plot_morphospace_stack <- function(pcoa_input, taxon_ages, taxon_groups, time_bi
   if (!is.timeBins(x = time_bins)) stop(check_timeBins(time_bins = time_bins))
   
   # If not a valid taxonGroups object then stop and provide feedback to user on what is wrong:
-  if (!is.taxonGroups(x = x)) stop(check_taxonGroups(taxon_groups = x)[1])
+  if (!is.taxonGroups(x = taxon_groups)) stop(check_taxonGroups(taxon_groups = x)[1])
   
   # Subfunction to translate input ordination coordinates to stack plotting coordinates:
   translate_to_stack_coordinates <- function(x, y, x_range, y_range, shear, n_stacks, platform_size) {

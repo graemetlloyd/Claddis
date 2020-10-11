@@ -138,7 +138,7 @@ plot_morphospace <- function(pcoa_input, x_axis = 1, y_axis = 2, z_axis = NULL, 
   # - Check inputs.
 
   # If not a valid taxonGroups object then stop and provide feedback to user on what is wrong:
-  if (!is.null(x = taxon_groups) && !is.taxonGroups(x = x)) stop(check_taxonGroups(taxon_groups = x)[1])
+  if (!is.null(x = taxon_groups) && !is.taxonGroups(x = taxon_groups)) stop(check_taxonGroups(taxon_groups = x)[1])
 
   # Check group_legend_position is a valid value and stop and warn user if not:
   if (!group_legend_position %in% c("bottom_left", "bottom_right", "top_left", "top_right")) stop("group_legend_position must be one of \"bottom_left\", \"bottom_right\", \"top_left\", or \"top_right\".")
