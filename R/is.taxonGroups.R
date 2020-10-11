@@ -39,7 +39,7 @@
 is.taxonGroups <- function(x) {
   
   # Get any error messages for taxon_groups:
-  messages <- Claddis::check_taxonGroups(taxon_groups = x)
+  messages <- check_taxonGroups(taxon_groups = x)
   
   # Return logical indicating whether object is a valid taxonGroups object or not:
   ifelse(test = length(x = messages) > 0, yes = FALSE, no = TRUE)
