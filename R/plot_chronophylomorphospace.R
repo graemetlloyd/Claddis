@@ -7,7 +7,7 @@
 #' @param pcoa_input Principal coordinate data in the format output by  \link{ordinate_cladistic_matrix} that includes a tree and ancestral states.
 #' @param x_axis Which ordination axis to plot as the x-axis.
 #' @param y_axis Which ordination axis to plot as the y-axis.
-#' @param taxon_groups A named list of groups to which taxa are assigned (optional). This is used to plot points or convex hulls in different colours corresponding to each group. As the user names the groups these can represent any grouping of interest (e.g., taxonomic, ecological, temporal, spatial). \link{assign_taxa_to_bins} can automate temporal assignments.
+#' @param taxon_groups An object of class \code{taxonGroups}.
 #' @param plot_tips Whether or not to plot the tip nodes (defaults to TRUE).
 #' @param plot_nodes Whether or not to plot the internal nodes (defaults to TRUE).
 #' @param plot_taxon_names Whether or not to show the taxon nodes (defaults to TRUE).

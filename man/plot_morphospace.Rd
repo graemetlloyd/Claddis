@@ -35,7 +35,7 @@ plot_morphospace(
 
 \item{z_axis}{Which ordination axis to plot as the z-axis (defaults to NULL, i.e., is not plotted).}
 
-\item{taxon_groups}{A named list of groups to which taxa are assigned (optional). This is used to plot points or convex hulls in different colours corresponding to each group. As the user names the groups these can represent any grouping of interest (e.g., taxonomic, ecological, temporal, spatial). \link{assign_taxa_to_bins} can automate temporal assignments.}
+\item{taxon_groups}{An object of class \code{taxonGroups}.}
 
 \item{plot_taxon_names}{Logical indicating whether to plot the names of the taxa (defaults to FALSE).}
 

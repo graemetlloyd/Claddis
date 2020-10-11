@@ -7,7 +7,7 @@
 check_taxonGroups(taxon_groups)
 }
 \arguments{
-\item{taxon_groups}{A taxonGroups object.}
+\item{taxon_groups}{An object of class \code{taxonGroups}.}
 }
 \value{
 An error message or empty vector if no errors found.

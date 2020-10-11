@@ -31,7 +31,7 @@ plot_morphospace_stack(
 
 \item{taxon_ages}{A two-column matrix of the first and last apperance dates (columns; \code{"fad"} and \code{"lad"}) for the taxa (as rownames) from \code{pcoa_input}.}
 
-\item{taxon_groups}{A named list of groups to which taxa are assigned (optional). This is used to plot points or convex hulls in different colours corresponding to each group. As the user names the groups these can represent any grouping of interest (e.g., taxonomic, ecological, temporal, spatial).}
+\item{taxon_groups}{An object of class \code{taxonGroups}.}
 
 \item{time_bins}{An object of class \code{timeBins}.}
 

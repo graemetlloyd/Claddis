@@ -7,7 +7,7 @@
 is.taxonGroups(x)
 }
 \arguments{
-\item{x}{A taxonGroups object.}
+\item{x}{An object of class \code{taxonGroups}.}
 }
 \value{
 \code{is.taxonGroups} returns either TRUE or FALSE.

@@ -4,7 +4,7 @@
 #'
 #' Functions to deal with the taxon groups class.
 #'
-#' @param x A taxonGroups object.
+#' @param x An object of class \code{taxonGroups}.
 #'
 #' @details
 #'

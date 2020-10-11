@@ -6,7 +6,7 @@
 #'
 #' @param pcoa_input The main input in the format output from \link{ordinate_cladistic_matrix}.
 #' @param taxon_ages A two-column matrix of the first and last apperance dates (columns; \code{"fad"} and \code{"lad"}) for the taxa (as rownames) from \code{pcoa_input}.
-#' @param taxon_groups A named list of groups to which taxa are assigned (optional). This is used to plot points or convex hulls in different colours corresponding to each group. As the user names the groups these can represent any grouping of interest (e.g., taxonomic, ecological, temporal, spatial).
+#' @param taxon_groups An object of class \code{taxonGroups}.
 #' @param time_bins An object of class \code{timeBins}.
 #' @param shear A single value (between 0 and 1) that determines the "sheared" visual appearance of the platforms.
 #' @param x_axis The ordination axis to plot on the x-axis.

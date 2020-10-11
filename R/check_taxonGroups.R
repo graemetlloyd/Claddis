@@ -4,7 +4,7 @@
 #'
 #' Internal function to check taxonGroups object for errors.
 #'
-#' @param taxon_groups A taxonGroups object.
+#' @param taxon_groups An object of class \code{taxonGroups}.
 #'
 #' @details
 #'
