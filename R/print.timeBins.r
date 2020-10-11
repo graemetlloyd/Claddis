@@ -25,7 +25,7 @@
 #' # Set class as timeBins:
 #' class(time_bins) <- "timeBins"
 #'
-#' # Show print.cladisticMatrix version of each included data sets:
+#' # Show print.timeBins version of each included data sets:
 #' print.timeBins(x = time_bins)
 #' @export print.timeBins
 print.timeBins <- function(x, ...) {

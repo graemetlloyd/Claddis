@@ -28,7 +28,7 @@ time_bins <- matrix(data = c(99.6, 93.5, 93.5, 89.3, 89.3, 85.8, 85.8, 83.5, 83.
 # Set class as timeBins:
 class(time_bins) <- "timeBins"
 
-# Show print.cladisticMatrix version of each included data sets:
+# Show print.timeBins version of each included data sets:
 print.timeBins(x = time_bins)
 }
 \author{
