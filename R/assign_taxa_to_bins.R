@@ -17,7 +17,7 @@
 #'
 #' @return
 #'
-#' A named list of taxa assigned to time bins.
+#' An object of class \code{taxonGroups}.
 #'
 #' @author
 #'
@@ -113,6 +113,9 @@ assign_taxa_to_bins <- function(taxon_ages, time_bins) {
   
   # Add group names from time bins:
   names(x = taxa_assigned_to_bins) <- rownames(x = time_bins)
+  
+  # Set class as taxonGroups:
+  class(x = taxa_assigned_to_bins) <- "taxonGroups"
   
   # Return taxa assigned to bins:
   taxa_assigned_to_bins

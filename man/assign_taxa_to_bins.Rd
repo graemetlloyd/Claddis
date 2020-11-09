@@ -12,7 +12,7 @@ assign_taxa_to_bins(taxon_ages, time_bins)
 \item{time_bins}{An object of class \code{timeBins}.}
 }
 \value{
-A named list of taxa assigned to time bins.
+An object of class \code{taxonGroups}.
 }
 \description{
 Given a set of first and last appearances assigns a set of taxa to a series of time bins.
