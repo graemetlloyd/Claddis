@@ -23,6 +23,8 @@
 #' @export check_cladisticMatrix
 check_cladisticMatrix <- function(cladistic_matrix) {
   
+  # TO DO:
+  #
   # Make this class hierarchical? E.g., add matrixBlock class. Also, maybe add just a taxon names part to output.
   
   # Check cladistic_matrix has class cladisticMatrix and add error message to output if true:
