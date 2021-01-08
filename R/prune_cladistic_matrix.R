@@ -161,7 +161,7 @@ prune_cladistic_matrix <- function(cladistic_matrix, blocks2prune = c(), charact
   }
   
   # Rename (renumber) matrix blocks to ensure consistent output:
-  names(cladistic_matrix[2:length(x = cladistic_matrix)]) <- paste("matrix_", 1:(length(x = cladistic_matrix) - 1), sep = "")
+  names(cladistic_matrix)[2:length(x = cladistic_matrix)] <- paste("matrix_", 1:(length(x = cladistic_matrix) - 1), sep = "")
 
   # Ensure class is set:
   class(cladistic_matrix) <- "cladisticMatrix"
