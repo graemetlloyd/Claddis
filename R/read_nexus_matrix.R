@@ -851,6 +851,9 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   # Special case if there are user-defined characters, i.e. step matrices:
   if (length(x = grep("USERTYPE", raw_nexus, ignore.case = TRUE)) > 0) {
     
+    # Set available letters for naming stepmatrices (limits number of stepmatrices allowed):
+    available_letters <- c(LETTERS, unlist(lapply(as.list(LETTERS), function(x) paste(x, LETTERS, sep = ""))))
+    
     # Get rows corresponding to start of stepmatrices:
     step_matrix_rows <- grep("USERTYPE", raw_nexus, ignore.case = TRUE)
     
@@ -858,13 +861,13 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
     step_matrices <- list()
     
     # Little check in case of abnormally large number of step matrices:
-    if (length(x = step_matrix_rows) > length(x = LETTERS)) stop("Not enough letters to store the number of different step matrices.")
+    if (length(x = step_matrix_rows) > length(x = available_letters)) stop("Not enough available letters to store the number of different step matrices. Ask Graeme to up the available number!")
     
     # For each step matrix:
     for(i in step_matrix_rows) {
       
       # Grab text block corresponding to step matrix:
-      step_matrix_block <- raw_nexus[i:(i + as.numeric(strsplit(raw_nexus[i], "\\(STEPMATRIX\\)=")[[1]][2]) + 1)]
+      step_matrix_block <- trim_marginal_whitespace(x = raw_nexus[i:(i + as.numeric(strsplit(raw_nexus[i], "\\(STEPMATRIX\\)=")[[1]][2]) + 1)])
       
       # Remove [] labels for rows:
       step_matrix_block <- gsub(pattern = "\\[[:A-Z:]\\] |\\[[:0-9:]\\] ", replacement = "", x = step_matrix_block)
@@ -882,10 +885,10 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
       step_matrix_name <- strsplit(strsplit(raw_nexus[i], "USERTYPE ")[[1]][2], " ")[[1]][1]
       
       # Replace step matrix name with step_N:
-      raw_nexus <- gsub(pattern = step_matrix_name, replacement = paste("step_", LETTERS[length(x = step_matrices)], sep = ""), x = raw_nexus)
+      raw_nexus <- gsub(pattern = step_matrix_name, replacement = paste("step_", available_letters[length(x = step_matrices)], sep = ""), x = raw_nexus)
       
       # Use step matrix name (step_N) in list for later calling:
-      names(step_matrices)[length(x = step_matrices)] <- paste("step_", LETTERS[length(x = step_matrices)], sep = "")
+      names(step_matrices)[length(x = step_matrices)] <- paste("step_", available_letters[length(x = step_matrices)], sep = "")
       
     }
     
