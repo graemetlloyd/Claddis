@@ -1,3 +1,14 @@
+Version - 0.6.6 - 2021-02-21
+
+- Added check_cladisticMatrix and is.cladisticMatrix functions to support cladisticMatrix class.
+- Changed class of assign_taxa_to_bins output to taxonGroups.
+- Fixed bug in prune_cladistic_matrix where blocks were not being renamed correctly.
+- Upped limit for number of step matrices allowed (from 26 to 702).
+- Fixed minor bug when reading stepmatrices with read_nexus_matrix.
+- Added locate_bracket_positions function, to locate positions of any kind of brackets in a text string.
+- Added convert_state_tree_to_adjacency_matrix function, to open up means for dealing with character state trees in future.
+- Added convert_adjacency_matrix_to_stepmatrix function, to allow conversion of character state trees to step matrices.
+
 Version - 0.6.5 - 2020-08-11
 
 - Pushing new timeBins class through Claddis.
