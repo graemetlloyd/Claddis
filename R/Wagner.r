@@ -330,13 +330,15 @@ parsimony_ancestors <- function(tree, tip_states, stepmatrix) {
       for(needle in (tip_count + 2):(tip_count + node_count - tip_count)) {
         
         # Permute new tree lengths given ancestral state(s):
-        permuted_new_lengths <- stepmatrix[node_estimates[tree$edge[tree$edge[, 2] == needle, 1], ], ] + matrix(data = rep(x = node_values[needle, ], times = ncol(x = node_estimates)), nrow = ncol(x = node_estimates), byrow = TRUE)
+        permuted_new_lengths <- stepmatrix[node_estimates[tree$edge[tree$edge[, 2] == needle, 1], ], , drop = FALSE] + matrix(data = rep(x = node_values[needle, ], times = ncol(x = node_estimates)), nrow = ncol(x = node_estimates), byrow = TRUE)
         
         # SOMETHING GOES WRONG HERE WITH TRANSPOSITIONS OF MATRIX I DO NOT WANT IT TO DO. GRRRR.
         # MIGHT HAVE TO MAKE NODE ESTIMATES A LIST AND REBUILD AROUND THAT.
         
         # Update node estimates with all possible most parsimonious state(s):
-        new_node_estimates <- apply(X = cbind(1:nrow(x = permuted_new_lengths), permuted_new_lengths), MARGIN = 1, FUN = function(x) {column_number <- x[1]; x <- x[-1]; possible_states <- names(x = x[x == min(x = x)]); n_states <- length(x = possible_states); new_node_estimates <- matrix(data = rep(x = node_estimates[, column_number], times = n_states), ncol = n_states); new_node_estimates[needle, ] <- possible_states; new_node_estimates})
+        new_node_estimates <- apply(X = cbind(1:nrow(x = permuted_new_lengths), permuted_new_lengths), MARGIN = 1, FUN = function(x) {column_number <- x[1]; x <- x[-1]; possible_states <- colnames(stepmatrix)[x == min(x = x)]; n_states <- length(x = possible_states); new_node_estimates <- matrix(data = rep(x = node_estimates[, column_number], times = n_states), ncol = n_states); new_node_estimates[needle, ] <- possible_states; new_node_estimates})
+        
+        # BELOW IS ANNOYING BUT NOT SURE HOW TO AVOID IN THIS FRAMEWORK
         
         # If output turned out to be a list coerce back to a matrix:
         if(is.list(x = new_node_estimates)) new_node_estimates <- do.call(what = cbind, args = new_node_estimates)
@@ -350,116 +352,98 @@ parsimony_ancestors <- function(tree, tip_states, stepmatrix) {
 
   }
   
-  node_estimates <- list(c(unname(obj = tip_states[tree$tip.label]), rep(x = NA, times = node_count - tip_count)))
   
-  # Find all possible root states:
-  possible_root_states <- colnames(x = node_values)[node_values[tip_count + 1, ] == min(x = node_values[tip_count + 1, ])]
-  #possible_root_states <- c("1", "2")
-  # Make new node estimates with every possible root state:
-  node_estimates <- lapply(X = as.list(x = possible_root_states), FUN = function(x) {new_node_estimates <- node_estimates[[1]]; new_node_estimates[tip_count + 1] <- x; new_node_estimates})
   
-  # For each internal node above the root to the tips:
-  for(needle in (tip_count + 2):(tip_count + node_count - tip_count)) {
   
-    # Permute new tree lengths given ancestral state(s):
-    permuted_new_lengths <- stepmatrix[unlist(x = lapply(X = node_estimates, FUN = function(x) x[tree$edge[tree$edge[, 2] == needle, 1]])), 1] + matrix(data = rep(x = node_values[needle, ], times = length(x = node_estimates)), nrow = length(x = node_estimates), byrow = TRUE)
+  
+  
+  
+  
+  #node_estimates <- do.call(what = cbind, args = list(c(unname(obj = tip_states[tree$tip.label]), rep(x = NA, times = node_count - tip_count))))
+  
+  
+  node_estimates <- matrix(data = apply(X = node_values, MARGIN = 1, FUN = function(x) {x <- names(x = x[x == min(x = x)]); ifelse(test = length(x = x) == 1, x, NA)}), ncol = 1, nrow = node_count)
+  
+  
+  # Only continue if there is any ambiguity:
+  if(any(x = is.na(x = node_estimates))) {
     
+    # Find all possible root states:
+    possible_root_states <- colnames(x = node_values)[node_values[tip_count + 1, ] == min(x = node_values[tip_count + 1, ])]
     
-    
-    
-    node_estimates <- do.call(what = rbind, args = lapply(X = apply(X = cbind(1:nrow(x = permuted_new_lengths), permuted_new_lengths), MARGIN = 1, FUN = list), FUN = function(x) {x <- unlist(x = x); column_number <- x[1]; x <- x[-1]; x == min(x = x); possible_states <- colnames(x = stepmatrix)[x == min(x = x)]; n_states <- length(x = possible_states); new_node_estimates <- lapply(X = as.list(x = possible_states), FUN = function(y) {new_node_estimates <- node_estimates[[column_number]]; new_node_estimates[needle] <- y; new_node_estimates}); do.call(what = rbind, args = new_node_estimates)}))
-    
-    
-    node_estimates <- lapply(X = as.list(x = 1:nrow(x = node_estimates)), FUN = function(x) node_estimates[x, ])
-    
-    
-    # SOMEHOW NEED ABOVE NOT TO BE NESTED LISTS!!!!!
- 
+    # Make new node estimates with every possible root state:
+    node_estimates <- do.call(what = cbind, args = lapply(X = as.list(x = possible_root_states), FUN = function(x) {y <- node_estimates; y[tip_count + 1, ] <- x; y}))
+      
+    # For each internal node above the root to the tips:
+    for(needle in (tip_count + 2):(tip_count + node_count - tip_count)) {
+      
+      # Establish ancestor of current node:
+      ancestor_node <- tree$edge[tree$edge[, 2] == needle, 1]
+      
+      # Reformat node_estimates as a list to enable lapply:
+      node_estimates <- mapply(FUN = function(x, y) {z <- list(); z$N <- x; z$estimates <- y; z}, x = as.list(x = 1:ncol(x = node_estimates)), y = split(x = node_estimates, f = col(x = node_estimates)), SIMPLIFY = FALSE)
+      
+      
+      node_estimates <- do.call(what = cbind, args = lapply(X = node_estimates, FUN = function(x) {
+        
+        updated_tree_lengths <- stepmatrix[x$estimates[ancestor_node], ] + node_values[needle, ]
+        
+        possible_states <- names(x = updated_tree_lengths[updated_tree_lengths == min(x = updated_tree_lengths)])
+        
+        n_states <- length(x = possible_states)
+        
+        new_estimates <- matrix(data = rep(x = x$estimates, times = n_states), ncol = n_states)
+        
+        new_estimates[needle, ] <- possible_states
+        
+        new_estimates
+        
+      }))
+      
+      # WILL WANT TO RETURN *ONLY* ESTIMATES PART SO CAN do.call BACK TO MATRIX
+      
+      # Permute new tree lengths given ancestral state(s):
+      #permuted_new_lengths <- stepmatrix[node_estimates[ancestor_node, ], , drop = FALSE] + matrix(data = rep(x = node_values[needle, ], times = ncol(x = node_estimates)), nrow = ncol(x = node_estimates), byrow = TRUE)
+
+
+      
+      
+      
+      
+      
+      
+      #node_estimates <- do.call(what = rbind, args = lapply(X = apply(X = cbind(1:nrow(x = permuted_new_lengths), permuted_new_lengths), MARGIN = 1, FUN = list), FUN = function(x) {x <- unlist(x = x); column_number <- x[1]; x <- x[-1]; x == min(x = x); possible_states <- colnames(x = stepmatrix)[x == min(x = x)]; n_states <- length(x = possible_states); new_node_estimates <- lapply(X = as.list(x = possible_states), FUN = function(y) {new_node_estimates <- node_estimates[[column_number]]; new_node_estimates[needle] <- y; new_node_estimates}); do.call(what = rbind, args = new_node_estimates)}))
+      
+      
+      
+      #node_estimates <- lapply(X = as.list(x = 1:nrow(x = node_estimates)), FUN = function(x) node_estimates[x, ])
+      
+      # UGH. NOW OVERPERMUTES AND LAPPLY STRUCTURE IS FUCKING UP.
+      
+    }
   }
 
 
-#any(x = unlist(x = lapply(X = node_estimates, FUN = is.na)))
-  
-  node_estimates <- do.call(what = cbind, args = node_estimates)
-  
-
-par(mfrow = c(1, ncol(node_estimates)))
-par(mfrow = c(4, 6))
-for(i in 1:ncol(node_estimates)) {
-  plot(tree, show.tip.label = FALSE)
-  tiplabels(node_estimates[1:tip_count], cex = 2)
-  nodelabels(node_estimates[(1 + tip_count):node_count, i], cex = 2)
-}
 
 
-  
-  
-  
-  # TEST BIT BELOW: TEST FAILS!
-  
-  # Set up list to store estimate(s) for every node:
-  #node_estimates <- rep(x = NA, times = node_count)
-  
-  # Populate tip values immediately:
-  #node_estimates[1:tip_count] <- tip_states[tree$tip.label]
 
-  # Get most parsimonious root state(s):
-  #root_states <- colnames(node_values)[node_values[tip_count + 1, ] == min(x = node_values[tip_count + 1, ])]
+
+
+# PLOTTING TREE BLOCK:
+#par(mfrow = c(1, ncol(node_estimates)))
+#par(mfrow = c(4, 6))
+#for(i in 1:ncol(node_estimates)) {
+#  plot(tree, show.tip.label = FALSE)
+#  tiplabels(node_estimates[1:tip_count], cex = 2)
+#  nodelabels(node_estimates[(1 + tip_count):node_count, i], cex = 2)
+#}
+
+
   
-  # Set a single root state (picking arbitrarily if multiple options) and store as first node estimate:
-  #node_estimates[tip_count + 1] <- ifelse(length(x = root_states) > 0, sample(x = root_states, size = 1), root_states)
   
-  # INSERT CONDITIONAL SOMEWHERE TO DO QUICKLY IF NO AMBIGUITIES!
   
-  # Second pass (traverse tree from root to tips):
-  #for(needle in (tip_count + 2):(tip_count + node_count - tip_count)) {
-    
-    # Find ancestor of current node:
-    #ancestor <- tree$edge[tree$edge[, 2] == needle, 1]
-    
-    # Find ancestor state:
-    #ancestor_state <- node_estimates[ancestor]
-    
-    # Find possible states at current node:
-    #possible_states <- colnames(node_values)[node_values[needle, ] == min(x = node_values[needle, ])]
-    
-    # If there are multiple possible states:
-    #if(length(x = possible_states) > 1) {
-      
-      # Find intersecting state(s) of current node and its' ancestor:
-      #intersecting_states <- intersect(x = ancestor_state, y = possible_states)
-      
-      # If a single intersecting state, then store that:
-      #if(length(x = intersecting_states) == 1) {
-        
-        # Simply store that value as the estimate:
-        #node_estimates[needle] <- intersecting_states
-        
-      # If not singe intersecting state:
-      #} else {
-        
-        # DEFO BREAKS HERE!
-        
-        #ancestor_distances <- stepmatrix[ancestor_state, possible_states]
-        
-        # DELTRAN SO PICK CLOSEST VALUE:
-        #node_estimates[needle] <- names(ancestor_distances)[ancestor_distances == min(x = ancestor_distances)]
-        
-        # ACCTRAN SO PICK LARGEST VALUE
-        #node_estimates[needle] <- names(ancestor_distances)[ancestor_distances == max(x = ancestor_distances)]
-        
-        #}
-      
-    # If only a single possible state:
-    #} else {
-      
-      # Assign that state as the estimate:
-      #node_estimates[needle] <- possible_states
-      
-      #}
-    
-    #}
-    
+  # Return??:
+  node_estimates
     
     
   
@@ -485,7 +469,13 @@ tree <- ape::read.tree(text = "((C,(A,B)),(D,E));")
 tip_states <- c(A = 1, B = 2, C = 2, D = 1, E = 0)
 
 # Ordered:
-plot(tree, show.tip.label = FALSE); tiplabels(tip_states[tree$tip.label]); nodelabels(unlist(lapply(apply(parsimony_ancestors(tree, tip_states = c(A = 1, B = 2, C = 2, D = 1, E = 0), stepmatrix = "ordered")[(ape::Ntip(tree) + 1):(ape::Ntip(tree) + tree$Nnode), , drop = FALSE], 1, list), function(x) {x <- unlist(x); paste(names(x)[x == min(x)], collapse = ",")})))
+plot(tree, show.tip.label = FALSE)
+tiplabels(tip_states[tree$tip.label])
+node_estimates <- parsimony_ancestors(tree, tip_states = c(A = 1, B = 2, C = 2, D = 1, E = 0), stepmatrix = "ordered")
+nodelabels(node_estimates[6:9, 1])
+
+
+nodelabels([(ape::Ntip(tree) + 1):(ape::Ntip(tree) + tree$Nnode), , drop = FALSE], 1, list), function(x) {x <- unlist(x); paste(names(x)[x == min(x)], collapse = ",")})))
 
 # Unordered:
 plot(tree, show.tip.label = FALSE); tiplabels(tip_states[tree$tip.label]); nodelabels(unlist(lapply(apply(parsimony_ancestors(tree, tip_states = c(A = 1, B = 2, C = 2, D = 1, E = 0), stepmatrix = "unordered")[(ape::Ntip(tree) + 1):(ape::Ntip(tree) + tree$Nnode), , drop = FALSE], 1, list), function(x) {x <- unlist(x); paste(names(x)[x == min(x)], collapse = ",")})))
