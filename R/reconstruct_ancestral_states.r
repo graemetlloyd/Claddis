@@ -21,6 +21,7 @@
 #' # MANUAL: really only for rooted trees (unrooted possible using same methods (see Swofford and Maddison(1992), but unclear why you would want to do this with trees without direction of time (i.e., a root).
 #' # MANUAL: works with multifirctaions and doesn't reuire a fully bifurcating tree, but does assume polytomies are therefore "hard".
 #' # MANUAL: Swofford and Maddison (1992; p210): "Both [ACCTRAN and DELTRAN] start by either assuming that the ancestral state is known or by choosing a state from the set of optimal assignments to the root node" - i.e., always an arbitrainess problem at root!
+#' MISSING DATA (NA) IS DEALT WITH BY SETTING ALL TIP VALUES FOR A MISSING STATE TO ZERO (AS PER SWOFFORD AND MADDISON 1992).
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -99,7 +100,7 @@
 #'   tree = tree,
 #'   tip_states = tip_states,
 #'   stepmatrix = matrix(
-#'     data = c(0,1,2,999,0,1,999,999,0),
+#'     data = c(0, 1, 2, 999, 0, 1, 999, 999, 0),
 #'     nrow = 3,
 #'     ncol = 3,
 #'     dimnames = list(0:2, 0:2)
@@ -117,7 +118,7 @@
 #'   tree = tree,
 #'   tip_states = tip_states,
 #'   stepmatrix = matrix(
-#'     data = c(0,999,999,1,0,999,2,1,0),
+#'     data = c(0, 999, 999, 1, 0, 999, 2, 1, 0),
 #'     nrow = 3,
 #'     ncol = 3,
 #'     dimnames = list(0:2, 0:2)
@@ -132,7 +133,11 @@
 #'
 #' # Ordered with polytomies:
 #' tree <- ape::read.tree(text = "((C,A,B),(D,E));") # Two non-root internal
-#' node_estimates <- reconstruct_ancestral_states(tree = tree, tip_states = tip_states, stepmatrix = "ordered")
+#' node_estimates <- reconstruct_ancestral_states(
+#'   tree = tree,
+#'   tip_states = tip_states,
+#'   stepmatrix = "ordered"
+#' )
 #' par(mfrow = c(1, ncol(node_estimates)))
 #' for(i in 1:ncol(node_estimates)) {
 #'   plot(tree, show.tip.label = FALSE)
@@ -140,7 +145,11 @@
 #'   nodelabels(node_estimates[6:8, i], cex = 2)
 #' }
 #' tree <- ape::read.tree(text = "((C,A,B),D,E);") # One non-root internal
-#' node_estimates <- reconstruct_ancestral_states(tree = tree, tip_states = tip_states, stepmatrix = "ordered")
+#' node_estimates <- reconstruct_ancestral_states(
+#'   tree = tree,
+#'   tip_states = tip_states,
+#'   stepmatrix = "ordered"
+#' )
 #' par(mfrow = c(1, ncol(node_estimates)))
 #' for(i in 1:ncol(node_estimates)) {
 #'   plot(tree, show.tip.label = FALSE)
@@ -148,7 +157,11 @@
 #'   nodelabels(node_estimates[6:7, i], cex = 2)
 #' }
 #' tree <- ape::read.tree(text = "(C,A,B,D,E);") # Star tree
-#' node_estimates <- reconstruct_ancestral_states(tree = tree, tip_states = tip_states, stepmatrix = "ordered")
+#' node_estimates <- reconstruct_ancestral_states(
+#'   tree = tree,
+#'   tip_states = tip_states,
+#'   stepmatrix = "ordered"
+#' )
 #' par(mfrow = c(1, ncol(node_estimates)))
 #' for(i in 1:ncol(node_estimates)) {
 #'   plot(tree, show.tip.label = FALSE)
@@ -169,7 +182,8 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix) {
   # - states are discrete
   # - states in tip states are all available in stepmatrix and vice versa
   # - stepmatrix values are zero or positive (don't have to be integers?)
-  # Put checks at higher level to avoid repeating for every character in a matrix (slow?)
+  # - Check there are enough states to do something with!
+  # - Put checks at higher level to avoid repeating for every character in a matrix (slow?)
   
   # If stepmatrix is not already specified as a matrix (i.e., it is simply "ordered", "unordrered" etc.):
   if(!is.matrix(x = stepmatrix)) {
@@ -230,6 +244,9 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix) {
   
   # Populate tip values (zeroes for assigned state(s):
   for(i in 1:tip_count) node_values[i, colnames(x = node_values) == tip_states[i]] <- 0
+  
+  # If any tips are missing then set all states for those as zero:
+  if(any(x = is.na(x = tip_states))) node_values[which(x = is.na(x = tip_states)), ] <- 0
   
   # First pass (traverse tree from tips to root):
   for(needle in (tip_count + node_count - tip_count):(tip_count + 1)) {
@@ -306,6 +323,8 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix) {
   # - Ancestral states
   # - Ambiguities?
   # - Stepmatrix used
+  # - Tree used
+  # - Tip states used
   # - Tree length
   # - How root value was chosen (arbitraty forced, unambiguous?)
   # - Algorithm (parsimony, ML, etc.)

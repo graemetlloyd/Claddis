@@ -32,6 +32,7 @@ Text.
 # MANUAL: really only for rooted trees (unrooted possible using same methods (see Swofford and Maddison(1992), but unclear why you would want to do this with trees without direction of time (i.e., a root).
 # MANUAL: works with multifirctaions and doesn't reuire a fully bifurcating tree, but does assume polytomies are therefore "hard".
 # MANUAL: Swofford and Maddison (1992; p210): "Both [ACCTRAN and DELTRAN] start by either assuming that the ancestral state is known or by choosing a state from the set of optimal assignments to the root node" - i.e., always an arbitrainess problem at root!
+MISSING DATA (NA) IS DEALT WITH BY SETTING ALL TIP VALUES FOR A MISSING STATE TO ZERO (AS PER SWOFFORD AND MADDISON 1992).
 }
 \examples{
 
@@ -94,7 +95,7 @@ node_estimates <- reconstruct_ancestral_states(
   tree = tree,
   tip_states = tip_states,
   stepmatrix = matrix(
-    data = c(0,1,2,999,0,1,999,999,0),
+    data = c(0, 1, 2, 999, 0, 1, 999, 999, 0),
     nrow = 3,
     ncol = 3,
     dimnames = list(0:2, 0:2)
@@ -112,7 +113,7 @@ node_estimates <- reconstruct_ancestral_states(
   tree = tree,
   tip_states = tip_states,
   stepmatrix = matrix(
-    data = c(0,999,999,1,0,999,2,1,0),
+    data = c(0, 999, 999, 1, 0, 999, 2, 1, 0),
     nrow = 3,
     ncol = 3,
     dimnames = list(0:2, 0:2)
@@ -127,7 +128,11 @@ for(i in 1:ncol(node_estimates)) {
 
 # Ordered with polytomies:
 tree <- ape::read.tree(text = "((C,A,B),(D,E));") # Two non-root internal
-node_estimates <- reconstruct_ancestral_states(tree = tree, tip_states = tip_states, stepmatrix = "ordered")
+node_estimates <- reconstruct_ancestral_states(
+  tree = tree,
+  tip_states = tip_states,
+  stepmatrix = "ordered"
+)
 par(mfrow = c(1, ncol(node_estimates)))
 for(i in 1:ncol(node_estimates)) {
   plot(tree, show.tip.label = FALSE)
@@ -135,7 +140,11 @@ for(i in 1:ncol(node_estimates)) {
   nodelabels(node_estimates[6:8, i], cex = 2)
 }
 tree <- ape::read.tree(text = "((C,A,B),D,E);") # One non-root internal
-node_estimates <- reconstruct_ancestral_states(tree = tree, tip_states = tip_states, stepmatrix = "ordered")
+node_estimates <- reconstruct_ancestral_states(
+  tree = tree,
+  tip_states = tip_states,
+  stepmatrix = "ordered"
+)
 par(mfrow = c(1, ncol(node_estimates)))
 for(i in 1:ncol(node_estimates)) {
   plot(tree, show.tip.label = FALSE)
@@ -143,7 +152,11 @@ for(i in 1:ncol(node_estimates)) {
   nodelabels(node_estimates[6:7, i], cex = 2)
 }
 tree <- ape::read.tree(text = "(C,A,B,D,E);") # Star tree
-node_estimates <- reconstruct_ancestral_states(tree = tree, tip_states = tip_states, stepmatrix = "ordered")
+node_estimates <- reconstruct_ancestral_states(
+  tree = tree,
+  tip_states = tip_states,
+  stepmatrix = "ordered"
+)
 par(mfrow = c(1, ncol(node_estimates)))
 for(i in 1:ncol(node_estimates)) {
   plot(tree, show.tip.label = FALSE)
