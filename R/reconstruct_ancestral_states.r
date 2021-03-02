@@ -5,7 +5,7 @@
 #' Given a tree, discrete states for each tip, and either a specific stepmatrix or character type, returns the most parsimonious ancestral reconstruction(s).
 #'
 #' @param tree A tree (phylo object).
-#' @param tip_states A labelled vector of tip states. These should be discrete and mathc the row and column headings in \code{stepmatrix}, with labels matching the tip labels of \code{tree}.
+#' @param tip_states A labelled vector of tip states. These should be discrete and match the row and column headings in \code{stepmatrix}, with labels matching the tip labels of \code{tree}.
 #' @param stepmatrix Either the character type (one of \code{"ordered"} or \code{"unordered"}) or a custom-specified step matrix. If the latter this must be square with identical row and column names correspnding to the values in \code{tip_states}. The diagonal must be zero, but off-diagonal values can be any non-negative real number. I.e., they needn't be integers, and the matrix does not need to be symmetric. Note that for transitions the rows are considered the "from" values, and the columns the "to" value. Thus a cost for the transition from state "0" to state "1" would be specified by \code{stepmatrix["0", "1"]}. (This is only relevant where matrices are asymmetric in tranistion costs.)
 #'
 #' @details
@@ -22,6 +22,9 @@
 #' # MANUAL: works with multifirctaions and doesn't reuire a fully bifurcating tree, but does assume polytomies are therefore "hard".
 #' # MANUAL: Swofford and Maddison (1992; p210): "Both [ACCTRAN and DELTRAN] start by either assuming that the ancestral state is known or by choosing a state from the set of optimal assignments to the root node" - i.e., always an arbitrainess problem at root!
 #' MISSING DATA (NA) IS DEALT WITH BY SETTING ALL TIP VALUES FOR A MISSING STATE TO ZERO (AS PER SWOFFORD AND MADDISON 1992).
+#' UNCERTAIN STATES (E.G., 0/1) CONSTRAIN ANCESTRAL STATES SLIGHTLY MORE THAN NA (ASSUMING THEY EXCLUDE SOME STATES. IMPLEMENTATION SAME AS SWOFFORD AND MADDISON (1992).
+#'
+#' HOW TO TREAT POLYTOMIES? MANY ISSUES RAISED IN SWOFFORD AND MADDISON (1992). ALTERNATIVE APPROACH IN LIKELIHOOD SUGGESTED BY REVELL.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -243,8 +246,8 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix) {
   node_values[1:tip_count, ] <- Inf
   
   # Populate tip values (zeroes for assigned state(s):
-  for(i in 1:tip_count) node_values[i, colnames(x = node_values) == tip_states[i]] <- 0
-  
+  for(i in 1:tip_count) node_values[i, match(x = strsplit(x = tip_states[i], split = "/")[[1]], table = colnames(x = node_values))] <- 0
+
   # If any tips are missing then set all states for those as zero:
   if(any(x = is.na(x = tip_states))) node_values[which(x = is.na(x = tip_states)), ] <- 0
   
@@ -261,6 +264,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix) {
   
   # ADD OPTION TO FIX ROOT HERE
   # CHECK OPTION DOESN'T FORCE INFINITY!
+  # CHECK Inf VALUES IN STEP MATRICES DO NOT LEAD TO ALL-Inf VALUES AT NODES!
   
   tree_length <- min(x = node_values[tip_count + 1, ])
   
@@ -271,8 +275,11 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix) {
   # Build node estimates from single state results:
   node_estimates <- matrix(data = apply(X = node_values, MARGIN = 1, FUN = function(x) {x <- names(x = x[x == min(x = x)]); ifelse(test = length(x = x) == 1, x, NA)}), ncol = 1, nrow = node_count)
   
-  # Only continue if there is any ambiguity:
-  if(any(x = is.na(x = node_estimates))) {
+  # Update tip states with their original values:
+  node_estimates[1:tip_count] <- tip_states
+  
+  # Only continue if there is any ambiguity at internal nodes:
+  if(any(x = is.na(x = node_estimates[(tip_count + 1):node_count]))) {
     
     # Find all possible root states:
     possible_root_states <- colnames(x = node_values)[node_values[tip_count + 1, ] == min(x = node_values[tip_count + 1, ])]
