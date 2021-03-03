@@ -24,6 +24,7 @@
 #' MISSING DATA (NA) IS DEALT WITH BY SETTING ALL TIP VALUES FOR A MISSING STATE TO ZERO (AS PER SWOFFORD AND MADDISON 1992).
 #' UNCERTAIN STATES (E.G., 0/1) CONSTRAIN ANCESTRAL STATES SLIGHTLY MORE THAN NA (ASSUMING THEY EXCLUDE SOME STATES. IMPLEMENTATION SAME AS SWOFFORD AND MADDISON (1992).
 #'
+#' ASYMMETRIC TRANSITIONS REQUIRE YOU TO KNOW POLARITY A PRIORI!
 #' HOW TO TREAT POLYTOMIES? MANY ISSUES RAISED IN SWOFFORD AND MADDISON (1992). ALTERNATIVE APPROACH IN LIKELIHOOD SUGGESTED BY REVELL.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
@@ -230,8 +231,14 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix) {
     
   }
   
-  # Reorder tip states (1 to N):
+  # Reorder tip states (1 to N) and store as character data:
   tip_states <- tip_states[tree$tip.label]
+  
+  # Reformat tip states as character vector:
+  tip_states <- as.character(x = tip_states)
+  
+  # Re-add names to tip states:
+  names(tip_states) <- tree$tip.label
   
   # Establish number of tips:
   tip_count <- ape::Ntip(phy = tree)
@@ -266,6 +273,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix) {
   # CHECK OPTION DOESN'T FORCE INFINITY!
   # CHECK Inf VALUES IN STEP MATRICES DO NOT LEAD TO ALL-Inf VALUES AT NODES!
   
+  # Store tree length:
   tree_length <- min(x = node_values[tip_count + 1, ])
   
   # STOP AFTER HERE IF ONLY WANT TREE LENGTH?
@@ -325,6 +333,50 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix) {
 
   # Return node estimates:
   node_estimates
+  
+  
+  
+  
+  # ADD SWOFORD REF TO DESCRIPTION
+  
+  
+  
+  
+  # Conjecture of Minaka (1993) seems to be wrong! I.e., there is not a single MPR that minimizes the distortion index (single ACCTRAN solution), nor a single MPR that maximizes it (single DELTRAN solution).
+  # But that was loking across all rootings of an unrooted tree, which does not reflect practice.
+  
+  # Ref: Minaka, N., 1993. Algebraic properties of the most parsimonious reconstructions of the hypothetical ancestors on a given tree. \emph{Forma}, \bold{8}, 277-296.
+  
+  calculate_distortion_index <- function(tree, tip_states, node_estimates, stepmatrix) {
+    
+    # Establish number of tips:
+    tip_count <- ape::Ntip(phy = tree)
+    
+    # Establish total number of nodes (terminal and internal):
+    node_count <- tip_count + tree$Nnode
+    
+    # Make list of all possible tips to keep for N -1 to 2 tips:
+    tips_to_keep <- strsplit(x = unlist(x = lapply(X = as.list(x = (tip_count - 1):2), FUN = function(x) lapply(X = combn(x = tree$tip.label, m = x, simplify = FALSE), FUN = function(y) paste(x = y, collapse = "|")))), split = "\\|")
+    
+    # Make list of tips to prune matching tips_to_keep:
+    tips_to_prune <- lapply(X = tips_to_keep, FUN = function(z) setdiff(tree$tip.label, z))
+    
+    # GONNA NEED TO DEAL WITH NAs AND UNCERTAINTIES IN THE BELOW (USES VALUES AS ROW-COLUMNS OF STEPMATRIX)
+    
+    # Calculate summed subtree lengths for each most parsimonious rconstruction:
+    sum_subtree_lengths <- unlist(x = lapply(X = as.list(x = 1:ncol(node_estimates)), FUN = function(y) {current_tree <- tree; current_tree$node.label <- node_estimates[(tip_count + 1):node_count, y]; subtree_lengths <- unlist(x = lapply(X = as.list(x = 1:length(x = tips_to_prune)), FUN = function(x) {subtree <- ape::drop.tip(phy = current_tree, tip = tips_to_prune[[x]]); subtree_node_estimates <- c(tip_states[tips_to_keep[[x]]][subtree$tip.label], subtree$node.label); sum(x = diag(x = stepmatrix[subtree_node_estimates[subtree$edge[, 1]], subtree_node_estimates[subtree$edge[, 2]]]))})); sum(x = subtree_lengths)}))
+    
+    # Return distortion indicies:
+    sum_subtree_lengths - min(x = sum_subtree_lengths)
+    
+    
+  }
+  
+  calculate_distortion_index(tree = tree, tip_states = tip_states, node_estimates = node_estimates, stepmatrix = stepmatrix)
+  
+
+  
+  node_estimates
 
   # OUTPUT:
   # - Ancestral states
@@ -333,12 +385,13 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix) {
   # - Tree used
   # - Tip states used
   # - Tree length
-  # - How root value was chosen (arbitraty forced, unambiguous?)
+  # - How root value was chosen (arbitrary forced, unambiguous?)
   # - Algorithm (parsimony, ML, etc.)
   # - CI?
   # - RI?
   # - N reversals
   # - N parallelisms
+  # - Distortion index for each MPR
   # - MAKE THIS A CLASS TOO!
   
 }
