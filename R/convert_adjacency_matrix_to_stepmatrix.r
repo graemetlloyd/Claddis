@@ -8,7 +8,7 @@
 #'
 #' @details
 #'
-#' This function is intended for internal use by \link{convert_state_tree_to_stepmatrix}, but as it also generalizes to solving any graph theory problem - generating a distance matrix corresponding to each shortest path between vertices of a connected graph represented as an adjacency matrix - it is made available explicitly here.
+#' This function is intended for internal use, but as it also generalizes to solving any graph theory problem - generating a distance matrix corresponding to each shortest path between vertices of a connected graph represented as an adjacency matrix - it is made available explicitly here.
 #'
 #' The process is best understood with an example. Imagine we have a graph like this:
 #'
@@ -44,7 +44,7 @@
 #'
 #' @seealso
 #'
-#' \link{convert_state_tree_to_stepmatrix}, link{locate_bracket_positions}
+#' \link{convert_state_tree_to_adjacency_matrix}, link{locate_bracket_positions}
 #'
 #' @examples
 #'
