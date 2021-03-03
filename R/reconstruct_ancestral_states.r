@@ -7,6 +7,7 @@
 #' @param tree A tree (phylo object).
 #' @param tip_states A labelled vector of tip states. These should be discrete and match the row and column headings in \code{stepmatrix}, with labels matching the tip labels of \code{tree}.
 #' @param stepmatrix Either the character type (one of \code{"ordered"} or \code{"unordered"}) or a custom-specified step matrix. If the latter this must be square with identical row and column names correspnding to the values in \code{tip_states}. The diagonal must be zero, but off-diagonal values can be any non-negative real number. I.e., they needn't be integers, and the matrix does not need to be symmetric. Note that for transitions the rows are considered the "from" values, and the columns the "to" value. Thus a cost for the transition from state "0" to state "1" would be specified by \code{stepmatrix["0", "1"]}. (This is only relevant where matrices are asymmetric in tranistion costs.)
+#' @param weight The character weight (defaults to one).
 #'
 #' @details
 #'
@@ -35,7 +36,11 @@
 #'
 #' @return
 #'
-#' A matrix where rows correspond to ALL nodes (i.e., terminal and internal) in the order numbered by \code{ape}, and columns correspond to unique most parsimnious reconstruction(s). I.e., if there is only one most parsimnious reconstruction there will be only one column.
+#' A list with multiple components, including:
+#'
+#' \item{length}{The tree length (number of steps).}
+#' \item{most_parsimonious_reconstructions}{A matrix where rows correspond to ALL nodes (i.e., terminal and internal) in the order numbered by \code{ape}, and columns correspond to every unique most parsimnious reconstruction. I.e., if there is only one most parsimonious reconstruction there will be only one column.}
+#'
 #'
 #' Users may also wish to refer to the more complex whole-matrix, likelihood-based function \link{estimate_ancestral_states}. Although, note that eventually parsimony will simply be an option to that function.
 #'
@@ -63,7 +68,7 @@
 #'   tree = tree,
 #'   tip_states = tip_states,
 #'   stepmatrix = "ordered"
-#' )
+#' )$most_parsimonious_reconstructions
 #'
 #' # Plot all most parsimonious reconstructions on the tree:
 #' par(mfrow = c(1, ncol(x = node_estimates)))
@@ -78,7 +83,7 @@
 #'   tree = tree,
 #'   tip_states = tip_states,
 #'   stepmatrix = "ordered"
-#' )
+#' )$most_parsimonious_reconstructions
 #' par(mfrow = c(1, ncol(node_estimates)))
 #' for(i in 1:ncol(x = node_estimates)) {
 #'   plot(x = tree, show.tip.label = FALSE)
@@ -91,7 +96,7 @@
 #'   tree = tree,
 #'   tip_states = tip_states,
 #'   stepmatrix = "unordered"
-#' )
+#' )$most_parsimonious_reconstructions
 #' par(mfrow = c(1, ncol(node_estimates)))
 #' for(i in 1:ncol(x = node_estimates)) {
 #'   plot(x = tree, show.tip.label = FALSE)
@@ -109,7 +114,7 @@
 #'     ncol = 3,
 #'     dimnames = list(0:2, 0:2)
 #'   )
-#' )
+#' )$most_parsimonious_reconstructions
 #' par(mfrow = c(1, ncol(x = node_estimates)))
 #' for(i in 1:ncol(node_estimates)) {
 #'   plot(x = tree, show.tip.label = FALSE)
@@ -127,7 +132,7 @@
 #'     ncol = 3,
 #'     dimnames = list(0:2, 0:2)
 #'   )
-#' )
+#' )$most_parsimonious_reconstructions
 #' par(mfrow = c(1, ncol(node_estimates)))
 #' for(i in 1:ncol(node_estimates)) {
 #'   plot(x = tree, show.tip.label = FALSE)
@@ -141,7 +146,7 @@
 #'   tree = tree,
 #'   tip_states = tip_states,
 #'   stepmatrix = "ordered"
-#' )
+#' )$most_parsimonious_reconstructions
 #' par(mfrow = c(1, ncol(node_estimates)))
 #' for(i in 1:ncol(node_estimates)) {
 #'   plot(tree, show.tip.label = FALSE)
@@ -153,7 +158,7 @@
 #'   tree = tree,
 #'   tip_states = tip_states,
 #'   stepmatrix = "ordered"
-#' )
+#' )$most_parsimonious_reconstructions
 #' par(mfrow = c(1, ncol(node_estimates)))
 #' for(i in 1:ncol(node_estimates)) {
 #'   plot(tree, show.tip.label = FALSE)
@@ -165,7 +170,7 @@
 #'   tree = tree,
 #'   tip_states = tip_states,
 #'   stepmatrix = "ordered"
-#' )
+#' )$most_parsimonious_reconstructions
 #' par(mfrow = c(1, ncol(node_estimates)))
 #' for(i in 1:ncol(node_estimates)) {
 #'   plot(tree, show.tip.label = FALSE)
@@ -174,7 +179,7 @@
 #' }
 #'
 #' @export reconstruct_ancestral_states
-reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix) {
+reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 1) {
   
   # TO DO
   # - Allow for polymorphisms (maybe conditionals for counting changes?) This is a hard problem!
@@ -230,6 +235,9 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix) {
     stepmatrix <- base_stepmatrix
     
   }
+  
+  # Apply character weight by multiplying through stepmatrix:
+  stepmatrix <- stepmatrix * weight
   
   # Reorder tip states (1 to N) and store as character data:
   tip_states <- tip_states[tree$tip.label]
@@ -337,14 +345,14 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix) {
   
   
   
-  # ADD SWOFORD REF TO DESCRIPTION
+  # ADD SWOFFORD REF TO DESCRIPTION (PROLLY NO DOI!)
   
   
   
   
   # Conjecture of Minaka (1993) seems to be wrong! I.e., there is not a single MPR that minimizes the distortion index (single ACCTRAN solution), nor a single MPR that maximizes it (single DELTRAN solution).
   # But that was loking across all rootings of an unrooted tree, which does not reflect practice.
-  
+  # No DOI available!
   # Ref: Minaka, N., 1993. Algebraic properties of the most parsimonious reconstructions of the hypothetical ancestors on a given tree. \emph{Forma}, \bold{8}, 277-296.
   
   calculate_distortion_index <- function(tree, tip_states, node_estimates, stepmatrix) {
@@ -374,9 +382,12 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix) {
   
   calculate_distortion_index(tree = tree, tip_states = tip_states, node_estimates = node_estimates, stepmatrix = stepmatrix)
   
-
   
-  node_estimates
+  
+  
+  
+  # Return compiled output:
+  list(length = tree_length, most_parsimonious_reconstructions = node_estimates)
 
   # OUTPUT:
   # - Ancestral states
@@ -387,7 +398,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix) {
   # - Tree length
   # - How root value was chosen (arbitrary forced, unambiguous?)
   # - Algorithm (parsimony, ML, etc.)
-  # - CI?
+  # - CI? (Character vs matrix - can they jstbe added?)
   # - RI?
   # - N reversals
   # - N parallelisms
