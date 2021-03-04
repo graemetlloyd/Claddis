@@ -178,6 +178,25 @@
 #'   nodelabels(node_estimates[6, i], cex = 2)
 #' }
 #'
+#' # Get tree length for an entire matrix of characters:
+#' tree <- ape::read.tree(
+#'   text = "(Outgroup,(Ornithischia,(Sauropodomorpha,(Ceratosauria,Procompsognathus,
+#'   Liliensternus,(Carnosauria,(Ornithmimidae,Saurornitholestes,Hulsanpes,(Coelurus,
+#'   Elmisauridae,(Compsognathus,(Ornitholestes,Microvenator,Caenagnathidae,
+#'   (Deinonychosauria,Avialae))))))))));"
+#' )
+#' tip_state_matrix <- gauthier_1986$matrix_1$matrix
+#' sum(x = apply(
+#'   X = tip_state_matrix,
+#'   MARGIN = 2, FUN = function(x) {
+#'     reconstruct_ancestral_states(
+#'       tree = tree,
+#'       tip_states = x,
+#'       stepmatrix = "unordered",
+#'       weight = 1)$length
+#'   }
+#' ))
+#'
 #' @export reconstruct_ancestral_states
 reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 1) {
   
@@ -194,16 +213,16 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   # - Check there are enough states to do something with!
   # - Put checks at higher level to avoid repeating for every character in a matrix (slow?)
   
-  # If stepmatrix is not already specified as a matrix (i.e., it is simply "ordered", "unordrered" etc.):
+  # If stepmatrix is not already specified as a matrix (i.e., it is simply "ordered", "unordered" etc.):
   if(!is.matrix(x = stepmatrix)) {
     
     # NEED TO SET MORE OPTIONS LIKE DOLLO, CAMIN-SOKAL AND....?
     
-    # First check stepmatrix is of a vaid type and stop wand warn user if not:
+    # First check stepmatrix is of a valid type and stop and warn user if not:
     if(length(x = setdiff(x = stepmatrix, y = c("ordered", "unordered"))) > 0) stop("If not a specific matrix, then stepmatrix must be one of \"ordered\" or \"unordered\".")
     
-    # Get tip states as numerics:
-    tip_state_numbers <- as.numeric(x = tip_states)
+    # Get numeric tip state values:
+    tip_state_numbers <- as.numeric(x = unlist(x = strsplit(x = as.character(x = tip_states), split = "&|/")))
     
     # Get the range (min-max) of tip values:
     tip_state_range <- range(x = tip_state_numbers[!is.na(x = tip_state_numbers)])
@@ -345,7 +364,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   
   
   
-  # ADD SWOFFORD REF TO DESCRIPTION (PROLLY NO DOI!)
+  # ADD SWOFFORD REF TO DESCRIPTION FILE (PROLLY NO DOI!)
   
   
   
@@ -380,7 +399,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
     
   }
   
-  calculate_distortion_index(tree = tree, tip_states = tip_states, node_estimates = node_estimates, stepmatrix = stepmatrix)
+  #calculate_distortion_index(tree = tree, tip_states = tip_states, node_estimates = node_estimates, stepmatrix = stepmatrix)
   
   
   
@@ -398,7 +417,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   # - Tree length
   # - How root value was chosen (arbitrary forced, unambiguous?)
   # - Algorithm (parsimony, ML, etc.)
-  # - CI? (Character vs matrix - can they jstbe added?)
+  # - CI? (Character vs matrix - can they just be added? - I think not)
   # - RI?
   # - N reversals
   # - N parallelisms

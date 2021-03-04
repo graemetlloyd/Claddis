@@ -174,6 +174,25 @@ for(i in 1:ncol(node_estimates)) {
   nodelabels(node_estimates[6, i], cex = 2)
 }
 
+# Get tree length for an entire matrix of characters:
+tree <- ape::read.tree(
+  text = "(Outgroup,(Ornithischia,(Sauropodomorpha,(Ceratosauria,Procompsognathus,
+  Liliensternus,(Carnosauria,(Ornithmimidae,Saurornitholestes,Hulsanpes,(Coelurus,
+  Elmisauridae,(Compsognathus,(Ornitholestes,Microvenator,Caenagnathidae,
+  (Deinonychosauria,Avialae))))))))));"
+)
+tip_state_matrix <- gauthier_1986$matrix_1$matrix
+sum(x = apply(
+  X = tip_state_matrix,
+  MARGIN = 2, FUN = function(x) {
+    reconstruct_ancestral_states(
+      tree = tree,
+      tip_states = x,
+      stepmatrix = "unordered",
+      weight = 1)$length
+  }
+))
+
 }
 \references{
 Swofford, D. L. and Maddison, W. P., 1992. Parsimony, character-state reconstructions, and evolutionary inferences. \emph{In}  R. L. Mayden (ed.) Systematics, Historical Ecology, and North American Freshwater Fishes. Stanford University Press, Stanford, p187-223.
