@@ -13,16 +13,13 @@ reconstruct_ancestral_states(tree, tip_states, stepmatrix, weight = 1)
 
 \item{stepmatrix}{Either the character type (one of \code{"ordered"} or \code{"unordered"}) or a custom-specified step matrix. If the latter this must be square with identical row and column names correspnding to the values in \code{tip_states}. The diagonal must be zero, but off-diagonal values can be any non-negative real number. I.e., they needn't be integers, and the matrix does not need to be symmetric. Note that for transitions the rows are considered the "from" values, and the columns the "to" value. Thus a cost for the transition from state "0" to state "1" would be specified by \code{stepmatrix["0", "1"]}. (This is only relevant where matrices are asymmetric in tranistion costs.)}
 
-\item{weight}{The character weight (defaults to one).}
+\item{weight}{The character weight (defaults to one). Setting this value ensures that the length of the tree (number of steps) is calculated accurately. Note that if a custom stepmatrix is defined and the weight is already encoded into the costs then this should be left as one.}
 }
 \value{
 A list with multiple components, including:
 
 \item{length}{The tree length (number of steps).}
-\item{most_parsimonious_reconstructions}{A matrix where rows correspond to ALL nodes (i.e., terminal and internal) in the order numbered by \code{ape}, and columns correspond to every unique most parsimnious reconstruction. I.e., if there is only one most parsimonious reconstruction there will be only one column.}
-
-
-Users may also wish to refer to the more complex whole-matrix, likelihood-based function \link{estimate_ancestral_states}. Although, note that eventually parsimony will simply be an option to that function.
+\item{most_parsimonious_reconstructions}{A matrix where rows correspond to \emph{all} nodes (i.e., terminal and internal) in the order numbered by \code{ape}, and columns correspond to every unique most parsimonious reconstruction. I.e., if there is only one most parsimonious reconstruction there will be only one column.}
 }
 \description{
 Given a tree, discrete states for each tip, and either a specific stepmatrix or character type, returns the most parsimonious ancestral reconstruction(s).
@@ -30,19 +27,22 @@ Given a tree, discrete states for each tip, and either a specific stepmatrix or 
 \details{
 Text.
 
-# Uses Swofford and Maddison 1992 general solution as covers more base's but is also slower.
-# Rooted tres only as direction fucking matters and roots have meaning (stepmatrices that are asymmetric)
+# Uses Swofford and Maddison 1992 general solution as covers more bases but is also slower.
+# Rooted trees only as direction fucking matters and roots have meaning (stepmatrices that are asymmetric)
 # Option to fix root state (polarize) somehow
 # From is row, to is column
 # MANUAL: generalized solution as accounts for more possibilities
-# MANUAL: really only for rooted trees (unrooted possible using same methods (see Swofford and Maddison(1992), but unclear why you would want to do this with trees without direction of time (i.e., a root).
-# MANUAL: works with multifirctaions and doesn't reuire a fully bifurcating tree, but does assume polytomies are therefore "hard".
+# MANUAL: really only for rooted trees (unrooted possible using same methods (see Swofford and Maddison (1992), but unclear why you would want to do this with trees without direction of time (i.e., a root).
+# MANUAL: works with multifurcations and doesn't require a fully bifurcating tree, but does assume polytomies are therefore "hard".
 # MANUAL: Swofford and Maddison (1992; p210): "Both [ACCTRAN and DELTRAN] start by either assuming that the ancestral state is known or by choosing a state from the set of optimal assignments to the root node" - i.e., always an arbitrainess problem at root!
 MISSING DATA (NA) IS DEALT WITH BY SETTING ALL TIP VALUES FOR A MISSING STATE TO ZERO (AS PER SWOFFORD AND MADDISON 1992).
 UNCERTAIN STATES (E.G., 0/1) CONSTRAIN ANCESTRAL STATES SLIGHTLY MORE THAN NA (ASSUMING THEY EXCLUDE SOME STATES. IMPLEMENTATION SAME AS SWOFFORD AND MADDISON (1992).
+CALCULATES TREE LENGTHS!
 
 ASYMMETRIC TRANSITIONS REQUIRE YOU TO KNOW POLARITY A PRIORI!
 HOW TO TREAT POLYTOMIES? MANY ISSUES RAISED IN SWOFFORD AND MADDISON (1992). ALTERNATIVE APPROACH IN LIKELIHOOD SUGGESTED BY REVELL.
+
+Users may also wish to refer to the more complex whole-matrix, likelihood-based function \link{estimate_ancestral_states}. Although, note that eventually parsimony will simply be an option to that function.
 }
 \examples{
 
@@ -195,7 +195,7 @@ sum(x = apply(
 
 }
 \references{
-Swofford, D. L. and Maddison, W. P., 1992. Parsimony, character-state reconstructions, and evolutionary inferences. \emph{In}  R. L. Mayden (ed.) Systematics, Historical Ecology, and North American Freshwater Fishes. Stanford University Press, Stanford, p187-223.
+Swofford, D. L. and Maddison, W. P., 1992. Parsimony, character-state reconstructions, and evolutionary inferences. \emph{In} R. L. Mayden (ed.) Systematics, Historical Ecology, and North American Freshwater Fishes. Stanford University Press, Stanford, p187-223.
 }
 \seealso{
 \link{estimate_ancestral_states}

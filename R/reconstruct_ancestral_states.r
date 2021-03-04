@@ -7,42 +7,42 @@
 #' @param tree A tree (phylo object).
 #' @param tip_states A labelled vector of tip states. These should be discrete and match the row and column headings in \code{stepmatrix}, with labels matching the tip labels of \code{tree}.
 #' @param stepmatrix Either the character type (one of \code{"ordered"} or \code{"unordered"}) or a custom-specified step matrix. If the latter this must be square with identical row and column names correspnding to the values in \code{tip_states}. The diagonal must be zero, but off-diagonal values can be any non-negative real number. I.e., they needn't be integers, and the matrix does not need to be symmetric. Note that for transitions the rows are considered the "from" values, and the columns the "to" value. Thus a cost for the transition from state "0" to state "1" would be specified by \code{stepmatrix["0", "1"]}. (This is only relevant where matrices are asymmetric in tranistion costs.)
-#' @param weight The character weight (defaults to one).
+#' @param weight The character weight (defaults to one). Setting this value ensures that the length of the tree (number of steps) is calculated accurately. Note that if a custom stepmatrix is defined and the weight is already encoded into the costs then this should be left as one.
 #'
 #' @details
 #'
 #' Text.
 #'
-#' # Uses Swofford and Maddison 1992 general solution as covers more base's but is also slower.
-#' # Rooted tres only as direction fucking matters and roots have meaning (stepmatrices that are asymmetric)
+#' # Uses Swofford and Maddison 1992 general solution as covers more bases but is also slower.
+#' # Rooted trees only as direction fucking matters and roots have meaning (stepmatrices that are asymmetric)
 #' # Option to fix root state (polarize) somehow
 #' # From is row, to is column
 
 #' # MANUAL: generalized solution as accounts for more possibilities
-#' # MANUAL: really only for rooted trees (unrooted possible using same methods (see Swofford and Maddison(1992), but unclear why you would want to do this with trees without direction of time (i.e., a root).
-#' # MANUAL: works with multifirctaions and doesn't reuire a fully bifurcating tree, but does assume polytomies are therefore "hard".
+#' # MANUAL: really only for rooted trees (unrooted possible using same methods (see Swofford and Maddison (1992), but unclear why you would want to do this with trees without direction of time (i.e., a root).
+#' # MANUAL: works with multifurcations and doesn't require a fully bifurcating tree, but does assume polytomies are therefore "hard".
 #' # MANUAL: Swofford and Maddison (1992; p210): "Both [ACCTRAN and DELTRAN] start by either assuming that the ancestral state is known or by choosing a state from the set of optimal assignments to the root node" - i.e., always an arbitrainess problem at root!
 #' MISSING DATA (NA) IS DEALT WITH BY SETTING ALL TIP VALUES FOR A MISSING STATE TO ZERO (AS PER SWOFFORD AND MADDISON 1992).
 #' UNCERTAIN STATES (E.G., 0/1) CONSTRAIN ANCESTRAL STATES SLIGHTLY MORE THAN NA (ASSUMING THEY EXCLUDE SOME STATES. IMPLEMENTATION SAME AS SWOFFORD AND MADDISON (1992).
+#' CALCULATES TREE LENGTHS!
 #'
 #' ASYMMETRIC TRANSITIONS REQUIRE YOU TO KNOW POLARITY A PRIORI!
 #' HOW TO TREAT POLYTOMIES? MANY ISSUES RAISED IN SWOFFORD AND MADDISON (1992). ALTERNATIVE APPROACH IN LIKELIHOOD SUGGESTED BY REVELL.
+#'
+#' Users may also wish to refer to the more complex whole-matrix, likelihood-based function \link{estimate_ancestral_states}. Although, note that eventually parsimony will simply be an option to that function.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
 #' @references
 #'
-#' Swofford, D. L. and Maddison, W. P., 1992. Parsimony, character-state reconstructions, and evolutionary inferences. \emph{In}  R. L. Mayden (ed.) Systematics, Historical Ecology, and North American Freshwater Fishes. Stanford University Press, Stanford, p187-223.
+#' Swofford, D. L. and Maddison, W. P., 1992. Parsimony, character-state reconstructions, and evolutionary inferences. \emph{In} R. L. Mayden (ed.) Systematics, Historical Ecology, and North American Freshwater Fishes. Stanford University Press, Stanford, p187-223.
 #'
 #' @return
 #'
 #' A list with multiple components, including:
 #'
 #' \item{length}{The tree length (number of steps).}
-#' \item{most_parsimonious_reconstructions}{A matrix where rows correspond to ALL nodes (i.e., terminal and internal) in the order numbered by \code{ape}, and columns correspond to every unique most parsimnious reconstruction. I.e., if there is only one most parsimonious reconstruction there will be only one column.}
-#'
-#'
-#' Users may also wish to refer to the more complex whole-matrix, likelihood-based function \link{estimate_ancestral_states}. Although, note that eventually parsimony will simply be an option to that function.
+#' \item{most_parsimonious_reconstructions}{A matrix where rows correspond to \emph{all} nodes (i.e., terminal and internal) in the order numbered by \code{ape}, and columns correspond to every unique most parsimonious reconstruction. I.e., if there is only one most parsimonious reconstruction there will be only one column.}
 #'
 #' @seealso
 #'
@@ -201,11 +201,17 @@
 reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 1) {
   
   # TO DO
-  # - Allow for polymorphisms (maybe conditionals for counting changes?) This is a hard problem!
+  # - Allow for true polymorphisms (maybe conditionals for counting changes?) This is a hard problem!
   # - How to allow for missing or uncertainty? This bit should be easy as set all states to zero, or all uncertain states to zero at tips.
-  # - ACCTRAN/DELTRAN/(Random?)/Branch lengths as weights to help collapse?/Uncertainity (e.g., 0/1)
-  # - Character weights? (Just multiply through stepmatrix by weight?)
-  
+  # - All (format?)/ACCTRAN/DELTRAN/(Random?)/Branch lengths as weights to help collapse?/Uncertainity (e.g., 0/1)
+  # - Missing and inapplicables shpuld probaby be assigned to nodes on a third pass "down" the tree (tips to roots) such that any all-descendants set gets assigned an NA/"" too. Otherwise ets false certainity by "bleeding" an ancestral state "up" the tree.
+  # - Make options match estimate_ancestral_states:
+  #   - @param estimate_all_nodes Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).
+  #   - @param estimate_tip_values Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).
+  #   - @param inapplicables_as_missing Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).
+  #   - @param polymorphism_behaviour One of either "equalp" or "treatasmissing".
+  #   - @param uncertainty_behaviour One of either "equalp" or "treatasmissing".
+
   # CHECKS TO WRITE
   # - states are discrete
   # - states in tip states are all available in stepmatrix and vice versa
@@ -373,7 +379,6 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   # But that was loking across all rootings of an unrooted tree, which does not reflect practice.
   # No DOI available!
   # Ref: Minaka, N., 1993. Algebraic properties of the most parsimonious reconstructions of the hypothetical ancestors on a given tree. \emph{Forma}, \bold{8}, 277-296.
-  
   calculate_distortion_index <- function(tree, tip_states, node_estimates, stepmatrix) {
     
     # Establish number of tips:
@@ -399,6 +404,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
     
   }
   
+  # Commented out because broken:
   #calculate_distortion_index(tree = tree, tip_states = tip_states, node_estimates = node_estimates, stepmatrix = stepmatrix)
   
   
