@@ -8,10 +8,11 @@
 #' @param tip_states A labelled vector of tip states. These should be discrete and match the row and column headings in \code{stepmatrix}, with labels matching the tip labels of \code{tree}.
 #' @param stepmatrix Either the character type (one of \code{"ordered"} or \code{"unordered"}) or a custom-specified step matrix. If the latter this must be square with identical row and column names correspnding to the values in \code{tip_states}. The diagonal must be zero, but off-diagonal values can be any non-negative real number. I.e., they needn't be integers, and the matrix does not need to be symmetric. Note that for transitions the rows are considered the "from" values, and the columns the "to" value. Thus a cost for the transition from state "0" to state "1" would be specified by \code{stepmatrix["0", "1"]}. (This is only relevant where matrices are asymmetric in tranistion costs.)
 #' @param weight The character weight (defaults to one). Setting this value ensures that the length of the tree (number of steps) is calculated accurately. Note that if a custom stepmatrix is defined and the weight is already encoded into the costs then this should be left as one.
+#' @param inapplicables_as_missing Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default).
 #'
 #' @details
 #'
-#' Text.
+#' .
 #'
 #' # Uses Swofford and Maddison 1992 general solution as covers more bases but is also slower.
 #' # Rooted trees only as direction fucking matters and roots have meaning (stepmatrices that are asymmetric)
@@ -198,17 +199,17 @@
 #' ))
 #'
 #' @export reconstruct_ancestral_states
-reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 1) {
+reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 1, inapplicables_as_missing = FALSE) {
   
   # TO DO
   # - Allow for true polymorphisms (maybe conditionals for counting changes?) This is a hard problem!
   # - How to allow for missing or uncertainty? This bit should be easy as set all states to zero, or all uncertain states to zero at tips.
   # - All (format?)/ACCTRAN/DELTRAN/(Random?)/Branch lengths as weights to help collapse?/Uncertainity (e.g., 0/1)
   # - Missing and inapplicables shpuld probaby be assigned to nodes on a third pass "down" the tree (tips to roots) such that any all-descendants set gets assigned an NA/"" too. Otherwise ets false certainity by "bleeding" an ancestral state "up" the tree.
+  # - Tip states as entered need preserving separately as some modification will need to happen to the variable if certain options are chosen.
   # - Make options match estimate_ancestral_states:
   #   - @param estimate_all_nodes Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).
   #   - @param estimate_tip_values Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).
-  #   - @param inapplicables_as_missing Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).
   #   - @param polymorphism_behaviour One of either "equalp" or "treatasmissing".
   #   - @param uncertainty_behaviour One of either "equalp" or "treatasmissing".
 
@@ -219,9 +220,17 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   # - Check there are enough states to do something with!
   # - Put checks at higher level to avoid repeating for every character in a matrix (slow?)
   
+  
+  # Reorder tip states (1 to N) and store an unmodified version:
+  input_tip_states <- tip_states <- tip_states[tree$tip.label]
+  
+  # If treating inapplicables as missing then replace any inapplicable tip state with NA:
+  if(inapplicables_as_missing) tip_states[tip_states == ""] <- NA
+  
   # If stepmatrix is not already specified as a matrix (i.e., it is simply "ordered", "unordered" etc.):
   if(!is.matrix(x = stepmatrix)) {
     
+    # NEED TO DEAL WITH POLYMORPHISMS IF NOT BEING TREATED AS UNCERTAINTIES
     # NEED TO SET MORE OPTIONS LIKE DOLLO, CAMIN-SOKAL AND....?
     
     # First check stepmatrix is of a valid type and stop and warn user if not:
@@ -263,9 +272,6 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   
   # Apply character weight by multiplying through stepmatrix:
   stepmatrix <- stepmatrix * weight
-  
-  # Reorder tip states (1 to N) and store as character data:
-  tip_states <- tip_states[tree$tip.label]
   
   # Reformat tip states as character vector:
   tip_states <- as.character(x = tip_states)
@@ -401,7 +407,6 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
     # Return distortion indicies:
     sum_subtree_lengths - min(x = sum_subtree_lengths)
     
-    
   }
   
   # Commented out because broken:
@@ -428,6 +433,107 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   # - N reversals
   # - N parallelisms
   # - Distortion index for each MPR
+  # - Character map?
   # - MAKE THIS A CLASS TOO!
   
 }
+
+make_all_polymorphisms <- function(single_states) unlist(x = lapply(X = as.list(x = 1:length(x = single_states)), FUN = function(x) apply(X = combn(x = sort(x = single_states), m = x), MARGIN = 2, FUN = function(y) paste(x = y, collapse = "&"))))
+
+make_stepmatrix <- function(all_states, method = "manhattan") {
+  
+  single_states <- strsplit(x = all_states[nchar(x = all_states) == max(x = nchar(x = all_states))], split = "&")[[1]]
+  
+  state_presence_matrix <- matrix(data = 0, nrow = length(x = single_states), ncol = length(x = all_states), dimnames = list(single_states, all_states))
+  
+  for(i in 1:ncol(x = state_presence_matrix)) state_presence_matrix[strsplit(x = colnames(x = state_presence_matrix)[i], split = "&")[[1]], i] <- 1
+  
+  as.matrix(x = dist(x = t(x = state_presence_matrix), method = method, diag = TRUE, upper = TRUE) / 2)
+  
+}
+
+make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = "manhattan")
+
+# KEY THING HERE IS ALLOWS POLYMORPHISMS AT INTERNAL NODES!
+
+
+tree <- ape::read.tree(text = "((C,(A,B)),(D,E));")
+tip_states <- c(A = "2", B = "1", C = "0&1", D = "2", E = "0")
+stepmatrix <- matrix(
+  data = c(0, 1, 0.5, 1, 0, 0.5, 0.5, 0.5, 0),
+  nrow = 3,
+  ncol = 3,
+  dimnames = list(c(0:1, "0&1"), c(0:1, "0&1"))
+)
+stepmatrix <- make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = "manhattan")
+weight <- 1
+node_estimates <- reconstruct_ancestral_states(
+  tree = tree,
+  tip_states = tip_states,
+  stepmatrix = stepmatrix
+)$most_parsimonious_reconstructions
+par(mfrow = c(1, ncol(node_estimates)))
+for(i in 1:ncol(node_estimates)) {
+  plot(tree, show.tip.label = FALSE)
+  tiplabels(tip_states[tree$tip.label], cex = 2)
+  nodelabels(node_estimates[6:9, i], cex = 2)
+}
+
+
+(angle / 360) * pi * 2
+
+
+
+middle_point <- list(long = 45, lat = 30)
+zero_and_one <- list(long = 0, lat = 45)
+one_and_two <- list(long = 90, lat = 45)
+zero_and_two <- list(long = 45, lat = 0)
+distances <- list(dist_1 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat, long2 = zero_and_one$long, lat2 = zero_and_one$lat, EarthRad = 1) / pi, dist_2 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat, long2 = one_and_two$long, lat2 = one_and_two$lat, EarthRad = 1) / pi, dist_3 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat, long2 = zero_and_two$long, lat2 = zero_and_two$lat, EarthRad = 1) / pi)
+increment <- 1
+while(!is.logical(all.equal(distances[[1]], distances[[3]]))) {
+  
+  current_gap <- as.numeric(strsplit(all.equal(distances[[1]], distances[[3]]), split = ": ")[[1]][2])
+  
+  distances_plus <- list(dist_1 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat + increment, long2 = zero_and_one$long, lat2 = zero_and_one$lat, EarthRad = 1) / pi, dist_2 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat + increment, long2 = one_and_two$long, lat2 = one_and_two$lat, EarthRad = 1) / pi, dist_3 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat + increment, long2 = zero_and_two$long, lat2 = zero_and_two$lat, EarthRad = 1) / pi)
+  
+  distances_minus <- list(dist_1 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat - increment, long2 = zero_and_one$long, lat2 = zero_and_one$lat, EarthRad = 1) / pi, dist_2 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat - increment, long2 = one_and_two$long, lat2 = one_and_two$lat, EarthRad = 1) / pi, dist_3 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat - increment, long2 = zero_and_two$long, lat2 = zero_and_two$lat, EarthRad = 1) / pi)
+  
+  # If either answer has converged:
+  if(is.logical(all.equal(distances_plus[[1]], distances_plus[[3]])) || is.logical(all.equal(distances_minus[[1]], distances_minus[[3]]))) {
+    
+    # If it was the plus version then update latitude accordingly:
+    if(is.logical(all.equal(distances_plus[[1]], distances_plus[[3]]))) middle_point$lat <- middle_point$lat + increment
+    
+    # If it was the minus version then update latitude accordingly:
+    if(is.logical(all.equal(distances_minus[[1]], distances_minus[[3]]))) middle_point$lat <- middle_point$lat - increment
+    
+  # If nietehr answer has converged:
+  } else {
+    
+    # Store plus answer gap:
+    plus_gap <- as.numeric(strsplit(all.equal(distances_plus[[1]], distances_plus[[3]]), split = ": ")[[1]][2])
+    
+    # Store minus answer gap:
+    minus_gap <- as.numeric(strsplit(all.equal(distances_minus[[1]], distances_minus[[3]]), split = ": ")[[1]][2])
+    
+    cat(current_gap, " | ", plus_gap, " | ", minus_gap, "\n")
+    
+    # If current gap beats out both then lower increment:
+    if(current_gap <= plus_gap && current_gap <= minus_gap) increment <- increment / 10
+    
+    # If plus gap did best update latitude accordingly:
+    if(plus_gap < current_gap && plus_gap < minus_gap) middle_point$lat <- middle_point$lat + increment
+    
+    # If minus gap did best update latitude accordingly:
+    if(minus_gap < current_gap && minus_gap < plus_gap) middle_point$lat <- middle_point$lat - increment
+    
+  }
+  
+  # Now update distances!:
+  distances <- list(dist_1 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat, long2 = zero_and_one$long, lat2 = zero_and_one$lat, EarthRad = 1) / pi, dist_2 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat, long2 = one_and_two$long, lat2 = one_and_two$lat, EarthRad = 1) / pi, dist_3 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat, long2 = zero_and_two$long, lat2 = zero_and_two$lat, EarthRad = 1) / pi)
+  
+}
+
+
+
+dispeRse::GreatCircleDistanceFromLongLat(long1 = 0, lat1 = 45, long2 = 45, lat2 = 0, EarthRad = 1) / pi
