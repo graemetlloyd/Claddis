@@ -234,7 +234,8 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   # Reorder tip states (1 to N) and store an unmodified version:
   input_tip_states <- tip_states <- tip_states[tree$tip.label]
   
-  ### DO SAME WITH TREE (AS MAY MODIFY BRANCH LENGTHS FOR WEIGHTING LATER)
+  # Store pristine input tree:
+  input_tree <- tree
   
   # If treating inapplicables as missing then replace any inapplicable tip state with NA:
   if(inapplicables_as_missing) tip_states[tip_states == ""] <- NA
@@ -403,7 +404,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   
   
   # Return compiled output:
-  list(length = tree_length, most_parsimonious_reconstructions = node_estimates)
+  list(length = tree_length, most_parsimonious_reconstructions = node_estimates, input_tree = input_tree)
 
   # OUTPUT:
   # - Ancestral states
