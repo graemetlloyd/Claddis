@@ -428,49 +428,6 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
 
 
 
-# Conjecture of Minaka (1993) seems to be wrong! I.e., there is not a single MPR that minimizes the distortion index (single ACCTRAN solution), nor a single MPR that maximizes it (single DELTRAN solution).
-# But that was looking across all rootings of an unrooted tree, which does not reflect practice.
-# No DOI available!
-# Ref: Minaka, N., 1993. Algebraic properties of the most parsimonious reconstructions of the hypothetical ancestors on a given tree. \emph{Forma}, \bold{8}, 277-296.
-calculate_distortion_index <- function(tree, tip_states, stepmatrix, weight = 1, inapplicables_as_missing = FALSE) {
-  
-  # EXAMPLE
-  tree <- ape::read.tree(text = "((C,(A,B)),(D,E));")
-  tip_states <- c(A = 1, B = 2, C = 2, D = 1, E = 0)
-  stepmatrix <- matrix(
-    data = c(0, 1, 2, 1, 0, 1, 2, 1, 0),
-    nrow = 3,
-    ncol = 3,
-    dimnames = list(0:2, 0:2)
-  )
-  weight = 1
-  inapplicables_as_missing = FALSE
-
-  
-  # Establish number of tips:
-  tip_count <- ape::Ntip(phy = tree)
-  
-  # Establish total number of nodes (terminal and internal):
-  node_count <- tip_count + tree$Nnode
-  
-  # Make list of all possible tips to keep for N -1 to 2 tips:
-  tips_to_keep <- strsplit(x = unlist(x = lapply(X = as.list(x = (tip_count - 1):2), FUN = function(x) lapply(X = combn(x = tree$tip.label, m = x, simplify = FALSE), FUN = function(y) paste(x = y, collapse = "|")))), split = "\\|")
-  
-  # Make list of tips to prune matching tips_to_keep:
-  tips_to_prune <- lapply(X = tips_to_keep, FUN = function(z) setdiff(tree$tip.label, z))
-  
-  # GONNA NEED TO DEAL WITH NAs AND UNCERTAINTIES IN THE BELOW (USES VALUES AS ROW-COLUMNS OF STEPMATRIX)
-  
-  # Calculate summed subtree lengths for each most parsimonious rconstruction:
-  sum_subtree_lengths <- unlist(x = lapply(X = as.list(x = 1:ncol(node_estimates)), FUN = function(y) {current_tree <- tree; current_tree$node.label <- node_estimates[(tip_count + 1):node_count, y]; subtree_lengths <- unlist(x = lapply(X = as.list(x = 1:length(x = tips_to_prune)), FUN = function(x) {subtree <- ape::drop.tip(phy = current_tree, tip = tips_to_prune[[x]]); subtree_node_estimates <- c(tip_states[tips_to_keep[[x]]][subtree$tip.label], subtree$node.label); sum(x = diag(x = stepmatrix[subtree_node_estimates[subtree$edge[, 1]], subtree_node_estimates[subtree$edge[, 2]]]))})); sum(x = subtree_lengths)}))
-  
-  # Return distortion indicies:
-  sum_subtree_lengths - min(x = sum_subtree_lengths)
-  
-}
-
-# Commented out because broken:
-calculate_distortion_index(tree = tree, tip_states = tip_states, node_estimates = node_estimates, stepmatrix = stepmatrix)
 
 
 
