@@ -284,9 +284,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   }
   
   # Apply character weight by multiplying through stepmatrix:
-  stepmatrix <- stepmatrix * weight
-  
-  ### NEED TO MOVE ABOVE TO LATER AS WOULD BREAK IN CASE OF ZERO WEIGHT CHARACTERS.
+  stepmatrix <- stepmatrix
   
   # Reformat tip states as character vector:
   tip_states <- as.character(x = tip_states)
@@ -328,7 +326,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   # CHECK Inf VALUES IN STEP MATRICES DO NOT LEAD TO ALL-Inf VALUES AT NODES!
   
   # Store tree length:
-  tree_length <- min(x = node_values[tip_count + 1, ])
+  tree_length <- min(x = node_values[tip_count + 1, ]) * weight
   
   # STOP AFTER HERE IF ONLY WANT TREE LENGTH?
   
