@@ -14,12 +14,17 @@
 #'
 #' .
 #'
-#' # Uses Swofford and Maddison 1992 general solution as covers more bases but is also slower.
+#' # Uses Swofford and Maddison 1992 general solution as covers more bases (i.e., any stepmatrix plus works for polytomies) but is also slower.
 #' # Rooted trees only as direction fucking matters and roots have meaning (stepmatrices that are asymmetric)
 #' # Option to fix root state (polarize) somehow
-#' # From is row, to is column
+#' # From is row, to is column (directional hence requires/assumes rooted trees)
 
-#' # MANUAL: generalized solution as accounts for more possibilities
+#' \bold{Polymorphic characters}
+#'
+#' # Nixon and Davis (1991) show that ignoring (true) polymorphisms leads to inaccurate (under counted) tree lengths. Hence options here.
+#' # Maddison adn Maddison (1987) suggested stepatrix solutionss that allow for polymorphic ancestors.
+
+#' # MANUAL: generalized (stepmatrix) solution as accounts for more possibilities
 #' # MANUAL: really only for rooted trees (unrooted possible using same methods (see Swofford and Maddison (1992), but unclear why you would want to do this with trees without direction of time (i.e., a root).
 #' # MANUAL: works with multifurcations and doesn't require a fully bifurcating tree, but does assume polytomies are therefore "hard".
 #' # MANUAL: Swofford and Maddison (1992; p210): "Both [ACCTRAN and DELTRAN] start by either assuming that the ancestral state is known or by choosing a state from the set of optimal assignments to the root node" - i.e., always an arbitrainess problem at root!
@@ -35,6 +40,12 @@
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
 #' @references
+#'
+#' Maddison, D. R. and Maddison, W. P., 2000. \emph{MacClade 4}. Sinauer Associates Incoroporated, Sunderland. 492pp.
+#'
+#' Maddison, W. P. and Maddison, D. R., 1987. \emph{MacClade 2.1}. Distributed by the authors, Cambridge.
+#'
+#' Nixon, K. C. and Davis, J. I., 1991. Polymorphic taxa, missing values and cladistic analysis. \emph{Cladistics}, \bold{7}, 233-241.
 #'
 #' Swofford, D. L. and Maddison, W. P., 1992. Parsimony, character-state reconstructions, and evolutionary inferences. \emph{In} R. L. Mayden (ed.) Systematics, Historical Ecology, and North American Freshwater Fishes. Stanford University Press, Stanford, p187-223.
 #'
@@ -205,7 +216,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   # - Allow for true polymorphisms (maybe conditionals for counting changes?) This is a hard problem!
   # - How to allow for missing or uncertainty? This bit should be easy as set all states to zero, or all uncertain states to zero at tips.
   # - All (format?)/ACCTRAN/DELTRAN/(Random?)/Branch lengths as weights to help collapse?/Uncertainity (e.g., 0/1)
-  # - Missing and inapplicables shpuld probaby be assigned to nodes on a third pass "down" the tree (tips to roots) such that any all-descendants set gets assigned an NA/"" too. Otherwise ets false certainity by "bleeding" an ancestral state "up" the tree.
+  # - Missing and inapplicables shpuld probably be assigned to nodes on a third pass "down" the tree (tips to roots) such that any all-descendants set gets assigned an NA/"" too. Otherwise sets false certainity by "bleeding" an ancestral value "up" the tree.
   # - Tip states as entered need preserving separately as some modification will need to happen to the variable if certain options are chosen.
   # - Make options match estimate_ancestral_states:
   #   - @param estimate_all_nodes Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).
@@ -220,9 +231,10 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   # - Check there are enough states to do something with!
   # - Put checks at higher level to avoid repeating for every character in a matrix (slow?)
   
-  
   # Reorder tip states (1 to N) and store an unmodified version:
   input_tip_states <- tip_states <- tip_states[tree$tip.label]
+  
+  ### DO SAME WITH TREE (AS MAY MODIFY BRANCH LENGTHS FOR WEIGHTING LATER)
   
   # If treating inapplicables as missing then replace any inapplicable tip state with NA:
   if(inapplicables_as_missing) tip_states[tip_states == ""] <- NA
@@ -231,7 +243,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   if(!is.matrix(x = stepmatrix)) {
     
     # NEED TO DEAL WITH POLYMORPHISMS IF NOT BEING TREATED AS UNCERTAINTIES
-    # NEED TO SET MORE OPTIONS LIKE DOLLO, CAMIN-SOKAL AND....?
+    # NEED TO SET MORE OPTIONS LIKE DOLLO, CAMIN-SOKAL AND STRATIGRAPHIC
     
     # First check stepmatrix is of a valid type and stop and warn user if not:
     if(length(x = setdiff(x = stepmatrix, y = c("ordered", "unordered"))) > 0) stop("If not a specific matrix, then stepmatrix must be one of \"ordered\" or \"unordered\".")
@@ -272,6 +284,8 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   
   # Apply character weight by multiplying through stepmatrix:
   stepmatrix <- stepmatrix * weight
+  
+  ### NEED TO MOVE ABOVE TO LATER AS WOULD BREAK IN CASE OF ZERO WEIGHT CHARACTERS.
   
   # Reformat tip states as character vector:
   tip_states <- as.character(x = tip_states)
@@ -324,6 +338,8 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   
   # Update tip states with their original values:
   node_estimates[1:tip_count] <- tip_states
+  
+  ### ABOVE NEEDS TO BE INPUT TIP STATES NOT MODIFED VERSION!
   
   # Only continue if there is any ambiguity at internal nodes:
   if(any(x = is.na(x = node_estimates[(tip_count + 1):node_count]))) {
@@ -381,36 +397,6 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   
   
   
-  # Conjecture of Minaka (1993) seems to be wrong! I.e., there is not a single MPR that minimizes the distortion index (single ACCTRAN solution), nor a single MPR that maximizes it (single DELTRAN solution).
-  # But that was loking across all rootings of an unrooted tree, which does not reflect practice.
-  # No DOI available!
-  # Ref: Minaka, N., 1993. Algebraic properties of the most parsimonious reconstructions of the hypothetical ancestors on a given tree. \emph{Forma}, \bold{8}, 277-296.
-  calculate_distortion_index <- function(tree, tip_states, node_estimates, stepmatrix) {
-    
-    # Establish number of tips:
-    tip_count <- ape::Ntip(phy = tree)
-    
-    # Establish total number of nodes (terminal and internal):
-    node_count <- tip_count + tree$Nnode
-    
-    # Make list of all possible tips to keep for N -1 to 2 tips:
-    tips_to_keep <- strsplit(x = unlist(x = lapply(X = as.list(x = (tip_count - 1):2), FUN = function(x) lapply(X = combn(x = tree$tip.label, m = x, simplify = FALSE), FUN = function(y) paste(x = y, collapse = "|")))), split = "\\|")
-    
-    # Make list of tips to prune matching tips_to_keep:
-    tips_to_prune <- lapply(X = tips_to_keep, FUN = function(z) setdiff(tree$tip.label, z))
-    
-    # GONNA NEED TO DEAL WITH NAs AND UNCERTAINTIES IN THE BELOW (USES VALUES AS ROW-COLUMNS OF STEPMATRIX)
-    
-    # Calculate summed subtree lengths for each most parsimonious rconstruction:
-    sum_subtree_lengths <- unlist(x = lapply(X = as.list(x = 1:ncol(node_estimates)), FUN = function(y) {current_tree <- tree; current_tree$node.label <- node_estimates[(tip_count + 1):node_count, y]; subtree_lengths <- unlist(x = lapply(X = as.list(x = 1:length(x = tips_to_prune)), FUN = function(x) {subtree <- ape::drop.tip(phy = current_tree, tip = tips_to_prune[[x]]); subtree_node_estimates <- c(tip_states[tips_to_keep[[x]]][subtree$tip.label], subtree$node.label); sum(x = diag(x = stepmatrix[subtree_node_estimates[subtree$edge[, 1]], subtree_node_estimates[subtree$edge[, 2]]]))})); sum(x = subtree_lengths)}))
-    
-    # Return distortion indicies:
-    sum_subtree_lengths - min(x = sum_subtree_lengths)
-    
-  }
-  
-  # Commented out because broken:
-  #calculate_distortion_index(tree = tree, tip_states = tip_states, node_estimates = node_estimates, stepmatrix = stepmatrix)
   
   
   
@@ -438,21 +424,138 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   
 }
 
-make_all_polymorphisms <- function(single_states) unlist(x = lapply(X = as.list(x = 1:length(x = single_states)), FUN = function(x) apply(X = combn(x = sort(x = single_states), m = x), MARGIN = 2, FUN = function(y) paste(x = y, collapse = "&"))))
 
-make_stepmatrix <- function(all_states, method = "manhattan") {
+
+
+
+# Conjecture of Minaka (1993) seems to be wrong! I.e., there is not a single MPR that minimizes the distortion index (single ACCTRAN solution), nor a single MPR that maximizes it (single DELTRAN solution).
+# But that was looking across all rootings of an unrooted tree, which does not reflect practice.
+# No DOI available!
+# Ref: Minaka, N., 1993. Algebraic properties of the most parsimonious reconstructions of the hypothetical ancestors on a given tree. \emph{Forma}, \bold{8}, 277-296.
+calculate_distortion_index <- function(tree, tip_states, stepmatrix, weight = 1, inapplicables_as_missing = FALSE) {
   
-  single_states <- strsplit(x = all_states[nchar(x = all_states) == max(x = nchar(x = all_states))], split = "&")[[1]]
+  # EXAMPLE
+  tree <- ape::read.tree(text = "((C,(A,B)),(D,E));")
+  tip_states <- c(A = 1, B = 2, C = 2, D = 1, E = 0)
+  stepmatrix <- matrix(
+    data = c(0, 1, 2, 1, 0, 1, 2, 1, 0),
+    nrow = 3,
+    ncol = 3,
+    dimnames = list(0:2, 0:2)
+  )
+  weight = 1
+  inapplicables_as_missing = FALSE
+
   
-  state_presence_matrix <- matrix(data = 0, nrow = length(x = single_states), ncol = length(x = all_states), dimnames = list(single_states, all_states))
+  # Establish number of tips:
+  tip_count <- ape::Ntip(phy = tree)
   
-  for(i in 1:ncol(x = state_presence_matrix)) state_presence_matrix[strsplit(x = colnames(x = state_presence_matrix)[i], split = "&")[[1]], i] <- 1
+  # Establish total number of nodes (terminal and internal):
+  node_count <- tip_count + tree$Nnode
   
-  as.matrix(x = dist(x = t(x = state_presence_matrix), method = method, diag = TRUE, upper = TRUE) / 2)
+  # Make list of all possible tips to keep for N -1 to 2 tips:
+  tips_to_keep <- strsplit(x = unlist(x = lapply(X = as.list(x = (tip_count - 1):2), FUN = function(x) lapply(X = combn(x = tree$tip.label, m = x, simplify = FALSE), FUN = function(y) paste(x = y, collapse = "|")))), split = "\\|")
+  
+  # Make list of tips to prune matching tips_to_keep:
+  tips_to_prune <- lapply(X = tips_to_keep, FUN = function(z) setdiff(tree$tip.label, z))
+  
+  # GONNA NEED TO DEAL WITH NAs AND UNCERTAINTIES IN THE BELOW (USES VALUES AS ROW-COLUMNS OF STEPMATRIX)
+  
+  # Calculate summed subtree lengths for each most parsimonious rconstruction:
+  sum_subtree_lengths <- unlist(x = lapply(X = as.list(x = 1:ncol(node_estimates)), FUN = function(y) {current_tree <- tree; current_tree$node.label <- node_estimates[(tip_count + 1):node_count, y]; subtree_lengths <- unlist(x = lapply(X = as.list(x = 1:length(x = tips_to_prune)), FUN = function(x) {subtree <- ape::drop.tip(phy = current_tree, tip = tips_to_prune[[x]]); subtree_node_estimates <- c(tip_states[tips_to_keep[[x]]][subtree$tip.label], subtree$node.label); sum(x = diag(x = stepmatrix[subtree_node_estimates[subtree$edge[, 1]], subtree_node_estimates[subtree$edge[, 2]]]))})); sum(x = subtree_lengths)}))
+  
+  # Return distortion indicies:
+  sum_subtree_lengths - min(x = sum_subtree_lengths)
   
 }
 
-make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = "manhattan")
+# Commented out because broken:
+calculate_distortion_index(tree = tree, tip_states = tip_states, node_estimates = node_estimates, stepmatrix = stepmatrix)
+
+
+
+
+
+make_all_polymorphisms <- function(single_states) unlist(x = lapply(X = as.list(x = 1:length(x = single_states)), FUN = function(x) apply(X = combn(x = sort(x = single_states), m = x), MARGIN = 2, FUN = function(y) paste(x = y, collapse = "&"))))
+
+make_stepmatrix <- function(all_states, method = c("hypercube", "manhattan")) {
+  
+  # Coordinate space:
+  #"hypercube"
+  #"hypersphere"
+  #"simplex"
+  
+  # Distance method:
+  #"manhattan"
+  #"euclidean"
+  #"great_circle"
+  
+  # Get single states:
+  single_states <- strsplit(x = all_states[nchar(x = all_states) == max(x = nchar(x = all_states))], split = "&")[[1]]
+  
+  # Create coordinate matrix and initialise with zeroes:
+  state_presence_matrix <- matrix(data = 0, nrow = length(x = single_states), ncol = length(x = all_states), dimnames = list(single_states, all_states))
+  
+  # If using the hypercube coordinate space assign coordinates accordingly:
+  if(method[1] == "hypercube") for(i in 1:ncol(x = state_presence_matrix)) state_presence_matrix[strsplit(x = colnames(x = state_presence_matrix)[i], split = "&")[[1]], i] <- 1
+  
+  # If using the hypersphere or simplex coordinate space:
+  if(method[1] == "hypersphere" || method[1] == "simplex") {
+    
+    # For each coding:
+    for(i in 1:ncol(x = state_presence_matrix)) {
+      
+      # Isolate components of polymorphism:
+      components <- strsplit(x = colnames(x = state_presence_matrix)[i], split = "&")[[1]]
+      
+      # If using the hypersphere coordinate space then apply coordinates accordingly (the square root of 1/N states in polymorphism on each axis state is present):
+      if(method[1] == "hypersphere") state_presence_matrix[components, i] <- sqrt(x = 1 / length(x = components))
+      
+      # If using the simplex coordinate space then apply coordinates accordingly (1/N states in polymorphism on each axis state is present):
+      if(method[1] == "simplex") state_presence_matrix[components, i] <- 1 / length(x = components)
+      
+    }
+    
+  }
+
+  # If using a manhattan or euclidean distance, calculate distance directly from coordinate-space:
+  if(method[2] == "euclidean" || method[2] == "manhattan") stepmatrix <- as.matrix(x = dist(x = t(x = state_presence_matrix), method = method[2], diag = TRUE, upper = TRUE))
+  
+  # If using a great circle distance:
+  if(method[2] == "great_circle") {
+    
+    # Start by calculating the euclidean distances between each point:
+    stepmatrix <- as.matrix(x = dist(x = t(x = state_presence_matrix), method = "euclidean", diag = TRUE, upper = TRUE))
+    
+    # Treating distances as the chord length of a circle of radius one transform them to the arc length for the same:
+    stepmatrix <- 2 * asin(x = stepmatrix / 2)
+
+  }
+  
+  # Return a stepmatrix rescaled such that single state distances (e.g., 0 to 1) are one (i.e., a normal unordered character):
+  stepmatrix / stepmatrix[1, 2]
+  
+}
+
+make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "manhattan"))
+make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "manhattan"))
+make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "manhattan"))
+make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "euclidean"))
+make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "euclidean"))
+make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "euclidean"))
+make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "great_circle"))
+make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "great_circle"))
+make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "great_circle"))
+
+
+plot(x = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "manhattan")))$vectors[, 1], y = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "manhattan")))$vectors[, 2])
+text(x = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "manhattan")))$vectors[, 1], y = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "manhattan")))$vectors[, 2], labels = rownames(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "manhattan"))))
+
+plot(x = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "great_circle")))$vectors[, 1], y = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "great_circle")))$vectors[, 2])
+text(x = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "great_circle")))$vectors[, 1], y = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "great_circle")))$vectors[, 2], labels = rownames(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "great_circle"))))
+
+plot(x = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "euclidean")))$vectors[, 1], y = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "euclidean")))$vectors[, 2])
+text(x = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "euclidean")))$vectors[, 1], y = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "euclidean")))$vectors[, 2], labels = rownames(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "euclidean"))))
 
 # KEY THING HERE IS ALLOWS POLYMORPHISMS AT INTERNAL NODES!
 
@@ -465,7 +568,7 @@ stepmatrix <- matrix(
   ncol = 3,
   dimnames = list(c(0:1, "0&1"), c(0:1, "0&1"))
 )
-stepmatrix <- make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = "manhattan")
+stepmatrix <- make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "manhattan"))
 weight <- 1
 node_estimates <- reconstruct_ancestral_states(
   tree = tree,
@@ -475,65 +578,30 @@ node_estimates <- reconstruct_ancestral_states(
 par(mfrow = c(1, ncol(node_estimates)))
 for(i in 1:ncol(node_estimates)) {
   plot(tree, show.tip.label = FALSE)
-  tiplabels(tip_states[tree$tip.label], cex = 2)
-  nodelabels(node_estimates[6:9, i], cex = 2)
+  ape::tiplabels(tip_states[tree$tip.label], cex = 2)
+  ape::nodelabels(node_estimates[6:9, i], cex = 2)
 }
 
-
-(angle / 360) * pi * 2
-
-
-
-middle_point <- list(long = 45, lat = 30)
-zero_and_one <- list(long = 0, lat = 45)
-one_and_two <- list(long = 90, lat = 45)
-zero_and_two <- list(long = 45, lat = 0)
-distances <- list(dist_1 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat, long2 = zero_and_one$long, lat2 = zero_and_one$lat, EarthRad = 1) / pi, dist_2 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat, long2 = one_and_two$long, lat2 = one_and_two$lat, EarthRad = 1) / pi, dist_3 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat, long2 = zero_and_two$long, lat2 = zero_and_two$lat, EarthRad = 1) / pi)
-increment <- 1
-while(!is.logical(all.equal(distances[[1]], distances[[3]]))) {
-  
-  current_gap <- as.numeric(strsplit(all.equal(distances[[1]], distances[[3]]), split = ": ")[[1]][2])
-  
-  distances_plus <- list(dist_1 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat + increment, long2 = zero_and_one$long, lat2 = zero_and_one$lat, EarthRad = 1) / pi, dist_2 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat + increment, long2 = one_and_two$long, lat2 = one_and_two$lat, EarthRad = 1) / pi, dist_3 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat + increment, long2 = zero_and_two$long, lat2 = zero_and_two$lat, EarthRad = 1) / pi)
-  
-  distances_minus <- list(dist_1 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat - increment, long2 = zero_and_one$long, lat2 = zero_and_one$lat, EarthRad = 1) / pi, dist_2 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat - increment, long2 = one_and_two$long, lat2 = one_and_two$lat, EarthRad = 1) / pi, dist_3 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat - increment, long2 = zero_and_two$long, lat2 = zero_and_two$lat, EarthRad = 1) / pi)
-  
-  # If either answer has converged:
-  if(is.logical(all.equal(distances_plus[[1]], distances_plus[[3]])) || is.logical(all.equal(distances_minus[[1]], distances_minus[[3]]))) {
-    
-    # If it was the plus version then update latitude accordingly:
-    if(is.logical(all.equal(distances_plus[[1]], distances_plus[[3]]))) middle_point$lat <- middle_point$lat + increment
-    
-    # If it was the minus version then update latitude accordingly:
-    if(is.logical(all.equal(distances_minus[[1]], distances_minus[[3]]))) middle_point$lat <- middle_point$lat - increment
-    
-  # If nietehr answer has converged:
-  } else {
-    
-    # Store plus answer gap:
-    plus_gap <- as.numeric(strsplit(all.equal(distances_plus[[1]], distances_plus[[3]]), split = ": ")[[1]][2])
-    
-    # Store minus answer gap:
-    minus_gap <- as.numeric(strsplit(all.equal(distances_minus[[1]], distances_minus[[3]]), split = ": ")[[1]][2])
-    
-    cat(current_gap, " | ", plus_gap, " | ", minus_gap, "\n")
-    
-    # If current gap beats out both then lower increment:
-    if(current_gap <= plus_gap && current_gap <= minus_gap) increment <- increment / 10
-    
-    # If plus gap did best update latitude accordingly:
-    if(plus_gap < current_gap && plus_gap < minus_gap) middle_point$lat <- middle_point$lat + increment
-    
-    # If minus gap did best update latitude accordingly:
-    if(minus_gap < current_gap && minus_gap < plus_gap) middle_point$lat <- middle_point$lat - increment
-    
-  }
-  
-  # Now update distances!:
-  distances <- list(dist_1 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat, long2 = zero_and_one$long, lat2 = zero_and_one$lat, EarthRad = 1) / pi, dist_2 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat, long2 = one_and_two$long, lat2 = one_and_two$lat, EarthRad = 1) / pi, dist_3 = dispeRse::GreatCircleDistanceFromLongLat(long1 = middle_point$long, lat1 = middle_point$lat, long2 = zero_and_two$long, lat2 = zero_and_two$lat, EarthRad = 1) / pi)
-  
-}
+# WRITE SOME KIND OF CHECK FOR SELF-CONSISTENCY IN STEP MATRICES. I.E., THE FIRECT PATH IS ALWAYS THE SAME LENGTH OR SHORTER THAN AN INDIRECT ONE. E.G., If 0 -> 2 is 4 steps, but 0->1->2 is only 3 steps. (Citation is MacClade 4 manual!)
+# OPTION TO TREAT POLYORPHISMS AS MISSING (NOT JUST INAPPLICABLES).
+# OPTION TO CONSTRAIN PARTICULAR NODES AND/OR MAKE TAXA ANCESTORS (MIGHT BE TRICKY AND A DOWN THE LINE ADDITION!) HMMM. OR HAVE CONDITIONAL THAT SETS INFINITE VAUES TO THE NON PRESENT STATES AT THIS NODE?
+# STRATIGRAPHIC AS A CHARACTER TYPE ALONG WITH DOLLO AND IRRERVERSIBLE (CAMIN-SOKAL)
+# WHAT IF CHARACTER IS WEIGHTED ZERO! NEED A CONDITIONAL TO DEAL WITH THIS AS STEPMATRIX CANNOT BE ALL ZEROES! MAYBE APPLY WEIGHT AT END AS MULTIPLE OF TREE LENGTH? PROBABLY SIMPLEST SOLUTION.
+# MORE PUTPUT OR SUMMARY OPTIONS COULD BE N CHANGES ON EACH BRANCH ACROSS MPRS, MEAN OF SAME, MIN AND MAX OF SAME. SIMILAR FOR CHANGE TYPES I.E., STEP MATRX BUT ACTUALLY FREQUENCY OF CHANGES FOR EACH TRANSITION.
+# AS RATE TENDS TOWARD INFINITY THEN RECONSTRUCTION AT A NODE TENDS TOWARDS EQUAL FREQUENCY OF EACH STATE (I.E., MAXIMAL UNCERTAINTY).
+# ALLOW TREES N STEPS LONGER SOMEHOW? OR RATHER MPRs ONE STEP LONGER, OR SOME OTHER VALUE OF USERS CHOOSING.
+# "This illustrates the fact that ACCTRAN and DELTRAN do not always choose a single one of the most parsimonious reconstructions." MacClade 4 manual, page 99).
+# "Note that MacClade, unlike PAUP*, does not choose the lowest-valued state at the root to begin these processes. Thus MacClade's ACCTRAN and DELTRAN may not fully resolve ambiguity in the ancestral state reconstruction."
+# INTERMEDIATES ARE GONNA MATTER IF MOVING TO CHARACTER MAPS. E.G., IF ONLY 0 AND 2 ARE SAMPLED BUT A CARACTER IS ORDERED THEN THERE ARE TWO CHANGES ALONG THE BRANCH NOT ONE TWO-STEP CHANGE.
+# POLYMORPHISM APPROACH SHOULDN'T CONFOUND THE"NORMAL" BEHAVIOUR OF AN ORDERED OR UNORDERED CHARACTER.
+# FOR SPEED KEEP STEPMATRIX OUTSIDE OF ASR FUNCTION AS WILL OFTEN REUSE SAME ONE.
 
 
+ACCTRAN
+DELTRAN
+MINF (Swofford and Maddison 1987) - I THINK NOT!
+MINSTATE
+MAXSTATE
+WEIGHTED BY BRANCH DURATION
 
-dispeRse::GreatCircleDistanceFromLongLat(long1 = 0, lat1 = 45, long2 = 45, lat2 = 0, EarthRad = 1) / pi
+
