@@ -237,6 +237,9 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   # Store pristine input tree:
   input_tree <- tree
   
+  # If there are no branch durations set these as all one:
+  if(is.null(x = tree$edge.length[1])) tree$edge.length <- rep(x = 1, length.out = nrow(x = tree$edge))
+  
   # If treating inapplicables as missing then replace any inapplicable tip state with NA:
   if(inapplicables_as_missing) tip_states[tip_states == ""] <- NA
   
@@ -313,12 +316,18 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   # First pass (traverse tree from tips to root):
   for(needle in (tip_count + node_count - tip_count):(tip_count + 1)) {
     
+    # Isolate descendants data (node numbers and edge lengths):
+    descendant_data <- cbind(tree$edge.length, tree$edge)[tree$edge[, 1] == needle, c(1, 3)]
+    
     # Find decsendants of current node:
-    descendants <- tree$edge[tree$edge[, 1] == needle, 2]
+    descendants <- descendant_data[, 2]
+    
+    # Get weights (1 / branch length):
+    descendant_weights <- 1 / descendant_data[, 1]
     
     # Calculate and store new node values:
-    node_values[needle, ] <- unlist(x = lapply(X = as.list(x = colnames(x = node_values)), FUN = function(fromstate) sum(x = unlist(x = lapply(X = as.list(x = descendants), FUN = function(descendant) min(x = node_values[descendant, ] + stepmatrix[fromstate, ]))))))
-    
+    node_values[needle, ] <- unlist(x = lapply(X = as.list(x = colnames(x = node_values)), FUN = function(fromstate) sum(x = mapply(FUN = function(descendant, descendant_weight) min(x = (node_values[descendant, ] + stepmatrix[fromstate, ]) * descendant_weight), descendant = descendants, descendant_weight = descendant_weights))))
+
   }
   
   # ADD OPTION TO FIX ROOT HERE
@@ -327,6 +336,8 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   
   # Store tree length:
   tree_length <- min(x = node_values[tip_count + 1, ]) * weight
+  
+  ### MAYE TREE LENGTH NEEDS TO BE DONE LATER IF USING BRANCH DURATION WEIGHTS?
   
   # STOP AFTER HERE IF ONLY WANT TREE LENGTH?
   
@@ -405,6 +416,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   list(length = tree_length, most_parsimonious_reconstructions = node_estimates, input_tree = input_tree)
 
   # OUTPUT:
+  # - Most of this needs to be put in different functions!
   # - Ancestral states
   # - Ambiguities?
   # - Stepmatrix used
