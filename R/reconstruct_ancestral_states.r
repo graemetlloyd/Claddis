@@ -412,8 +412,11 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
     #"euclidean"
     #"great_circle"
     
+    # Check data are not too big (>= 2^14 states) and stop and warn user if so:
+    if(length(x = all_states) >= 16384) stop("Stepmatrix would be too large. Use fewer states.")
+    
     # Get single states:
-    single_states <- strsplit(x = all_states[nchar(x = all_states) == max(x = nchar(x = all_states))], split = "&")[[1]]
+    single_states <- all_states[grep(pattern = "&", x = all_states, invert = TRUE)]
     
     # Create coordinate matrix and initialise with zeroes:
     state_presence_matrix <- matrix(data = 0, nrow = length(x = single_states), ncol = length(x = all_states), dimnames = list(single_states, all_states))
