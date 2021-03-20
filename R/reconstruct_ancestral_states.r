@@ -18,6 +18,7 @@
 #' # Rooted trees only as direction fucking matters and roots have meaning (stepmatrices that are asymmetric)
 #' # Option to fix root state (polarize) somehow
 #' # From is row, to is column (directional hence requires/assumes rooted trees)
+#' # Record in manual that weighted parsimony is folly, but could use to chose between MPRs (maybe?)
 
 #' \bold{Polymorphic characters}
 #'
@@ -55,6 +56,7 @@
 #'
 #' \item{length}{The tree length (number of steps).}
 #' \item{most_parsimonious_reconstructions}{A matrix where rows correspond to \emph{all} nodes (i.e., terminal and internal) in the order numbered by \code{ape}, and columns correspond to every unique most parsimonious reconstruction. I.e., if there is only one most parsimonious reconstruction there will be only one column.}
+#' \item{input_tree}{The input topology used.}
 #'
 #' @seealso
 #'
@@ -324,14 +326,12 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
 
   }
   
-  # ADD OPTION TO FIX ROOT HERE
+  # ADD OPTION TO FIX ROOT HERE (NAH, ALLOW OPTION TO FIX *ANY* NODE (OR COMBO OF NODES)
   # CHECK OPTION DOESN'T FORCE INFINITY!
   # CHECK Inf VALUES IN STEP MATRICES DO NOT LEAD TO ALL-Inf VALUES AT NODES!
   
   # Store tree length:
   tree_length <- min(x = node_values[tip_count + 1, ]) * weight
-  
-  ### MAYE TREE LENGTH NEEDS TO BE DONE LATER IF USING BRANCH DURATION WEIGHTS?
   
   # STOP AFTER HERE IF ONLY WANT TREE LENGTH?
   
@@ -343,7 +343,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   # Update tip states with their original values:
   node_estimates[1:tip_count] <- tip_states
   
-  ### ABOVE NEEDS TO BE INPUT TIP STATES NOT MODIFED VERSION!
+  ### ABOVE NEEDS TO BE INPUT TIP STATES NOT MODIFED VERSION! BUT LATER FOR OUTPUT? NEED TO RECORD SOMEWHERE WHAT HAS HAPPENED THUGH SO CAN PASS TO A CHARACTER MAP FUNCTION AND TREAT EVERYTHING CORRECTLY.
   
   # Only continue if there is any ambiguity at internal nodes:
   if(any(x = is.na(x = node_estimates[(tip_count + 1):node_count]))) {
@@ -389,6 +389,79 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
     }
     
   }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  make_all_polymorphisms <- function(single_states) unlist(x = lapply(X = as.list(x = 1:length(x = single_states)), FUN = function(x) apply(X = combn(x = sort(x = single_states), m = x), MARGIN = 2, FUN = function(y) paste(x = y, collapse = "&"))))
+  
+  make_stepmatrix <- function(all_states, method = c("hypercube", "manhattan")) {
+    
+    # Coordinate space:
+    #"hypercube"
+    #"hypersphere"
+    #"simplex"
+    
+    # Distance method:
+    #"manhattan"
+    #"euclidean"
+    #"great_circle"
+    
+    # Get single states:
+    single_states <- strsplit(x = all_states[nchar(x = all_states) == max(x = nchar(x = all_states))], split = "&")[[1]]
+    
+    # Create coordinate matrix and initialise with zeroes:
+    state_presence_matrix <- matrix(data = 0, nrow = length(x = single_states), ncol = length(x = all_states), dimnames = list(single_states, all_states))
+    
+    # If using the hypercube coordinate space assign coordinates accordingly:
+    if(method[1] == "hypercube") for(i in 1:ncol(x = state_presence_matrix)) state_presence_matrix[strsplit(x = colnames(x = state_presence_matrix)[i], split = "&")[[1]], i] <- 1
+    
+    # If using the hypersphere or simplex coordinate space:
+    if(method[1] == "hypersphere" || method[1] == "simplex") {
+      
+      # For each coding:
+      for(i in 1:ncol(x = state_presence_matrix)) {
+        
+        # Isolate components of polymorphism:
+        components <- strsplit(x = colnames(x = state_presence_matrix)[i], split = "&")[[1]]
+        
+        # If using the hypersphere coordinate space then apply coordinates accordingly (the square root of 1/N states in polymorphism on each axis state is present):
+        if(method[1] == "hypersphere") state_presence_matrix[components, i] <- sqrt(x = 1 / length(x = components))
+        
+        # If using the simplex coordinate space then apply coordinates accordingly (1/N states in polymorphism on each axis state is present):
+        if(method[1] == "simplex") state_presence_matrix[components, i] <- 1 / length(x = components)
+        
+      }
+      
+    }
+    
+    # If using a manhattan or euclidean distance, calculate distance directly from coordinate-space:
+    if(method[2] == "euclidean" || method[2] == "manhattan") stepmatrix <- as.matrix(x = dist(x = t(x = state_presence_matrix), method = method[2], diag = TRUE, upper = TRUE))
+    
+    # If using a great circle distance:
+    if(method[2] == "great_circle") {
+      
+      # Start by calculating the euclidean distances between each point:
+      stepmatrix <- as.matrix(x = dist(x = t(x = state_presence_matrix), method = "euclidean", diag = TRUE, upper = TRUE))
+      
+      # Treating distances as the chord length of a circle of radius one transform them to the arc length for the same:
+      stepmatrix <- 2 * asin(x = stepmatrix / 2)
+      
+    }
+    
+    # Return a stepmatrix rescaled such that single state distances (e.g., 0 to 1) are one (i.e., a normal unordered character):
+    stepmatrix / stepmatrix[1, 2]
+    
+  }
+  
+  # KEY THING HERE IS ALLOWS POLYMORPHISMS AT INTERNAL NODES!
+  
+
 
 
   
@@ -425,141 +498,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   
 }
 
-tree <- ape::read.tree(text = "((C:5,(A:1,B:0.01):2):1,(D:3,E:1):3);")
-tip_states <- c(A = 1, B = 2, C = 2, D = 1, E = 0)
-stepmatrix <- matrix(
-  data = c(0, 1, 2, 1, 0, 1, 2, 1, 0),
-  nrow = 3,
-  ncol = 3,
-  dimnames = list(0:2, 0:2)
-)
-node_estimates <- reconstruct_ancestral_states(
-  tree = tree,
-  tip_states = tip_states,
-  stepmatrix = stepmatrix
-)$most_parsimonious_reconstructions
-par(mfrow = c(1, ncol(node_estimates)))
-for(i in 1:ncol(node_estimates)) {
-  plot(tree, show.tip.label = FALSE)
-  ape::tiplabels(tip_states[tree$tip.label], cex = 2)
-  ape::nodelabels(node_estimates[6:9, i], cex = 2)
-}
-
-
-
-
-
-
-
-
-
-make_all_polymorphisms <- function(single_states) unlist(x = lapply(X = as.list(x = 1:length(x = single_states)), FUN = function(x) apply(X = combn(x = sort(x = single_states), m = x), MARGIN = 2, FUN = function(y) paste(x = y, collapse = "&"))))
-
-make_stepmatrix <- function(all_states, method = c("hypercube", "manhattan")) {
-  
-  # Coordinate space:
-  #"hypercube"
-  #"hypersphere"
-  #"simplex"
-  
-  # Distance method:
-  #"manhattan"
-  #"euclidean"
-  #"great_circle"
-  
-  # Get single states:
-  single_states <- strsplit(x = all_states[nchar(x = all_states) == max(x = nchar(x = all_states))], split = "&")[[1]]
-  
-  # Create coordinate matrix and initialise with zeroes:
-  state_presence_matrix <- matrix(data = 0, nrow = length(x = single_states), ncol = length(x = all_states), dimnames = list(single_states, all_states))
-  
-  # If using the hypercube coordinate space assign coordinates accordingly:
-  if(method[1] == "hypercube") for(i in 1:ncol(x = state_presence_matrix)) state_presence_matrix[strsplit(x = colnames(x = state_presence_matrix)[i], split = "&")[[1]], i] <- 1
-  
-  # If using the hypersphere or simplex coordinate space:
-  if(method[1] == "hypersphere" || method[1] == "simplex") {
-    
-    # For each coding:
-    for(i in 1:ncol(x = state_presence_matrix)) {
-      
-      # Isolate components of polymorphism:
-      components <- strsplit(x = colnames(x = state_presence_matrix)[i], split = "&")[[1]]
-      
-      # If using the hypersphere coordinate space then apply coordinates accordingly (the square root of 1/N states in polymorphism on each axis state is present):
-      if(method[1] == "hypersphere") state_presence_matrix[components, i] <- sqrt(x = 1 / length(x = components))
-      
-      # If using the simplex coordinate space then apply coordinates accordingly (1/N states in polymorphism on each axis state is present):
-      if(method[1] == "simplex") state_presence_matrix[components, i] <- 1 / length(x = components)
-      
-    }
-    
-  }
-
-  # If using a manhattan or euclidean distance, calculate distance directly from coordinate-space:
-  if(method[2] == "euclidean" || method[2] == "manhattan") stepmatrix <- as.matrix(x = dist(x = t(x = state_presence_matrix), method = method[2], diag = TRUE, upper = TRUE))
-  
-  # If using a great circle distance:
-  if(method[2] == "great_circle") {
-    
-    # Start by calculating the euclidean distances between each point:
-    stepmatrix <- as.matrix(x = dist(x = t(x = state_presence_matrix), method = "euclidean", diag = TRUE, upper = TRUE))
-    
-    # Treating distances as the chord length of a circle of radius one transform them to the arc length for the same:
-    stepmatrix <- 2 * asin(x = stepmatrix / 2)
-
-  }
-  
-  # Return a stepmatrix rescaled such that single state distances (e.g., 0 to 1) are one (i.e., a normal unordered character):
-  stepmatrix / stepmatrix[1, 2]
-  
-}
-
-make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "manhattan"))
-make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "manhattan"))
-make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "manhattan"))
-make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "euclidean"))
-make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "euclidean"))
-make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "euclidean"))
-make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "great_circle"))
-make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "great_circle"))
-make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "great_circle"))
-
-
-plot(x = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "manhattan")))$vectors[, 1], y = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "manhattan")))$vectors[, 2])
-text(x = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "manhattan")))$vectors[, 1], y = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "manhattan")))$vectors[, 2], labels = rownames(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "manhattan"))))
-
-plot(x = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "great_circle")))$vectors[, 1], y = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "great_circle")))$vectors[, 2])
-text(x = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "great_circle")))$vectors[, 1], y = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "great_circle")))$vectors[, 2], labels = rownames(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypersphere", "great_circle"))))
-
-plot(x = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "euclidean")))$vectors[, 1], y = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "euclidean")))$vectors[, 2])
-text(x = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "euclidean")))$vectors[, 1], y = ape::pcoa(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "euclidean")))$vectors[, 2], labels = rownames(make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("simplex", "euclidean"))))
-
-# KEY THING HERE IS ALLOWS POLYMORPHISMS AT INTERNAL NODES!
-
-
-tree <- ape::read.tree(text = "((C,(A,B)),(D,E));")
-tip_states <- c(A = "2", B = "1", C = "0&1", D = "2", E = "0")
-stepmatrix <- matrix(
-  data = c(0, 1, 0.5, 1, 0, 0.5, 0.5, 0.5, 0),
-  nrow = 3,
-  ncol = 3,
-  dimnames = list(c(0:1, "0&1"), c(0:1, "0&1"))
-)
-stepmatrix <- make_stepmatrix(all_states = make_all_polymorphisms(single_states = 0:2), method = c("hypercube", "manhattan"))
-weight <- 1
-node_estimates <- reconstruct_ancestral_states(
-  tree = tree,
-  tip_states = tip_states,
-  stepmatrix = stepmatrix
-)$most_parsimonious_reconstructions
-par(mfrow = c(1, ncol(node_estimates)))
-for(i in 1:ncol(node_estimates)) {
-  plot(tree, show.tip.label = FALSE)
-  ape::tiplabels(tip_states[tree$tip.label], cex = 2)
-  ape::nodelabels(node_estimates[6:9, i], cex = 2)
-}
-
-# WRITE SOME KIND OF CHECK FOR SELF-CONSISTENCY IN STEP MATRICES. I.E., THE FIRECT PATH IS ALWAYS THE SAME LENGTH OR SHORTER THAN AN INDIRECT ONE. E.G., If 0 -> 2 is 4 steps, but 0->1->2 is only 3 steps. (Citation is MacClade 4 manual!)
+# WRITE SOME KIND OF CHECK FOR SELF-CONSISTENCY IN STEP MATRICES. I.E., THE DIRECT PATH IS ALWAYS THE SAME LENGTH OR SHORTER THAN AN INDIRECT ONE. E.G., If 0 -> 2 is 4 steps, but 0->1->2 is only 3 steps. (Citation is MacClade 4 manual!)
 # OPTION TO TREAT POLYORPHISMS AS MISSING (NOT JUST INAPPLICABLES).
 # OPTION TO CONSTRAIN PARTICULAR NODES AND/OR MAKE TAXA ANCESTORS (MIGHT BE TRICKY AND A DOWN THE LINE ADDITION!) HMMM. OR HAVE CONDITIONAL THAT SETS INFINITE VAUES TO THE NON PRESENT STATES AT THIS NODE?
 # STRATIGRAPHIC AS A CHARACTER TYPE ALONG WITH DOLLO AND IRRERVERSIBLE (CAMIN-SOKAL)
@@ -574,11 +513,11 @@ for(i in 1:ncol(node_estimates)) {
 # FOR SPEED KEEP STEPMATRIX OUTSIDE OF ASR FUNCTION AS WILL OFTEN REUSE SAME ONE.
 
 
-ACCTRAN
-DELTRAN
-MINF (Swofford and Maddison 1987) - I THINK NOT!
-MINSTATE
-MAXSTATE
-WEIGHTED BY BRANCH DURATION
+# ACCTRAN
+# DELTRAN
+# MINF (Swofford and Maddison 1987) - I THINK NOT!
+# MINSTATE *shrug emoi*
+# MAXSTATE *shrug emoi*
+# WEIGHTED BY BRANCH DURATION?
 
 
