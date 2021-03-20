@@ -316,17 +316,11 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   # First pass (traverse tree from tips to root):
   for(needle in (tip_count + node_count - tip_count):(tip_count + 1)) {
     
-    # Isolate descendants data (node numbers and edge lengths):
-    descendant_data <- cbind(tree$edge.length, tree$edge)[tree$edge[, 1] == needle, c(1, 3)]
-    
     # Find decsendants of current node:
-    descendants <- descendant_data[, 2]
-    
-    # Get weights (1 / branch length):
-    descendant_weights <- 1 / descendant_data[, 1]
+    descendants <- tree$edge[tree$edge[, 1] == needle, 2]
     
     # Calculate and store new node values:
-    node_values[needle, ] <- unlist(x = lapply(X = as.list(x = colnames(x = node_values)), FUN = function(fromstate) sum(x = mapply(FUN = function(descendant, descendant_weight) min(x = (node_values[descendant, ] + stepmatrix[fromstate, ]) * descendant_weight), descendant = descendants, descendant_weight = descendant_weights))))
+    node_values[needle, ] <- unlist(x = lapply(X = as.list(x = colnames(x = node_values)), FUN = function(fromstate) sum(x = unlist(x = lapply(X = as.list(x = descendants), FUN = function(descendant) min(x = node_values[descendant, ] + stepmatrix[fromstate, ]))))))
 
   }
   
@@ -396,11 +390,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
     
   }
 
-  # Return node estimates:
-  node_estimates
-  
-  
-  
+
   
   # ADD SWOFFORD REF TO DESCRIPTION FILE (PROLLY NO DOI!)
   
@@ -435,6 +425,25 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
   
 }
 
+tree <- ape::read.tree(text = "((C:5,(A:1,B:0.01):2):1,(D:3,E:1):3);")
+tip_states <- c(A = 1, B = 2, C = 2, D = 1, E = 0)
+stepmatrix <- matrix(
+  data = c(0, 1, 2, 1, 0, 1, 2, 1, 0),
+  nrow = 3,
+  ncol = 3,
+  dimnames = list(0:2, 0:2)
+)
+node_estimates <- reconstruct_ancestral_states(
+  tree = tree,
+  tip_states = tip_states,
+  stepmatrix = stepmatrix
+)$most_parsimonious_reconstructions
+par(mfrow = c(1, ncol(node_estimates)))
+for(i in 1:ncol(node_estimates)) {
+  plot(tree, show.tip.label = FALSE)
+  ape::tiplabels(tip_states[tree$tip.label], cex = 2)
+  ape::nodelabels(node_estimates[6:9, i], cex = 2)
+}
 
 
 
