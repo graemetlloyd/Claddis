@@ -214,6 +214,9 @@
 #' @export reconstruct_ancestral_states
 reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 1, inapplicables_as_missing = FALSE) {
   
+  # WHOLE THING SHOULD BE REFACTORED TO DEAL WITH ENTIRE MATRIX (THE OBVIOUS END USE)
+  # ALSO ALLOWS MOVING MANY CHECKS TO A SINGLE PASS OF MATRIX AND HENCE FASTER
+  
   # TO DO
   # - Allow for true polymorphisms (maybe conditionals for counting changes?) This is a hard problem!
   # - How to allow for missing or uncertainty? This bit should be easy as set all states to zero, or all uncertain states to zero at tips.
@@ -460,6 +463,8 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
     # Return a stepmatrix rescaled such that single state distances (e.g., 0 to 1) are one (i.e., a normal unordered character):
     stepmatrix / stepmatrix[1, 2]
     
+    ### ABOVE WILL NEED TO BE MODIFIED IF USING ASYMMETRIC CHARACTERS LIKE DOLLO OR CAMINSOKAL OR STRATIGRAPHY
+    
   }
   
   # KEY THING HERE IS ALLOWS POLYMORPHISMS AT INTERNAL NODES!
@@ -512,7 +517,7 @@ reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 
 # "This illustrates the fact that ACCTRAN and DELTRAN do not always choose a single one of the most parsimonious reconstructions." MacClade 4 manual, page 99).
 # "Note that MacClade, unlike PAUP*, does not choose the lowest-valued state at the root to begin these processes. Thus MacClade's ACCTRAN and DELTRAN may not fully resolve ambiguity in the ancestral state reconstruction."
 # INTERMEDIATES ARE GONNA MATTER IF MOVING TO CHARACTER MAPS. E.G., IF ONLY 0 AND 2 ARE SAMPLED BUT A CARACTER IS ORDERED THEN THERE ARE TWO CHANGES ALONG THE BRANCH NOT ONE TWO-STEP CHANGE.
-# POLYMORPHISM APPROACH SHOULDN'T CONFOUND THE"NORMAL" BEHAVIOUR OF AN ORDERED OR UNORDERED CHARACTER.
+# POLYMORPHISM APPROACH SHOULDN'T CONFOUND THE "NORMAL" BEHAVIOUR OF AN ORDERED OR UNORDERED CHARACTER.
 # FOR SPEED KEEP STEPMATRIX OUTSIDE OF ASR FUNCTION AS WILL OFTEN REUSE SAME ONE.
 
 
