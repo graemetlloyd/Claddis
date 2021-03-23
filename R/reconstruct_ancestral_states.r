@@ -12,18 +12,265 @@
 #'
 #' @details
 #'
-#' .
+#' Can be used to infer ancestral states or get tree lengths (could theoretically buol a tree inference procedure around this by proposing different topologies, but ikely to be much slower than compiled software). Also a first step to generating character maps that can be used for plotting changes on a tree, performing rate analysis (see \link{test_rates}), or generating phylomorphospaces (not implemented yet).
 #'
-#' # Uses Swofford and Maddison 1992 general solution as covers more bases (i.e., any stepmatrix plus works for polytomies) but is also slower.
-#' # Rooted trees only as direction fucking matters and roots have meaning (stepmatrices that are asymmetric)
+#' \bold{Input}
+#'
+#' To use this function data must first be in the correct format.
+#'
+#' - Tree
+#' - Cladistic matrix (currently tip_states)
+#'
+#' \bold{Options}
+#'
+#' Come in two forms, those implicit (as decided by values in cladisticmatrix) and explicit to this function.
+#'
+#' \emph{Implicit options}
+#'
+#' - Stepmatrix
+#' - Weight (only affects tree length) - defaults to one as this is typical value used. This can disappear once cladistic matrix is input.
+#'
+#' \emph{Explicit options}
+#'
+#' - inapplicables_as_missing = FALSE, what to do with inapplicable characters. Currently treat as missing is only real option, but can be differet state that is also inferred as an ancestor.
+#' - More for uncertianties and polymorphisms (see below).
+#' - Add option to predict missing tip values (but definitely not recommended! - see Lloyd 2018)
+#' - Collpasing to a single output with ACCTRAN etc.?
+#'
+#' \bold{Implementation}
+#'
+#' Algorithms for reconstructing ancestral states under parsimony can be specific (e.g., for ordered characters only) or general (allowing for any character type, including highly specific custom-formats). The advantage of the former is usually that they are faster as multiple assumptions are already built in, but the latter offer more flexibility and represent the version applied here.
+#'
+#' More specifically this function is based on the approach described by Swofford and Maddison (1992) that assumes a rooted tree and uses a stepmatrix to define the costs (in number of steps) of specific transitions, i.e., from state X to state Y. The rooting is key here as it sets the directionality of evolution (i.e., time) and hence allows the use of asymmetric characters (where the cost of going from state X to state Y is different than going from stete Y to state X) as well as other direction-based optimisations (e.g., ACCTRAN and DELTRAN).
+#'
+#' \emph{Stepmatrices}
+#'
+#' Although rare as explicit statements (see Hooker 2014 for a rare example), any character type (e.g., ordered, unordered, Dollo) can be expressed as a step matrix. These are always square, with rows and columns representing the same set of states that will typically reflect (but are not restricted to) the range of values observed in the data. Individual values represent the cost (in steps) of each transition, with the row value being the "from" state and the column value being the "to" state. By convention the cost of going from any character to itself is zero and hence so is the diagonal of the matrix. An example stepmatrix for a three state unordered character would thus look like this:
+#'
+#' \preformatted{   -------------
+#'    | 0 | 1 | 2 |
+#' ----------------
+#'  0 | 0 | 1 | 1 |
+#' ----------------
+#'  1 | 1 | 0 | 1 |
+#' ----------------
+#'  2 | 1 | 1 | 0 |
+#' ----------------}
+#'
+#' Hence going from state 2 (third row) to state 1 (second column) reveals a cost of 1. Indeed, as this is an unordered character \emph{any} off-diagonal value is the same (here 1). By contrast an ordered matrix might look like this:
+#'
+#' \preformatted{   -------------
+#'    | 0 | 1 | 2 |
+#' ----------------
+#'  0 | 0 | 1 | 2 |
+#' ----------------
+#'  1 | 1 | 0 | 1 |
+#' ----------------
+#'  2 | 2 | 1 | 0 |
+#' ----------------}
+#'
+#' Now going from state 0 (first row) to state 2 (third column) costs 2 steps as by implication this transition must pass through the intermediate state 1.
+#'
+#' So far these examples are symmetric - i.e., you can imagine the diagonal as a line of reflection, or alternatively that going from state X to state Y \emph{always} costs the same as going from state Y to state X. However, asymmetric stepmatrices are also possible and there are multiple such character=types that may be relevant here, e.g., Dollo, Camin-Sokal, and stratigraphy.
+#'
+
+#' Dollo: (bird teeth example Field and Brocklehurst) M is large but not infinite as an acquisition is still expected, but should still outweigh any second acqusition such that when optimised multiple losses are allowed.
+#'
+#' \preformatted{   -------------------
+#'    |  0  |  1  |  2  |
+#' ----------------------
+#'  0 |  0  |  1  |  2  |
+#' ----------------------
+#'  1 |  M  |  0  |  1  |
+#' ----------------------
+#'  2 |  2M |  M  |  0  |
+#' ----------------------}
+
+#' Camin-Sokal (irreversible): Less obvious what an example may be, perhaps organelles in eukaryotes?
+#'
+#' \preformatted{   -------------------
+#'    |  0  |  1  |  2  |
+#' ----------------------
+#'  0 |  0  | Inf | Inf |
+#' ----------------------
+#'  1 |  1  |  0  | Inf |
+#' ----------------------
+#'  2 |  2  |  1  |  0  |
+#' ----------------------}
+
+#' Stratigraphy (irreversible, but costs reflect time differences, i.e., in millions of years).
+#'
+#' 0 - Santonian (85.8 - 83.5 Ma)
+#' 1 - Campanian (83.5 - 70.6 Ma)
+#' 2 - Maastrichtian (70.6 - 65.5 Ma)
+#'
+#' Midpoints: 0 (84.65 Ma), 1 (77.05 Ma), and 2 (68.05 Ma)
+#'
+#' \preformatted{    --------------------
+#'     |   0  |  1  |  2  |
+#' ------------------------
+#' | 0 |   0  | Inf | Inf |
+#' ------------------------
+#' | 1 |  7.6 |  0  | Inf |
+#' ------------------------
+#' | 2 | 16.6 |  9  |  0  |
+#' ------------------------}
+
+
+
+
+#' [MORE HERE]
+#'
+#' These are (in a very general way) related to the Q-matrices used in likelihood based approaches, but note that their use has multiple key differences and a Q-matrix cannot be directly interpretetd as a stepmatrix or vice versa.
+#'
+#' \bold{Special character types}
+#' \emph{Missing values}
+#' \emph{Inapplicables}
+#' \emph{Uncertainties}
+#'
+#' In Claddis, uncertainties are coded by separating states with the slash character, e.g., 0/1. The Swofford and Maddison (1992) algorithm - and the implementation used here - treats uncertainties (automatically) by allowing any of the possible states at the tip (here 0 or 1, but not, say, 2 or 3). In other words, it will opt for solutions that effectively prefer whichever state is easiest (fewest steps) to reach from a proposed ancestral value. This could therefore be used to predict what the "true" value may be, at least under the assumption of parsimony. However, such phylogenetic "prediction" [OPTION?] is generally advised against (Lloyd 2018).
+#'
+#' \emph{Polymorphisms}
+#'
+#' Polymorphisms represent perhaps the most complex problem for phylogenetic inference and ancestral state estimation (reconstruction), at least in part due to the varied nature their meaning can have (Swofford and Maddison 1992). For example, they may represent true variance within a species or composite variance in some higher taxon represented by a single OTU (something to be avoided if at all possible). Similarly, as different cladistic matrix formats do not necessarily allow the distinction between uncertainties and polymorphisms they can sometimes represent the former even though their encoding suggest the latter. (For example, TNT (Goloboff et al. 2008; Goloboff and Catalano 2016) conflates the two with a single representation within square brackets, [].)
+#'
+#' Misrepresenting true polymorphisms as uncertainty leads to incorrect estimates of the amount of evolution (tree length under parsimony; Nixon and Davis 1991) and disallows, potentially inapproriately, polymorphic values as ancestral state estimates (reconstructions).
+
+#' Really need explicit options before talking about this too much further.
+#' Maddison and Maddison (1987) suggested stepmatrix solutionss that allow for polymorphic ancestors.
+#' fitpolyMk in phytools [LINK?]
+
+#' An unordered stepmatrix using the Maddison and Maddison (1987) approach (NB: modified such that the single state transitions are scaled to one):
+#'
+#' \preformatted{        ---------------------------------------------
+#'         |  0  |  1  |  2  | 0&1 | 0&2 | 1&2 | 0&1&2 |
+#' -----------------------------------------------------
+#' |   0   |  0  |  1  |  1  | 0.5 | 0.5 | 1.5 |   1   |
+#' -----------------------------------------------------
+#' |   1   |  1  |  0  |  1  | 0.5 | 1.5 | 0.5 |   1   |
+#' -----------------------------------------------------
+#' |   2   |  1  |  1  |  0  | 1.5 | 0.5 | 0.5 |   1   |
+#' -----------------------------------------------------
+#' |  0&1  | 0.5 | 0.5 | 1.5 |  0  |  1  |  1  |  0.5  |
+#' -----------------------------------------------------
+#' |  0&2  | 0.5 | 1.5 | 0.5 |  1  |  0  |  1  |  0.5  |
+#' -----------------------------------------------------
+#' |  1&2  | 1.5 | 0.5 | 0.5 |  1  |  1  |  0  |  0.5  |
+#' -----------------------------------------------------
+#' | 0&1&2 |  1  |  1  |  1  | 0.5 | 0.5 | 0.5 |   0   |
+#' -----------------------------------------------------}
+#'
+#' These can also be represented as Manhattan distance between the vertices of a hypercube plotted in a space with axes representing the presence of each individual state (0, 1, or 2). Hence the value 0&1 would have the coordinates 1,1,0. For this three state example this will be a cube with every vertice except the origin (0,0,0) occupied by a possible state. (NB: This is also the reason for the N^2 - 1 growth of stepmatrix size given below.)
+#'
+#' However, this approach may not be ideal as it can lead to scenarios where a polymorphism may be seen as non-optimal. For example, the tree:
+#'
+#' \preformatted{0   1   2
+#'  \  |  /
+#'   \ | /
+#'    \|/
+#'     X}
+#'
+#' If we consider the possibilities for ancestor X being in each state they are:
+#'
+#' \preformatted{---------------------
+#' | Ancestral | Total |
+#' |   state   | steps |
+#' ---------------------
+#' |     0     |   2   |
+#' |     1     |   2   |
+#' |     2     |   2   |
+#' |    0&1    |  2.5  |
+#' |    0&2    |  2.5  |
+#' |    1&2    |  2.5  |
+#' |   0&1&2   |   3   |
+#' ---------------------}
+#'
+#' This seems like a scenario where 0&1&2 ought to be the optimal solution, or at least equally optimal, and yet it comes out as the maximally suboptimal solution. To allow such solutions to be considered optimal this function takes the basic concept of a coordinate space with axes representing each state, but allows ploting of values on either the surface of a hypersphere or a simplex, i.e., the dimensionally-scalable versions of a circle and an equilateral traingle, respectively. (Shapes that place polymorphic values closer to the origin and hence make them more parsimonious.) Similarly, the user can use either the Euclidean [OPTION], Manhattan [OPTION], or Great Circle [OPTION] distance between points. Here it is assumed these will match the shape used, specifically that the Hypercube uses Manhattan distances, a Hypersphere Great Circle distances, and a Simplex Euclidean distances, but no restrictions prevent other combinations being applied. (Caveat emptor, always.)
+#'
+#' Things become more complex when we consider ordered characters. For "intermediate" polymorphisms they can be simple, i.e.:
+#'
+#' \preformatted{/---\  0.5  /---\  0.5  /---\  0.5  /---\  0.5  /---\
+#' | 0 |<----->|0&1|<----->| 1 |<----->|1&2|<----->| 2 |
+#' \---/       \---/       \---/       \---/       \---/}
+#'
+#' Values between states are steps, leading to the following step matrix:
+#'
+#' \preformatted{        -------------------------------
+#'         |  0  |  1  |  2  | 0&1 | 1&2 |
+#' ---------------------------------------
+#' |   0   |  0  |  1  |  2  | 0.5 | 1.5 |
+#' ---------------------------------------
+#' |   1   |  1  |  0  |  1  | 0.5 | 0.5 |
+#' ---------------------------------------
+#' |   2   |  2  |  1  |  0  | 1.5 | 0.5 |
+#' ---------------------------------------
+#' |  0&1  | 0.5 | 0.5 | 1.5 |  0  |  1  |
+#' ---------------------------------------
+#' |  1&2  | 1.5 | 0.5 | 0.5 |  1  |  0  |
+#' ---------------------------------------}
+#'
+#' However, it is less obvious what to do with the "non-intermediate" polymorphisms, 0&2 and 0&1&2. The only suggested solution of which I am aware is that of Maddison and Maddison (2000) where changes (0.5 steps here) represent adding OR losing a state. Thus going from 0 to 1 involves 0.5 steps to gain 1 and then 0.5 steps to lose 0, and going from 0 to 0&1&2 involves (first) adding 1 (as this is already adjacent, i.e., accessible, to zero) then another 0.5 steps to add state 2 (now accessible via the state 1). Hence the extended stepmatrix would be:
+#'
+#' \preformatted{        ---------------------------------------------
+#'         |  0  |  1  |  2  | 0&1 | 0&2 | 1&2 | 0&1&2 |
+#' -----------------------------------------------------
+#' |   0   |  0  |  1  |  2  | 0.5 | 1.5 | 1.5 |   1   |
+#' -----------------------------------------------------
+#' |   1   |  1  |  0  |  1  | 0.5 | 1.5 | 0.5 |   1   |
+#' -----------------------------------------------------
+#' |   2   |  2  |  1  |  0  | 1.5 | 1.5 | 0.5 |   1   |
+#' -----------------------------------------------------
+#' |  0&1  | 0.5 | 0.5 | 1.5 |  0  |  1  |  1  |  0.5  |
+#' -----------------------------------------------------
+#' |  0&2  | 1.5 | 1.5 | 1.5 |  1  |  0  |  1  |  0.5  |
+#' -----------------------------------------------------
+#' |  1&2  | 1.5 | 0.5 | 0.5 |  1  |  1  |  0  |  0.5  |
+#' -----------------------------------------------------
+#' | 0&1&2 |  1  |  1  |  1  | 0.5 | 0.5 | 0.5 |   0   |
+#' -----------------------------------------------------}
+#'
+#' NOW DEAL WITH DOLLO AND CAMIN-SOKAL AND STRATIGRAPHY VERSIONS (THIS POLYMORPHISM ISSUE IS WHERE STRATIGRAPHY DIFFERS FROM IRRERVERSIBLE CHARACTERS).
+
+
+
+
+
+#'
+#' Forming stepmatrices in this way has a clear size limit. Specifically, it will require 2^N - 1 terms where N is the number of single states. Thus the size of stepmatrix required grows very quickly:
+#'
+#' \preformatted{------------------------------
+#' | N states | Stepmatrix size |
+#' ------------------------------
+#' |     2    |      3 x 3      |
+#' |     3    |      7 x 7      |
+#' |     4    |     15 x 15     |
+#' |     5    |     31 x 31     |
+#' |     6    |     63 x 63     |
+#' |     7    |    127 x 127    |
+#' |     8    |    255 x 255    |
+#' |     9    |    511 x 511    |
+#' |    10    |   1023 x 1023   |
+#' |    11    |   2047 x 2047   |
+#' |    12    |   4095 x 4095   |
+#' |    13    |   8191 x 8191   |
+#' |    14    |  16383 x 16383  |
+#' ------------------------------}
+#'
+#' Because of this the function will become extremely slow for these higher values and indeed does not allow more than fourteen states.
+#'
+#' \bold{Polytomies}
+#'
+#' Another advantage of the Swofford and Maddison (1992) approach is that it does not require fully-bifurcating topologies, hence these are "allowed" as input. However, it is important to note that the implementation here will treat any such polytomies (also known as multifurcations) as "hard". I.e., that they genuinely represent one species splitting into three or more descendant species. As always, the Ian Malcolm caveat applies - "your scientists were so preoccupied with whether or not they sould, they didn’t stop to think if they should."
+
+
+#'
+#'
 #' # Option to fix root state (polarize) somehow
 #' # From is row, to is column (directional hence requires/assumes rooted trees)
 #' # Record in manual that weighted parsimony is folly, but could use to chose between MPRs (maybe?)
 
 #' \bold{Polymorphic characters}
 #'
-#' # Nixon and Davis (1991) show that ignoring (true) polymorphisms leads to inaccurate (under counted) tree lengths. Hence options here.
-#' # Maddison adn Maddison (1987) suggested stepatrix solutionss that allow for polymorphic ancestors.
 
 #' # MANUAL: generalized (stepmatrix) solution as accounts for more possibilities
 #' # MANUAL: really only for rooted trees (unrooted possible using same methods (see Swofford and Maddison (1992), but unclear why you would want to do this with trees without direction of time (i.e., a root).
@@ -41,6 +288,14 @@
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
 #' @references
+#'
+#' Goloboff, P. A. and Catalano, S. A., 2016. TNT version 1.5, including a full implementation of phylogenetic morphometrics/ \emph{Cladistics}, \bold{32}. 221-238
+#'
+#' Goloboff, P., Farris, J. and Nixon, K., 2008. TNT, a free program for phylogenetic analysis. \emph{Cladistics}, \bold{24}, 774-786.
+#'
+#' Hooker, J. J., 2014. New postcranial bones of the extinct mammalian family Nyctitheriidae (Paleogene, UK): primitive euarchontans with scansorial locomotion. \emph{Palaeontologia Electronica}, \bold{17.3.47A}, 1-82.
+#'
+#' Lloyd, G. T., 2018. Journeys through discrete-character morphospace: synthesizing phylogeny, tempo, and disparity. \emph{Palaeontology}, \bold{61}, 637-645.
 #'
 #' Maddison, D. R. and Maddison, W. P., 2000. \emph{MacClade 4}. Sinauer Associates Incoroporated, Sunderland. 492pp.
 #'
@@ -214,10 +469,12 @@
 #' @export reconstruct_ancestral_states
 reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 1, inapplicables_as_missing = FALSE) {
   
-  # WHOLE THING SHOULD BE REFACTORED TO DEAL WITH ENTIRE MATRIX (THE OBVIOUS END USE)
+  # WHOLE THING SHOULD BE REFACTORED TO DEAL WITH ENTIRE MATRIX (THE OBVIOUS END USE) PLUS BRINGS INTO LINE WITH OTHER FUNCTIONS AND TRANSFERS MANY OPTIONS TO MATRIX STRUCTURE (ORDERING AND WEIGHTS PRIMARILY)
   # ALSO ALLOWS MOVING MANY CHECKS TO A SINGLE PASS OF MATRIX AND HENCE FASTER
+  # ALLOW FOR MULTIPLE TREES?
   
   # TO DO
+  # - Conditional for invariant character plus autapomorphic ones (fast solution that escapes estimates of other values)
   # - Allow for true polymorphisms (maybe conditionals for counting changes?) This is a hard problem!
   # - How to allow for missing or uncertainty? This bit should be easy as set all states to zero, or all uncertain states to zero at tips.
   # - All (format?)/ACCTRAN/DELTRAN/(Random?)/Branch lengths as weights to help collapse?/Uncertainity (e.g., 0/1)
