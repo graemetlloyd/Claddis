@@ -75,7 +75,7 @@
 #'   min_state = 0,
 #'   max_state = 2,
 #'   character_type = "unordered",
-#'   include_polymorphisms = FALSE,
+#'   include_polymorphisms = TRUE,
 #'   polymorphism_shape = "hypersphere",
 #'   polymorphism_distance = "great_circle"
 #' )
