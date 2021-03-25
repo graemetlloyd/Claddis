@@ -127,9 +127,6 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
   # - Need more incoming checks probably?
   # - Option to disallow polymorphisms as ancestors (still allows costs for transitions to polymorphic states to be taken into account)
   
-  # Check data are not too big (>= 2^14 states) and stop and warn user if so:
-  if(length(x = all_states) >= 16384) stop("Stepmatrix would be too large. Use fewer states.")
-  
   # Check character_type is a valid value and stop and warn user if not:
   if(length(x = setdiff(x = character_type, y = c("ordered", "unordered", "dollo", "irreversible", "stratigraphy"))) > 0) stop("character_type must be one of \"ordered\", \"unordered\", \"dollo\", \"irreversible\", or \"stratigraphy\".")
   
@@ -178,6 +175,9 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
       
       # Generate and store all possible states:
       all_states <- make_all_polymorphisms(single_states = single_states)
+      
+      # Check data are not too big (>= 2^14 states) and stop and warn user if so:
+      if(length(x = all_states) >= 16384) stop("Stepmatrix would be too large. Use fewer states.")
       
       # Create coordinate matrix and initialise with zeroes:
       state_presence_matrix <- matrix(data = 0, nrow = length(x = single_states), ncol = length(x = all_states), dimnames = list(single_states, all_states))
@@ -302,6 +302,9 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
       
       # Generate and store all possible states:
       all_states <- make_all_polymorphisms(single_states = single_states)
+      
+      # Check data are not too big (>= 2^14 states) and stop and warn user if so:
+      if(length(x = all_states) >= 16384) stop("Stepmatrix would be too large. Use fewer states.")
       
       # Assign age of oldest state to each polymorphism:
       state_ages <- unlist(x = lapply(X = as.list(x = all_states), FUN = function(x) state_ages[as.character(x = min(x = as.numeric(x = strsplit(x = x, split = "&")[[1]])))]))
