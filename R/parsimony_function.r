@@ -373,52 +373,6 @@ parsimony_function <- function(tree, cladistic_matrix, inapplicables_as_missing 
     # If treating inapplicables as missing then replace any inapplicable tip state with NA:
     if(inapplicables_as_missing) tip_states[tip_states == ""] <- NA
     
-    # If stepmatrix is not already specified as a matrix (i.e., it is simply "ordered", "unordered" etc.):
-    if(!is.matrix(x = stepmatrix)) {
-      
-      # NEED TO DEAL WITH POLYMORPHISMS IF NOT BEING TREATED AS UNCERTAINTIES
-      # NEED TO SET MORE OPTIONS LIKE DOLLO, CAMIN-SOKAL AND STRATIGRAPHIC
-      
-      # First check stepmatrix is of a valid type and stop and warn user if not:
-      if(length(x = setdiff(x = stepmatrix, y = c("ordered", "unordered"))) > 0) stop("If not a specific matrix, then stepmatrix must be one of \"ordered\" or \"unordered\".")
-      
-      # Get numeric tip state values:
-      tip_state_numbers <- as.numeric(x = unlist(x = strsplit(x = as.character(x = tip_states), split = "&|/")))
-      
-      # Get the range (min-max) of tip values:
-      tip_state_range <- range(x = tip_state_numbers[!is.na(x = tip_state_numbers)])
-      
-      # Get the size (n rows and columns) required for the stepmatrix:
-      stepmatrix_size <- diff(x = tip_state_range) + 1
-      
-      # Create base stepmatrix (to be altered further):
-      base_stepmatrix <- matrix(data = NA, nrow = stepmatrix_size, ncol = stepmatrix_size, dimnames = list(tip_state_range[1]:tip_state_range[2], tip_state_range[1]:tip_state_range[2]))
-      
-      # Add diagonal of zero as this should always be true regardless of character type:
-      diag(x = base_stepmatrix) <- 0
-      
-      # Case if character is ordered:
-      if(stepmatrix == "ordered") {
-        
-        # Populate upper triangle (cost is difference between states):
-        base_stepmatrix[upper.tri(x = base_stepmatrix)] <- unlist(x = lapply(X = as.list(x = 1:(stepmatrix_size - 1)), FUN = function(steps) steps:1))
-        
-        # Populate lower triangle (cost is difference between states):
-        base_stepmatrix[lower.tri(x = base_stepmatrix)] <- unlist(x = lapply(X = as.list(x = (stepmatrix_size - 1):1), FUN = function(steps) 1:steps))
-        
-      }
-      
-      # Case if character is unordered all off-diagonal values cost one step):
-      if(stepmatrix == "unordered") base_stepmatrix[is.na(x = base_stepmatrix)] <- 1
-      
-      # Overwrite stepmatrix with the fully formed stepmatrix:
-      stepmatrix <- base_stepmatrix
-      
-    }
-    
-    # Apply character weight by multiplying through stepmatrix:
-    stepmatrix <- stepmatrix
-    
     # Reformat tip states as character vector:
     tip_states <- as.character(x = tip_states)
     
@@ -547,74 +501,11 @@ parsimony_function <- function(tree, cladistic_matrix, inapplicables_as_missing 
   
 
 
-  make_all_polymorphisms <- function(single_states) unlist(x = lapply(X = as.list(x = 1:length(x = single_states)), FUN = function(x) apply(X = combn(x = sort(x = single_states), m = x), MARGIN = 2, FUN = function(y) paste(x = y, collapse = "&"))))
-  
-  make_stepmatrix <- function(all_states, method = c("hypercube", "manhattan")) {
-    
-    # Coordinate space:
-    #"hypercube"
-    #"hypersphere"
-    #"simplex"
-    
-    # Distance method:
-    #"manhattan"
-    #"euclidean"
-    #"great_circle"
-    
-    # Check data are not too big (>= 2^14 states) and stop and warn user if so:
-    if(length(x = all_states) >= 16384) stop("Stepmatrix would be too large. Use fewer states.")
-    
-    # Get single states:
-    single_states <- all_states[grep(pattern = "&", x = all_states, invert = TRUE)]
-    
-    # Create coordinate matrix and initialise with zeroes:
-    state_presence_matrix <- matrix(data = 0, nrow = length(x = single_states), ncol = length(x = all_states), dimnames = list(single_states, all_states))
-    
-    # If using the hypercube coordinate space assign coordinates accordingly:
-    if(method[1] == "hypercube") for(i in 1:ncol(x = state_presence_matrix)) state_presence_matrix[strsplit(x = colnames(x = state_presence_matrix)[i], split = "&")[[1]], i] <- 1
-    
-    # If using the hypersphere or simplex coordinate space:
-    if(method[1] == "hypersphere" || method[1] == "simplex") {
-      
-      # For each coding:
-      for(i in 1:ncol(x = state_presence_matrix)) {
-        
-        # Isolate components of polymorphism:
-        components <- strsplit(x = colnames(x = state_presence_matrix)[i], split = "&")[[1]]
-        
-        # If using the hypersphere coordinate space then apply coordinates accordingly (the square root of 1/N states in polymorphism on each axis state is present):
-        if(method[1] == "hypersphere") state_presence_matrix[components, i] <- sqrt(x = 1 / length(x = components))
-        
-        # If using the simplex coordinate space then apply coordinates accordingly (1/N states in polymorphism on each axis state is present):
-        if(method[1] == "simplex") state_presence_matrix[components, i] <- 1 / length(x = components)
-        
-      }
-      
-    }
-    
-    # If using a manhattan or euclidean distance, calculate distance directly from coordinate-space:
-    if(method[2] == "euclidean" || method[2] == "manhattan") stepmatrix <- as.matrix(x = dist(x = t(x = state_presence_matrix), method = method[2], diag = TRUE, upper = TRUE))
-    
-    # If using a great circle distance:
-    if(method[2] == "great_circle") {
-      
-      # Start by calculating the euclidean distances between each point:
-      stepmatrix <- as.matrix(x = dist(x = t(x = state_presence_matrix), method = "euclidean", diag = TRUE, upper = TRUE))
-      
-      # Treating distances as the chord length of a circle of radius one transform them to the arc length for the same:
-      stepmatrix <- 2 * asin(x = stepmatrix / 2)
-      
-    }
-    
-    # Return a stepmatrix rescaled such that single state distances (e.g., 0 to 1) are one (i.e., a normal unordered character):
-    stepmatrix / stepmatrix[1, 2]
-    
-    ### ABOVE WILL NEED TO BE MODIFIED IF USING ASYMMETRIC CHARACTERS LIKE DOLLO OR CAMINSOKAL OR STRATIGRAPHY
-    
-  }
+
+
   
   # KEY THING HERE IS ALLOWS POLYMORPHISMS AT INTERNAL NODES!
-  
+  # KEY QUESTION IS ARE THERE EVER CASES WHERE //ALL// POSSIBLE MPRS INCLUDEA POLYMORPHIC ANCESTOR?
 
 
 
@@ -663,7 +554,7 @@ parsimony_function <- function(tree, cladistic_matrix, inapplicables_as_missing 
 # INTERMEDIATES ARE GONNA MATTER IF MOVING TO CHARACTER MAPS. E.G., IF ONLY 0 AND 2 ARE SAMPLED BUT A CARACTER IS ORDERED THEN THERE ARE TWO CHANGES ALONG THE BRANCH NOT ONE TWO-STEP CHANGE.
 # POLYMORPHISM APPROACH SHOULDN'T CONFOUND THE "NORMAL" BEHAVIOUR OF AN ORDERED OR UNORDERED CHARACTER.
 # FOR SPEED KEEP STEPMATRIX OUTSIDE OF ASR FUNCTION AS WILL OFTEN REUSE SAME ONE.
-
+# TEST WEIGHTING OF STRATOCLADISTICS BY USING A STRATIGRAPHIC CHARACTER AND WEIGHTING IT MULTIPLE WAYS (AS A SLIDER) AND SHOW HOW IT EFFECTS PARSIMONY VS STRAT CONGRUENCE TREE LANDSCAPES
 
 # ACCTRAN
 # DELTRAN
