@@ -260,6 +260,9 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
     # If excluding polymorphisms:
     } else {
       
+      # Calculate stepmatrix size:
+      stepmatrix_size <- length(x = single_states)
+      
       # Initialise stepmatrix with all values set to zero:
       stepmatrix <- matrix(data = 0, nrow = stepmatrix_size, ncol = stepmatrix_size, dimnames = list(single_states, single_states))
       
@@ -286,6 +289,9 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
       
     # If excluding polymorphisms:
     } else {
+      
+      # Calculate stepmatrix size:
+      stepmatrix_size <- length(x = single_states)
       
       # Initialise stepmatrix with all values set to zero:
       stepmatrix <- matrix(data = 0, nrow = stepmatrix_size, ncol = stepmatrix_size, dimnames = list(single_states, single_states))
