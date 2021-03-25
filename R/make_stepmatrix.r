@@ -65,7 +65,9 @@
 #'   min_state = 0,
 #'   max_state = 2,
 #'   character_type = "unordered",
-#'   include_polymorphisms = FALSE
+#'   include_polymorphisms = FALSE,
+#'   polymorphism_shape = "hypersphere",
+#'   polymorphism_distance = "great_circle"
 #' )
 #'
 #' # Make an unordered stepmatrix including polymorphisms:
@@ -73,7 +75,7 @@
 #'   min_state = 0,
 #'   max_state = 2,
 #'   character_type = "unordered",
-#'   include_polymorphisms = FALSE.
+#'   include_polymorphisms = FALSE,
 #'   polymorphism_shape = "hypersphere",
 #'   polymorphism_distance = "great_circle"
 #' )
@@ -83,7 +85,9 @@
 #'   min_state = 0,
 #'   max_state = 2,
 #'   character_type = "ordered",
-#'   include_polymorphisms = FALSE
+#'   include_polymorphisms = FALSE,
+#'   polymorphism_shape = "hypersphere",
+#'   polymorphism_distance = "great_circle"
 #' )
 #'
 #' # Make a Dollo stepmatrix:
@@ -92,6 +96,8 @@
 #'   max_state = 2,
 #'   character_type = "dollo",
 #'   include_polymorphisms = FALSE,
+#'   polymorphism_shape = "hypersphere",
+#'   polymorphism_distance = "great_circle",
 #'   dollo_penalty = 100
 #' )
 #'
@@ -100,7 +106,9 @@
 #'   min_state = 0,
 #'   max_state = 2,
 #'   character_type = "irreversible",
-#'   include_polymorphisms = FALSE
+#'   include_polymorphisms = FALSE,
+#'   polymorphism_shape = "hypersphere",
+#'   polymorphism_distance = "great_circle"
 #' )
 #'
 #' # Make a stratigraphic stepmatrix:
@@ -109,6 +117,8 @@
 #'   max_state = 2,
 #'   character_type = "stratigraphy",
 #'   include_polymorphisms = FALSE,
+#'   polymorphism_shape = "hypersphere",
+#'   polymorphism_distance = "great_circle",
 #'   state_ages = c(52, 34, 12)
 #' )
 #'
@@ -118,6 +128,8 @@
 #'   max_state = 2,
 #'   character_type = "stratigraphy",
 #'   include_polymorphisms = TRUE,
+#'   polymorphism_shape = "hypersphere",
+#'   polymorphism_distance = "great_circle",
 #'   state_ages = c(52, 34, 12)
 #' )
 #'
