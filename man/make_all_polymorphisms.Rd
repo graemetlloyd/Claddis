@@ -16,11 +16,11 @@ A vector of all possible polymorphic (and non-polymorphic) states.
 Given a set of discrete states will generate all possibly polymorphic comibinations of those states.
 }
 \details{
-Thsi funtion solves a phylogenetic combinatorics problem - what are all the possible outcomes for a character to be in given polymorphisms are allowed?
+This function solves a simple phylogenetic combinatorics problem - what are all the possible outcomes for a character to be in given polymorphisms (of any size) are allowed?
 
 For example, for three states (0, 1, 2) there are seven possible states: 0, 1, 2, 0&1, 0&2, 1&2 and 0&1&2.
 
-If the user is instead only interested in the size of this state space this is given by 2^N - 1, where N is the number of single states. Thus, the first several sizes are:
+If the user is instead only interested in the size of this state space this is simply given by 2^N - 1, where N is the number of single states. Thus, the first several outcomes are:
 
 \preformatted{----------------------------------
 | N states | N possible outcomes |
@@ -40,7 +40,7 @@ If the user is instead only interested in the size of this state space this is g
 |    14    |          16383      |
 ----------------------------------}
 
-Note that this function is really designed for internal use, but may have value to some users.
+Note that this function is really designed for internal use, but may have value to some users and so is available "visibly" here.
 }
 \examples{
 
