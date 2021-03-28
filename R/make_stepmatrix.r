@@ -22,7 +22,7 @@
 #' \emph{unordered} Fitch
 #' \emph{dollo} States must be in order.
 #' \emph{irreversible} States must be in order. Aka. Camin-Sokal.
-#' \emph{stratigraphy} States must be in order from oldest to youngest. Special case of irreversible and needs additional input of ages for differences!
+#' \emph{stratigraphy} States must be in order from oldest to youngest. In usage zero must also be root state or else it makes no damn sense. Special case of irreversible and needs additional input of ages for differences!
 #'
 #' \bold{Polymorphic characters}
 #'
@@ -86,6 +86,16 @@
 #'   max_state = 2,
 #'   character_type = "ordered",
 #'   include_polymorphisms = FALSE,
+#'   polymorphism_shape = "hypersphere",
+#'   polymorphism_distance = "great_circle"
+#' )
+#'
+#' # Make an ordered stepmatrix including polymorphisms:
+#' make_stepmatrix(
+#'   min_state = 0,
+#'   max_state = 2,
+#'   character_type = "ordered",
+#'   include_polymorphisms = TRUE,
 #'   polymorphism_shape = "hypersphere",
 #'   polymorphism_distance = "great_circle"
 #' )
@@ -157,7 +167,40 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
     # If including polymorphisms:
     if(include_polymorphisms) {
       
-      ### TO FINISH
+      # Generate and store all possible states:
+      all_states <- make_all_polymorphisms(single_states = single_states)
+      
+      # Check data are not too big (>= 2^14 states) and stop and warn user if so:
+      if(length(x = all_states) >= 16384) stop("Stepmatrix would be too large. Use fewer states.")
+      
+      # Calculate stepmatrix size:
+      stepmatrix_size <- length(x = all_states)
+      
+      # Initialise adjacency atrix with zeroes:
+      adjacency_matrix <- matrix(data = 0, nrow = stepmatrix_size, ncol = stepmatrix_size, dimnames = list(all_states, all_states))
+      
+      # For each state save the last one:
+      for(state in all_states[-length(x = all_states)]) {
+        
+        # Find matching states for current state:
+        state_matches <- apply(X = do.call(what = rbind, args = lapply(X = as.list(x = strsplit(x = state, split = "&")[[1]]), FUN = function(x) single_states == x)), MARGIN = 2, FUN = any)
+        
+        # Find states that are addable (reachable) from current state(s):
+        addable_states <- single_states[apply(X = rbind(!state_matches, unlist(lapply(X = as.list(x = 1:length(x = state_matches)), FUN = function(x) any(x = c(state_matches[x - 1], state_matches[x + 1]), na.rm = TRUE)))), MARGIN = 2, FUN = all)]
+        
+        # Compile state(s) adjacent to current state:
+        adjacent_states <- unlist(x = lapply(X = as.list(x = addable_states), FUN = function(new_state) paste(x = sort(x = c(new_state, strsplit(x = state, split = "&")[[1]])), collapse = "&")))
+        
+        # Populate adjaceney matrix with these states:
+        adjacency_matrix[state, adjacent_states] <- adjacency_matrix[adjacent_states, state] <- 1
+        
+      }
+      
+      # Convert adjacency matrix to step matrix:
+      stepmatrix <- convert_adjacency_matrix_to_stepmatrix(adjacency_matrix = adjacency_matrix)
+      
+      # Return stepmatrix rescaled such that adjacent singe states are one step:
+      return(stepmatrix / stepmatrix[1, 2])
     
     # If excluding polymorphisms:
     } else {
@@ -255,6 +298,12 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
     # If including polymorphisms:
     if(include_polymorphisms) {
       
+      # Generate and store all possible states:
+      all_states <- make_all_polymorphisms(single_states = single_states)
+      
+      # Check data are not too big (>= 2^14 states) and stop and warn user if so:
+      if(length(x = all_states) >= 16384) stop("Stepmatrix would be too large. Use fewer states.")
+
       ### TO FINISH
       
     # If excluding polymorphisms:
@@ -285,6 +334,12 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
     # If including polymorphisms:
     if(include_polymorphisms) {
       
+      # Generate and store all possible states:
+      all_states <- make_all_polymorphisms(single_states = single_states)
+      
+      # Check data are not too big (>= 2^14 states) and stop and warn user if so:
+      if(length(x = all_states) >= 16384) stop("Stepmatrix would be too large. Use fewer states.")
+
       ### TO FINISH
       
     # If excluding polymorphisms:

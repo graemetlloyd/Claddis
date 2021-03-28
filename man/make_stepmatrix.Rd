@@ -46,7 +46,7 @@ Text.
 \emph{unordered} Fitch
 \emph{dollo} States must be in order.
 \emph{irreversible} States must be in order. Aka. Camin-Sokal.
-\emph{stratigraphy} States must be in order from oldest to youngest. Special case of irreversible and needs additional input of ages for differences!
+\emph{stratigraphy} States must be in order from oldest to youngest. In usage zero must also be root state or else it makes no damn sense. Special case of irreversible and needs additional input of ages for differences!
 
 \bold{Polymorphic characters}
 
@@ -96,6 +96,16 @@ make_stepmatrix(
   max_state = 2,
   character_type = "ordered",
   include_polymorphisms = FALSE,
+  polymorphism_shape = "hypersphere",
+  polymorphism_distance = "great_circle"
+)
+
+# Make an ordered stepmatrix including polymorphisms:
+make_stepmatrix(
+  min_state = 0,
+  max_state = 2,
+  character_type = "ordered",
+  include_polymorphisms = TRUE,
   polymorphism_shape = "hypersphere",
   polymorphism_distance = "great_circle"
 )
