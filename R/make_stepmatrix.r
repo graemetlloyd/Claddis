@@ -315,11 +315,11 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
       # Initialise stepmatrix with all values set to zero:
       stepmatrix <- matrix(data = 0, nrow = stepmatrix_size, ncol = stepmatrix_size, dimnames = list(single_states, single_states))
       
-      # Store ordered values in upper triangles:
-      stepmatrix[upper.tri(x = stepmatrix)] <- unlist(x = lapply(X = as.list(x = 1:(stepmatrix_size - 1)), FUN = function(steps) steps:1))
+      # Set upper triangle as an ordered character times the dollo_penalty
+      stepmatrix[upper.tri(x = stepmatrix)] <- unlist(x = lapply(X = as.list(x = 1:(stepmatrix_size - 1)), FUN = function(steps) steps:1)) * dollo_penalty
       
-      # Set lower triangle as an ordered character times the dollo_penalty:
-      stepmatrix[lower.tri(x = stepmatrix)] <- unlist(x = lapply(X = as.list(x = (stepmatrix_size - 1):1), FUN = function(steps) 1:steps)) * dollo_penalty
+      # Store regular ordered values in lower triangles::
+      stepmatrix[lower.tri(x = stepmatrix)] <- unlist(x = lapply(X = as.list(x = (stepmatrix_size - 1):1), FUN = function(steps) 1:steps))
       
       # Return stepmatrix:
       return(stepmatrix)
@@ -351,11 +351,11 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
       # Initialise stepmatrix with all values set to zero:
       stepmatrix <- matrix(data = 0, nrow = stepmatrix_size, ncol = stepmatrix_size, dimnames = list(single_states, single_states))
       
-      # Exclude losses by setting upper triangle values to infinity:
-      stepmatrix[upper.tri(x = stepmatrix)] <- Inf
+      # Exclude losses by setting lower triangle values to infinity:
+      stepmatrix[lower.tri(x = stepmatrix)] <- Inf
       
-      # Set lower triangle as an ordered character:
-      stepmatrix[lower.tri(x = stepmatrix)] <- unlist(x = lapply(X = as.list(x = (stepmatrix_size - 1):1), FUN = function(steps) 1:steps))
+      # Set upper triangle as an ordered character:
+      stepmatrix[upper.tri(x = stepmatrix)] <- unlist(x = lapply(X = as.list(x = 1:(stepmatrix_size - 1)), FUN = function(steps) steps:1))
       
       # Return stepmatrix:
       return(stepmatrix)
@@ -391,7 +391,7 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
     stepmatrix <- as.matrix(x = dist(x = state_ages, diag = TRUE, upper = TRUE))
     
     # Set infinite cost to all reversals:
-    stepmatrix[upper.tri(x = stepmatrix)] <- Inf
+    stepmatrix[lower.tri(x = stepmatrix)] <- Inf
     
     # Return stepmatrix:
     return(stepmatrix)
