@@ -371,21 +371,7 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
     names(x = state_ages) <- min_state:max_state
     
     # If including polymorphisms:
-    if(include_polymorphisms) {
-      
-      # Generate and store all possible states:
-      all_states <- make_all_polymorphisms(single_states = single_states)
-      
-      # Check data are not too big (>= 2^14 states) and stop and warn user if so:
-      if(length(x = all_states) >= 16384) stop("Stepmatrix would be too large. Use fewer states.")
-      
-      # Assign age of oldest state to each polymorphism:
-      state_ages <- unlist(x = lapply(X = as.list(x = all_states), FUN = function(x) state_ages[as.character(x = min(x = as.numeric(x = strsplit(x = x, split = "&")[[1]])))]))
-      
-      # Update names to all states:
-      names(x = state_ages) <- all_states
-      
-    }
+    if(include_polymorphisms) stop("If character_type is \"stratigraphy\" then include_polymorphisms cannot be TRUE. If the age of the OTU is uncertain then code it as such (use / instead of & between state). If the OTU is truly present in multiple units then only code it as the oldest one or break it up into multiple OTUs.")
     
     # Generate initial stepmatrix using temporal distances:
     stepmatrix <- as.matrix(x = dist(x = state_ages, diag = TRUE, upper = TRUE))
