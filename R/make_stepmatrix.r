@@ -15,7 +15,7 @@
 #'
 #' @details
 #'
-#' Stepmatrices encode the parsimony cost (number of evolutionary "steps") for each possible state-to-state transition and can be used to estimate total lengths and make estimates (often also called reconstructions) for ancestral states at branching points on a given topology (tree). This function automates the generation of some common stepmatrix types for use elsewhere in Claddis.
+#' Stepmatrices encode the parsimony cost (number of evolutionary "steps") for each possible state-to-state transition and can be used to estimate total lengths and make estimates (often also called reconstructions) for ancestral states at branching points on a given topology (tree). This function automates the generation of some common stepmatrix types for use elsewhere in Claddis and hence is primarily an internal function. However, as stepmatrices are fundamental to various key analyses their operation is detailed extensively below.
 #'
 #' \bold{Stepmatrix basics}
 #'
@@ -223,7 +223,7 @@
 #' |   0&1&2   |  1.8  |
 #' ---------------------}
 #'
-#' Note that this makes every candidate equally plausible, save 0&1&2 which is the uniquely maximally optimal.
+#' Note that this makes every candidate equally plausible, save 0&1&2 which is the uniquely maximally optimal solution.
 #'
 #' No recommendation is made here on which of these shape-distance combinations is "best", rather they are offered as potentially superior alternatives for a given situation. Note also, that although it is assumed the user will want to match the shape and distance as suggested above there are no restrictions preventing other combinations.
 #'
@@ -309,7 +309,7 @@
 #'
 #' Note that here here any stepmatrix (save the stratigraphic kind) is rescaled such that the "base weight" - which can be thought of as the lowest single state to single state transition possible (excluding the diagonal) - is set to 1. However, users may also wish to weight individual characters differently. It may be tempting, then, to simply multiply the values of each stepmatrix by that weight for use elsewhere. This is discouraged, however, as: 1. Other Claddis functions and data matrix data structures allow for weights to be encoded elsewhere (this would be at best redundant and at worst incorrect, if weights get applied twice), and 2. This can lead to confounded results in some cases. For example, if weighting a character zero to exclude it from an analysis any ancestral state estimation would become equally likely, meaning (inadvertently) large numbers of redundant calculations get made. In short, do not weight steomatrices direcrtly, but use the weights component of each matrix block in a \code{cladisticMatrix} object instead.
 #'
-#' \code{Relation to Q-matrices}
+#' \bold{Relation to Q-matrices}
 #'
 #' Q-matrices are used in likelihood and Bayesian approaches and also deal with state-to-state transitions, but are fundamentally distinct from stepmatrices in multiple ways. For example, Q-matrices encode transition rates, not costs, and their values are typically parameters that are estimated from the data not prior statements about the data. However, both can be rendered as Markov chain diagrams. Put simply though, they are not equivalent or interchangable.
 #'
