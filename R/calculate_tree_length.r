@@ -10,6 +10,13 @@
 #'
 #' @details
 #'
+
+
+# MAKE A TREE-LENGTH FUNCTION (THAT HAPPENS TO EXPORT NODE VALUES)
+# THEN MAKE SEPARATE ANCESTRAL STATE RECONSTRUCTION FUNCTION THAT CALLS THIS OTHER FUNCTION
+
+
+
 #' Can be used to infer ancestral states or get tree lengths (could theoretically buol a tree inference procedure around this by proposing different topologies, but ikely to be much slower than compiled software). Also a first step to generating character maps that can be used for plotting changes on a tree, performing rate analysis (see \link{test_rates}), or generating phylomorphospaces (not implemented yet).
 #'
 #' \bold{Input}
@@ -111,14 +118,14 @@
 #'   (Deinonychosauria,Avialae))))))))));"
 #' )
 #' inapplicables_as_missing = FALSE
-#' parsimony_function(
+#' calculate_tree_length(
 #'   tree = tree,
 #'   cladistic_matrix,
 #'   inapplicables_as_missing = FALSE
 #' )
 #'
-#' @export parsimony_function
-parsimony_function <- function(tree, cladistic_matrix, inapplicables_as_missing = FALSE) {
+#' @export calculate_tree_length
+calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missing = FALSE) {
   
   # WHOLE THING SHOULD BE REFACTORED TO DEAL WITH ENTIRE MATRIX (THE OBVIOUS END USE) PLUS BRINGS INTO LINE WITH OTHER FUNCTIONS AND TRANSFERS MANY OPTIONS TO MATRIX STRUCTURE (ORDERING AND WEIGHTS PRIMARILY)
   # ALSO ALLOWS MOVING MANY CHECKS TO A SINGLE PASS OF MATRIX AND HENCE FASTER
