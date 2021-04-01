@@ -189,7 +189,7 @@ write_nexus_matrix <- function(cladistic_matrix, file_name) {
   character_weights <- unlist(x = lapply(X = data_blocks, "[[", "character_weights"))
 
   # Create options block (if no block names):
-  if (all(is.na(block_names))) options_block <- paste(ifelse(all(ordering == "unord"), "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n", ifelse(all(ordering == "ord"), "\tOPTIONS  DEFTYPE=ord PolyTcount=MINSTEPS ;\n", "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n")), ifelse(length(x = unique(x = ordering)) == 1 && length(x = setdiff(x = unique(x = ordering), y = c("ord", "unord"))) == 0, "", paste("\tTYPESET * UNTITLED  = ", paste(paste(sort(x = unique(x = ordering)), unlist(x = lapply(X = lapply(X = lapply(X = as.list(x = sort(x = unique(x = ordering))), "==", ordering), which), zip_string)), sep = ": "), collapse = ", "), ";\n", sep = "")), sep = "")
+  if (all(is.na(block_names))) options_block <- paste(ifelse(all(ordering == "unordered"), "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n", ifelse(all(ordering == "ordered"), "\tOPTIONS  DEFTYPE=ord PolyTcount=MINSTEPS ;\n", "\tOPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;\n")), ifelse(length(x = unique(x = ordering)) == 1 && length(x = setdiff(x = unique(x = ordering), y = c("ordered", "unordered"))) == 0, "", paste("\tTYPESET * UNTITLED  = ", paste(paste(sort(x = unique(x = ordering)), unlist(x = lapply(X = lapply(X = lapply(X = as.list(x = sort(x = unique(x = ordering))), "==", ordering), which), zip_string)), sep = ": "), collapse = ", "), ";\n", sep = "")), sep = "")
 
   # Create options block (if there are block names):
   if (!all(is.na(unlist(x = block_names)))) options_block <- paste(paste("\tTYPESET * UNTITLED  (CHARACTERS = ", block_names, ")  =  ", unlist(x = lapply(X = lapply(X = data_blocks, "[[", "ordering"), function(x) paste(paste(paste(sort(x = unique(x = x)), unlist(x = lapply(X = lapply(X = lapply(X = as.list(x = sort(x = unique(x = x))), "==", x), which), zip_string)), sep = ": "), collapse = ", "), sep = ""))), ";\n", sep = ""), collapse = "")
@@ -198,7 +198,7 @@ write_nexus_matrix <- function(cladistic_matrix, file_name) {
   if (length(x = grep(" cont: ", options_block)) > 0) options_block <- gsub(pattern = " cont: ", replacement = " Squared: ", x = options_block)
 
   # Convert continuous character weights to one before making weights block:
-  character_weights[ordering == "cont"] <- 1
+  character_weights[ordering == "continuous"] <- 1
 
   # Create weights block (if no block names):
   if (all(is.na(block_names))) weights_block <- ifelse(all(character_weights == 1), "", paste("\tWTSET * UNTITLED  = ", paste(paste(sort(x = unique(x = character_weights)), unlist(x = lapply(X = lapply(X = lapply(X = as.list(x = sort(x = unique(x = character_weights))), "==", character_weights), which), zip_string)), sep = ": "), collapse = ", "), ";\n", sep = ""))

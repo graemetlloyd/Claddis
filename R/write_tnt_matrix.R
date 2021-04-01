@@ -222,7 +222,7 @@ write_tnt_matrix <- function(cladistic_matrix, file_name, add_analysis_block = F
   }
 
   # Build ccode block:
-  ccode_block <- paste("ccode ", paste(paste(ifelse(ifelse(ordering == "cont", "ord", ordering) == "ord", "+", "-"), ifelse(character_weights == 0, "]", "["), "/", ifelse(ordering == "cont", "1", ifelse(character_weights == 0, 1, character_weights)), " ", paste(1:sum(n_characters) - 1), sep = ""), collapse = " "), " ;\n", sep = "")
+  ccode_block <- paste("ccode ", paste(paste(ifelse(ifelse(ordering == "continuous", "ord", ordering) == "ord", "+", "-"), ifelse(character_weights == 0, "]", "["), "/", ifelse(ordering == "continuous", "1", ifelse(character_weights == 0, 1, character_weights)), " ", paste(1:sum(n_characters) - 1), sep = ""), collapse = " "), " ;\n", sep = "")
 
   # Build full string with all blocks together:
   full_string <- paste("taxname=;\nmxram 4096;\ntaxname +", max(nchar(x = rownames(x = cladistic_matrix$matrix_1$matrix))), ";\nnstates num 32;\nxread\n", header_block, sum(n_characters), " ", n_taxa, "\n", matrix_block, ";\n", ccode_block, stepmatrix_block, "proc/;\n", sep = "")

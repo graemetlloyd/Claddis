@@ -262,8 +262,8 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
         })
 
         # If there are unordered characters present convert maximum distances to one:
-        if (any(character_ordering[mean_characters_to_check] == "unord")) {
-          state_matrices[which(x = character_ordering[mean_characters_to_check] == "unord")] <- lapply(X = state_matrices[which(x = character_ordering[mean_characters_to_check] == "unord")], function(x) {
+        if (any(character_ordering[mean_characters_to_check] == "unordered")) {
+          state_matrices[which(x = character_ordering[mean_characters_to_check] == "unordered")] <- lapply(X = state_matrices[which(x = character_ordering[mean_characters_to_check] == "unordered")], function(x) {
             x[x > 1] <- 1
             return(x)
           })
@@ -301,7 +301,7 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
   fix_unordered <- function(differences, comparable_characters, ordering) {
 
     # If unordered and distance greater than one replace with one:
-    if (length(x = which(x = differences > 1)) > 0) differences[which(x = differences > 1)[which(x = ordering[comparable_characters[which(x = differences > 1)]] == "unord")]] <- 1
+    if (length(x = which(x = differences > 1)) > 0) differences[which(x = differences > 1)[which(x = ordering[comparable_characters[which(x = differences > 1)]] == "unordered")]] <- 1
 
     # Return corrected unordered distances:
     return(list(differences))

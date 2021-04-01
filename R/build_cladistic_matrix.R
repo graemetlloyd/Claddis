@@ -7,7 +7,7 @@
 #' @param character_taxon_matrix A Character-Taxon (columns-rows) matrix, with taxon names as rownames.
 #' @param header A scalar indicating any header text (defaults to an empty string: "").
 #' @param character_weights A vector specifying the weights used (if not specified defaults to 1).
-#' @param ordering A vector indicating whether characters are ordered ("ord") or unordered ("unord") (if no specified defaults to ordered).
+#' @param ordering A vector indicating whether characters are ordered (\code{"ordered"}) or unordered (\code{"unordered"}) (if no specified defaults to ordered).
 #' @param symbols The symbols to use if writing to a file (defaults to the numbers 0:9 then the letters A to V).
 #' @param equalise.weights Optional that overrides the weights specified above make all characters truly equally weighted.
 #' @param ignore_duplicate_taxa Logical indicating whether or not to ignore (allow; TRUE) duplicate taxa or not (FALSE; default).
@@ -21,7 +21,7 @@
 #' @return
 #'
 #' \item{topper}{Contains any header text or step matrices and pertains to the entire file.}
-#' \item{matrix_N}{One or more matrix blocks (numbered 1 to N) with associated information pertaining only to that matrix block. This includes the block name (if specificed, NA if not), the block datatype (one of "CONTINUOUS", "DNA", "NUCLEOTIDE", "PROTEIN", "RESTRICTION", "RNA", or "STANDARD"), the actual matrix (taxa as rows, names stored as rownames and characters as columns), the ordering type of each character ("ord" = ordered, "unord" = unordered), the character weights, the minimum and maximum values (used by Claddis' distance functions), and the original characters (symbols, missing, and gap values) used for writing out the data.}
+#' \item{matrix_N}{One or more matrix blocks (numbered 1 to N) with associated information pertaining only to that matrix block. This includes the block name (if specificed, NA if not), the block datatype (one of "CONTINUOUS", "DNA", "NUCLEOTIDE", "PROTEIN", "RESTRICTION", "RNA", or "STANDARD"), the actual matrix (taxa as rows, names stored as rownames and characters as columns), the ordering type of each character (\code{"ordered"}, \code{"unordered"} etc.), the character weights, the minimum and maximum values (used by Claddis' distance functions), and the original characters (symbols, missing, and gap values) used for writing out the data.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -95,7 +95,7 @@ build_cladistic_matrix <- function(character_taxon_matrix, header = "", characte
   if (!is.null(ordering) && length(x = ordering) != ncol(character_taxon_matrix)) stop("ordering must have same length as number of characters in character_taxon_matrix.")
 
   # Check ordering is of unord or ord type only:
-  if (!is.null(ordering) && length(x = setdiff(x = ordering, y = c("unord", "ord"))) > 0) stop("ordering must be unord or ord only.")
+  if (!is.null(ordering) && length(x = setdiff(x = ordering, y = c("unordered", "ordered"))) > 0) stop("ordering must be unordered or ordered only.")
 
   # Check symbols are of correct length:
   if (!is.null(symbols) && length(x = symbols) >= (diff(range(as.numeric(unique(x = sort(x = unlist(x = strsplit(as.vector(character_taxon_matrix), split = "&|/"))))))) + 1)) stop("symbols must be at least as long as the range of character values in character_taxon_matrix.")
@@ -107,7 +107,7 @@ build_cladistic_matrix <- function(character_taxon_matrix, header = "", characte
   if (length(x = header) != 1) stop("header text must be a single value.")
 
   # If no ordering set default to ordered.
-  if (is.null(ordering)) ordering <- rep("ord", ncol(character_taxon_matrix))
+  if (is.null(ordering)) ordering <- rep("ordered", ncol(character_taxon_matrix))
 
   # If no weights are set:
   if (is.null(character_weights)) character_weights <- rep(1, ncol(character_taxon_matrix))
@@ -137,10 +137,10 @@ build_cladistic_matrix <- function(character_taxon_matrix, header = "", characte
     character_weights <- apply(rbind(c(maximum_values - minimum_values), rep(1, nchar)), 2, max)
 
     # Update weights for unordered characters:
-    character_weights[ordering == "unord"] <- 1
+    character_weights[ordering == "unordered"] <- 1
 
     # Update weights for ordered characters:
-    character_weights[ordering == "ord"] <- 1 / character_weights[ordering == "ord"]
+    character_weights[ordering == "ordered"] <- 1 / character_weights[ordering == "ordered"]
 
     # If there are step matrices (not technically using these yet, but I guess this will have to exist eventually):
     if (!is.null(step_matrices)) {

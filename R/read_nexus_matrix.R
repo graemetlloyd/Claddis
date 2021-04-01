@@ -18,7 +18,7 @@
 #' @return
 #'
 #' \item{topper}{Contains any header text or step matrices and pertains to the entire file.}
-#' \item{matrix_N}{One or more matrix blocks (numbered 1 to N) with associated information pertaining only to that matrix block. This includes the block name (if specificed, NA if not), the block datatype (one of "CONTINUOUS", "DNA", "NUCLEOTIDE", "PROTEIN", "RESTRICTION", "RNA", or "STANDARD"), the actual matrix (taxa as rows, names stored as rownames and characters as columns), the ordering type of each character ("ord" = ordered, "unord" = unordered), the character weights, the minimum and maximum values (used by Claddis' distance functions), and the original characters (symbols, missing, and gap values) used for writing out the data.}
+#' \item{matrix_N}{One or more matrix blocks (numbered 1 to N) with associated information pertaining only to that matrix block. This includes the block name (if specificed, NA if not), the block datatype (one of "CONTINUOUS", "DNA", "NUCLEOTIDE", "PROTEIN", "RESTRICTION", "RNA", or "STANDARD"), the actual matrix (taxa as rows, names stored as rownames and characters as columns), the ordering type of each character (\code{"ordered"}, \code{"unordered"}), the character weights, the minimum and maximum values (used by Claddis' distance functions), and the original characters (symbols, missing, and gap values) used for writing out the data.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -898,7 +898,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   character_weights <- lapply(X = lapply(X = matrix_block_list, ncol), rep, x = 1)
   
   # Set default ordering as unordered:
-  ordering <- lapply(X = lapply(X = matrix_block_list, ncol), rep, x = "unord")
+  ordering <- lapply(X = lapply(X = matrix_block_list, ncol), rep, x = "unordered")
   
   # For each matrix block:
   for(i in 1:length(x = matrix_block_list)) {
@@ -926,13 +926,13 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   }
 
   # Set default ordering as unord:
-  default_ordering <- "unord"
+  default_ordering <- "unordered"
   
   # If deafult ordering is specified, store it:
   if (length(x = grep("DEFTYPE", toupper(raw_nexus))) > 0) default_ordering <- strsplit(strsplit(raw_nexus[grep("deftype", raw_nexus, ignore.case = TRUE)], "DEFTYPE=|Deftype=|deftype=")[[1]][2], " ")[[1]][1]
   
-  # If default ordering is ordered then update ordering as "ord":
-  if (default_ordering == "ord") ordering <- lapply(X = lapply(X = matrix_block_list, ncol), rep, x = "ord")
+  # If default ordering is ordered then update ordering as "ordered":
+  if (default_ordering == "ordered") ordering <- lapply(X = lapply(X = matrix_block_list, ncol), rep, x = "ordered")
   
   # If one or more blocks are of type CONTINUOUS:
   if (any(toupper(names(matrix_block_list)) == "CONTINUOUS")) {
@@ -940,8 +940,8 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
     # Get continuous blocks:
     continuous_blocks <- which(x = toupper(names(matrix_block_list)) == "CONTINUOUS")
     
-    # Update continuous ordering to "cont" to denote characters are tp be treated as continuous:
-    for(i in continuous_blocks) ordering[[i]] <- gsub(pattern = "unord", replacement = "cont", x = ordering[[i]])
+    # Update continuous ordering to "continuous" to denote characters are tp be treated as continuous:
+    for(i in continuous_blocks) ordering[[i]] <- gsub(pattern = "unordered", replacement = "continuous", x = ordering[[i]])
     
   }
   
@@ -1018,11 +1018,11 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   # Check for characters without an ordering status and stop and warn user if found:
   if (any(is.na(unlist(x = ordering)))) stop(paste("The following characters have undefined ordering: ", paste(which(x = is.na(unlist(x = ordering))), collapse = ", "), ". Add their ordering to the assumptions block and try again.", sep =""))
   
-  # Convert any "Squared" ordering to "cont" for continuous:
-  ordering <- lapply(X = ordering, gsub, pattern = "Squared", replacement = "cont", ignore.case = TRUE)
+  # Convert any "Squared" ordering to "continuous" for continuous:
+  ordering <- lapply(X = ordering, gsub, pattern = "Squared", replacement = "continuous", ignore.case = TRUE)
   
   # Look for any non-standard ordering (i.e., not cont, ord, unord, or Step_X):
-  nonstandard_ordering <- setdiff(x = unique(x = unlist(x = ordering)), y = c("cont", "ord", "unord", names(step_matrices)))
+  nonstandard_ordering <- setdiff(x = unique(x = unlist(x = ordering)), y = c("continuous", "ordered", "unordered", names(step_matrices)))
   
   # If any non-standard ordering is found stop and warn user:
   if (length(x = nonstandard_ordering) > 0) stop(paste("The following non-standard character ordering(s) were found: ", paste(nonstandard_ordering, collapse = ", "), ". These should be one of type \"cont\", \"ord\", \"unord\", or step matrix.", sep = ""))
@@ -1115,13 +1115,13 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
     }
     
     # If there are any unordered characters:
-    if (any(unlist(x = ordering) == "unord")) {
+    if (any(unlist(x = ordering) == "unordered")) {
       
       # Get numbers of blocks with unordered characters:
-      blocks_with_unordered_characters <- which(x = unlist(x = lapply(X = lapply(X = ordering, '==', "unord"), sum)) > 0)
+      blocks_with_unordered_characters <- which(x = unlist(x = lapply(X = lapply(X = ordering, '==', "unordered"), sum)) > 0)
       
       # Convert all unordered characters to weight one:
-      for(i in blocks_with_unordered_characters) starting_weights[[i]][which(x = ordering[[i]] == "unord")] <- 1
+      for(i in blocks_with_unordered_characters) starting_weights[[i]][which(x = ordering[[i]] == "unordered")] <- 1
       
     }
     

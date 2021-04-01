@@ -187,7 +187,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
       if (length(x = missingRows) > 0) {
 
         # Build missing state by either forming a polymorphism of all possible tip states, or if continuous the midpoint value:
-        fill_states <- ifelse(tip_states$ordering == "cont", (tip_states$minimum_values + tip_states$maximum_values) / 2, paste(tip_states$minimum_values:tip_states$maximum_values, collapse = "/"))
+        fill_states <- ifelse(tip_states$ordering == "continuous", (tip_states$minimum_values + tip_states$maximum_values) / 2, paste(tip_states$minimum_values:tip_states$maximum_values, collapse = "/"))
 
         # Insert missing values:
         tip_states$tip_states[missingRows] <- fill_states
@@ -237,7 +237,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
     if (length(x = x$tip_states) > 0) {
 
       # If the character is not continuous (i.e., it is some form of discrete character):
-      if (x$ordering != "cont") {
+      if (x$ordering != "continuous") {
 
         # Temporarily store tip states so matrix format can overwrite the stored version below:
         tip_states <- x$tip_states
@@ -326,7 +326,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
     if (!is.null(x$tree)) {
 
       # If character is continuous:
-      if (x$ordering == "cont") {
+      if (x$ordering == "continuous") {
 
         # Get ancestral states using ace:
         x$ancestral_states <- ace(x = x$tip_states, phy = x$tree)$ace

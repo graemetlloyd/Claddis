@@ -42,9 +42,9 @@ print.cladisticMatrix <- function(x, ...) {
   data_types <- sort(x = tolower(x = unique(x = unname(obj = unlist(x = lapply(X = x[2:length(x = x)], FUN = function(x) x$datatype))))))
   character_ordering <- unname(obj = unlist(x = lapply(X = x[2:length(x = x)], FUN = function(x) x$ordering)))
   character_weights <- unname(obj = unlist(x = lapply(X = x[2:length(x = x)], FUN = function(x) x$character_weights)))
-  n_unordered_characters <- sum(character_ordering == "unord")
-  n_ordered_characters <- sum(character_ordering == "ord")
-  n_continuous_characters <- sum(character_ordering == "cont")
+  n_unordered_characters <- sum(character_ordering == "unordered")
+  n_ordered_characters <- sum(character_ordering == "ordered")
+  n_continuous_characters <- sum(character_ordering == "continuous")
   n_stepmatrix_characters <- length(x = grep(pattern = "step", x = character_ordering))
   
   # Calculate character sizes for ordering types:
@@ -52,7 +52,7 @@ print.cladisticMatrix <- function(x, ...) {
   character_spacings <- unlist(x = lapply(X = as.list(x = max(x = character_sizes) - character_sizes), function(x) paste(rep(x = " ", times = x), collapse = "")))
   
   # Get number of unique weights (excluding continuous characters):
-  unique_non_continuous_weights <- unique(x = character_weights[character_ordering != "cont"])
+  unique_non_continuous_weights <- unique(x = character_weights[character_ordering != "continuous"])
 
   # Create block parentheses text:
   if(length(x = block_sizes) == 1) block_parentheses <- ""

@@ -509,7 +509,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
   continuous_characters_discretized <- FALSE
 
   # Check for continuous characters as these will need to be modified for modelling to discrete characters:
-  if (any(ordering == "cont")) {
+  if (any(ordering == "continuous")) {
 
     # Tell user this is happening:
     cat("Continuous characters found. Converting to gap-weighted discrete characters.\n")
@@ -518,7 +518,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
     continuous_characters_discretized <- TRUE
 
     # Find out which characters are continuous:
-    continuous_characters_found <- which(x = ordering == "cont")
+    continuous_characters_found <- which(x = ordering == "continuous")
 
     # Rescale continous characters as zero to one values:
     list_of_continuous_values_rescaled_zero_to_one <- lapply(X = lapply(X = lapply(X = apply(all_states[, continuous_characters_found, drop = FALSE], 2, list), unlist), as.numeric), function(x) {
@@ -531,7 +531,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
     all_states[, continuous_characters_found] <- do.call(what = cbind, args = lapply(X = lapply(X = lapply(X = list_of_continuous_values_rescaled_zero_to_one, function(x) as.list(x = x)), lapply, function(x) ifelse(is.na(x), NA, max(which(x = x >= (0:31) / 31)) - 1)), unlist))
 
     # Convert character type to ordered:
-    ordering[continuous_characters_found] <- "ord"
+    ordering[continuous_characters_found] <- "ordered"
 
     # Convert weights to 1/31:
     character_weights[continuous_characters_found] <- 1 / 31
@@ -571,7 +571,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
     character_changes <- matrix(nrow = 0, ncol = 5, dimnames = list(c(), c("character", "from", "to", "steps", "weight")))
 
     # If characters change then make a matrix from them:
-    if (length(x = character_differences) > 0) character_changes <- rbind(character_changes, cbind(as.numeric(comparable_characters[character_differences]), as.numeric(x$character_states_from_to["from", comparable_characters[character_differences]]), as.numeric(x$character_states_from_to["to", comparable_characters[character_differences]]), ifelse(comparable_ordering[character_differences] == "unord", 1, abs(as.numeric(x$character_states_from_to["to", comparable_characters[character_differences]]) - as.numeric(x$character_states_from_to["from", comparable_characters[character_differences]]))), comparable_weights[character_differences]))
+    if (length(x = character_differences) > 0) character_changes <- rbind(character_changes, cbind(as.numeric(comparable_characters[character_differences]), as.numeric(x$character_states_from_to["from", comparable_characters[character_differences]]), as.numeric(x$character_states_from_to["to", comparable_characters[character_differences]]), ifelse(comparable_ordering[character_differences] == "unordered", 1, abs(as.numeric(x$character_states_from_to["to", comparable_characters[character_differences]]) - as.numeric(x$character_states_from_to["from", comparable_characters[character_differences]]))), comparable_weights[character_differences]))
 
     # Store character changes as new sublist for x:
     x$character_changes <- character_changes
