@@ -988,6 +988,9 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
         
       }
       
+      # Ensure explicit labels are applied:
+      ordering <- lapply(X = ordering, FUN = function(x) gsub(pattern = "ord", replacement = "ordered", x = x))
+      
     # If there are not any block names (or if some blocks lack names):
     } else {
       
@@ -1004,7 +1007,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
       for(i in 1:length(x = ordering_lengths)) {
         
         # Store part of extracted ordering corresponding to ith block:
-        ordering[[i]][1:ordering_lengths[i]] <-  ordering_extracted[1:ordering_lengths[i]]
+        ordering[[i]][1:ordering_lengths[i]] <- ordering_extracted[1:ordering_lengths[i]]
         
         # Remove already transferred ordering from extracted ready for next block:
         ordering_extracted <- ordering_extracted[-(1:ordering_lengths[i])]
@@ -1025,7 +1028,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   nonstandard_ordering <- setdiff(x = unique(x = unlist(x = ordering)), y = c("continuous", "ordered", "unordered", names(step_matrices)))
   
   # If any non-standard ordering is found stop and warn user:
-  if (length(x = nonstandard_ordering) > 0) stop(paste("The following non-standard character ordering(s) were found: ", paste(nonstandard_ordering, collapse = ", "), ". These should be one of type \"cont\", \"ord\", \"unord\", or step matrix.", sep = ""))
+  if (length(x = nonstandard_ordering) > 0) stop(paste("The following non-standard character ordering(s) were found: ", paste(nonstandard_ordering, collapse = ", "), ". These should be one of type \"continuous\", \"ordered\", \"unordered\", or step matrix.", sep = ""))
   
   # Find any WTSET lines:
   weightset_lines <- raw_nexus[lapply(X = lapply(X = strsplit(raw_nexus, split = ""), '[', 1:5), paste, collapse = "") == "WTSET"]
