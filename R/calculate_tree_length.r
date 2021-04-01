@@ -160,10 +160,10 @@ calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missi
     input_tree <- tree
     
     # If there are no branch durations set these as all one:
-    if(is.null(x = tree$edge.length[1])) tree$edge.length <- rep(x = 1, length.out = nrow(x = tree$edge))
+    if (is.null(x = tree$edge.length[1])) tree$edge.length <- rep(x = 1, length.out = nrow(x = tree$edge))
     
     # If treating inapplicables as missing then replace any inapplicable tip state with NA:
-    if(inapplicables_as_missing) tip_states[tip_states == ""] <- NA
+    if (inapplicables_as_missing) tip_states[tip_states == ""] <- NA
     
     # Reformat tip states as character vector:
     tip_states <- as.character(x = tip_states)
@@ -187,7 +187,7 @@ calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missi
     for(i in 1:tip_count) node_values[i, match(x = strsplit(x = tip_states[i], split = "/")[[1]], table = colnames(x = node_values))] <- 0
     
     # If any tips are missing then set all states for those as zero:
-    if(any(x = is.na(x = tip_states))) node_values[which(x = is.na(x = tip_states)), ] <- 0
+    if (any(x = is.na(x = tip_states))) node_values[which(x = is.na(x = tip_states)), ] <- 0
     
     # First pass (traverse tree from tips to root):
     for(needle in (tip_count + node_count - tip_count):(tip_count + 1)) {
@@ -220,7 +220,7 @@ calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missi
     ### ABOVE NEEDS TO BE INPUT TIP STATES NOT MODIFED VERSION! BUT LATER FOR OUTPUT? NEED TO RECORD SOMEWHERE WHAT HAS HAPPENED THUGH SO CAN PASS TO A CHARACTER MAP FUNCTION AND TREAT EVERYTHING CORRECTLY.
     
     # Only continue if there is any ambiguity at internal nodes:
-    if(any(x = is.na(x = node_estimates[(tip_count + 1):node_count]))) {
+    if (any(x = is.na(x = node_estimates[(tip_count + 1):node_count]))) {
       
       # Find all possible root states:
       possible_root_states <- colnames(x = node_values)[node_values[tip_count + 1, ] == min(x = node_values[tip_count + 1, ])]

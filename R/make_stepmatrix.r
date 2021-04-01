@@ -430,28 +430,28 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
   # - Option to disallow polymorphisms as ancestors (still allows costs for transitions to polymorphic states to be taken into account)
   
   # Check character_type is a valid value and stop and warn user if not:
-  if(length(x = setdiff(x = character_type, y = c("ordered", "unordered", "dollo", "irreversible", "stratigraphy"))) > 0) stop("character_type must be one of \"ordered\", \"unordered\", \"dollo\", \"irreversible\", or \"stratigraphy\".")
+  if (length(x = setdiff(x = character_type, y = c("ordered", "unordered", "dollo", "irreversible", "stratigraphy"))) > 0) stop("character_type must be one of \"ordered\", \"unordered\", \"dollo\", \"irreversible\", or \"stratigraphy\".")
   
   # Check polymorphism_shape is a valid value and stop and warn user if not:
-  if(length(x = setdiff(x = polymorphism_shape, y = c("hypercube", "hypersphere", "simplex"))) > 0) stop("character_type must be one of \"hypercube\", \"hypersphere\", \"simplex\".")
+  if (length(x = setdiff(x = polymorphism_shape, y = c("hypercube", "hypersphere", "simplex"))) > 0) stop("character_type must be one of \"hypercube\", \"hypersphere\", \"simplex\".")
   
   # Check polymorphism_distance is a valid value and stop and warn user if not:
-  if(length(x = setdiff(x = polymorphism_distance, y = c("manhattan", "euclidean", "great_circle"))) > 0) stop("character_type must be one of \"manhattan\", \"euclidean\", \"great_circle\".")
+  if (length(x = setdiff(x = polymorphism_distance, y = c("manhattan", "euclidean", "great_circle"))) > 0) stop("character_type must be one of \"manhattan\", \"euclidean\", \"great_circle\".")
   
   # Get single states:
   single_states <- min_state:max_state
   
   # Case if character is ordered:
-  if(character_type == "ordered") {
+  if (character_type == "ordered") {
     
     # If including polymorphisms:
-    if(include_polymorphisms) {
+    if (include_polymorphisms) {
       
       # Generate and store all possible states:
       all_states <- make_all_polymorphisms(single_states = single_states)
       
       # Check data are not too big (>= 2^14 states) and stop and warn user if so:
-      if(length(x = all_states) >= 16384) stop("Stepmatrix would be too large. Use fewer states.")
+      if (length(x = all_states) >= 16384) stop("Stepmatrix would be too large. Use fewer states.")
       
       # Calculate stepmatrix size:
       stepmatrix_size <- length(x = all_states)
@@ -503,25 +503,25 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
   }
 
   # Case if character is unordered:
-  if(character_type == "unordered") {
+  if (character_type == "unordered") {
     
     # If including polymorphisms:
-    if(include_polymorphisms) {
+    if (include_polymorphisms) {
       
       # Generate and store all possible states:
       all_states <- make_all_polymorphisms(single_states = single_states)
       
       # Check data are not too big (>= 2^14 states) and stop and warn user if so:
-      if(length(x = all_states) >= 16384) stop("Stepmatrix would be too large. Use fewer states.")
+      if (length(x = all_states) >= 16384) stop("Stepmatrix would be too large. Use fewer states.")
       
       # Create coordinate matrix and initialise with zeroes:
       state_presence_matrix <- matrix(data = 0, nrow = length(x = single_states), ncol = length(x = all_states), dimnames = list(single_states, all_states))
       
       # If using the hypercube coordinate space assign coordinates accordingly:
-      if(polymorphism_shape == "hypercube") for(i in 1:ncol(x = state_presence_matrix)) state_presence_matrix[strsplit(x = colnames(x = state_presence_matrix)[i], split = "&")[[1]], i] <- 1
+      if (polymorphism_shape == "hypercube") for(i in 1:ncol(x = state_presence_matrix)) state_presence_matrix[strsplit(x = colnames(x = state_presence_matrix)[i], split = "&")[[1]], i] <- 1
       
       # If using the hypersphere or simplex coordinate space:
-      if(polymorphism_shape == "hypersphere" || polymorphism_shape == "simplex") {
+      if (polymorphism_shape == "hypersphere" || polymorphism_shape == "simplex") {
         
         # For each coding:
         for(i in 1:ncol(x = state_presence_matrix)) {
@@ -530,20 +530,20 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
           components <- strsplit(x = colnames(x = state_presence_matrix)[i], split = "&")[[1]]
           
           # If using the hypersphere coordinate space then apply coordinates accordingly (the square root of 1/N states in polymorphism on each axis state is present):
-          if(polymorphism_shape == "hypersphere") state_presence_matrix[components, i] <- sqrt(x = 1 / length(x = components))
+          if (polymorphism_shape == "hypersphere") state_presence_matrix[components, i] <- sqrt(x = 1 / length(x = components))
           
           # If using the simplex coordinate space then apply coordinates accordingly (1/N states in polymorphism on each axis state is present):
-          if(polymorphism_shape == "simplex") state_presence_matrix[components, i] <- 1 / length(x = components)
+          if (polymorphism_shape == "simplex") state_presence_matrix[components, i] <- 1 / length(x = components)
           
         }
         
       }
       
       # If using a manhattan or euclidean distance, calculate distance directly from coordinate-space:
-      if(polymorphism_distance == "euclidean" || polymorphism_distance == "manhattan") stepmatrix <- as.matrix(x = dist(x = t(x = state_presence_matrix), method = polymorphism_distance, diag = TRUE, upper = TRUE))
+      if (polymorphism_distance == "euclidean" || polymorphism_distance == "manhattan") stepmatrix <- as.matrix(x = dist(x = t(x = state_presence_matrix), method = polymorphism_distance, diag = TRUE, upper = TRUE))
       
       # If using a great circle distance:
-      if(polymorphism_distance == "great_circle") {
+      if (polymorphism_distance == "great_circle") {
         
         # Start by calculating the euclidean distances between each point:
         stepmatrix <- as.matrix(x = dist(x = t(x = state_presence_matrix), method = "euclidean", diag = TRUE, upper = TRUE))
@@ -573,10 +573,10 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
   }
   
   # Case if character is Dollo:
-  if(character_type == "dollo") {
+  if (character_type == "dollo") {
     
     # If including polymorphisms:
-    if(include_polymorphisms) {
+    if (include_polymorphisms) {
       
       # Stop and warn user:
       stop("If character_type is \"dollo\" then include_polymorphisms cannot be TRUE. This is because there is no safe way to record acquisitions and losses of single states where polymorphisms exist using just a stepmatrix approach. Consider recoding as a single state, although note that this will necessarily mean some change(s) are not accounted for.")
@@ -604,10 +604,10 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
   }
   
   # Case if character is irreversible:
-  if(character_type == "irreversible") {
+  if (character_type == "irreversible") {
     
     # If including polymorphisms:
-    if(include_polymorphisms) {
+    if (include_polymorphisms) {
       
       # Stop and warn user:
       stop("If character_type is \"irreversible\" then include_polymorphisms cannot be TRUE. This is because there is no safe way to record acquisitions and losses of single states where polymorphisms exist using just a stepmatrix approach. Consider recoding as a single state, although note that this will necessarily mean some change(s) are not accounted for.")
@@ -635,13 +635,13 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
   }
   
   # Case if character is stratigraphy:
-  if(character_type == "stratigraphy") {
+  if (character_type == "stratigraphy") {
     
     # Add state names to ages:
     names(x = state_ages) <- min_state:max_state
     
     # If including polymorphisms:
-    if(include_polymorphisms) stop("If character_type is \"stratigraphy\" then include_polymorphisms cannot be TRUE. If the age of the OTU is uncertain then code it as such (use / instead of & between states). If the OTU is truly present in multiple units then only code it as the oldest one, or, alternatively, break the OTU up into multiple OTUs.")
+    if (include_polymorphisms) stop("If character_type is \"stratigraphy\" then include_polymorphisms cannot be TRUE. If the age of the OTU is uncertain then code it as such (use / instead of & between states). If the OTU is truly present in multiple units then only code it as the oldest one, or, alternatively, break the OTU up into multiple OTUs.")
     
     # Generate initial stepmatrix using temporal distances:
     stepmatrix <- as.matrix(x = dist(x = state_ages, diag = TRUE, upper = TRUE))

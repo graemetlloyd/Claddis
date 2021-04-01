@@ -114,7 +114,7 @@ convert_state_tree_to_adjacency_matrix <- function(state_tree) {
     bracket_positions <- locate_bracket_positions(input_string = tree_string)
     
     # If there are any internal parentheses:
-    if(nrow(x = bracket_positions) > 1) {
+    if (nrow(x = bracket_positions) > 1) {
       
       # Split string:
       split_string <- strsplit(x = tree_string, split = "")[[1]]
