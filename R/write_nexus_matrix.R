@@ -195,7 +195,10 @@ write_nexus_matrix <- function(cladistic_matrix, file_name) {
   if (!all(is.na(unlist(x = block_names)))) options_block <- paste(paste("\tTYPESET * UNTITLED  (CHARACTERS = ", block_names, ")  =  ", unlist(x = lapply(X = lapply(X = data_blocks, "[[", "ordering"), function(x) paste(paste(paste(sort(x = unique(x = x)), unlist(x = lapply(X = lapply(X = lapply(X = as.list(x = sort(x = unique(x = x))), "==", x), which), zip_string)), sep = ": "), collapse = ", "), sep = ""))), ";\n", sep = ""), collapse = "")
 
   # Replace cont with Squared if continuous characters present:
-  if (length(x = grep(" cont: ", options_block)) > 0) options_block <- gsub(pattern = " cont: ", replacement = " Squared: ", x = options_block)
+  if (length(x = grep(" continuous: ", options_block)) > 0) options_block <- gsub(pattern = " continuous: ", replacement = " Squared: ", x = options_block)
+  
+  # Replace ordered with ord if discrete characters present:
+  if (length(x = grep("ordered: ", options_block)) > 0) options_block <- gsub(pattern = "ordered: ", replacement = "ord: ", x = options_block)
 
   # Convert continuous character weights to one before making weights block:
   character_weights[ordering == "continuous"] <- 1
