@@ -4,7 +4,16 @@
 \alias{calculate_tree_length}
 \title{Reconstruct ancestral states using parsimony}
 \usage{
-calculate_tree_length(tree, cladistic_matrix, inapplicables_as_missing = FALSE)
+calculate_tree_length(
+  tree,
+  cladistic_matrix,
+  inapplicables_as_missing = FALSE,
+  include_polymorphisms,
+  polymorphism_shape,
+  polymorphism_distance,
+  state_ages,
+  dollo_penalty
+)
 }
 \arguments{
 \item{tree}{A tree (phylo object).}
@@ -12,6 +21,16 @@ calculate_tree_length(tree, cladistic_matrix, inapplicables_as_missing = FALSE)
 \item{cladistic_matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}. These should be discrete with labels matching the tip labels of \code{tree}.}
 
 \item{inapplicables_as_missing}{Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default).}
+
+\item{include_polymorphisms}{Argument passed to \link{make_stepmatrix}.}
+
+\item{polymorphism_shape}{Argument passed to \link{make_stepmatrix}.}
+
+\item{polymorphism_distance}{Argument passed to \link{make_stepmatrix}.}
+
+\item{state_ages}{Argument passed to \link{make_stepmatrix}.}
+
+\item{dollo_penalty}{Argument passed to \link{make_stepmatrix}.}
 }
 \value{
 A list with multiple components, including:
