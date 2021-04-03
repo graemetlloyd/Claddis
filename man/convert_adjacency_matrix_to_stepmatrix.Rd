@@ -10,7 +10,7 @@ convert_adjacency_matrix_to_stepmatrix(adjacency_matrix)
 \item{adjacency_matrix}{A labelled square matrix with zeroes denoting non-adjacencies and ones denoting adjacencies.}
 }
 \value{
-A stepmatrix where values indicate the minimum number of edges (shortest path) between each pair of vertices.
+An object of class \code{stepMatrix} - a square stepmatrix with rows representing "from" states, columns "to" states, and individual cells the cost in steps of that transition (based on the minimum number of edges, i.e., the shortest path, between each pair of vertices).
 }
 \description{
 Takes an adjacency matrix as input and returns the corresponding stepmatrix.

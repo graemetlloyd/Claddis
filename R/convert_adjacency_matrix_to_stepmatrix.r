@@ -40,7 +40,7 @@
 #'
 #' @return
 #'
-#' A stepmatrix where values indicate the minimum number of edges (shortest path) between each pair of vertices.
+#' An object of class \code{stepMatrix} - a square stepmatrix with rows representing "from" states, columns "to" states, and individual cells the cost in steps of that transition (based on the minimum number of edges, i.e., the shortest path, between each pair of vertices).
 #'
 #' @seealso
 #'
@@ -107,6 +107,9 @@ convert_adjacency_matrix_to_stepmatrix <- function(adjacency_matrix) {
     stepmatrix[current_path[1], current_path[2]] <- stepmatrix[current_path[2], current_path[1]] <- length(path_list)
     
   }
+  
+  # Set class of output as stepMatrix:
+  class(stepmatrix) <- "stepMatrix"
   
   # Return complete stepmatrix:
   stepmatrix

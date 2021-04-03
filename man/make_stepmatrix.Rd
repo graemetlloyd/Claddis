@@ -33,7 +33,7 @@ make_stepmatrix(
 \item{dollo_penalty}{The size of the cost penalty for the acquisition of a Dollo character (defaults to \code{999}). Note: this should always be a positive real value greater than one, and never infinity (\code{Inf}), as at least one acquisition is expected.}
 }
 \value{
-A square stepmatrix with rows representing "from" states, columns "to" states, and individual cells the cost in steps of that transition.
+An object of class \code{stepMatrix} - a square stepmatrix with rows representing "from" states, columns "to" states, and individual cells the cost in steps of that transition.
 }
 \description{
 Given a set of discrete states and a character type will make the approriate stepmatrix for them.

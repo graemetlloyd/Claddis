@@ -343,7 +343,7 @@
 #'
 #' @return
 #'
-#' A square stepmatrix with rows representing "from" states, columns "to" states, and individual cells the cost in steps of that transition.
+#' An object of class \code{stepMatrix} - a square stepmatrix with rows representing "from" states, columns "to" states, and individual cells the cost in steps of that transition.
 #'
 #' @seealso
 #'
@@ -479,8 +479,8 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
       # Convert adjacency matrix to step matrix:
       stepmatrix <- convert_adjacency_matrix_to_stepmatrix(adjacency_matrix = adjacency_matrix)
       
-      # Return stepmatrix rescaled such that adjacent singe states are one step:
-      return(stepmatrix / stepmatrix[1, 2])
+      # Rescale such that adjacent single states are one step:
+      stepmatrix <- stepmatrix / stepmatrix[1, 2]
     
     # If excluding polymorphisms:
     } else {
@@ -494,9 +494,6 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
       # Store ordered values in upper and lower triangles:
       stepmatrix[upper.tri(x = stepmatrix)] <- unlist(x = lapply(X = as.list(x = 1:(stepmatrix_size - 1)), FUN = function(steps) steps:1))
       stepmatrix[lower.tri(x = stepmatrix)] <- unlist(x = lapply(X = as.list(x = (stepmatrix_size - 1):1), FUN = function(steps) 1:steps))
-      
-      # Return stepmatrix:
-      return(stepmatrix)
 
     }
   
@@ -553,8 +550,8 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
         
       }
       
-      # Return a stepmatrix rescaled such that single state distances (e.g., 0 to 1) are one (i.e., a normal unordered character):
-      return(stepmatrix / stepmatrix[1, 2])
+      # Rescale such that single state distances (e.g., 0 to 1) are one (i.e., a normal unordered character):
+      stepmatrix <- stepmatrix / stepmatrix[1, 2]
       
     # If excluding polymorphisms:
     } else {
@@ -564,9 +561,6 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
       
       # Make diagional of stepmatrix zero:
       diag(x = stepmatrix) <- 0
-      
-      # Return stepmatrix:
-      return(stepmatrix)
       
     }
     
@@ -596,9 +590,6 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
       # Store regular ordered values in lower triangles::
       stepmatrix[lower.tri(x = stepmatrix)] <- unlist(x = lapply(X = as.list(x = (stepmatrix_size - 1):1), FUN = function(steps) 1:steps))
       
-      # Return stepmatrix:
-      return(stepmatrix)
-      
     }
     
   }
@@ -627,9 +618,6 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
       # Set upper triangle as an ordered character:
       stepmatrix[upper.tri(x = stepmatrix)] <- unlist(x = lapply(X = as.list(x = 1:(stepmatrix_size - 1)), FUN = function(steps) steps:1))
       
-      # Return stepmatrix:
-      return(stepmatrix)
-      
     }
     
   }
@@ -649,9 +637,12 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
     # Set infinite cost to all reversals:
     stepmatrix[lower.tri(x = stepmatrix)] <- Inf
     
-    # Return stepmatrix:
-    return(stepmatrix)
-    
   }
+  
+  # Set class of output as stepMatrix:
+  class(stepmatrix) <- "stepMatrix"
+  
+  # Return stepmatrx:
+  stepmatrix
   
 }
