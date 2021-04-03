@@ -7,6 +7,11 @@
 #' @param tree A tree (phylo object).
 #' @param cladistic_matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}. These should be discrete with labels matching the tip labels of \code{tree}.
 #' @param inapplicables_as_missing Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default).
+#' @param include_polymorphisms Argument passed to \link{make_stepmatrix}.
+#' @param polymorphism_shape Argument passed to \link{make_stepmatrix}.
+#' @param polymorphism_distance Argument passed to \link{make_stepmatrix}.
+#' @param state_ages Argument passed to \link{make_stepmatrix}.
+#' @param dollo_penalty Argument passed to \link{make_stepmatrix}.
 #'
 #' @details
 #'
@@ -125,7 +130,7 @@
 #' )
 #'
 #' @export calculate_tree_length
-calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missing = FALSE) {
+calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missing = FALSE, include_polymorphisms, polymorphism_shape, polymorphism_distance, state_ages, dollo_penalty) {
   
   # WHOLE THING SHOULD BE REFACTORED TO DEAL WITH ENTIRE MATRIX (THE OBVIOUS END USE) PLUS BRINGS INTO LINE WITH OTHER FUNCTIONS AND TRANSFERS MANY OPTIONS TO MATRIX STRUCTURE (ORDERING AND WEIGHTS PRIMARILY)
   # ALSO ALLOWS MOVING MANY CHECKS TO A SINGLE PASS OF MATRIX AND HENCE FASTER
@@ -150,11 +155,44 @@ calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missi
   # - stepmatrix values are zero or positive (don't have to be integers?)
   # - Check there are enough states to do something with!
   # - Put checks at higher level to avoid repeating for every character in a matrix (slow?)
+  
+  
+  
+  # Combine all blocks into a single input matrix:
+  single_input_matrix <- list(
+    matrix = do.call(what = cbind, args = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(x) x$matrix)),
+    ordering = unname(obj = do.call(what = c, args = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(x) x$ordering))),
+    weights = unname(obj = do.call(what = c, args = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(x) x$character_weights))),
+    minima = unname(obj = do.call(what = c, args = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(x) x$minimum_values))),
+    maxima = unname(obj = do.call(what = c, args = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(x) x$maximum_values)))
+  )
+  
+  # Build character list:
+  character_list <- lapply(
+    X = as.list(x = 1:length(x = single_input_matrix$ordering)),
+    FUN = function(x) list(
+      tip_states = single_input_matrix$matrix[, x],
+      stepmatrix = make_stepmatrix(
+        min_state = single_input_matrix$minima[x],
+        max_state = single_input_matrix$maxima[x],
+        character_type = single_input_matrix$ordering[x],
+        include_polymorphisms = include_polymorphisms,
+        polymorphism_shape = polymorphism_shape,
+        polymorphism_distance = polymorphism_distance,
+        state_ages = state_ages,
+        dollo_penalty = dollo_penalty
+      ),
+      weight = single_input_matrix$weights[x],
+      inapplicables_as_missing = inapplicables_as_missing
+    )
+  )
+  
+  
 
-  reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight = 1, inapplicables_as_missing = FALSE) {
+  reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight, inapplicables_as_missing = FALSE) {
     
     # Reorder tip states (1 to N) and store an unmodified version:
-    input_tip_states <- tip_states <- tip_states[tree$tip.label]
+    pristine_tip_states <- tip_states <- tip_states[tree$tip.label]
     
     # Store pristine input tree:
     input_tree <- tree
@@ -270,25 +308,30 @@ calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missi
   }
   
   
+  
+  ancestral_values <- lapply(
+    X = character_list,
+    function(x) reconstruct_ancestral_states(
+      tree = tree,
+      tip_states = x$tip_states,
+      stepmatrix = x$stepmatrix,
+      weight = x$weight,
+      inapplicables_as_missing = x$inapplicables_as_missing
+    )
+  )
+  
+  
+  
+  
+  
   # TO ADD INTO FUNCTION:
   estimate_all_nodes <- FALSE
   estimate_tip_values <- FALSE # Should not happen for inapplicables when they are treated as inapplicables
   
-  # Combine all blocks into a single input matrix:
-  single_input_matrix <- list(
-    matrix = do.call(what = cbind, args = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(x) x$matrix)),
-    ordering = unname(obj = do.call(what = c, args = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(x) x$ordering))),
-    weights = unname(obj = do.call(what = c, args = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(x) x$character_weights))),
-    minima = unname(obj = do.call(what = c, args = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(x) x$minimum_values))),
-    maxima = unname(obj = do.call(what = c, args = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(x) x$maximum_values)))
-  )
-  
-  # Above needs to deal with actual stepmatrices:
-  
-  full_output <- lapply(X = as.list(1:ncol(x = single_input_matrix$matrix)), FUN = function(x) reconstruct_ancestral_states(tree = tree, tip_states = single_input_matrix$matrix[, x], stepmatrix = "unordered", weight = single_input_matrix$weights[x], inapplicables_as_missing = inapplicables_as_missing))
   
   
-  tree_length <- do.call(what = sum, args = lapply(X = full_output, FUN = function(x) x$length))
+  
+  
   
   
 
@@ -297,7 +340,7 @@ calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missi
 
   
   # KEY THING HERE IS ALLOWS POLYMORPHISMS AT INTERNAL NODES!
-  # KEY QUESTION IS ARE THERE EVER CASES WHERE //ALL// POSSIBLE MPRS INCLUDEA POLYMORPHIC ANCESTOR?
+  # KEY QUESTION IS ARE THERE EVER CASES WHERE //ALL// POSSIBLE MPRS INCLUDE A POLYMORPHIC ANCESTOR?
   
   
   
@@ -328,7 +371,6 @@ calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missi
   # - RI?
   # - N reversals
   # - N parallelisms
-  # - Distortion index for each MPR
   # - Character map?
   # - MAKE THIS A CLASS TOO!
   
