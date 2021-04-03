@@ -39,10 +39,18 @@ print.stepMatrix <- function(x, ...) {
   if (!inherits(x = x, what = "stepMatrix")) stop("x must be an object of class \"stepMatrix\".")
   
   # If not a valid stepMatrix object then stop and provide feedback to user on what is wrong:
-  #if (!is.stepMatrix(x = x)) stop(check_taxonGroups(taxon_groups = x)[1])
+  #if (!is.stepMatrix(x = x)) stop(check_stepMatrix(stepmatrix = x)[1])
   
+  # Store separate version of matrix:
+  plain_matrix <- x
+  
+  # Remove stepMatrix class from matrix:
+  class(x = plain_matrix) <- NULL
+  
+  # Now can check for matrix symmetry and store:
+  matrix_symmetry <- ifelse(test = isSymmetric(object = plain_matrix), yes = "Symmetric", no = "Asymmetric")
   
   # Return summary information about object:
-  cat(paste0("taxonGroups object composed of ", length(x = x), " groups:"), "\n", unlist(x = lapply(X = as.list(x = names(x = x)), function(y) paste0(" ", y, paste0(rep(x = " ", times = max(x = nchar(x = names(x = x))) - nchar(x = y) + 1), collapse = ""), "(", length(x = x[[y]]), " taxa", format_taxon_names(x = x[[y]]), ")\n"))))
+  cat(paste0(matrix_symmetry, " stepMatrix object containing ", nrow(x = x), " unique states."))
   
 }
