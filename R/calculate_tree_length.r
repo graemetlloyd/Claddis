@@ -216,7 +216,7 @@ calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missi
     node_count <- tip_count + tree$Nnode
     
     # Initialise node_values matrix:
-    node_values <- matrix(data = NA, nrow = node_count, ncol = ncol(x = stepmatrix), dimnames = list(c(), colnames(stepmatrix)))
+    node_values <- matrix(data = NA, nrow = node_count, ncol = stepmatrix$size, dimnames = list(c(), colnames(stepmatrix)))
     
     # Begin by inserting Inf as default tip value:
     node_values[1:tip_count, ] <- Inf
@@ -234,7 +234,7 @@ calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missi
       descendants <- tree$edge[tree$edge[, 1] == needle, 2]
       
       # Calculate and store new node values:
-      node_values[needle, ] <- unlist(x = lapply(X = as.list(x = colnames(x = node_values)), FUN = function(fromstate) sum(x = unlist(x = lapply(X = as.list(x = descendants), FUN = function(descendant) min(x = node_values[descendant, ] + stepmatrix[fromstate, ]))))))
+      node_values[needle, ] <- unlist(x = lapply(X = as.list(x = colnames(x = node_values)), FUN = function(fromstate) sum(x = unlist(x = lapply(X = as.list(x = descendants), FUN = function(descendant) min(x = node_values[descendant, ] + stepmatrix$stepmatrix[fromstate, ]))))))
       
     }
     
@@ -279,7 +279,7 @@ calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missi
         node_estimates <- do.call(what = cbind, args = lapply(X = node_estimates, FUN = function(x) {
           
           # Get updated tree lengths for current node as per Swofford and Maddison 1992 second pass:
-          updated_tree_lengths <- stepmatrix[x[ancestor_node], ] + node_values[needle, ]
+          updated_tree_lengths <- stepmatrix$stepmatrix[x[ancestor_node], ] + node_values[needle, ]
           
           # Store all possible most parsimonious state(s) for current node:
           possible_states <- names(x = updated_tree_lengths[updated_tree_lengths == min(x = updated_tree_lengths)])
