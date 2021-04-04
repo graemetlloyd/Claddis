@@ -16,7 +16,7 @@ An object of class \code{stepMatrix} - a square stepmatrix with rows representin
 Takes an adjacency matrix as input and returns the corresponding stepmatrix.
 }
 \details{
-This function is intended for internal use, but as it also generalizes to solving any graph theory problem - generating a distance matrix corresponding to each shortest path between vertices of a connected graph represented as an adjacency matrix - it is made available explicitly here.
+This function is intended for internal use, but as it also generalizes to solving a general graph theory problem - generating a distance matrix corresponding to each shortest path between vertices of a connected graph represented as an adjacency matrix - it is made available explicitly here.
 
 The process is best understood with an example. Imagine we have a graph like this:
 
@@ -34,11 +34,17 @@ Note: here we assume symmetry, 0-1 = 1-0.
 
 Graphs like this can be explicitly captured as adjacency matrices, where a one denotes two vertices are "adjacent" (connected by an edge) and a zero that they are not.
 
-\preformatted{ |0|1|2|3|
-0|0|1|0|1|
-1|1|0|1|0|
-2|0|1|0|0|
-3|1|0|0|0|}
+\preformatted{    _________________
+    | 0 | 1 | 2 | 3 |
+---------------------
+| 0 | 0 | 1 | 0 | 1 |
+---------------------
+| 1 | 1 | 0 | 1 | 0 |
+---------------------
+| 2 | 0 | 1 | 0 | 0 |
+---------------------
+| 3 | 1 | 0 | 0 | 0 |
+---------------------}
 
 But what such matrices do not tell us is how far every vertex-to-vertex path is in terms of edge counts. E.g., the path length from vertex 3 to vertex 2.
 
