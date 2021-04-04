@@ -444,6 +444,9 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
   # Case if character is ordered:
   if (character_type == "ordered") {
     
+    # Store symmetry of stepmatrix as symmetric:
+    symmetry <- "Symmetric"
+    
     # If including polymorphisms:
     if (include_polymorphisms) {
       
@@ -502,6 +505,9 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
   # Case if character is unordered:
   if (character_type == "unordered") {
     
+    # Store symmetry of stepmatrix as symmetric:
+    symmetry <- "Symmetric"
+
     # If including polymorphisms:
     if (include_polymorphisms) {
       
@@ -569,6 +575,9 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
   # Case if character is Dollo:
   if (character_type == "dollo") {
     
+    # Store symmetry of stepmatrix as asymmetric:
+    symmetry <- "Asymmetric"
+
     # If including polymorphisms:
     if (include_polymorphisms) {
       
@@ -597,6 +606,9 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
   # Case if character is irreversible:
   if (character_type == "irreversible") {
     
+    # Store symmetry of stepmatrix as asymmetric:
+    symmetry <- "Asymmetric"
+
     # If including polymorphisms:
     if (include_polymorphisms) {
       
@@ -625,6 +637,9 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
   # Case if character is stratigraphy:
   if (character_type == "stratigraphy") {
     
+    # Store symmetry of stepmatrix as asymmetric:
+    symmetry <- "Asymmetric"
+
     # Add state names to ages:
     names(x = state_ages) <- min_state:max_state
     
@@ -639,10 +654,13 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
     
   }
   
+  # Create full stepmatrix object:
+  stepmatrix <- list(size = ncol(x = stepmatrix), stepmatrix = stepmatrix, symmetry = symmetry, includes_polymorphisms = include_polymorphisms)
+  
   # Set class of output as stepMatrix:
   class(stepmatrix) <- "stepMatrix"
   
-  # Return stepmatrx:
+  # Return stepmatrix:
   stepmatrix
   
 }
