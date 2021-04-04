@@ -29,7 +29,7 @@
 #'   polymorphism_distance = "great_circle"
 #' )
 #'
-#' # Show print.stepMatrix version of each included data sets:
+#' # Show print.stepMatrix version:
 #' print.stepMatrix(x = example_stepmatrix)
 #'
 #' @export print.stepMatrix
