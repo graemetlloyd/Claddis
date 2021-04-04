@@ -8,7 +8,7 @@
 #'
 #' @details
 #'
-#' Internatl Claddis function. Nothing to see here. Carry on.
+#' Internal Claddis function. Nothing to see here. Carry on.
 #'
 #' @return An error message or empty vector if no errors found.
 #'
