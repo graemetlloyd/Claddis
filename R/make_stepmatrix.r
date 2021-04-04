@@ -343,7 +343,7 @@
 #'
 #' @return
 #'
-#' An object of class \code{stepMatrix} - a square stepmatrix with rows representing "from" states, columns "to" states, and individual cells the cost in steps of that transition.
+#' An object of class \code{stepMatrix}.
 #'
 #' @seealso
 #'
@@ -480,7 +480,7 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
       }
       
       # Convert adjacency matrix to step matrix:
-      stepmatrix <- convert_adjacency_matrix_to_stepmatrix(adjacency_matrix = adjacency_matrix)
+      stepmatrix <- convert_adjacency_matrix_to_stepmatrix(adjacency_matrix = adjacency_matrix)$stepmatrix
       
       # Rescale such that adjacent single states are one step:
       stepmatrix <- stepmatrix / stepmatrix[1, 2]
@@ -655,7 +655,7 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
   }
   
   # Create full stepmatrix object:
-  stepmatrix <- list(size = ncol(x = stepmatrix), stepmatrix = stepmatrix, symmetry = symmetry, includes_polymorphisms = include_polymorphisms)
+  stepmatrix <- list(size = ncol(x = stepmatrix), type = character_type, stepmatrix = stepmatrix, symmetry = symmetry, includes_polymorphisms = include_polymorphisms)
   
   # Set class of output as stepMatrix:
   class(stepmatrix) <- "stepMatrix"

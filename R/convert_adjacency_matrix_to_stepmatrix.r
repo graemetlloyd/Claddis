@@ -46,7 +46,7 @@
 #'
 #' @return
 #'
-#' An object of class \code{stepMatrix} - a square stepmatrix with rows representing "from" states, columns "to" states, and individual cells the cost in steps of that transition (based on the minimum number of edges, i.e., the shortest path, between each pair of vertices).
+#' An object of class \code{stepMatrix}.
 #'
 #' @seealso
 #'
@@ -73,6 +73,9 @@ convert_adjacency_matrix_to_stepmatrix <- function(adjacency_matrix) {
   # TO DO:
   #
   # - Check that matrix is connected somehow (cannot solve all distances if not)
+  
+  # Check adjacency_matrix is symmetric and stop and warn user if not:
+  if (!isSymmetric(object = adjacency_matrix)) stop("adjacency_matrix must be symmetric. Fix and try again.")
   
   # Set initial stepmatrix as adjacency matrix:
   stepmatrix <- adjacency_matrix
@@ -114,8 +117,17 @@ convert_adjacency_matrix_to_stepmatrix <- function(adjacency_matrix) {
     
   }
   
+  # Store default character type as custom:
+  character_type <- "custom"
+  
+  # If adjacency matrix matches an unordered character (everything is adjacent) then store character type as such:
+  if (all(x = as.dist(m = adjacency_matrix) == 1)) character_type <- "unordered"
+  
+  # If adjacency matrix matches an ordered character (everything is adjacent) then store character type as such:
+  if (all(adjacency_matrix[c(2, cumsum(x = rep(x = matrix_size + 1, length.out = matrix_size - 2)) + 2)] == 1) && sum(adjacency_matrix) == ((2 * matrix_size) - 2)) character_type <- "unordered"
+  
   # Create full stepmatrix object:
-  stepmatrix <- list(size = ncol(x = stepmatrix), stepmatrix = stepmatrix, symmetry = "Symmetric", includes_polymorphisms = ifelse(test = length(x = grep(pattern = "&", x = colnames(x = stepmatrix))) > 0, yes = TRUE, no = FALSE))
+  stepmatrix <- list(size = ncol(x = stepmatrix), type = character_type, stepmatrix = stepmatrix, symmetry = "Symmetric", includes_polymorphisms = ifelse(test = length(x = grep(pattern = "&", x = colnames(x = stepmatrix))) > 0, yes = TRUE, no = FALSE))
 
   # Set class of output as stepMatrix:
   class(stepmatrix) <- "stepMatrix"

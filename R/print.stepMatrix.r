@@ -45,6 +45,6 @@ print.stepMatrix <- function(x, ...) {
   #if (!is.stepMatrix(x = x)) stop(check_stepMatrix(stepmatrix = x)[1])
   
   # Return summary information about object:
-  cat(paste0(x$symmetry, " stepMatrix object containing ", x$size, " unique states ", ifelse(test = includes_polymorphisms, yes = "(including polymorphic states)", no = ""), "."))
+  cat(paste0(x$symmetry, " ", x$type, " stepMatrix object containing ", x$size, " unique states", ifelse(test = x$includes_polymorphisms, yes = " (including polymorphic states)", no = ""), "."))
   
 }
