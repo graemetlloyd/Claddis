@@ -35,22 +35,16 @@
 #' @export print.stepMatrix
 print.stepMatrix <- function(x, ...) {
   
+  # ANOTHER USEFUL THING TO STATE IS WHETHER MATRIX CAN BE REPRESENTED AS AN ADJACENCY MATRIX?
+  # NEED FUNCTION TO CONVERT STEPMATRIX TO Q-MATRIX PARAMETERS? NOT ALL DOABLE, BUT SEEMS USEFUL IF APPLYING LIKELIHOOD ELSEWHERE IN CLADDIS
+  
   # Check x has class stepMatrix and stop and warn user if not:
   if (!inherits(x = x, what = "stepMatrix")) stop("x must be an object of class \"stepMatrix\".")
   
   # If not a valid stepMatrix object then stop and provide feedback to user on what is wrong:
   #if (!is.stepMatrix(x = x)) stop(check_stepMatrix(stepmatrix = x)[1])
   
-  # Store separate version of matrix:
-  plain_matrix <- x
-  
-  # Remove stepMatrix class from matrix:
-  class(x = plain_matrix) <- NULL
-  
-  # Now can check for matrix symmetry and store:
-  matrix_symmetry <- ifelse(test = isSymmetric(object = plain_matrix), yes = "Symmetric", no = "Asymmetric")
-  
   # Return summary information about object:
-  cat(paste0(matrix_symmetry, " stepMatrix object containing ", nrow(x = x), " unique states."))
+  cat(paste0(x$symmetry, " stepMatrix object containing ", x$size, " unique states ", ifelse(test = includes_polymorphisms, yes = "(including polymorphic states)", no = ""), "."))
   
 }
