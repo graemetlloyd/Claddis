@@ -123,6 +123,9 @@ convert_adjacency_matrix_to_stepmatrix <- function(adjacency_matrix) {
   # If adjacency matrix matches an unordered character (everything is adjacent) then store character type as such:
   if (all(x = as.dist(m = adjacency_matrix) == 1)) character_type <- "unordered"
   
+  # Calculate size of adjacency matrix:
+  matrix_size <- nrow(x = adjacency_matrix)
+  
   # If adjacency matrix matches an ordered character (everything is adjacent) then store character type as such:
   if (all(adjacency_matrix[c(2, cumsum(x = rep(x = matrix_size + 1, length.out = matrix_size - 2)) + 2)] == 1) && sum(adjacency_matrix) == ((2 * matrix_size) - 2)) character_type <- "unordered"
   
