@@ -42,7 +42,7 @@ print.stepMatrix <- function(x, ...) {
   if (!inherits(x = x, what = "stepMatrix")) stop("x must be an object of class \"stepMatrix\".")
   
   # If not a valid stepMatrix object then stop and provide feedback to user on what is wrong:
-  #if (!is.stepMatrix(x = x)) stop(check_stepMatrix(stepmatrix = x)[1])
+  if (!is.stepMatrix(x = x)) stop(check_stepMatrix(stepmatrix = x)[1])
   
   # Return summary information about object:
   cat(paste0(x$symmetry, " ", x$type, " stepMatrix object containing ", x$size, " unique states", ifelse(test = x$includes_polymorphisms, yes = " (including polymorphic states)", no = ""), "."))
