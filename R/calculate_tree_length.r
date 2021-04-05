@@ -188,6 +188,17 @@ calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missi
   )
   
   
+  
+  
+  
+  tree <- ape::read.tree(text = "((A,B),(C,(D,E)));")
+  tip_states <- c(A = 0, B = 1, C = 0, D = 2, E = 1)
+  stepmatrix <- make_stepmatrix(min_state = 0, max_state = 2, character_type = "ordered", include_polymorphisms = FALSE, polymorphism_shape = "hypersphere", polymorphism_distance = "great_circle")
+  weight <- 1
+  inapplicables_as_missing = FALSE
+
+
+
 
   reconstruct_ancestral_states <- function(tree, tip_states, stepmatrix, weight, inapplicables_as_missing = FALSE) {
     
@@ -216,7 +227,7 @@ calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missi
     node_count <- tip_count + tree$Nnode
     
     # Initialise node_values matrix:
-    node_values <- matrix(data = NA, nrow = node_count, ncol = stepmatrix$size, dimnames = list(c(), colnames(stepmatrix)))
+    node_values <- matrix(data = 0, nrow = node_count, ncol = stepmatrix$size, dimnames = list(c(), colnames(stepmatrix$stepmatrix)))
     
     # Begin by inserting Inf as default tip value:
     node_values[1:tip_count, ] <- Inf
@@ -227,6 +238,8 @@ calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missi
     # If any tips are missing then set all states for those as zero:
     if (any(x = is.na(x = tip_states))) node_values[which(x = is.na(x = tip_states)), ] <- 0
     
+    ### FORCE ROOT STATES IF ASKED TO:
+    
     # First pass (traverse tree from tips to root):
     for(needle in (tip_count + node_count - tip_count):(tip_count + 1)) {
       
@@ -234,8 +247,21 @@ calculate_tree_length <- function(tree, cladistic_matrix, inapplicables_as_missi
       descendants <- tree$edge[tree$edge[, 1] == needle, 2]
       
       # Calculate and store new node values:
-      node_values[needle, ] <- unlist(x = lapply(X = as.list(x = colnames(x = node_values)), FUN = function(fromstate) sum(x = unlist(x = lapply(X = as.list(x = descendants), FUN = function(descendant) min(x = node_values[descendant, ] + stepmatrix$stepmatrix[fromstate, ]))))))
-      
+      node_values[needle, ] <- apply(
+        X = rbind(
+          node_values[needle, ],
+          unlist(x = lapply(
+            X = as.list(x = colnames(x = node_values)),
+            FUN = function(fromstate) {
+              sum(x = unlist(x = lapply(
+                X = as.list(x = descendants),
+                FUN = function(descendant) min(x = node_values[descendant, ] + stepmatrix$stepmatrix[fromstate, ]))))
+            })
+          )
+        ),
+        MARGIN = 2,
+        FUN = max
+      )
     }
     
     # ADD OPTION TO FIX ROOT HERE (NAH, ALLOW OPTION TO FIX *ANY* NODE (OR COMBO OF NODES)
