@@ -182,13 +182,13 @@ write_tnt_matrix <- function(cladistic_matrix, file_name, add_analysis_block = F
       costs <- vector(mode = "character")
 
       # For each row state (from):
-      for (j in rownames(x = cladistic_matrix$topper$step_matrices[[i]])) {
+      for (j in rownames(x = cladistic_matrix$topper$step_matrices[[i]]$stepmatrix)) {
 
         # For each column state (to):
-        for (k in colnames(x = cladistic_matrix$topper$step_matrices[[i]])) {
+        for (k in colnames(x = cladistic_matrix$topper$step_matrices[[i]]$stepmatrix)) {
 
           # Add cost of j to k transition to costs vector:
-          costs <- c(costs, paste(j, ">", k, " ", cladistic_matrix$topper$step_matrices[[i]][j, k], sep = ""))
+          costs <- c(costs, paste(j, ">", k, " ", cladistic_matrix$topper$step_matrices[[i]]$stepmatrix[j, k], sep = ""))
         }
       }
 
@@ -198,7 +198,7 @@ write_tnt_matrix <- function(cladistic_matrix, file_name, add_analysis_block = F
       # Get hits (characters assigned to ith step matrix):
       hits <- which(x = ordering == names(cladistic_matrix$topper$step_matrices)[i])
 
-      # Add huts to global hits for all step matrices:
+      # Add hits to global hits for all step matrices:
       global_hits <- c(global_hits, hits)
 
       # Stop if no hits!:
@@ -214,7 +214,7 @@ write_tnt_matrix <- function(cladistic_matrix, file_name, add_analysis_block = F
     # Make step matrix block:
     stepmatrix_block <- paste(paste(c(all_step_matrix_lines, paste("ccode ( ", paste(sort(x = global_hits - 1), collapse = " "), ";", sep = "")), collapse = "\n"), "\n", sep = "")
 
-    # If no step matri(ces):
+  # If no step matri(ces):
   } else {
 
     # Create empty step matrix block:

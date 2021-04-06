@@ -929,7 +929,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   default_ordering <- "unordered"
   
   # If deafult ordering is specified, store it:
-  if (length(x = grep("DEFTYPE", toupper(raw_nexus))) > 0) default_ordering <- gsub(patttern = "ord", replacement = "ordered", x = strsplit(strsplit(raw_nexus[grep("deftype", raw_nexus, ignore.case = TRUE)], "DEFTYPE=|Deftype=|deftype=")[[1]][2], " ")[[1]][1])
+  if (length(x = grep("DEFTYPE", toupper(raw_nexus))) > 0) default_ordering <- gsub(pattern = "ord", replacement = "ordered", x = strsplit(strsplit(raw_nexus[grep("deftype", raw_nexus, ignore.case = TRUE)], "DEFTYPE=|Deftype=|deftype=")[[1]][2], " ")[[1]][1])
   
   # If default ordering is ordered then update ordering as "ordered":
   if (default_ordering == "ordered") ordering <- lapply(X = lapply(X = matrix_block_list, ncol), rep, x = "ordered")

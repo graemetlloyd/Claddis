@@ -177,9 +177,9 @@ write_nexus_matrix <- function(cladistic_matrix, file_name) {
   if (!is.list(cladistic_matrix$topper$step_matrices)) cladistic_matrix$topper$step_matrices <- list(NULL)
 
   # Create step matrix block:
-  stepmatrix_block <- paste(ifelse(!unlist(x = lapply(X = cladistic_matrix$topper$step_matrices, is.null)), paste(paste("\tUSERTYPE '", names(cladistic_matrix$topper$step_matrices), "' (STEPMATRIX) = ", unlist(x = lapply(X = cladistic_matrix$topper$step_matrices, ncol)), "\n", sep = ""), paste("\t", unlist(x = lapply(X = lapply(X = cladistic_matrix$topper$step_matrices, colnames), paste, collapse = " ")), "\n\t", sep = ""), unlist(x = lapply(X = lapply(X = lapply(X = cladistic_matrix$topper$step_matrices, function(x) {
-    diag(x = x) <- "."
-    return(x)
+  stepmatrix_block <- paste(ifelse(!unlist(x = lapply(X = cladistic_matrix$topper$step_matrices, is.null)), paste(paste("\tUSERTYPE '", names(cladistic_matrix$topper$step_matrices), "' (STEPMATRIX) = ", unlist(x = lapply(X = cladistic_matrix$topper$step_matrices, function(x) ncol(x = x$stepmatrix))), "\n", sep = ""), paste("\t", unlist(x = lapply(X = lapply(X = cladistic_matrix$topper$step_matrices, function(x) colnames(x = x$stepmatrix)), paste, collapse = " ")), "\n\t", sep = ""), unlist(x = lapply(X = lapply(X = lapply(X = cladistic_matrix$topper$step_matrices, function(x) {
+    diag(x = x$stepmatrix) <- "."
+    return(x$stepmatrix)
   }), apply, 1, paste, collapse = " "), paste, collapse = "\n\t")), "\n\t;\n", sep = ""), ""), collapse = "")
 
   # Get ordering of all characters in sequence:
