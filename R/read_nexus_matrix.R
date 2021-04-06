@@ -925,11 +925,11 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
     
   }
 
-  # Set default ordering as unord:
+  # Set default ordering as unordered:
   default_ordering <- "unordered"
   
   # If deafult ordering is specified, store it:
-  if (length(x = grep("DEFTYPE", toupper(raw_nexus))) > 0) default_ordering <- strsplit(strsplit(raw_nexus[grep("deftype", raw_nexus, ignore.case = TRUE)], "DEFTYPE=|Deftype=|deftype=")[[1]][2], " ")[[1]][1]
+  if (length(x = grep("DEFTYPE", toupper(raw_nexus))) > 0) default_ordering <- gsub(patttern = "ord", replacement = "ordered", x = strsplit(strsplit(raw_nexus[grep("deftype", raw_nexus, ignore.case = TRUE)], "DEFTYPE=|Deftype=|deftype=")[[1]][2], " ")[[1]][1])
   
   # If default ordering is ordered then update ordering as "ordered":
   if (default_ordering == "ordered") ordering <- lapply(X = lapply(X = matrix_block_list, ncol), rep, x = "ordered")
@@ -1023,6 +1023,9 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   
   # Convert any "Squared" ordering to "continuous" for continuous:
   ordering <- lapply(X = ordering, gsub, pattern = "Squared", replacement = "continuous", ignore.case = TRUE)
+  
+  # Convert any abbreviated ord or unord characters to ordered or unordered:
+  ordering <- lapply(X = ordering, gsub, pattern = "ord", replacement = "ordered", ignore.case = TRUE)
   
   # Look for any non-standard ordering (i.e., not cont, ord, unord, or Step_X):
   nonstandard_ordering <- setdiff(x = unique(x = unlist(x = ordering)), y = c("continuous", "ordered", "unordered", names(step_matrices)))
@@ -1201,6 +1204,22 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
     # Update weights:
     character_weights <- starting_weights
     
+  }
+  
+  # If stepmatrices exist they will need to be formatted correctly for Claddis:
+  if (is.list(x = step_matrices)) {
+    
+    # Reformat any stepmatrices in Claddis format (character type defaults to custom as cannot know for sure what other types might fit):
+    step_matrices <- lapply(X = step_matrices, function(x) {
+      matrix_size <- ncol(x = x)
+      matrix_labels <- colnames(x = x)
+      stepmatrix <- matrix(data = as.numeric(x = x), nrow = matrix_size, dimnames = list(matrix_labels, matrix_labels))
+      symmetry <- ifelse(test = isSymmetric(object = stepmatrix), yes = "Symmetric", no = "Asymmetric")
+      includes_polymorphisms <- ifelse(test = length(x = grep(pattern = "&", x = matrix_labels)) > 0, yes = TRUE, no = FALSE)
+      stepmatrix <- list(size = matrix_size, type = "custom", stepmatrix = stepmatrix, symmetry = symmetry, includes_polymorphisms = includes_polymorphisms)
+      class(stepmatrix) <- "stepMatrix"
+      stepmatrix
+    })
   }
   
   # Create top list:
