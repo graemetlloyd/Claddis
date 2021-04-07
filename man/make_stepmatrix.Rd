@@ -45,27 +45,27 @@ Stepmatrices encode the parsimony cost (number of evolutionary "steps") for each
 
 Although their usage is rare as explicit statements (see Hooker 2014 for an example), any character type (e.g., ordered, unordered, Dollo) can be expressed as a step matrix. These are always square, with rows and columns representing the same set of states that will typically reflect (but are not restricted to) the range of values observed in the data. Individual values represent the cost (in steps) of each transition, with the row value being the "from" state and the column value being the "to" state. By convention, the cost of going from any character to itself is zero and hence so is the diagonal of the matrix. An example stepmatrix for a three state unordered character would thus look like this:
 
-\preformatted{   -------------
-   | 0 | 1 | 2 |
-----------------
- 0 | 0 | 1 | 1 |
-----------------
- 1 | 1 | 0 | 1 |
-----------------
- 2 | 1 | 1 | 0 |
-----------------}
+\preformatted{    -------------
+    | 0 | 1 | 2 |
+-----------------
+| 0 | 0 | 1 | 1 |
+-----------------
+| 1 | 1 | 0 | 1 |
+-----------------
+| 2 | 1 | 1 | 0 |
+-----------------}
 
 Hence going from state 2 (third row) to state 1 (second column) reveals a cost of 1. Indeed, as this is an unordered character, \emph{any} off-diagonal value has the same cost of 1. By contrast an ordered matrix might look like this:
 
-\preformatted{   -------------
-   | 0 | 1 | 2 |
-----------------
- 0 | 0 | 1 | 2 |
-----------------
- 1 | 1 | 0 | 1 |
-----------------
- 2 | 2 | 1 | 0 |
-----------------}
+\preformatted{    -------------
+    | 0 | 1 | 2 |
+-----------------
+| 0 | 0 | 1 | 2 |
+-----------------
+| 1 | 1 | 0 | 1 |
+-----------------
+| 2 | 2 | 1 | 0 |
+-----------------}
 
 Now going from state 0 (first row) to state 2 (third column) costs 2 steps, as by implication this transition must pass through the intermediate state (1).
 
@@ -87,33 +87,33 @@ An unordered character, also known as a Fitch character (Fitch 1971), is one whe
 
 Under a Dollo assumption the acquisition of a \emph{derived} character state is considered to be sufficiently complex (biologically difficult) that in all probability it only occurred once. Even if lost later in evolution, it is considered that it cannot be reacquired. An example of this is the frequent loss of teeth in dinosaurs (Brocklehurst and Field 2021). Teeth were never reacquired in this group, with tooth-like serrations forming in many birds instead. Modelling such characters with a stepmatrix is challenging (indeed, it cannot truly been done with \emph{just} a stepmatrix - see below). The way it is typically done (Kitching et al. 1998) is to form the stepmatrix like this:
 
-\preformatted{   -------------------
-   |  0  |  1  |  2  |
-----------------------
- 0 |  0  |  1M |  2M |
-----------------------
- 1 |  1  |  0  |  1M |
-----------------------
- 2 |  2  |  1  |  0  |
-----------------------}
+\preformatted{    -------------------
+    |  0  |  1  |  2  |
+-----------------------
+| 0 |  0  |  1M |  2M |
+-----------------------
+| 1 |  1  |  0  |  1M |
+-----------------------
+| 2 |  2  |  1  |  0  |
+-----------------------}
 
-Where \code{M} is some arbitrary large number, set here using the \code{dollo_penalty} option. Note that \code{M} should still be finite as the purpose is to weight acquisitions such that they are sufficiently expensive that any most parsimonious reconstruction will favour only one, but not make them so expensive that they are not favoured at all. Furthermore, in this example there are twp derived states (1 and 2) and hence logically the weighting should be similar to an ordered character. Specifically, that there should be a single acquisition of state 1 (from state 0) and that this should precede a single acquistion of state 2 (from state 1). Most of the time, though, a Dollo character will be binary (e.g., see \link{map_dollo_changes}).
+Where \code{M} is some arbitrary large number, set here using the \code{dollo_penalty} option. Note that \code{M} should still be finite as the purpose is to weight acquisitions such that they are sufficiently expensive that any most parsimonious reconstruction will favour only one, but not make them so expensive that they are not favoured at all. Furthermore, in this example there are two derived states (1 and 2) and hence logically the weighting should be similar to an ordered character. Specifically, that there should be a single acquisition of state 1 (from state 0) and that this should precede a single acquistion of state 2 (from state 1). Most of the time, though, a Dollo character will be binary (e.g., see \link{map_dollo_changes}).
 
 Importantly, and as stated above, a Dollo stepmatrix, unlike the ordered and unordered stepmatrices, cannot be used without further analytical restrictions. Specifically, because it assumes an asymmetric acquisition of \emph{derived} states the root or "primitive" value must be 0. (It would not be logical to apply such a steoatrix where the root state is 1 or 2.) Thus use of a Dollo character requires the additional assumption that the primitive (root) state is known \emph{a priori}. As always, it is up to the user to know that this is a valid assumption for their data, and to set a value for the \code{dollo_penalty} accordingly.
 
 \emph{Irreversible (Camin-Sokal)} - \code{character_type = "irreversible"}
 
-Sometimes confused with a Dollo character, irreversible or Camin-Sokal (Camin and Sokal 1965) characters, do not allow for any reversals to a prior state once the derived state has been acquired. An irreversible stematrix might look like this:
+Sometimes confused with a Dollo character, irreversible or Camin-Sokal (Camin and Sokal 1965) characters, do not allow for any reversals to a prior state once the derived state has been acquired. An irreversible stepmatrix might look like this:
 
-\preformatted{   -------------------
-   |  0  |  1  |  2  |
-----------------------
- 0 |  0  |  1  |  2  |
-----------------------
- 1 | Inf |  0  |  1  |
-----------------------
- 2 | Inf | Inf |  0  |
-----------------------}
+\preformatted{    -------------------
+    |  0  |  1  |  2  |
+-----------------------
+| 0 |  0  |  1  |  2  |
+-----------------------
+| 1 | Inf |  0  |  1  |
+-----------------------
+| 2 | Inf | Inf |  0  |
+-----------------------}
 
 The upper triangle (representing gains) is the same as for an ordered character, but the lower triangle (representing losses, or reversals) will always be comprised of infinite costs (\code{Inf}), precluding their possibility in a most parsimonious reconstruction. Thus, in practice, any number of gains is allowed, but losses never are.
 
@@ -137,17 +137,17 @@ This is best illustrated with an example. Let's assume we have three states and 
 
 Note that the user needn't use midpoint (a first or last appearance date may be preferable). Indeeed, a simple unit count could be applied instead but this would then be identical to an irreversible character (except, perhaps, in the case of polymorphisms - see below).
 
-The use of stratigraphy as a character is probably not generally recommended, but is offered here for those that wish to explore stratocladistic methods that aim to incorporate stratigraphic information in phylogenetic inference and identify ancestor-descendant relationships (Fisher 1994).
+The use of stratigraphy as a character is probably not generally recommended, but is offered here for those that wish to explore stratocladistic methods that aim to incorporate stratigraphic information in phylogenetic inference and identify ancestor-descendant relationships (see Fisher 1994).
 
 As with the other asymmetric characters it is an additional assumption that the root represent 0 (the oldest sampled value).
 
 \emph{Other character types}
 
-Although no other character types are supported here, other forms of stepmatrix can of course exist (e.g., see those in Hooker 2014). These can still be used elsewhere in Claddis, but users must either generate them themselves or have them be specified within a \#NEXUS file imported into Claddis. Note that general advice is to always have the diagonal be zero and the off-diagonal values be positive, otherwise downstream use will typically be confounded.
+Although no other character types are supported here, other forms of stepmatrix can of course exist (e.g., see those in Hooker 2014). These can still be used elsewhere in Claddis, but users must either generate them themselves or have them be specified within a NEXUS file imported into Claddis. Note that general advice is to always have the diagonal be zero and the off-diagonal values be positive, otherwise downstream use will typically be confounded.
 
 \bold{Polymorphic characters}
 
-True polymorphisms represent perhaps the most complex problem for phylogenetic inference and ancestral state estimation (reconstruction), at least in part due to the varied nature their meaning can have (Swofford and Maddison 1992). For example, they may represent true variance within a species or composite variance in some higher taxon represented by a single OTU (something to be avoided if at all possible). Similarly, as different cladistic matrix formats do not necessarily allow the distinction between uncertainties and polymorphisms they can sometimes represent the former even though their encoding suggest the latter. For example, TNT (Goloboff et al. 2008; Goloboff and Catalano 2016) conflates the two with a single representation within square brackets, [].
+True polymorphisms represent perhaps the most complex problem for phylogenetic inference and ancestral state estimation (reconstruction), at least in part due to the varied nature their meaning can have (Swofford and Maddison 1992). For example, they may represent true variance within a species or composite variance in some higher taxon represented by a single OTU (something to be avoided if at all possible). Similarly, as different cladistic matrix formats do not necessarily allow the distinction between uncertainties and polymorphisms they can sometimes represent the former even though their encoding suggest the latter. For example, TNT (Goloboff et al. 2008; Goloboff and Catalano 2016) conflates the two with a single representation using square brackets, [].
 
 Misrepresenting true polymorphisms as uncertainties leads to incorrect estimates of the amount of evolution (tree length under parsimony; Nixon and Davis 1991) and disallows, potentially inappropriately, polymorphic values as ancestral state estimates (reconstructions). Hence, it can be argued polymorphic combinations should also be considered in stepmatrices, too (e.g., Maddison and Maddison 1987). This is allowed here (\code{include_polymorphisms = TRUE}), but is only approprate for some specific character types which we can consider in turn below.
 
@@ -215,7 +215,7 @@ Thus, 0&1&2 is neither uniquely optimal, nor amongst the optimal solutions. In f
 |   0&1&2   |   3   |
 ---------------------}
 
-Indeed, we would never favour any polymorphism here. Thus to allow for 0&1&2 to be optimal we must consider other "shapes" for our polymorphism space. This function offers two alternatives: 1. the simplex (the hyperdimensional equivalent of an equilateral triangle), and 2. the hypersphere (the hyperdimensional equivalent of the circle). These two shapes also imply their own distance measures (Euclidean and Great Circle, respectively). Both extend to any dimension as required and both have the critical property of bringing the coordinates of polymorphic combinations closer to the origin and hence making them more plausible candidates under the parsimony criterion.
+Indeed, we would never favour any polymorphism here. Thus to allow for 0&1&2 to be optimal we must consider other "shapes" for our polymorphism space. This function offers two alternatives: 1. the simplex (the hyperdimensional equivalent of an equilateral triangle), and 2. the hypersphere (the hyperdimensional equivalent of the circle). These two shapes also imply their own distance measures (Euclidean and Great Circle, respectively). Both extend to any dimension as required and both have the critical property of bringing the coordinates of polymorphic combinations closer to the origin, i.e., closer to the single state values, and hence making them more plausible candidates under the parsimony criterion.
 
 For the simplex (\code{polymorphism_shape = "simplex"}) the single states represent the vertices, with double states (e.g., 0&1) plotting midway along edges. More specifically, coordinates will always sum to one, e.g., for our three-state scenario, state 1 (0 + 1 + 0 = 1), state 1&2 (0 + 1/2 + 1/2 = 1), and state 0&1&2 (1/3 + 1/3 + 1/3 = 1), hence this is how they are assigned. Transition costs are then best considered as the Euclidean distances (\code{polymorphism_distance = "euclidean"}) between points. Repeating our scenario above this would lead to the following costs for each candidate for ancestor X (distances given to 1dp):
 
@@ -232,7 +232,7 @@ For the simplex (\code{polymorphism_shape = "simplex"}) the single states repres
 |   0&1&2   |  1.7  |
 ---------------------}
 
-For the hypersphere (\code{polymorphism_shape = "hypersphere"}) the single states represent the vertices, with double states (e.g., 0&1) plotting midway along the great circle linking them (i.e., the surface of a hypersphere). Now coordinates are given as the square root of 1/N along each axis the state is present on (0 if absent), and where N is the number of states present in the polymorphism. Thus, 0&2 would be given as sqrt(1/2), 0, sqrt(1/2). Transition costs are now best considered as the equivalent of a Great Circle distance - the shortest distance across the surface of the hypersphere (\code{polymorphism_distance = "great_circle"}) between two points. Repeating our scenario above again this would lead to the following costs for each candidate for ancestor X (distances given to 1dp):
+For the hypersphere (\code{polymorphism_shape = "hypersphere"}) the single states represent the vertices, with double states (e.g., 0&1) plotting midway along the great circle linking them (i.e., across the surface of a hypersphere). Now coordinates are given as the square root of 1/N along each axis the state is present on (0 if absent), and where N is the number of states present in the polymorphism. Thus, 0&2 would be given as sqrt(1/2), 0, sqrt(1/2). Transition costs are now best considered as the equivalent of a Great Circle distance - the shortest distance across the surface of the hypersphere (\code{polymorphism_distance = "great_circle"}) between two points. Repeating our scenario above again this would lead to the following costs for each candidate for ancestor X (distances given to 1dp):
 
 \preformatted{---------------------
 | Ancestral | Total |
@@ -249,7 +249,7 @@ For the hypersphere (\code{polymorphism_shape = "hypersphere"}) the single state
 
 Note that this makes every candidate equally plausible, save 0&1&2 which is the uniquely maximally optimal solution.
 
-No recommendation is made here on which of these shape-distance combinations is "best", rather they are offered as potentially superior alternatives for a given situation. Note also, that although it is assumed the user will want to match the shape and distance as suggested above there are no restrictions preventing other combinations.
+No recommendation is made here on which of these shape-distance combinations is "best", rather they are offered as potentially superior alternatives for a given situation. Note, also, that although it is assumed the user will want to match the shape and distance as suggested above there are no restrictions preventing other combinations being used instead.
 
 \emph{Ordered polymorphisms}
 
@@ -295,7 +295,7 @@ However, it is less obvious what to do with the "non-intermediate" polymorphisms
 | 0&1&2 |  1  |  1  |  1  | 0.5 | 0.5 | 0.5 |   0   |
 -----------------------------------------------------}
 
-Note that in practical terms the function generates such stepmatrices by first establishing an adjacency matrix (which siwtches are reachable from the current state?) and then converting these to stepmatrices using the \link{convert_adjacency_matrix_to_stepmatrix} function.
+Note that in practical terms the function generates such stepmatrices by first establishing an adjacency matrix (which switches are reachable from the current state?) and then converting these to stepmatrices using the \link{convert_adjacency_matrix_to_stepmatrix} function.
 
 \emph{Dollo and irreversible polymorphisms}
 
@@ -307,7 +307,7 @@ The stratigraphic case may seem like it ought to follow the same rule as irrever
 
 \emph{Polymorphism limits}
 
-Even where polymorphisms may be appropriate (i.e., for some ordered and unordered characters) they still represent a major increase to stepmatrix size that can cause memory limits to be hit far in advance of stepmatrices that exclude them. Specifically, and as shown in our hypercube example, there will be as many possible states as N^2 - 1, where N is the number of single states and the minus one indicates the exclusion of the origin value. Thus the size of any stepmatrix required grows very quickly:
+Even where polymorphisms may be appropriate (i.e., for some ordered and unordered characters) they still represent a major increase to stepmatrix size that can cause memory limits to be hit far in advance of stepmatrices that exclude them. Specifically, and as shown in our hypercube example, there will be as many possible states as N^2 - 1, where N is the number of single states and the minus one indicates the exclusion of the origin value. Thus the size of stepmatrix required grows very quickly:
 
 \preformatted{------------------------------
 | N states | Stepmatrix size |
@@ -327,11 +327,11 @@ Even where polymorphisms may be appropriate (i.e., for some ordered and unordere
 |    14    |  16383 x 16383  |
 ------------------------------}
 
-Because of this the function will become extremely slow for these higher values and indeed here is hard-capped at no more than fourteen states. Consequently any gap-weighted characters are also most likely inappropriate for polymorphism use.
+Because of this, the function will become extremely slow for these higher values and, indeed, here is hard-capped at no more than fourteen states. Consequently any gap-weighted characters are also most likely inappropriate for polymorphism use.
 
 \bold{Character weights}
 
-Note that here here any stepmatrix (save the stratigraphic kind) is rescaled such that the "base weight" - which can be thought of as the lowest single state to single state transition possible (excluding the diagonal) - is set to 1. However, users may also wish to weight individual characters differently. It may be tempting, then, to simply multiply the values of each stepmatrix by that weight for use elsewhere. This is discouraged, however, as: 1. Other Claddis functions and data matrix data structures allow for weights to be encoded elsewhere (this would be at best redundant and at worst incorrect, if weights get applied twice), and 2. This can lead to confounded results in some cases. For example, if weighting a character zero to exclude it from an analysis any ancestral state estimation would become equally likely, meaning (inadvertently) large numbers of redundant calculations get made. In short, do not weight steomatrices direcrtly, but use the weights component of each matrix block in a \code{cladisticMatrix} object instead.
+Note that here any stepmatrix (save the stratigraphic kind) is rescaled such that the "base weight" - which can be thought of as the lowest single state to single state transition possible (excluding the diagonal) - is set to 1. However, users may also wish to weight individual characters differently. It may be tempting, then, to simply multiply the values of each stepmatrix by that weight for use elsewhere. This is discouraged, however, as: 1. Other Claddis functions and data matrix data structures allow for weights to be encoded elsewhere (this would be at best redundant and at worst incorrect, if weights get applied twice), and 2. This can lead to confounded results in some cases. For example, if weighting a character zero to exclude it from an analysis any ancestral state estimation would become equally likely, meaning (inadvertently) large numbers of redundant calculations get made. In short, do not weight steomatrices directly, but use the weights component of each matrix block in a \code{cladisticMatrix} object instead.
 
 \bold{Relation to Q-matrices}
 
