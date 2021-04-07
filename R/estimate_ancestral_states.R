@@ -152,7 +152,7 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
   # Get vector of character numbers where all values are NA:
   dataless_characters <- which(x = apply(cladistic_matrix, 2, function(x) all(is.na(x))))
 
-  # Look for all missing characters and stop and wanr user if found:
+  # Look for all missing characters and stop and warn user if found:
   if (!all_missing_allowed && length(x = dataless_characters) > 0) stop(paste0("The following characters are coded as missing across all tips: ", paste0(dataless_characters, collapse = ", "), ". This can arise either because of the input data (in which case it is recommended that the user prune these characters using prune_cladistic_matrix) or because of the chosen options for inapplicables_as_missing, polymorphism_behaviour, and/or uncertainty_behaviour (in which case the user may wish to chose different values for these)."))
 
   # Convert tip states into a list:
