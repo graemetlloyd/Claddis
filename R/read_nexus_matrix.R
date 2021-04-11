@@ -831,7 +831,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   if (any(unlist(x = lapply(X = row_names, duplicated)))) stop(paste("The following taxon name(s) are duplicated:", paste(unlist(x = row_names)[which(x = unlist(x = lapply(X = row_names, duplicated)))], collapse = ", "), ". Rename so that all taxon names are unique.", sep = ""))
   
   # Check names match across matrix blocks and stop and warn if not:
-  if (length(x = unlist(x = lapply(X = row_names, setdiff, unique(x = unlist(x = row_names))))) > 0) stop(paste("Taxa do no match across matrx blocks. Check the following names:", paste(unlist(x = lapply(X = row_names, setdiff, unique(x = unlist(x = row_names)))), collapse = ", "), ".", sep = ""))
+  if (length(x = unlist(x = lapply(X = row_names, setdiff, unique(x = unlist(x = row_names))))) > 0) stop(paste("Taxa do no match across matrix blocks. Check the following names:", paste(unlist(x = lapply(X = row_names, setdiff, unique(x = unlist(x = row_names)))), collapse = ", "), ".", sep = ""))
   
   # Store taxon names:
   taxon_names <- unique(x = unlist(x = row_names))
@@ -1024,8 +1024,12 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   # Convert any "Squared" ordering to "continuous" for continuous:
   ordering <- lapply(X = ordering, gsub, pattern = "Squared", replacement = "continuous", ignore.case = TRUE)
   
-  # Convert any abbreviated ord or unord characters to ordered or unordered:
-  ordering <- lapply(X = ordering, gsub, pattern = "ord", replacement = "ordered", ignore.case = TRUE)
+  # Catch any remaining abbreviated character types:
+  ordering <- lapply(X = ordering, function(x) {
+    if (any(x == "ord")) x[x == "ord"] <- "ordered"
+    if (any(x == "unord")) x[x == "unord"] <- "unordered"
+    x
+  })
   
   # Look for any non-standard ordering (i.e., not cont, ord, unord, or Step_X):
   nonstandard_ordering <- setdiff(x = unique(x = unlist(x = ordering)), y = c("continuous", "ordered", "unordered", names(step_matrices)))
