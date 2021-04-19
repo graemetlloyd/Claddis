@@ -13,14 +13,14 @@ make_all_polymorphisms(single_states)
 A vector of all possible polymorphic (and non-polymorphic) states.
 }
 \description{
-Given a set of discrete states will generate all possibly polymorphic comibinations of those states.
+Given a set of discrete states will generate all possible polymorphic combinations of those states.
 }
 \details{
 This function solves a simple phylogenetic combinatorics problem - what are all the possible outcomes for a character to be in given polymorphisms (of any size) are allowed?
 
-For example, for three states (0, 1, 2) there are seven possible states: 0, 1, 2, 0&1, 0&2, 1&2 and 0&1&2.
+For example, for three states (0, 1, 2) there are seven possible states inclusive of polymorphisms: 0, 1, 2, 0&1, 0&2, 1&2 and 0&1&2.
 
-If the user is instead only interested in the size of this state space this is simply given by 2^N - 1, where N is the number of single states. Thus, the first several outcomes are:
+If the user is instead only interested in the size of this state space, this is simply given by 2^N - 1, where N is the number of single states. Thus, the first several outcomes are:
 
 \preformatted{----------------------------------
 | N states | N possible outcomes |
