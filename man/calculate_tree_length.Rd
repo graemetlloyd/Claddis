@@ -2,10 +2,10 @@
 % Please edit documentation in R/calculate_tree_length.r
 \name{calculate_tree_length}
 \alias{calculate_tree_length}
-\title{Reconstruct ancestral states using parsimony}
+\title{Calculates the parsimony length of a set of phylogenetic tree(s)}
 \usage{
 calculate_tree_length(
-  tree,
+  trees,
   cladistic_matrix,
   inapplicables_as_missing = FALSE,
   include_polymorphisms,
@@ -16,11 +16,11 @@ calculate_tree_length(
 )
 }
 \arguments{
-\item{tree}{A tree (phylo object).}
+\item{trees}{A tree (phylo object) or set of trees (multiPhylo object).}
 
 \item{cladistic_matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}. These should be discrete with labels matching the tip labels of \code{tree}.}
 
-\item{inapplicables_as_missing}{Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default).}
+\item{inapplicables_as_missing}{Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).}
 
 \item{include_polymorphisms}{Argument passed to \link{make_stepmatrix}.}
 
@@ -40,26 +40,23 @@ A list with multiple components, including:
 \item{input_tree}{The input topology used.}
 }
 \description{
-Given a tree, discrete states for each tip, and either a specific stepmatrix or character type, returns the most parsimonious ancestral reconstruction(s).
+Given a tree, or set of trees, and a cladistic matrix returns their parsimony length in number of steps.
 }
 \details{
-Can be used to infer ancestral states or get tree lengths (could theoretically buol a tree inference procedure around this by proposing different topologies, but ikely to be much slower than compiled software). Also a first step to generating character maps that can be used for plotting changes on a tree, performing rate analysis (see \link{test_rates}), or generating phylomorphospaces (not implemented yet).
+Under the maximum parsimony criterion, a phylogenetic hypothesis is considered optimal if it requires the fewest number of evolutionary "steps". In order to evalulate this criterion we must therefore be able to calculate a tree's "length" (total steps assuming the fewest possible steps for every character used). Given a set of phylogenetic hypothes(es) and a cladistic matrix this function calculates the minimum length of each tree.
 
-\bold{Input}
+\bold{Input data format}
 
-To use this function data must first be in the correct format.
+This function operates on a phylogenetic tree, or trees (in \code{ape} format), and a cladistic matrix (in \link{cladisticMatrix} format [UPDATE]). However, the algorithm used is based on the genralised stepmatrix approach of Swofford and Maddison (1992) and hence stepmatrices need to be defined for each character (this is done internally by calling \link{make_stepmatrix}), and some of the options are merely passed to this function.
 
-- Tree
-- Cladistic matrix (currently tip_states)
+\bold{Algorithm}
 
-\bold{Options}
+Technically the Swofford and Maddison (1992) algorithm is designed for ancestral state reconstruction, but as its' first pass of the tree assigns lengths for each possible state at each node the minimum value at the root is the tree length and hence by skipping the later steps this can be used as a tree length algorithm. The choice of the Swofford and Maddison algorithm, rather than the Wagner or Fitch algorithms (for ordered and unordered characters, respectively) is to generalize to the broadest range of character types, including asymmetric characters (Camin-Sokal, Dollo, stratigraphic), custom character types (specified using stepmatrices or character state trees), as well as to any resolution of tree (i.e., including multifurcating trees). The only restriction here is that the tree must be rooted such that time's arrow is explicitly present. This is essential as the root defines the lengths across the whole tree, but also for asymmetric characters directionality must be explicit. The two obvious downsides to this algorithm is that it can be slower and that it is not appropriate for unrooted trees.
 
-Come in two forms, those implicit (as decided by values in cladisticmatrix) and explicit to this function.
+\bold{Stepmatrices and stepmatrix options}
 
-\emph{Implicit options}
-
-- Stepmatrix
-- Weight (only affects tree length) - defaults to one as this is typical value used. This can disappear once cladistic matrix is input.
+Stepmatrices are described in detail in the \link{make_stepmatrix} manual, as are the options that are passed from this function to that one.
+Can be used to infer ancestral states or get tree lengths (could theoretically build a tree inference procedure around this by proposing different topologies, but ikely to be much slower than compiled software). Also a first step to generating character maps that can be used for plotting changes on a tree, performing rate analysis (see \link{test_rates}), or generating phylomorphospaces (not implemented yet).
 
 \emph{Explicit options}
 
@@ -103,11 +100,6 @@ Another advantage of the Swofford and Maddison (1992) approach is that it does n
 MISSING DATA (NA) IS DEALT WITH BY SETTING ALL TIP VALUES FOR A MISSING STATE TO ZERO (AS PER SWOFFORD AND MADDISON 1992).
 UNCERTAIN STATES (E.G., 0/1) CONSTRAIN ANCESTRAL STATES SLIGHTLY MORE THAN NA (ASSUMING THEY EXCLUDE SOME STATES. IMPLEMENTATION SAME AS SWOFFORD AND MADDISON (1992).
 CALCULATES TREE LENGTHS!
-
-ASYMMETRIC TRANSITIONS REQUIRE YOU TO KNOW POLARITY A PRIORI!
-HOW TO TREAT POLYTOMIES? MANY ISSUES RAISED IN SWOFFORD AND MADDISON (1992). ALTERNATIVE APPROACH IN LIKELIHOOD SUGGESTED BY REVELL.
-
-Users may also wish to refer to the more complex whole-matrix, likelihood-based function \link{estimate_ancestral_states}. Although, note that eventually parsimony will simply be an option to that function.
 }
 \examples{
 
@@ -119,11 +111,15 @@ tree <- ape::read.tree(
   Elmisauridae,(Compsognathus,(Ornitholestes,Microvenator,Caenagnathidae,
   (Deinonychosauria,Avialae))))))))));"
 )
-inapplicables_as_missing = FALSE
 calculate_tree_length(
   tree = tree,
-  cladistic_matrix,
-  inapplicables_as_missing = FALSE
+  cladistic_matrix = cladistic_matrix,
+  inapplicables_as_missing = FALSE,
+  include_polymorphisms = FALSE,
+  polymorphism_shape = "hypersphere",
+  polymorphism_distance = "great_circle",
+  state_ages = c(),
+  dollo_penalty = 999
 )
 
 }
@@ -133,7 +129,7 @@ Lloyd, G. T., 2018. Journeys through discrete-character morphospace: synthesizin
 Swofford, D. L. and Maddison, W. P., 1992. Parsimony, character-state reconstructions, and evolutionary inferences. \emph{In} R. L. Mayden (ed.) Systematics, Historical Ecology, and North American Freshwater Fishes. Stanford University Press, Stanford, p187-223.
 }
 \seealso{
-\link{estimate_ancestral_states}
+\link{make_stepmatrix}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
