@@ -107,9 +107,15 @@
 #'
 #' A list with multiple components, including:
 #'
-#' \item{length}{The tree length (number of steps).}
-#' \item{most_parsimonious_reconstructions}{A matrix where rows correspond to \emph{all} nodes (i.e., terminal and internal) in the order numbered by \code{ape}, and columns correspond to every unique most parsimonious reconstruction. I.e., if there is only one most parsimonious reconstruction there will be only one column.}
-#' \item{input_tree}{The input topology used.}
+#' \item{input_trees}{The tree(s) used as input.}
+#' \item{input_matrix}{The raw (unmodified) \code{cladistic_matrix} input.}
+#' \item{input_options}{The various input options used. Output for use by downstream functions, such as ancestral state estimation and stochastic character mapping.}
+#' \item{stepmatrices}{The stepmatrices (one for each character) used. These are typically generated automatically by the funcion, but are output here for later use in ancestral state estimation and stochastic character mapping functions.}
+#' \item{character_matrix}{The single character matrix object used. Essentially the \code{input_matrix} modified by the \link{input_options}.}
+#' \item{character_lengths}{A matrix of characters (rows) and trees (columns) with values indicating the number of steps. The column sums of this matrix are the \code{tree_lengths} values. This output can also be used for homoplasy metrics.}
+#' \item{character_weights}{A vector of the character weights used.}
+#' \item{tree_lengths}{The primary output - the length for each input tree in total steps.}
+#' \item{node_values}{The values (lengths for each state) for each node acrss trees and characters. This is used by \link{reconstruct_ancestral_states} for ancestral state reconstruction.}
 #'
 #' @seealso
 #'
