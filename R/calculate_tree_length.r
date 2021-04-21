@@ -645,3 +645,9 @@ reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_n
   
 }
 
+# HOMOPLASY FUNCTION
+# - Option to define outgroup (root state?) as will affect min steps value
+# - Otherwise need to do path both ways, e.g., 0->1->2 and 2->1->0 in case of asymmetric characters
+# - Keep check for variance as no changes at all if invariant.
+# - How to handle uncertainties?
+
