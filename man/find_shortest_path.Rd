@@ -14,15 +14,17 @@ find_shortest_path(stepmatrix, start, end)
 \item{end}{The end state of the requested path.}
 }
 \value{
-A vector of states describing a path in order from start to end.
+A vector of states describing one optimal path in the order \code{start} to \code{end}.
 }
 \description{
 Given a start and end state, returns the shortest path through a stepmatrix.
 }
 \details{
-A common problem in graph theory is identifying the shortest path to take between two vertices of a connected graph. A stepmatrix also describes a graph, with transition costs representing edge weights that can be asymmetric (e.g., going from 0 to 1 can have a different weight than going from 1 to 0). Finding the shortest path between states - i.e., the path that minimises total weiight (cost) - from a stepmatrix has two main applications in Claddis: 1. to check a stepmatrix is internally consistent (no cost is misidentified due to a "cheaper" route being available - solving a problem identified in MADDISON), and 2. to identify the minimum number of steps a character could have on a tree (an essential aspect of various homoplasy metrics, Hoyal Cuthill et al. 2010).
+A common problem in graph theory is identifying the shortest path to take between two vertices of a connected graph. A stepmatrix also describes a graph, with transition costs representing edge weights that can be asymmetric (e.g., going from 0 to 1 can have a different weight than going from 1 to 0). Finding the shortest path between states - i.e., the path that minimises total weight (cost) - from a stepmatrix has two main applications in Claddis: 1. to check a stepmatrix is internally consistent (no cost is misidentified due to a "cheaper" route being available - solving a problem identified in Maddison and Maddison 2003), and 2. to identify the minimum number of steps a character could have on a tree (an essential aspect of various homoplasy metrics, see Hoyal Cuthill et al. 2010).
 
 This function implements a slightly modified version of Dijkstra's algorithm (Dijkstra 1959) to deal with the special case of a cladistic-style stepmatrix. The core code is taken from \link[https://www.r-bloggers.com/2020/10/finding-the-shortest-path-with-dijkstras-algorithm/]{this} R-bloggers post.
+
+Note: if multiple equally optimal solutions are possible, the function will only return one of them. I.e., just because a solution is not presented it cannot be assumed it is suboptimal. For example, for any ordered character (of three or more states) there will always be multiple equally optimal solutions.
 }
 \examples{
 
@@ -56,9 +58,11 @@ find_shortest_path(
 Dijkstra, E. W., 1959. A note on two problems in connexion with graphs. \emph{Numerische Mathematik}, \bold{1}, 269–271.
 
 Hoyal Cuthill, J. F., Braddy, S. J. and Donoghue, P. C. J., 2010. A formula for maximum possible steps in multistate characters: isolating matrix parameter effects on measures of evolutionary convergence. \emph{Cladistics}, \bold{26}, 98-102.
+
+Maddison, D. R. and Maddison, W. P., 2003. \emph{MacClade 4: Analysis of phylogeny and character evolution}. Version 4.06. Sinauer Associates, Sunderland, Massachusetts.
 }
 \seealso{
-\link{make_all_polymorphisms}
+\link{convert_adjacency_matrix_to_stepmatrix}, \link{make_stepmatrix}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
