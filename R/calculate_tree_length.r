@@ -6,16 +6,9 @@
 #'
 #' @param trees A tree (phylo object) or set of trees (multiPhylo object).
 #' @param cladistic_matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}. These should be discrete with labels matching the tip labels of \code{tree}.
-
-# @param estimate_all_nodes Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).
-# @param estimate_tip_values Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).
-
 #' @param inapplicables_as_missing Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).
-
-# @param polymorphism_behaviour One of either "equalp" or "treatasmissing". MISSING, UNCERTAINTY, STEPMATRIX, PERDA
-# @param uncertainty_behaviour One of either "equalp" or "treatasmissing".
-
-#' @param include_polymorphisms Argument passed to \link{make_stepmatrix}.
+#' @param polymorphism_behaviour One of either "missing", "uncertainty", "polymorphism", or "random". See details.
+#' @param uncertainty_behaviour One of either "missing", "uncertainty", "polymorphism", or "random". See details.
 #' @param polymorphism_shape Argument passed to \link{make_stepmatrix}.
 #' @param polymorphism_distance Argument passed to \link{make_stepmatrix}.
 #' @param state_ages Argument passed to \link{make_stepmatrix}.
@@ -23,15 +16,15 @@
 #'
 #' @details
 #'
-#' Under the maximum parsimony criterion, a phylogenetic hypothesis is considered optimal if it requires the fewest number of evolutionary "steps". In order to evalulate this criterion we must therefore be able to calculate a tree's "length" (total steps assuming the fewest possible steps for every character used). Given a set of phylogenetic hypothes(es) and a cladistic matrix this function calculates the minimum length of each tree.
+#' Under the maximum parsimony criterion, a phylogenetic hypothesis is considered optimal if it requires the fewest number of evolutionary "steps". In order to evalulate this criterion we must therefore be able to calculate a tree's "length" (total steps assuming the fewest possible steps for every character used). Given a set of phylogenetic hypothes(es) and a cladistic matrix this function calculates the minimum length for each tree.
 #'
 #' \bold{Input data format}
 #'
-#' This function operates on a phylogenetic tree, or trees (in \code{ape} format), and a cladistic matrix (in \link{cladisticMatrix} format [UPDATE]). However, the algorithm used is based on the genralised stepmatrix approach of Swofford and Maddison (1992) and hence stepmatrices need to be defined for each character (this is done internally by calling \link{make_stepmatrix}), and some of the options are merely passed to this function.
+#' This function operates on a phylogenetic tree, or trees (in \code{ape} format), and a cladistic matrix (in \link{cladisticMatrix} format [UPDATE]). However, the algorithm used is based on the generalised stepmatrix approach of Swofford and Maddison (1992) and hence stepmatrices need to be defined for each character (this is done internally by calling \link{make_stepmatrix}), and some of the options are merely passed to this function.
 #'
 #' \bold{Algorithm}
 #'
-#' Technically the Swofford and Maddison (1992) algorithm is designed for ancestral state reconstruction, but as its' first pass of the tree assigns lengths for each possible state at each node the minimum value at the root is the tree length and hence by skipping the later steps this can be used as a tree length algorithm. The choice of the Swofford and Maddison algorithm, rather than the Wagner or Fitch algorithms (for ordered and unordered characters, respectively) is to generalize to the broadest range of character types, including asymmetric characters (Camin-Sokal, Dollo, stratigraphic), custom character types (specified using stepmatrices or character state trees), as well as to any resolution of tree (i.e., including multifurcating trees). The only restriction here is that the tree must be rooted such that time's arrow is explicitly present. This is essential as the root defines the lengths across the whole tree, but also for asymmetric characters directionality must be explicit. The two obvious downsides to this algorithm is that it can be slower and that it is not appropriate for unrooted trees.
+#' Technically the Swofford and Maddison (1992) algorithm is designed for ancestral state reconstruction, but as its' first pass of the tree assigns lengths for each possible state at each node the minimum value of these options at the root is also the tree length for that character and hence by skipping the later steps this can be used as a tree length algorithm by simply adding these values for each character. The choice of the Swofford and Maddison algorithm, rather than the Wagner or Fitch algorithms (for ordered and unordered characters, respectively) is to generalize to the broadest range of character types, including asymmetric characters (Camin-Sokal, Dollo, stratigraphic), custom character types (specified using stepmatrices or character state trees), as well as to any resolution of tree (i.e., including multifurcating trees - important for establishing maximum step counts for homoplasy indices). The only restriction here is that the tree must be rooted such that time's arrow is explicitly present. This is essential, as the root defines the lengths across the whole tree, but also for asymmetric characters directionality must be explicit. The two obvious downsides to this algorithm is that it can be slower and that it is not appropriate for unrooted trees.
 #'
 #' \bold{Stepmatrices and stepmatrix options}
 #'
@@ -40,14 +33,15 @@
 
 
 
+# Polymorphism options ("missing", "uncertainty", "polymorphism", or "random")
+# - Treat as uncertainty (undercounts changes, may affect ASR)
+# - Treat as missing (undercounts changes, may affect ASR)
+# - Treat as states (requires stepmatrix to cover possibilities)
 
 
-# MAKE A TREE-LENGTH FUNCTION (THAT HAPPENS TO EXPORT NODE VALUES)
-# THEN MAKE SEPARATE ANCESTRAL STATE RECONSTRUCTION FUNCTION THAT CALLS THIS OTHER FUNCTION
 
 
-
-#' Can be used to infer ancestral states or get tree lengths (could theoretically build a tree inference procedure around this by proposing different topologies, but ikely to be much slower than compiled software). Also a first step to generating character maps that can be used for plotting changes on a tree, performing rate analysis (see \link{test_rates}), or generating phylomorphospaces (not implemented yet).
+#' Can be used to infer ancestral states or get tree lengths (could theoretically build a tree inference procedure around this by proposing different topologies, but likely to be much slower than compiled software). Also a first step to generating character maps that can be used for plotting changes on a tree, performing rate analysis (see \link{test_rates}), or generating phylomorphospaces (not implemented yet).
 #'
 #' \emph{Explicit options}
 #'
@@ -87,6 +81,9 @@
 
 #' \bold{Polymorphic characters}
 #'
+#' Random is same as PERDA approach of Watanabe [ADD REF]
+
+
 
 #' # MANUAL: generalized (stepmatrix) solution as accounts for more possibilities
 #' # MANUAL: really only for rooted trees (unrooted possible using same methods (see Swofford and Maddison (1992), but unclear why you would want to do this with trees without direction of time (i.e., a root).
@@ -132,7 +129,8 @@
 #'   tree = tree,
 #'   cladistic_matrix = cladistic_matrix,
 #'   inapplicables_as_missing = FALSE,
-#'   include_polymorphisms = FALSE,
+#'   polymorphism_behaviour = "uncertainty",
+#'   uncertainty_behaviour = "uncertainty",
 #'   polymorphism_shape = "hypersphere",
 #'   polymorphism_distance = "great_circle",
 #'   state_ages = c(),
@@ -140,7 +138,7 @@
 #' )
 #'
 #' @export calculate_tree_length
-calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_missing = FALSE, include_polymorphisms, polymorphism_shape, polymorphism_distance, state_ages, dollo_penalty) {
+calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_missing = FALSE, polymorphism_behaviour, uncertainty_behaviour, polymorphism_shape, polymorphism_distance, state_ages, dollo_penalty) {
   
   # ADD CHECKS!
   # - is.tree/is.cladisticmatrix
@@ -168,15 +166,17 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
   
   
   
-  # Polymorphism options
-  # - Treat as uncertainty (undercounts changes, may affect ASR)
-  # - Treat as missing (undercounts changes, may affect ASR)
-  # - Treat as states (requires stepmatrix to cover possibilities)
-  
+  ### GONNA HAVE TO WORK OUT HOW TO SET THIS AUTOMATICALY?
+  ### IT IS HARD THOUGH AS NODE NUMBERS VARY ACROSS TREES! HMMMM.... MAYBE DEEP SIX THIS FOR NOW AND REYURN TO IT LATER?
+  ### ALSO NEEDS TO BE ADDED TO OUTPUT LATER SOMEHOW
+  ### MAYBE MAKE THIS A CLASS AND/OR "APPEND" IT TO A "phylo" CLASS OBJECT
+  node_constraints = NULL
+
   # If trees is a single topology then reformat as a list of length one:
   if (class(x = trees) == "phylo") trees <- list(trees)
   
-  ### CHECK CLASS IS CORRECT AT OUTPUT!
+  # Set include_polymorphisms for make_stepmatrix by polymorphism_behaviour or uncertainty_behaviour choice:
+  include_polymorphisms <- ifelse(test = polymorphism_behaviour == "polymorphism" || uncertainty_behaviour == "polymorphism", yes = TRUE, no = FALSE)
   
   # Combine all blocks into a single input matrix:
   single_input_matrix <- list(
@@ -187,6 +187,32 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
     maxima = unname(obj = do.call(what = c, args = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(x) x$maximum_values)))
   )
   
+  # If inapplicables are to be treated as missing:
+  if (inapplicables_as_missing) {
+    
+    # As long as inapplicables are found then convert them to NA:
+    if (any(x = single_input_matrix$matrix == "", na.rm = TRUE)) single_input_matrix$matrix[single_input_matrix$matrix == ""] <- NA
+    
+  }
+  
+  # If polymorphisms are present in the matrix:
+  if (length(x = grep(pattern = "&", x = single_input_matrix$matrix)) > 0) {
+    
+    if (polymorphism_behaviour == "missing") single_input_matrix$matrix[grep(pattern = "&", x = single_input_matrix$matrix)] <- NA
+    if (polymorphism_behaviour == "uncertainty") single_input_matrix$matrix[grep(pattern = "&", x = single_input_matrix$matrix)] <- gsub(pattern = "&", replacement = "/", x = single_input_matrix$matrix[grep(pattern = "&", x = single_input_matrix$matrix)])
+    if (polymorphism_behaviour == "random") single_input_matrix$matrix[grep(pattern = "&", x = single_input_matrix$matrix)] <- unlist(x = lapply(X = as.list(x = single_input_matrix$matrix[grep(pattern = "&", x = single_input_matrix$matrix)]), FUN = function(x) sample(x = strsplit(x = x, split = "&")[[1]], size = 1)))
+
+  }
+  
+  # If uncertainties are present in the matrix:
+  if (length(x = grep(pattern = "/", x = single_input_matrix$matrix)) > 0) {
+    
+    if (uncertainty_behaviour == "missing") single_input_matrix$matrix[grep(pattern = "/", x = single_input_matrix$matrix)] <- NA
+    if (uncertainty_behaviour == "polymorphism") single_input_matrix$matrix[grep(pattern = "/", x = single_input_matrix$matrix)] <- gsub(pattern = "/", replacement = "&", x = single_input_matrix$matrix[grep(pattern = "/", x = single_input_matrix$matrix)])
+    if (uncertainty_behaviour == "random") single_input_matrix$matrix[grep(pattern = "/", x = single_input_matrix$matrix)] <- unlist(x = lapply(X = as.list(x = single_input_matrix$matrix[grep(pattern = "/", x = single_input_matrix$matrix)]), FUN = function(x) sample(x = strsplit(x = x, split = "/")[[1]], size = 1)))
+    
+  }
+
   # Build character list:
   character_list <- lapply(
     X = as.list(x = 1:length(x = single_input_matrix$ordering)),
@@ -219,14 +245,12 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
   
   
   
-  #first_pass # Tree length and node values [OUTPUTS: length, node_values, tip_states_actually_used etc.)
-  #second_pass # All MPRs (OUTPUTS: all_mprs)
-  #third_pass # Missing/inapplicables applied to internal nodes (OUTPUTS: modified_mprs)
   
   
   # NEED DIFFERENT FUNCTION FOR CONTINUOUS CHARACTERS (AS STEPMATRIX MAKES LITTLE SENSE!).
+  # CAN USE asr_squared_change_parsimony in castor but does mean adding a dependency
   
-  first_pass <- function(tree, tip_states, stepmatrix, weight, inapplicables_as_missing = FALSE, node_constraints = NULL) {
+  first_pass <- function(tree, tip_states, stepmatrix, weight, node_constraints = NULL) {
     
     # Reorder tip states (1 to N) and store an unmodified version:
     pristine_tip_states <- tip_states <- tip_states[tree$tip.label]
@@ -236,9 +260,6 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
     
     # If there are no branch durations set these as all one:
     if (is.null(x = tree$edge.length[1])) tree$edge.length <- rep(x = 1, length.out = nrow(x = tree$edge))
-    
-    # If treating inapplicables as missing then replace any inapplicable tip state with NA:
-    if (inapplicables_as_missing) tip_states[tip_states == ""] <- NA
     
     # Reformat tip states as character vector:
     tip_states <- as.character(x = tip_states)
@@ -322,33 +343,12 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
     input_values <- list(tree = tree, tip_states = pristine_tip_states, stepmatrix = stepmatrix, weight = weight, inapplicables_as_missing = inapplicables_as_missing, node_constraints = node_constraints)
     
     # Return output:
-    list(length = tree_length, node_values = node_values, tip_values = tip_states, input_values = input_values)
+    list(length = tree_length, node_values = node_values)
     
-    ### DO NOT NEED TIP STATES IN ABOVE AS ALREADY USED TIP VALUES CAN BE STORED IN NODE VALUES!
-    ### DO THEY GET STORED PROPERLY???
   }
-  
-  
-  
-  #tree <- ape::read.tree(text = "((A,B),(C,(D,E)));")
-  #tip_states <- c(A = 0, B = 1, C = 0, D = 2, E = 1)
-  #stepmatrix <- make_stepmatrix(min_state = 0, max_state = 2, character_type = "ordered", include_polymorphisms = FALSE, polymorphism_shape = "hypersphere", polymorphism_distance = "great_circle")
-  #weight <- 1
-  #inapplicables_as_missing = FALSE
-  #node_constraints <- c("6" = "0", "9" = "1/2")
-  
-  #first_pass(tree, tip_states, stepmatrix, weight, inapplicables_as_missing = FALSE, node_constraints)
 
 
-
-
-
-
-
-  ### GONNA HAVE TO WORK OUT HOW TO SET THIS AUTOMATICALY?
-  node_constraints = NULL
-  
-
+  #
   trees_list <- lapply(
     X = trees,
     FUN = function(y) {
@@ -359,41 +359,55 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
           tip_states = x$tip_states,
           stepmatrix = x$stepmatrix,
           weight = x$weight,
-          inapplicables_as_missing = x$inapplicables_as_missing,
           node_constraints = node_constraints
         )
       )
     }
   )
   
-  # Return total tree length:
-  unlist(x = lapply(X = trees_list, FUN = function(y) do.call(what = sum, args = lapply(X = y, FUN = function(x) x$length))))
+  # Build matrix of individual character tree lengths for output:
+  character_lengths <- do.call(what = cbind, args = lapply(X = trees_list, FUN = function(y) unlist(x = lapply(X = y, FUN = function(x) x$length))))
   
-  ### NEED MORE STUFF IN OUTPUT!
-  # - Trees used
-  # - node values for MPR handling
+  # Return compiled output:
+  list(
+    input_trees = trees,
+    input_matrix = cladistic_matrix,
+    input_options = list(
+      inapplicables_as_missing = inapplicables_as_missing,
+      polymorphism_behaviour = polymorphism_behaviour,
+      uncertainty_behaviour = uncertainty_behaviour,
+      polymorphism_shape = polymorphism_shape,
+      polymorphism_distance = polymorphism_distance,
+      state_ages = state_ages,
+      dollo_penalty = dollo_penalty
+    ),
+    stepmatrices = lapply(X = character_list, FUN = function(x) x$stepmatrix),
+    character_matrix = single_input_matrix,
+    character_lengths = character_lengths,
+    character_weights = single_input_matrix$weights,
+    tree_lengths = apply(X = character_lengths, MARGIN = 2, FUN = sum),
+    node_values = lapply(X = trees_list, FUN = function(y) lapply(X = y, FUN = function(x) x$node_values))
+  )
+
 }
 
 #trees = ape::read.tree("http://www.graemetlloyd.com/mpts/Hooker_2014a.tre")
 #cladistic_matrix = Claddis::read_nexus_matrix("http://www.graemetlloyd.com/nexus/Hooker_2014a.nex")
 #inapplicables_as_missing = FALSE
-#include_polymorphisms = FALSE
+#polymorphism_behaviour = "uncertainty"
+#uncertainty_behaviour = "uncertainty"
 #polymorphism_shape = "hypersphere"
 #polymorphism_distance = "great_circle"
 #state_ages = c()
 #dollo_penalty = 999
 
-#calculate_tree_length(trees = trees, cladistic_matrix = cladistic_matrix, inapplicables_as_missing = inapplicables_as_missing, include_polymorphisms = include_polymorphisms, polymorphism_shape = polymorphism_shape, polymorphism_distance = polymorphism_distance, state_ages = state_ages, dollo_penalty = dollo_penalty)
-
+#calculate_tree_length(trees = trees, cladistic_matrix = cladistic_matrix, inapplicables_as_missing = inapplicables_as_missing, polymorphism_behaviour = "uncertainty", uncertainty_behaviour = "uncertainty", polymorphism_shape = polymorphism_shape, polymorphism_distance = polymorphism_distance, state_ages = state_ages, dollo_penalty = dollo_penalty)$tree_lengths
 
 
 
 # FIXING NODE VALUES RELATES TO ANCESTRY STATEMENTS TOO (EFFECTIVELY CAN BE USED TO ASSUME ANCESTOR - LINKS TO STRATOCLADISTICS)
 
 
-# TO ADD INTO NODE ESTIMATE VERSION OF FUNCTION:
-#estimate_all_nodes <- FALSE
-#estimate_tip_values <- FALSE # Should not happen for inapplicables when they are treated as inapplicables
 
 
 
@@ -437,7 +451,7 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
 # - Tip states used
 # - Tree lengths
 # - How root value was chosen (arbitrary forced, unambiguous?)
-# - Algorithm (parsimony, ML, etc.)
+# - Algorithm (parsimony, ML, etc.) - for later integration into single ASR function with other options (likelihood, rerooting etc.)
 # - CI? (Characters as vector then can do summed for matrix)
 # - RI? (Need to know max value which is just fit on star tree)
 # - N reversals (Will depend on root and "direction")
@@ -457,7 +471,7 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
 # INTERMEDIATES ARE GONNA MATTER IF MOVING TO CHARACTER MAPS. E.G., IF ONLY 0 AND 2 ARE SAMPLED BUT A CHARACTER IS ORDERED THEN THERE ARE TWO CHANGES ALONG THE BRANCH NOT ONE TWO-STEP CHANGE.
 # POLYMORPHISM APPROACH SHOULDN'T CONFOUND THE "NORMAL" BEHAVIOUR OF AN ORDERED OR UNORDERED CHARACTER.
 # TEST WEIGHTING OF STRATOCLADISTICS BY USING A STRATIGRAPHIC CHARACTER AND WEIGHTING IT MULTIPLE WAYS (AS A SLIDER) AND SHOW HOW IT EFFECTS PARSIMONY VS STRAT CONGRUENCE TREE LANDSCAPES
-
+# MONOFURCATIONS IDEA IN CASTOR IS INTERESTING AS ALLOWS POINT ESTIMATES ALONG BRANCHES (E.G., FOR SCM OF A CONTINUOUS CHARACTER)
 
 
 
@@ -474,13 +488,25 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
 #' Given a tree, or set of trees, and a cladistic matrix returns all most parsimonious reconstruction(s) for every character.
 #'
 #' @param trees A tree (phylo object) or set of trees (multiPhylo object).
-
-### OTHER PARAMATERS (MANY PASSED TO OTHER FUNCTIONS)
-
+#' @param cladistic_matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}. These should be discrete with labels matching the tip labels of \code{tree}.
+#' @param estimate_all_nodes Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).
+#' @param estimate_tip_values Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).
+#' @param inapplicables_as_missing Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).
+#' @param polymorphism_behaviour One of either "missing", "uncertainty", "polymorphism", or "random". See details.
+#' @param uncertainty_behaviour One of either "missing", "uncertainty", "polymorphism", or "random". See details.
+#' @param polymorphism_shape Argument passed to \link{make_stepmatrix}.
+#' @param polymorphism_distance Argument passed to \link{make_stepmatrix}.
+#' @param state_ages Argument passed to \link{make_stepmatrix}.
+#' @param dollo_penalty Argument passed to \link{make_stepmatrix}.
+#'
 #' @details
 #'
 #' Users may also wish to refer to the more complex whole-matrix, likelihood-based function \link{estimate_ancestral_states}. Although, note that eventually parsimony will simply be an option to that function.
 #'
+
+
+# REFERENCE castor asr_max_parsimony and phangorn acctran as alternates
+
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
 #' @references
@@ -502,9 +528,9 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
 #' # TO DO
 #'
 #' @export reconstruct_ancestral_states
-reconstruct_ancestral_states <- function(trees) {
+reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, polymorphism_behaviour = "uncertainty", uncertainty_behaviour = "uncertainty", polymorphism_shape, polymorphism_distance, state_ages, dollo_penalty) {
   
-  # COLLAPSE OPTIONS:
+  # COLLAPSE OPTIONS (MAYBE FOR ANOTHER FUNCTION?):
   # - ACCTRAN
   # - DELTRAN
   # - MINF (Swofford and Maddison 1987) - I THINK NOT!
@@ -512,7 +538,33 @@ reconstruct_ancestral_states <- function(trees) {
   # - MAXSTATE *shrug emoji*
   # - WEIGHTED BY BRANCH DURATION? (E.G., ((0:1,1:4)); SHOULD FAVOUR A 0 ROOT STATE). NEED WAY TO "SCORE" THESE SUCH THAT CAN FIND MPR WITH BEST SCORE.
   
+  # TO ADD INTO NODE ESTIMATE VERSION OF FUNCTION:
+  #estimate_all_nodes <- FALSE
+  #estimate_tip_values <- FALSE # Should not happen for inapplicables when they are treated as inapplicables
+
   # WILL NEED TO MODIFY BELOW TO DEAL WITH UNCERTAINTIES AND POLYMORPHISMS AT TIPS
+  
+  
+  
+  
+  tree_length_output <- calculate_tree_length(
+    trees = trees,
+    cladistic_matrix = cladistic_matrix,
+    inapplicables_as_missing = inapplicables_as_missing,
+    polymorphism_behaviour = polymorphism_behaviour,
+    uncertainty_behaviour = uncertainty_behaviour,
+    polymorphism_shape = polymorphism_shape,
+    polymorphism_distance = polymorphism_distance,
+    state_ages = state_ages,
+    dollo_penalty = dollo_penalty
+  )
+  
+  
+  # THEN:
+  # second_pass # All MPRs (OUTPUTS: all_mprs)
+  # third_pass # Missing/inapplicables applied to internal nodes (OUTPUTS: modified_mprs)
+
+
   
   # Build node estimates from single state results:
   node_estimates <- matrix(

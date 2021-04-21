@@ -8,7 +8,8 @@ calculate_tree_length(
   trees,
   cladistic_matrix,
   inapplicables_as_missing = FALSE,
-  include_polymorphisms,
+  polymorphism_behaviour,
+  uncertainty_behaviour,
   polymorphism_shape,
   polymorphism_distance,
   state_ages,
@@ -22,7 +23,9 @@ calculate_tree_length(
 
 \item{inapplicables_as_missing}{Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).}
 
-\item{include_polymorphisms}{Argument passed to \link{make_stepmatrix}.}
+\item{polymorphism_behaviour}{One of either "missing", "uncertainty", "polymorphism", or "random". See details.}
+
+\item{uncertainty_behaviour}{One of either "missing", "uncertainty", "polymorphism", or "random". See details.}
 
 \item{polymorphism_shape}{Argument passed to \link{make_stepmatrix}.}
 
@@ -43,20 +46,20 @@ A list with multiple components, including:
 Given a tree, or set of trees, and a cladistic matrix returns their parsimony length in number of steps.
 }
 \details{
-Under the maximum parsimony criterion, a phylogenetic hypothesis is considered optimal if it requires the fewest number of evolutionary "steps". In order to evalulate this criterion we must therefore be able to calculate a tree's "length" (total steps assuming the fewest possible steps for every character used). Given a set of phylogenetic hypothes(es) and a cladistic matrix this function calculates the minimum length of each tree.
+Under the maximum parsimony criterion, a phylogenetic hypothesis is considered optimal if it requires the fewest number of evolutionary "steps". In order to evalulate this criterion we must therefore be able to calculate a tree's "length" (total steps assuming the fewest possible steps for every character used). Given a set of phylogenetic hypothes(es) and a cladistic matrix this function calculates the minimum length for each tree.
 
 \bold{Input data format}
 
-This function operates on a phylogenetic tree, or trees (in \code{ape} format), and a cladistic matrix (in \link{cladisticMatrix} format [UPDATE]). However, the algorithm used is based on the genralised stepmatrix approach of Swofford and Maddison (1992) and hence stepmatrices need to be defined for each character (this is done internally by calling \link{make_stepmatrix}), and some of the options are merely passed to this function.
+This function operates on a phylogenetic tree, or trees (in \code{ape} format), and a cladistic matrix (in \link{cladisticMatrix} format [UPDATE]). However, the algorithm used is based on the generalised stepmatrix approach of Swofford and Maddison (1992) and hence stepmatrices need to be defined for each character (this is done internally by calling \link{make_stepmatrix}), and some of the options are merely passed to this function.
 
 \bold{Algorithm}
 
-Technically the Swofford and Maddison (1992) algorithm is designed for ancestral state reconstruction, but as its' first pass of the tree assigns lengths for each possible state at each node the minimum value at the root is the tree length and hence by skipping the later steps this can be used as a tree length algorithm. The choice of the Swofford and Maddison algorithm, rather than the Wagner or Fitch algorithms (for ordered and unordered characters, respectively) is to generalize to the broadest range of character types, including asymmetric characters (Camin-Sokal, Dollo, stratigraphic), custom character types (specified using stepmatrices or character state trees), as well as to any resolution of tree (i.e., including multifurcating trees). The only restriction here is that the tree must be rooted such that time's arrow is explicitly present. This is essential as the root defines the lengths across the whole tree, but also for asymmetric characters directionality must be explicit. The two obvious downsides to this algorithm is that it can be slower and that it is not appropriate for unrooted trees.
+Technically the Swofford and Maddison (1992) algorithm is designed for ancestral state reconstruction, but as its' first pass of the tree assigns lengths for each possible state at each node the minimum value of these options at the root is also the tree length for that character and hence by skipping the later steps this can be used as a tree length algorithm by simply adding these values for each character. The choice of the Swofford and Maddison algorithm, rather than the Wagner or Fitch algorithms (for ordered and unordered characters, respectively) is to generalize to the broadest range of character types, including asymmetric characters (Camin-Sokal, Dollo, stratigraphic), custom character types (specified using stepmatrices or character state trees), as well as to any resolution of tree (i.e., including multifurcating trees - important for establishing maximum step counts for homoplasy indices). The only restriction here is that the tree must be rooted such that time's arrow is explicitly present. This is essential, as the root defines the lengths across the whole tree, but also for asymmetric characters directionality must be explicit. The two obvious downsides to this algorithm is that it can be slower and that it is not appropriate for unrooted trees.
 
 \bold{Stepmatrices and stepmatrix options}
 
 Stepmatrices are described in detail in the \link{make_stepmatrix} manual, as are the options that are passed from this function to that one.
-Can be used to infer ancestral states or get tree lengths (could theoretically build a tree inference procedure around this by proposing different topologies, but ikely to be much slower than compiled software). Also a first step to generating character maps that can be used for plotting changes on a tree, performing rate analysis (see \link{test_rates}), or generating phylomorphospaces (not implemented yet).
+Can be used to infer ancestral states or get tree lengths (could theoretically build a tree inference procedure around this by proposing different topologies, but likely to be much slower than compiled software). Also a first step to generating character maps that can be used for plotting changes on a tree, performing rate analysis (see \link{test_rates}), or generating phylomorphospaces (not implemented yet).
 
 \emph{Explicit options}
 
@@ -93,6 +96,7 @@ Another advantage of the Swofford and Maddison (1992) approach is that it does n
 # Record in manual that weighted parsimony is folly, but could use to chose between MPRs (maybe?)
 \bold{Polymorphic characters}
 
+Random is same as PERDA approach of Watanabe [ADD REF]
 # MANUAL: generalized (stepmatrix) solution as accounts for more possibilities
 # MANUAL: really only for rooted trees (unrooted possible using same methods (see Swofford and Maddison (1992), but unclear why you would want to do this with trees without direction of time (i.e., a root).
 # MANUAL: works with multifurcations and doesn't require a fully bifurcating tree, but does assume polytomies are therefore "hard".
@@ -115,7 +119,8 @@ calculate_tree_length(
   tree = tree,
   cladistic_matrix = cladistic_matrix,
   inapplicables_as_missing = FALSE,
-  include_polymorphisms = FALSE,
+  polymorphism_behaviour = "uncertainty",
+  uncertainty_behaviour = "uncertainty",
   polymorphism_shape = "hypersphere",
   polymorphism_distance = "great_circle",
   state_ages = c(),
