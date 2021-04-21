@@ -4,10 +4,42 @@
 \alias{reconstruct_ancestral_states}
 \title{Determine maximum parsimony ancestral state reconstruction(s)}
 \usage{
-reconstruct_ancestral_states(trees)
+reconstruct_ancestral_states(
+  trees,
+  cladistic_matrix,
+  estimate_all_nodes = FALSE,
+  estimate_tip_values = FALSE,
+  inapplicables_as_missing = FALSE,
+  polymorphism_behaviour = "uncertainty",
+  uncertainty_behaviour = "uncertainty",
+  polymorphism_shape,
+  polymorphism_distance,
+  state_ages,
+  dollo_penalty
+)
 }
 \arguments{
 \item{trees}{A tree (phylo object) or set of trees (multiPhylo object).}
+
+\item{cladistic_matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}. These should be discrete with labels matching the tip labels of \code{tree}.}
+
+\item{estimate_all_nodes}{Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).}
+
+\item{estimate_tip_values}{Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).}
+
+\item{inapplicables_as_missing}{Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).}
+
+\item{polymorphism_behaviour}{One of either "missing", "uncertainty", "polymorphism", or "random". See details.}
+
+\item{uncertainty_behaviour}{One of either "missing", "uncertainty", "polymorphism", or "random". See details.}
+
+\item{polymorphism_shape}{Argument passed to \link{make_stepmatrix}.}
+
+\item{polymorphism_distance}{Argument passed to \link{make_stepmatrix}.}
+
+\item{state_ages}{Argument passed to \link{make_stepmatrix}.}
+
+\item{dollo_penalty}{Argument passed to \link{make_stepmatrix}.}
 }
 \value{
 A list with multiple components, including:
