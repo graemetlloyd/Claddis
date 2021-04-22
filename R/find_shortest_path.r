@@ -64,6 +64,8 @@
 #' @export find_shortest_path
 find_shortest_path <- function(stepmatrix, start, end) {
   
+  # THIS WOULD IDEALLY BE REFACTORED TO JUST USE STEPMATRIX DIRECTLY (I.E., WITHOUT CONVERTING TO THE GRAPH FORMAT.)
+  
   # If start and end are identical (on diagonal of matrix):
   if (start == end) {
     
