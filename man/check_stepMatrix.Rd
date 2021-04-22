@@ -17,6 +17,8 @@ Internal function to check stepMatrix object for errors.
 }
 \details{
 Internal Claddis function. Nothing to see here. Carry on.
+
+Solves issue raised in Maddison and Maddison (2003) by checking stepmatrices are internally consistent such that each transition cost represent the cost of the shortest possible path.
 }
 \examples{
 
@@ -33,6 +35,9 @@ stepmatrix <- make_stepmatrix(
 # Check that this is a valid stepMatrix object (should return empty vector):
 check_stepMatrix(stepmatrix = stepmatrix)
 
+}
+\references{
+Maddison, D. R. and Maddison, W. P., 2003. \emph{MacClade 4: Analysis of phylogeny and character evolution}. Version 4.06. Sinauer Associates, Sunderland, Massachusetts.
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
