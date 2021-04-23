@@ -17,9 +17,9 @@ calculate_tree_length(
 )
 }
 \arguments{
-\item{trees}{A tree (phylo object) or set of trees (multiPhylo object).}
+\item{trees}{A tree (\code{phylo} object) or set of trees (\code{multiPhylo} object).}
 
-\item{cladistic_matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}. These should be discrete with labels matching the tip labels of \code{tree}.}
+\item{cladistic_matrix}{A character-taxon matrix in the format imported by \link{read_nexus_matrix}. These should be discrete with rownames (ytaxon labels) matching the tip labels of \code{trees}.}
 
 \item{inapplicables_as_missing}{Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).}
 
@@ -56,60 +56,44 @@ Under the maximum parsimony criterion, a phylogenetic hypothesis is considered o
 
 \bold{Input data format}
 
-This function operates on a phylogenetic tree, or trees (in \code{ape} format), and a cladistic matrix (in \link{cladisticMatrix} format [UPDATE]). However, the algorithm used is based on the generalised stepmatrix approach of Swofford and Maddison (1992) and hence stepmatrices need to be defined for each character (this is done internally by calling \link{make_stepmatrix}), and some of the options are merely passed to this function.
+This function operates on a phylogenetic tree, or trees (in \code{ape} format), and a cladistic matrix (in \code{cladisticMatrix} format). However, the algorithm used is based on the generalised stepmatrix approach of Swofford and Maddison (1992) and hence stepmatrices need to be defined for each character (this is done internally by calling \link{make_stepmatrix}), and some of the options are merely passed to this function.
 
 \bold{Algorithm}
 
-Technically the Swofford and Maddison (1992) algorithm is designed for ancestral state reconstruction, but as its' first pass of the tree assigns lengths for each possible state at each node the minimum value of these options at the root is also the tree length for that character and hence by skipping the later steps this can be used as a tree length algorithm by simply adding these values for each character. The choice of the Swofford and Maddison algorithm, rather than the Wagner or Fitch algorithms (for ordered and unordered characters, respectively) is to generalize to the broadest range of character types, including asymmetric characters (Camin-Sokal, Dollo, stratigraphic), custom character types (specified using stepmatrices or character state trees), as well as to any resolution of tree (i.e., including multifurcating trees - important for establishing maximum step counts for homoplasy indices). The only restriction here is that the tree must be rooted such that time's arrow is explicitly present. This is essential, as the root defines the lengths across the whole tree, but also for asymmetric characters directionality must be explicit. The two obvious downsides to this algorithm is that it can be slower and that it is not appropriate for unrooted trees.
+Technically the Swofford and Maddison (1992) algorithm is designed for ancestral state reconstruction, but as its' first pass of the tree assigns lengths for each possible state at each node the minimum value of these options at the root is also the tree length for that character and hence by skipping the later steps this can be used as a tree length algorithm by simply summing the values across each character. The choice of the Swofford and Maddison algorithm, rather than the Wagner or Fitch algorithms (for ordered and unordered characters, respectively) is to generalize to the broadest range of character types, including asymmetric characters (Camin-Sokal, Dollo, stratigraphic), custom character types (specified using stepmatrices or character state trees), as well as to any resolution of tree (i.e., including multifurcating trees - important for establishing maximum step counts for homoplasy indices). The only restriction here is that the tree must be rooted such that time's arrow is explicitly present. This is essential, as the root defines the lengths across the whole tree, but also for asymmetric characters directionality must be explicit, as well as some downstream appraoches (such as ACCTRAN and DELTRAN). The two obvious drawbacks to this algorithm are that it can be slower and that it is not appropriate for unrooted trees.
 
 \bold{Stepmatrices and stepmatrix options}
 
-Stepmatrices are described in detail in the \link{make_stepmatrix} manual, as are the options that are passed from this function to that one.
-Can be used to infer ancestral states or get tree lengths (could theoretically build a tree inference procedure around this by proposing different topologies, but likely to be much slower than compiled software). Also a first step to generating character maps that can be used for plotting changes on a tree, performing rate analysis (see \link{test_rates}), or generating phylomorphospaces (not implemented yet).
+Stepmatrices are described in detail in the \link{make_stepmatrix} manual, as are the options that are passed from this function to that one. Thus, the user is directed there for a more in-depth discussion of options.
 
-\emph{Explicit options}
+\bold{Inapplicable and missing characters}
 
-- inapplicables_as_missing = FALSE, what to do with inapplicable characters. Currently treat as missing is only real option, but can be differet state that is also inferred as an ancestor.
-- More for uncertianties and polymorphisms (see below).
-- Add option to predict missing tip values (but definitely not recommended! - see Lloyd 2018)
-- Collpasing to a single output with ACCTRAN etc.?
+In practice these two character types are treated the same for length calculations - in effect these are "free" characters that do not constrain the tree length calculation in the same way that a coded character would (because a coded character's transition cost must be accounted for; Swofford and Maddison 1992). Note that there \emph{are} reasons to take differences into account in phylogenetic inference itself (see papers by Brazeau et al. 2019 and Goloboff et al. in press). The option to treat them differently here is therefore only important in terms of downstream analyses, such as ancestral state reconstruction (see \link{reconstruct_ancestral_states} for details).
 
-\bold{Implementation}
+\bold{Polymorphisms and uncertainties}
 
-Algorithms for reconstructing ancestral states under parsimony can be specific (e.g., for ordered characters only) or general (allowing for any character type, including highly specific custom-formats). The advantage of the former is usually that they are faster as multiple assumptions are already built in, but the latter offer more flexibility and represent the version applied here.
+Polymorphisms (coded with empersands between states) and uncertainties (coded with slashes between states) can be interpreted in different ways, including those that affect estimates of tree length. Hence four options are provided to the user here:
 
-More specifically this function is based on the approach described by Swofford and Maddison (1992) that assumes a rooted tree and uses a stepmatrix to define the costs (in number of steps) of specific transitions, i.e., from state X to state Y. The rooting is key here as it sets the directionality of evolution (i.e., time) and hence allows the use of asymmetric characters (where the cost of going from state X to state Y is different than going from stete Y to state X) as well as other direction-based optimisations (e.g., ACCTRAN and DELTRAN).
+ \enumerate{
+   \item{Missing (\code{polymorphism_behaviour = "missing"} or \code{uncertainty_behaviour = "missing"}). }{Here polymorphisms are simply replaced by the missing character (\code{NA}). This removes polymorphisms and uncertainties from the calculation process completely (likely leading to undercounts), and hence is not generally recommended.}
+   \item{Uncertainty (\code{polymorphism_behaviour = "uncertainty"} or \code{uncertainty_behaviour = "uncertainty"}). }{This is the intended use of uncertain codings (e.g., \code{0/1}) and constrains the tree length calculation to having to explain the \emph{least} costly transition of those in the uncertainty. This is recommended for uncertain characters (although note that it biases the result towards the shortest possible length), but not truly polymorphic characters (as one or more state acquisitions are being missed, see Nixon and Davis 1991 and \link{make_stepmatrix} for discussion of this). This is also - to the best of my knowledge - the approach used by most parsimony software, such as PAUP* (Swofford 2003) and TNT (Goloboff et al. 2008; Goloboff and Catalano 2016).}
+   \item{Polymorphism (\code{polymorphism_behaviour = "polymorphism"} or \code{uncertainty_behaviour = "polymorphism"}). }{If polymorphisms are real then some means of accounting for the changes that produce them seems appropriate, albeit difficult (see Nixon and Davis 1991 and Swofford and Maddison 1992 for discussions). If this option is applied it triggers the downstream options in \emph{make_stepmatrix} (by internally setting \code{include_polymorphisms = TRUE}), and the user should look there for more information. This is tentatively recommended for true polymorphisms (but note that it complicates interpretation), but not uncertainties.}
+   \item{Random (\code{polymorphism_behaviour = "random"} or \code{uncertainty_behaviour = "random"}). }{Another means of dealing with multiple-state characters is simply to sample a single state at random for each one, for example as Watanabe (2016) did with their PERDA algorithm. This simplifies the process, but also logically requires running the function multiple times to quantify uncertainty. This is not recommended for true polymorphisms (as interpretation is confounded), but may be appropriate for a less downwards biased tree count than \code{"uncertainty"}.}
+}
 
-
-\bold{Special character types}
-\emph{Missing values}
-\emph{Inapplicables}
-\emph{Uncertainties}
-
-In Claddis, uncertainties are coded by separating states with the slash character, e.g., 0/1. The Swofford and Maddison (1992) algorithm - and the implementation used here - treats uncertainties (automatically) by allowing any of the possible states at the tip (here 0 or 1, but not, say, 2 or 3). In other words, it will opt for solutions that effectively prefer whichever state is easiest (fewest steps) to reach from a proposed ancestral value. This could therefore be used to predict what the "true" value may be, at least under the assumption of parsimony. However, such phylogenetic "prediction" [OPTION?] is generally advised against (Lloyd 2018).
-
-\emph{Polymorphisms}
-
-TEXT?
+These choices can also effect ancestral state estimation (see \link{reconstruct_ancestral_states}).
 
 \bold{Polytomies}
 
-Another advantage of the Swofford and Maddison (1992) approach is that it does not require fully-bifurcating topologies, hence these are "allowed" as input. However, it is important to note that the implementation here will treat any such polytomies (also known as multifurcations) as "hard". I.e., that they genuinely represent one species splitting into three or more descendant species. As always, the Ian Malcolm caveat applies - "your scientists were so preoccupied with whether or not they sould, they didn’t stop to think if they should."
+Polytomies are explicitly allowed by the function, but will always be treated as "hard" (i.e., literal multifurcations). Note that typically these will lead to higher tree lengths than fully bifurcating trees and indeed that the maximum number of steps is typically calculated from the star tree (single multifurcation).
 
+\bold{Further constraints}
 
-# Option to fix root state (polarize) somehow
-# From is row, to is column (directional hence requires/assumes rooted trees)
-# Record in manual that weighted parsimony is folly, but could use to chose between MPRs (maybe?)
-\bold{Polymorphic characters}
+In future the function will allow restrictions to be placed on the state at particular internal nodes. This can have multiple applications, including (for example) treating some taxa as ancestral such that their states are directly tied to specific nodes, e.g., in stratocladistics (Fisher 1994; Marcot and Fox 2008).
 
-Random is same as PERDA approach of Watanabe [ADD REF]
-# MANUAL: generalized (stepmatrix) solution as accounts for more possibilities
-# MANUAL: really only for rooted trees (unrooted possible using same methods (see Swofford and Maddison (1992), but unclear why you would want to do this with trees without direction of time (i.e., a root).
-# MANUAL: works with multifurcations and doesn't require a fully bifurcating tree, but does assume polytomies are therefore "hard".
-# MANUAL: Swofford and Maddison (1992; p210): "Both [ACCTRAN and DELTRAN] start by either assuming that the ancestral state is known or by choosing a state from the set of optimal assignments to the root node" - i.e., always an arbitrainess problem at root!
-MISSING DATA (NA) IS DEALT WITH BY SETTING ALL TIP VALUES FOR A MISSING STATE TO ZERO (AS PER SWOFFORD AND MADDISON 1992).
-UNCERTAIN STATES (E.G., 0/1) CONSTRAIN ANCESTRAL STATES SLIGHTLY MORE THAN NA (ASSUMING THEY EXCLUDE SOME STATES. IMPLEMENTATION SAME AS SWOFFORD AND MADDISON (1992).
-CALCULATES TREE LENGTHS!
+\bold{Character weights}
+
+Tree lengths output already include corrections for character weights as supplied in the \code{cladistic_matrix} input. So, for example, if a binary character has two steps on the tree, but is weighted five then it will contribute a value of ten steps to the result.
 }
 \examples{
 
@@ -135,12 +119,28 @@ calculate_tree_length(
 
 }
 \references{
-Lloyd, G. T., 2018. Journeys through discrete-character morphospace: synthesizing phylogeny, tempo, and disparity. \emph{Palaeontology}, \bold{61}, 637-645.
+Brazeau, M. D., Guillerme, T. and Smith, M. R., 2019. An algorithm for morphological phylogenetic analysis with inapplicable data. \emph{Systematic Biology}, \bold{68}, 619-631.
+
+Fisher, D. C., 1994. Stratocladistics: morphological and temporal patterns and their relation to phylogenetic process. In L. Grande and O. Rieppel (eds.), \emph{Interpreting the Hierarchy of Nature}. Academic Press, San Diego. pp133–171.
+
+Goloboff, P. A. and Catalano, S. A., 2016. TNT version 1.5, including a full implementation of phylogenetic morphometrics/ \emph{Cladistics}, \bold{32}. 221-238
+
+Goloboff, P., Farris, J. and Nixon, K., 2008. TNT, a free program for phylogenetic analysis. \emph{Cladistics}, \bold{24}, 774-786.
+
+Goloboff, P. A., De Laet, J., Rios-Tamayo, D. and Szumik, C. A., in press. A reconsideration of inapplicable characters, and an approximation with step‐matrix recoding. \emph{Cladistics}.
+
+Marcot, J. D. and Fox, D. L., 2008. StrataPhy: a new computer program for stratocladistic analysis. \emph{Palaeontologia Electronica}, \bold{11}, 5A.
+
+Nixon, K. C. and Davis, J. I., 1991. Polymorphic taxa, missing values and cladistic analysis. \emph{Cladistics}, \bold{7}, 233-241.
+
+Swofford, D. L., 2003. \emph{PAUP*. Phylogenetic Analysis Using Parsimony (*and Other Methods). Version 4}. Sinauer Associates, Sunderland, Massachusetts.
 
 Swofford, D. L. and Maddison, W. P., 1992. Parsimony, character-state reconstructions, and evolutionary inferences. \emph{In} R. L. Mayden (ed.) Systematics, Historical Ecology, and North American Freshwater Fishes. Stanford University Press, Stanford, p187-223.
+
+Watanabe, A., 2016. The impact of poor sampling of polymorphism on cladistic analysis. \emph{Cladistics}, \bold{32}, 317-334.
 }
 \seealso{
-\link{make_stepmatrix}
+\link{make_stepmatrix}, \link{reconstruct_ancestral_states}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
