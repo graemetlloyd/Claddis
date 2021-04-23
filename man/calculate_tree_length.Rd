@@ -115,7 +115,7 @@ calculate_tree_length(
   polymorphism_distance = "great_circle",
   state_ages = c(),
   dollo_penalty = 999
-)
+)$tree_lengths
 
 }
 \references{

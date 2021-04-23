@@ -121,7 +121,7 @@
 #'   polymorphism_distance = "great_circle",
 #'   state_ages = c(),
 #'   dollo_penalty = 999
-#' )
+#' )$tree_lengths
 #'
 #' @export calculate_tree_length
 calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_missing = FALSE, polymorphism_behaviour, uncertainty_behaviour, polymorphism_shape, polymorphism_distance, state_ages, dollo_penalty) {
