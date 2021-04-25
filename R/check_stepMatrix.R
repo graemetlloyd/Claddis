@@ -10,7 +10,7 @@
 #'
 #' Internal Claddis function. Nothing to see here. Carry on.
 #'
-#' Solves issue raised in Maddison and Maddison (2003) by checking stepmatrices are internally consistent such that each transition cost represent the cost of the shortest possible path.
+#' Solves issue raised in Maddison and Maddison (2003) by checking custom stepmatrices are internally consistent such that each transition cost represents the cost of the shortest possible path.
 #'
 #' @return An error message or empty vector if no errors found.
 #'
@@ -37,10 +37,6 @@
 #'
 #' @export check_stepMatrix
 check_stepMatrix <- function(stepmatrix) {
-  
-  # TO ADD
-  # - Check stepmatrix does not allow shorter routes via other states (somehow!) I.e., is internally consistent.
-  # - Above check is in place but cannot account for polymorphic stepmatrices produced using e.g., great_circle distances as assumes distances are planar? Maybe need to store something else to account for this?
   
   # Check stepmatrix has class stepMatrix and add error message to output if true:
   if (!inherits(x = stepmatrix, what = "stepMatrix")) return("stepmatrix must be an object of class \"stepMatrix\".")
@@ -93,35 +89,39 @@ check_stepMatrix <- function(stepmatrix) {
   # Check includes_polymorphisms is formatted correctly and add error message to output if false:
   if (!is.logical(x = stepmatrix$includes_polymorphisms) || length(x = stepmatrix$includes_polymorphisms) != 1) stop("stepmatrix$includes_polymorphisms should be a single logical value indicating whether polymorphisms are included or not.")
   
-  # Subfunction to build shortest path stepmatrix:
-  #build_shortest_path_stepmatrix <- function(stepmatrix) {
+  # Check matrix makes sense (but only if custom):
+  if (stepmatrix$type == "custom") {
     
-    # Get stepmatrix states:
-    #  states <- rownames(x = stepmatrix$stepmatrix)
+    # Subfunction to build shortest path stepmatrix:
+    build_shortest_path_stepmatrix <- function(stepmatrix) {
+      
+      # Get stepmatrix states:
+      states <- rownames(x = stepmatrix$stepmatrix)
+      
+      # Get length of each shortest path:
+      path_lengths <- apply(
+        X = expand.grid(start = states, end = states),
+        MARGIN = 1,
+        FUN = function(x) {
+          path <- find_shortest_path(stepmatrix = stepmatrix, start = x[1], end = x[2])
+          lengths <- lapply(
+            X = as.list(x = 2:length(x = path)),
+            function(i) stepmatrix$stepmatrix[path[(i - 1)], path[i]]
+          )
+          sum(x = unlist(x = lengths))
+        }
+      )
+      
+      # Return shortest path stepmatrix:
+      matrix(data = path_lengths, nrow = stepmatrix$size, dimnames = list(states, states))
+    }
     
-    # Get length of each shortest path:
-    #path_lengths <- apply(
-    #X = expand.grid(start = states, end = states),
-    #MARGIN = 1,
-    #FUN = function(x) {
-    #path <- find_shortest_path(stepmatrix = stepmatrix, start = x[1], end = x[2])
-    #lengths <- lapply(
-    #X = as.list(x = 2:length(x = path)),
-    #function(i) stepmatrix$stepmatrix[path[(i - 1)], path[i]]
-    #)
-    #sum(x = unlist(x = lengths))
-  #    }
-  #  )
+    # Build stepmatrix where are costs are shortest path costs:
+    shortest_path_stepmatrix <- build_shortest_path_stepmatrix(stepmatrix = stepmatrix)
     
-    # Return shortest path stepmatrix:
-  #  matrix(data = path_lengths, nrow = stepmatrix$size, dimnames = list(states, states))
-  #}
-  
-  # Build stepmatrix where are costs are shortest path costs:
-  #shortest_path_stepmatrix <- build_shortest_path_stepmatrix(stepmatrix = stepmatrix)
-  
-  # If stepmatrix is not all shortest paths stop and warn user:
-  #if (!all(x = shortest_path_stepmatrix == stepmatrix$stepmatrix)) stop("stepmatrix is not internally consistent (t least one path is shorter - lower cost - than stated). Fix using find_shortest_path and try again.")
+    # If stepmatrix is not all shortest paths stop and warn user:
+    if (!all(x = shortest_path_stepmatrix == stepmatrix$stepmatrix)) stop("stepmatrix is not internally consistent (at least one path is shorter - lower cost - than stated). Fix using find_shortest_path and try again.")
+  }
 
   # Return empty vector:
   vector(mode = "character")
