@@ -42,7 +42,7 @@ A list with multiple components, including:
 \item{input_matrix}{The raw (unmodified) \code{cladistic_matrix} input.}
 \item{input_options}{The various input options used. Output for use by downstream functions, such as ancestral state estimation and stochastic character mapping.}
 \item{stepmatrices}{The stepmatrices (one for each character) used. These are typically generated automatically by the funcion, but are output here for later use in ancestral state estimation and stochastic character mapping functions.}
-\item{character_matrix}{The single character matrix object used. Essentially the \code{input_matrix} modified by the \link{input_options}.}
+\item{character_matrix}{The single character matrix object used. Essentially the \code{input_matrix} modified by the \code{input_options}.}
 \item{character_lengths}{A matrix of characters (rows) and trees (columns) with values indicating the number of steps. The column sums of this matrix are the \code{tree_lengths} values. This output can also be used for homoplasy metrics.}
 \item{character_weights}{A vector of the character weights used.}
 \item{tree_lengths}{The primary output - the length for each input tree in total steps.}
