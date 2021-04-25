@@ -49,15 +49,16 @@
 #' @export reconstruct_ancestral_states
 reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, polymorphism_behaviour = "uncertainty", uncertainty_behaviour = "uncertainty", polymorphism_shape, polymorphism_distance, state_ages, dollo_penalty) {
   
-  # COLLAPSE OPTIONS (MAYBE FOR ANOTHER FUNCTION?):
+  # COLLAPSE OPTIONS (MAYBE ANOTHER FUNCTION?):
   # - ACCTRAN
   # - DELTRAN
   # - MINF (Swofford and Maddison 1987) - I THINK NOT!
   # - MINSTATE *shrug emoji*
   # - MAXSTATE *shrug emoji*
   # - WEIGHTED BY BRANCH DURATION? (E.G., ((0:1,1:4)); SHOULD FAVOUR A 0 ROOT STATE). NEED WAY TO "SCORE" THESE SUCH THAT CAN FIND MPR WITH BEST SCORE.
+  # - ALLOW ROOT TO LEAN TOWARDS LOWEST STATE? (e.g., 0 > 1).
   
-  # ALLOW RECONSTRUCTIONS N STEPS LONGER SOMEHOW?
+  # ALLOW RECONSTRUCTIONS N STEPS LONGER SOMEHOW? PROBABLY A BACKBURNER/LONG TERM THING
   
   # TO ADD INTO NODE ESTIMATE VERSION OF FUNCTION:
   #estimate_all_nodes <- FALSE
@@ -65,10 +66,34 @@ reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_n
 
   # WILL NEED TO MODIFY BELOW TO DEAL WITH UNCERTAINTIES AND POLYMORPHISMS AT TIPS
   
+  trees <- ape::read.tree(text = c("(A,(B,(C,(D,E))));", "(A,((B,C),(D,E)));"))
+  cladistic_matrix <- build_cladistic_matrix(
+    character_taxon_matrix = matrix(
+      data = sample(
+        x = c("0", "1"), # ADD MISSING, POLYMORPHISM, INAPPLICABLE ETC. HERE LATER TO TEST
+        size = 50,
+        replace = TRUE
+      ),
+      nrow = 5,
+      ncol = 10,
+      dimnames = list(
+        LETTERS[1:5],
+        c()
+      )
+    )
+  )
+  estimate_all_nodes = FALSE
+  estimate_tip_values = FALSE
+  inapplicables_as_missing = FALSE
+  polymorphism_behaviour = "uncertainty"
+  uncertainty_behaviour = "uncertainty"
+  polymorphism_shape = "hypersphere"
+  polymorphism_distance = "great_circle"
+  state_ages = c()
+  dollo_penalty = 100
   
-  
-  
-  tree_length_output <- calculate_tree_length(
+  # Perform Swofford and Maddison (1992) first pass of tree by calling calculate_tree_length:
+  first_pass_output <- calculate_tree_length(
     trees = trees,
     cladistic_matrix = cladistic_matrix,
     inapplicables_as_missing = inapplicables_as_missing,
@@ -84,80 +109,117 @@ reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_n
   # THEN:
   # second_pass # All MPRs (OUTPUTS: all_mprs)
   # third_pass # Missing/inapplicables applied to internal nodes (OUTPUTS: modified_mprs)
-
-
   
-  # Build node estimates from single state results:
-  node_estimates <- matrix(
-    data = apply(
-      X = node_values,
-      MARGIN = 1,
-      FUN = function(x) {
-        x <- names(x = x[x == min(x = x)])
-        ifelse(
-          test = length(x = x) == 1,
-          yes = x,
-          no = NA
-        )
-      }),
-    ncol = 1,
-    nrow = node_count
-  )
   
-  # Update tip states with their original values:
-  node_estimates[1:tip_count] <- tip_states
   
-  ### ABOVE NEEDS TO BE INPUT TIP STATES NOT MODIFIED VERSION! BUT LATER FOR OUTPUT? NEED TO RECORD SOMEWHERE WHAT HAS HAPPENED THOUGH SO CAN PASS TO A CHARACTER MAP FUNCTION AND TREAT EVERYTHING CORRECTLY.
-  ### ACTUALLY SHOULD PROBABLY BE
   
-  # Only continue if there is any ambiguity at internal nodes:
-  if (any(x = is.na(x = node_estimates[(tip_count + 1):node_count]))) {
+  
+  
+  # Subfunction to perform Swofford and Maddison (1992) second pass (generates all most parsimonious reconstructions):
+  second_pass <- function(tree, node_values, tip_count, node_count, stepmatrix) {
     
-    # Find all possible root states:
-    possible_root_states <- colnames(x = node_values)[node_values[tip_count + 1, ] == min(x = node_values[tip_count + 1, ])]
+    # Build node estimates from single state results:
+    node_estimates <- matrix(
+      data = apply(
+        X = node_values,
+        MARGIN = 1,
+        FUN = function(x) {
+          x <- names(x = x[x == min(x = x)])
+          ifelse(
+            test = length(x = x) == 1,
+            yes = x,
+            no = NA
+          )
+        }
+      ),
+      ncol = 1,
+      nrow = node_count
+    )
     
-    # Make new node estimates with every possible root state:
-    node_estimates <- do.call(what = cbind, args = lapply(X = as.list(x = possible_root_states), FUN = function(x) {y <- node_estimates; y[tip_count + 1, ] <- x; y}))
+    # Update tip states with their original values:
+    #node_estimates[1:tip_count] <- tip_states
     
-    # For each internal node above the root to the tips:
-    for(needle in (tip_count + 2):(tip_count + node_count - tip_count)) {
+    ### ABOVE NEEDS TO BE INPUT TIP STATES NOT MODIFIED VERSION! BUT LATER FOR OUTPUT? NEED TO RECORD SOMEWHERE WHAT HAS HAPPENED THOUGH SO CAN PASS TO A CHARACTER MAP FUNCTION AND TREAT EVERYTHING CORRECTLY.
+    ### ACTUALLY SHOULD PROBABLY BE
+    
+    # Only continue if there is any ambiguity at internal nodes:
+    if (any(x = is.na(x = node_estimates[(tip_count + 1):node_count]))) {
       
-      # Establish ancestor of current node:
-      ancestor_node <- tree$edge[tree$edge[, 2] == needle, 1]
+      # Find all possible root states:
+      possible_root_states <- colnames(x = node_values)[node_values[tip_count + 1, ] == min(x = node_values[tip_count + 1, ])]
       
-      # Reformat node_estimates as a list to enable lapply:
-      node_estimates <- split(x = node_estimates, f = col(x = node_estimates))
+      # Make new node estimates with every possible root state:
+      node_estimates <- do.call(what = cbind, args = lapply(X = as.list(x = possible_root_states), FUN = function(x) {y <- node_estimates; y[tip_count + 1, ] <- x; y}))
       
-      # Permute all possible values and reformat as matrix:
-      node_estimates <- do.call(what = cbind, args = lapply(X = node_estimates, FUN = function(x) {
+      # For each internal node above the root to the tips:
+      for(needle in (tip_count + 2):(tip_count + node_count - tip_count)) {
         
-        # Get updated tree lengths for current node as per Swofford and Maddison 1992 second pass:
-        updated_tree_lengths <- stepmatrix$stepmatrix[x[ancestor_node], ] + node_values[needle, ]
+        # Establish ancestor of current node:
+        ancestor_node <- tree$edge[tree$edge[, 2] == needle, 1]
         
-        # Store all possible most parsimonious state(s) for current node:
-        possible_states <- names(x = updated_tree_lengths[updated_tree_lengths == min(x = updated_tree_lengths)])
+        # Reformat node_estimates as a list to enable lapply:
+        node_estimates <- split(x = node_estimates, f = col(x = node_estimates))
         
-        # Store total number of possible states:
-        n_states <- length(x = possible_states)
+        # Permute all possible values and reformat as matrix:
+        node_estimates <- do.call(what = cbind, args = lapply(X = node_estimates, FUN = function(x) {
+          
+          # Get updated tree lengths for current node as per Swofford and Maddison 1992 second pass:
+          updated_tree_lengths <- stepmatrix$stepmatrix[x[ancestor_node], ] + node_values[needle, ]
+          
+          # Store all possible most parsimonious state(s) for current node:
+          possible_states <- names(x = updated_tree_lengths[updated_tree_lengths == min(x = updated_tree_lengths)])
+          
+          # Store total number of possible states:
+          n_states <- length(x = possible_states)
+          
+          # Create new node estimates to store possible state(s):
+          new_estimates <- matrix(data = rep(x = x, times = n_states), ncol = n_states)
+          
+          # Add possible state(s)
+          new_estimates[needle, ] <- possible_states
+          
+          # Return new estimates only:
+          new_estimates
+          
+        }))
         
-        # Create new node estimates to store possible state(s):
-        new_estimates <- matrix(data = rep(x = x, times = n_states), ncol = n_states)
-        
-        # Add possible state(s)
-        new_estimates[needle, ] <- possible_states
-        
-        # Return new estimates only:
-        new_estimates
-        
-      }))
+      }
       
     }
     
+    # Return node estimates:
+    node_estimates
+    
   }
   
-  # Return compiled output:
-  list(length = tree_length, most_parsimonious_reconstructions = node_estimates, input_tree = input_tree)
+  # Perform second pass and add to first pass output:
+  first_pass_output$node_estimates <- lapply(
+    X = as.list(x = 1:length(x = first_pass_output$input_trees)),
+    FUN = function(tree_n) {
+      tree <- first_pass_output$input_trees[[tree_n]]
+      tip_count <- ape::Ntip(tree)
+      node_count <- tip_count + tree$Nnode
+      lapply(
+        X = as.list(1:ncol(x = first_pass_output$character_matrix$matrix)),
+        FUN = function(character_n) {
+          stepmatrix <- first_pass_output$stepmatrices[[character_n]]
+          node_values <- first_pass_output$node_values[[tree_n]][[character_n]]
+          second_pass(
+            tree = tree,
+            node_values = node_values,
+            tip_count = tip_count,
+            node_count = node_count,
+            stepmatrix = stepmatrix
+          )
+        }
+      )
+    }
+  )
   
+  ### NEED TO DEAL WITH MISSING/UNCERTIANTY AND GENERAL THIRD PASS STUFF IN HERE
+  
+  # Return already compiled output:
+  first_pass_output
 }
 
 # WHAT IF ALL CHARACTERS ARE UNCERTAIN!!!!!!
