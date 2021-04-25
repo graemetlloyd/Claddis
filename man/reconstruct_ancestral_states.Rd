@@ -54,7 +54,41 @@ Users may also wish to refer to the more complex whole-matrix, likelihood-based 
 }
 \examples{
 
-# TO DO
+# Generate two trees:
+trees <- ape::read.tree(text = c("(A,(B,(C,(D,E))));", "(A,((B,C),(D,E)));"))
+
+# Build a simple 5-by-10 binary character matrix:
+cladistic_matrix <- build_cladistic_matrix(
+  character_taxon_matrix = matrix(
+    data = sample(
+      x = c("0", "1"), # ADD MISSING, POLYMORPHISM, INAPPLICABLE ETC. HERE LATER TO TEST
+      size = 50,
+      replace = TRUE
+    ),
+    nrow = 5,
+    ncol = 10,
+    dimnames = list(
+      LETTERS[1:5],
+      c()
+    )
+  )
+)
+
+# Reconstruct ancestral states (limiting output to all most parsimonious
+# ancestral state reconstruction for every tree and character combination):
+reconstruct_ancestral_states(
+  trees = trees,
+  cladistic_matrix = cladistic_matrix,
+  estimate_all_nodes = FALSE,
+  estimate_tip_values = FALSE,
+  inapplicables_as_missing = FALSE,
+  polymorphism_behaviour = "uncertainty",
+  uncertainty_behaviour = "uncertainty",
+  polymorphism_shape = "hypersphere",
+  polymorphism_distance = "great_circle",
+  state_ages = c(),
+  dollo_penalty = 100
+)$node_estimates
 
 }
 \references{

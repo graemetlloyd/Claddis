@@ -44,7 +44,41 @@
 #'
 #' @examples
 #'
-#' # TO DO
+#' # Generate two trees:
+#' trees <- ape::read.tree(text = c("(A,(B,(C,(D,E))));", "(A,((B,C),(D,E)));"))
+#'
+#' # Build a simple 5-by-10 binary character matrix:
+#' cladistic_matrix <- build_cladistic_matrix(
+#'   character_taxon_matrix = matrix(
+#'     data = sample(
+#'       x = c("0", "1"), # ADD MISSING, POLYMORPHISM, INAPPLICABLE ETC. HERE LATER TO TEST
+#'       size = 50,
+#'       replace = TRUE
+#'     ),
+#'     nrow = 5,
+#'     ncol = 10,
+#'     dimnames = list(
+#'       LETTERS[1:5],
+#'       c()
+#'     )
+#'   )
+#' )
+#'
+#' # Reconstruct ancestral states (limiting output to all most parsimonious
+#' # ancestral state reconstruction for every tree and character combination):
+#' reconstruct_ancestral_states(
+#'   trees = trees,
+#'   cladistic_matrix = cladistic_matrix,
+#'   estimate_all_nodes = FALSE,
+#'   estimate_tip_values = FALSE,
+#'   inapplicables_as_missing = FALSE,
+#'   polymorphism_behaviour = "uncertainty",
+#'   uncertainty_behaviour = "uncertainty",
+#'   polymorphism_shape = "hypersphere",
+#'   polymorphism_distance = "great_circle",
+#'   state_ages = c(),
+#'   dollo_penalty = 100
+#' )$node_estimates
 #'
 #' @export reconstruct_ancestral_states
 reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, polymorphism_behaviour = "uncertainty", uncertainty_behaviour = "uncertainty", polymorphism_shape, polymorphism_distance, state_ages, dollo_penalty) {
@@ -65,32 +99,6 @@ reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_n
   #estimate_tip_values <- FALSE # Should not happen for inapplicables when they are treated as inapplicables
 
   # WILL NEED TO MODIFY BELOW TO DEAL WITH UNCERTAINTIES AND POLYMORPHISMS AT TIPS
-  
-  trees <- ape::read.tree(text = c("(A,(B,(C,(D,E))));", "(A,((B,C),(D,E)));"))
-  cladistic_matrix <- build_cladistic_matrix(
-    character_taxon_matrix = matrix(
-      data = sample(
-        x = c("0", "1"), # ADD MISSING, POLYMORPHISM, INAPPLICABLE ETC. HERE LATER TO TEST
-        size = 50,
-        replace = TRUE
-      ),
-      nrow = 5,
-      ncol = 10,
-      dimnames = list(
-        LETTERS[1:5],
-        c()
-      )
-    )
-  )
-  estimate_all_nodes = FALSE
-  estimate_tip_values = FALSE
-  inapplicables_as_missing = FALSE
-  polymorphism_behaviour = "uncertainty"
-  uncertainty_behaviour = "uncertainty"
-  polymorphism_shape = "hypersphere"
-  polymorphism_distance = "great_circle"
-  state_ages = c()
-  dollo_penalty = 100
   
   # Perform Swofford and Maddison (1992) first pass of tree by calling calculate_tree_length:
   first_pass_output <- calculate_tree_length(
