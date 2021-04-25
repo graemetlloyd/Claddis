@@ -237,7 +237,9 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
     input_tree <- tree
     
     # If there are no branch durations set these as all one:
-    if (is.null(x = tree$edge.length[1])) tree$edge.length <- rep(x = 1, length.out = nrow(x = tree$edge))
+    #if (is.null(x = tree$edge.length[1])) tree$edge.length <- rep(x = 1, length.out = nrow(x = tree$edge))
+    
+    ### IS ABOVE STILL REQUIRED??? I THINK THIS IS LEGACY OF WEIGHTED PASIMONY FAILIURE.
     
     # Reformat tip states as character vector:
     tip_states <- as.character(x = tip_states)
@@ -288,7 +290,7 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
     }
     
     # First pass (traverse tree from tips to root):
-    for(needle in (tip_count + node_count - tip_count):(tip_count + 1)) {
+    for(needle in c((tip_count + 1):node_count)[order(x = ape::node.depth(phy = tree)[(tip_count + 1):node_count])]) {
       
       # Find decsendants of current node:
       descendants <- tree$edge[tree$edge[, 1] == needle, 2]
@@ -365,5 +367,4 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
     tree_lengths = apply(X = character_lengths, MARGIN = 2, FUN = sum),
     node_values = lapply(X = trees_list, FUN = function(y) lapply(X = y, FUN = function(x) x$node_values))
   )
-
 }
