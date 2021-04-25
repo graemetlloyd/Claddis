@@ -92,6 +92,7 @@ importFrom(stats,pchisq)
 importFrom(stats,runif)
 importFrom(stats,var)
 importFrom(utils,combn)
+importFrom(utils,stack)
 
 # S3:
 S3method(print, cladisticMatrix)

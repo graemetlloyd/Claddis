@@ -131,7 +131,7 @@ find_shortest_path <- function(stepmatrix, start, end) {
         ### BELOW IS CODE TAKEN FROM https://www.r-bloggers.com/2020/10/finding-the-shortest-path-with-dijkstras-algorithm/ WITH LITTLE MODIFICATION
         
         # Create edgelist with weights
-        G <- data.frame(stack(graph), weights = stack(weights)[[1]])
+        G <- data.frame(utils::stack(x = graph), weights = stack(weights)[[1]])
         
         # Sub function to give path length:
         path_length <- function(path) {
