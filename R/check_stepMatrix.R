@@ -40,6 +40,7 @@ check_stepMatrix <- function(stepmatrix) {
   
   # TO ADD
   # - Check stepmatrix does not allow shorter routes via other states (somehow!) I.e., is internally consistent.
+  # - Above check is in place but cannot account for polymorphic stepmatrices produced using e.g., great_circle distances as assumes distances are planar? Maybe need to store something else to account for this?
   
   # Check stepmatrix has class stepMatrix and add error message to output if true:
   if (!inherits(x = stepmatrix, what = "stepMatrix")) return("stepmatrix must be an object of class \"stepMatrix\".")
@@ -93,34 +94,34 @@ check_stepMatrix <- function(stepmatrix) {
   if (!is.logical(x = stepmatrix$includes_polymorphisms) || length(x = stepmatrix$includes_polymorphisms) != 1) stop("stepmatrix$includes_polymorphisms should be a single logical value indicating whether polymorphisms are included or not.")
   
   # Subfunction to build shortest path stepmatrix:
-  build_shortest_path_stepmatrix <- function(stepmatrix) {
+  #build_shortest_path_stepmatrix <- function(stepmatrix) {
     
     # Get stepmatrix states:
-    states <- rownames(x = stepmatrix$stepmatrix)
+    #  states <- rownames(x = stepmatrix$stepmatrix)
     
     # Get length of each shortest path:
-    path_lengths <- apply(
-      X = expand.grid(start = states, end = states),
-      MARGIN = 1,
-      FUN = function(x) {
-        path <- find_shortest_path(stepmatrix = stepmatrix, start = x[1], end = x[2])
-        lengths <- lapply(
-          X = as.list(x = 2:length(x = path)),
-          function(i) stepmatrix$stepmatrix[path[(i - 1)], path[i]]
-        )
-        sum(x = unlist(x = lengths))
-      }
-    )
+    #path_lengths <- apply(
+    #X = expand.grid(start = states, end = states),
+    #MARGIN = 1,
+    #FUN = function(x) {
+    #path <- find_shortest_path(stepmatrix = stepmatrix, start = x[1], end = x[2])
+    #lengths <- lapply(
+    #X = as.list(x = 2:length(x = path)),
+    #function(i) stepmatrix$stepmatrix[path[(i - 1)], path[i]]
+    #)
+    #sum(x = unlist(x = lengths))
+  #    }
+  #  )
     
     # Return shortest path stepmatrix:
-    matrix(data = path_lengths, nrow = stepmatrix$size, dimnames = list(states, states))
-  }
+  #  matrix(data = path_lengths, nrow = stepmatrix$size, dimnames = list(states, states))
+  #}
   
   # Build stepmatrix where are costs are shortest path costs:
-  shortest_path_stepmatrix <- build_shortest_path_stepmatrix(stepmatrix = stepmatrix)
+  #shortest_path_stepmatrix <- build_shortest_path_stepmatrix(stepmatrix = stepmatrix)
   
   # If stepmatrix is not all shortest paths stop and warn user:
-  if (!all(x = shortest_path_stepmatrix == stepmatrix$stepmatrix)) stop("stepmatrix is not internally consistent (t least one path is shorter - lower cost - than stated). Fix using find_shortest_path and try again.")
+  #if (!all(x = shortest_path_stepmatrix == stepmatrix$stepmatrix)) stop("stepmatrix is not internally consistent (t least one path is shorter - lower cost - than stated). Fix using find_shortest_path and try again.")
 
   # Return empty vector:
   vector(mode = "character")
