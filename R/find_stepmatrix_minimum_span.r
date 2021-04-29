@@ -10,9 +10,9 @@
 #'
 #' The minimum parsimony length a phylogenetic hypothesis could have depends on the stepmatrix of transition costs and the states actually sampled. If the stepmatrix rows and columns already represent sampled states then this minimum length is reduced to a graph theory problem - the minimum spanning tree. This function returns the length of that tree and hence the minimum steps value (as used in stratocladistics to define "parsimony debt" Fisher 1994, or in homoplasy indices, see Hoyal Cuthill 2015).
 #'
-#' Strictly speaking the answer depends on whether the stepmatrix is symmetric (representing an undirected graph) or asymmetric (representing a directed graph). In both cases the transition costs are formally the edge weights. If the former then the problem is the "regular" minimum spanning tree, and if the latter then it is known as the arboresence. If the former, then Kruskal's (1956) algorithm is used and if the latter then Edmonds' (1967) algorithm is used. (The function automatically makes this choice using the value of \code{stepmatrix$symmetry}. In practice the implementations used come from the optrees package (Fontenla 2014), and call the \code{getMinimumSpanningTree} or \code{msArborEdmonds} function, respectively.
+#' Strictly speaking the answer depends on whether the stepmatrix is symmetric (representing an undirected graph) or asymmetric (representing a directed graph). In both cases the transition costs are formally the edge weights. If the former then the problem is the "regular" minimum spanning tree, and if the latter then it is known as the arboresence. If the former, then Kruskal's (1956) algorithm is used and if the latter then Edmonds' (1967) algorithm is used. (The function automatically makes this choice using the value of \code{stepmatrix$symmetry}.) In practice the implementations used come from the optrees package (Fontenla 2014), and specifically the functions \code{getMinimumSpanningTree} and \code{msArborEdmonds}.
 #'
-#' Note that this function only returns the length of the answer (in steps) not the actual path.
+#' Note that this function only returns the length of the answer (in steps), not the actual path.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -30,7 +30,7 @@
 #'
 #' @return
 #'
-#' A scalar indicating the ength in steps of the minimum spanning tree or arboresence.
+#' A scalar indicating the length in steps of the minimum spanning tree or arboresence.
 #'
 #' @seealso
 #'
