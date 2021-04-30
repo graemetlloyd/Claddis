@@ -34,7 +34,7 @@
 #'
 #' @seealso
 #'
-#' \link{find_shortest_path}
+#' \link{find_shortest_stepmatrix_path}
 #'
 #' @examples
 #'

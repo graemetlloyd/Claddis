@@ -50,7 +50,7 @@ Hoyal Cuthill, J., 2015. The size of the character state space affects the occur
 Kruskal, J. B., 1956. On the shortest spanning subtree of a graph and the traveling salesman problem. \emph{Proceedings of the American Mathematical Society}, \bold{7}, 48-50.
 }
 \seealso{
-\link{find_shortest_path}
+\link{find_shortest_stepmatrix_path}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

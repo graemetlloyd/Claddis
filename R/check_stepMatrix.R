@@ -103,7 +103,7 @@ check_stepMatrix <- function(stepmatrix) {
         X = expand.grid(start = states, end = states),
         MARGIN = 1,
         FUN = function(x) {
-          path <- find_shortest_path(stepmatrix = stepmatrix, start = x[1], end = x[2])
+          path <- find_shortest_stepmatrix_path(stepmatrix = stepmatrix, start = x[1], end = x[2])
           lengths <- lapply(
             X = as.list(x = 2:length(x = path)),
             function(i) stepmatrix$stepmatrix[path[(i - 1)], path[i]]
@@ -120,7 +120,7 @@ check_stepMatrix <- function(stepmatrix) {
     shortest_path_stepmatrix <- build_shortest_path_stepmatrix(stepmatrix = stepmatrix)
     
     # If stepmatrix is not all shortest paths stop and warn user:
-    if (!all(x = shortest_path_stepmatrix == stepmatrix$stepmatrix)) stop("stepmatrix is not internally consistent (at least one path is shorter - lower cost - than stated). Fix using find_shortest_path and try again.")
+    if (!all(x = shortest_path_stepmatrix == stepmatrix$stepmatrix)) stop("stepmatrix is not internally consistent (at least one path is shorter - lower cost - than stated). Fix using find_shortest_stepmatrix_path and try again.")
   }
 
   # Return empty vector:

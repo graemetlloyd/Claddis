@@ -48,21 +48,21 @@
 #' )
 #'
 #' # Find the shortest path from state 0 to state 3:
-#' find_shortest_path(
+#' find_shortest_stepmatrix_path(
 #'   stepmatrix = stepmatrix,
 #'   start = "0",
 #'   end = "3"
 #' )
 #'
 #' # Show that this is directional by asking for the reverse path:
-#' find_shortest_path(
+#' find_shortest_stepmatrix_path(
 #'   stepmatrix = stepmatrix,
 #'   start = "3",
 #'   end = "0"
 #' )
 #'
-#' @export find_shortest_path
-find_shortest_path <- function(stepmatrix, start, end) {
+#' @export find_shortest_stepmatrix_path
+find_shortest_stepmatrix_path <- function(stepmatrix, start, end) {
   
   # THIS WOULD IDEALLY BE REFACTORED TO JUST USE STEPMATRIX DIRECTLY (I.E., WITHOUT CONVERTING TO THE GRAPH FORMAT.)
   
