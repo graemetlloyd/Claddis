@@ -109,14 +109,11 @@ find_stepmatrix_minimum_span <- function(stepmatrix) {
   # If graph (stepmatrix) is asymmetric then use Edmonds' algorithm:
   if (stepmatrix$symmetry == "Asymmetric") {
     
-    # Set root value:
-    root <- sampled_states[1]
-    
     # Return length of minimum arboresence:
     return(sum(x = optrees::msArborEdmonds(
       nodes = as.numeric(x = sampled_states),
       arcs = available_edges,
-      source.node = as.numeric(x = root),
+      source.node = 1,
       stages.data = FALSE
     )$tree.arcs[, 3]))
   }
