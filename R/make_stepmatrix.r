@@ -441,6 +441,9 @@ make_stepmatrix <- function(min_state = 0, max_state, character_type, include_po
   # Get single states:
   single_states <- min_state:max_state
   
+  # Check there is more tha one state and exclude polymorphisms if so:
+  if (min_state == max_state) include_polymorphisms <- FALSE
+  
   # Case if character is ordered:
   if (character_type == "ordered") {
     
