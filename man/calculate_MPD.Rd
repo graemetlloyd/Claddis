@@ -44,5 +44,5 @@ calculate_MPD(distances, taxon_groups)
 
 }
 \author{
-Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Thomas Guillerme \email{guillert@tcd.ie}
+Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }

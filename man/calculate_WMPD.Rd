@@ -52,5 +52,5 @@ calculate_WMPD(distances, taxon_groups)
 Close, R. A., Friedman, M., Lloyd, G. T. and Benson, R. B. J., 2015. Evidence for a mid-Jurassic adaptive radiation in mammals. \emph{Current Biology}, \bold{25}, 2137-2142.
 }
 \author{
-Graeme T. Lloyd \email{graemetlloyd@gmail.com} and Thomas Guillerme \email{guillert@tcd.ie}
+Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }

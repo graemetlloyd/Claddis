@@ -17,7 +17,7 @@
 #'
 #' A labelled vector of weighted mean pairwise distances.
 #'
-#' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Thomas Guillerme \email{guillert@@tcd.ie}
+#' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
 #' @references
 #'
