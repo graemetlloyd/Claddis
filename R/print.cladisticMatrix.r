@@ -55,18 +55,19 @@ print.cladisticMatrix <- function(x, ...) {
   unique_non_continuous_weights <- unique(x = character_weights[character_ordering != "continuous"])
 
   # Create block parentheses text:
-  if(length(x = block_sizes) == 1) block_parentheses <- ""
-  if(length(x = block_sizes) == 2) block_parentheses <- paste0(" (in 2 matrix blocks of ", paste0(block_sizes, collapse = " and "), " characters, respectively)")
-  if(length(x = block_sizes) > 2) block_parentheses <- paste0(" (in ", n_blocks, " matrix blocks of ", paste0(paste0(block_sizes[1:(length(x = block_sizes) - 1)], collapse = ", "), ", and ", block_sizes[length(x = block_sizes)]), " characters, respectively)")
+  if (length(x = block_sizes) == 1) block_parentheses <- ""
+  if (length(x = block_sizes) == 2) block_parentheses <- paste0(" (in 2 matrix blocks of ", paste0(block_sizes, collapse = " and "), " characters, respectively)")
+  if (length(x = block_sizes) > 2) block_parentheses <- paste0(" (in ", n_blocks, " matrix blocks of ", paste0(paste0(block_sizes[1:(length(x = block_sizes) - 1)], collapse = ", "), ", and ", block_sizes[length(x = block_sizes)]), " characters, respectively)")
   
   # Create block parentheses text:
-  if(length(x = data_types) == 1) data_type_lines <- data_types
-  if(length(x = data_types) == 2) data_type_lines <- paste0(paste0(data_types, collapse = " and "))
-  if(length(x = data_types) > 2) data_type_lines <- paste0(paste0(data_types[1:(length(x = data_types) - 1)], collapse = ", "), ", and ", data_types[length(x = data_types)])
+  if (length(x = data_types) == 1) data_type_lines <- data_types
+  if (length(x = data_types) == 2) data_type_lines <- paste0(paste0(data_types, collapse = " and "))
+  if (length(x = data_types) > 2) data_type_lines <- paste0(paste0(data_types[1:(length(x = data_types) - 1)], collapse = ", "), ", and ", data_types[length(x = data_types)])
   
   # Make weights line:
-  if(length(x = unique_non_continuous_weights) == 1) weight_line <- paste0("All non-continuous characters are weighted ", unique_non_continuous_weights, ".\n")
-  if(length(x = unique_non_continuous_weights) > 1) weight_line <- paste0("Non-continuous characters have variable weights.\n")
+  if (all(data_types == "continuous")) weight_line <- paste0("No non-continuous characters are present.\n")
+  if (length(x = unique_non_continuous_weights) == 1) weight_line <- paste0("All non-continuous characters are weighted ", unique_non_continuous_weights, ".\n")
+  if (length(x = unique_non_continuous_weights) > 1) weight_line <- paste0("Non-continuous characters have variable weights.\n")
 
   # Output:
   cat(paste0("Cladistic matrix containing ", n_taxa, " taxa and ", n_characters, " ", data_type_lines, " type characters", block_parentheses, ", of which:\n",
