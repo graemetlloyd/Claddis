@@ -41,7 +41,7 @@ check_stepMatrix <- function(stepmatrix) {
   # Check stepmatrix has class stepMatrix and add error message to output if true:
   if (!inherits(x = stepmatrix, what = "stepMatrix")) return("stepmatrix must be an object of class \"stepMatrix\".")
   
-  # Check stepmatrix is in form of list an add error message to output if false:
+  # Check stepmatrix is in form of list and add error message to output if false:
   if (!is.list(x = stepmatrix)) return("stepmatrix must be in the form of a list.")
   
   # Check length of list is exactly five and add error message to output if false:
