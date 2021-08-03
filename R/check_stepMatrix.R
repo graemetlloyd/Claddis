@@ -120,7 +120,7 @@ check_stepMatrix <- function(stepmatrix) {
     shortest_path_stepmatrix <- build_shortest_path_stepmatrix(stepmatrix = stepmatrix)
     
     # If stepmatrix is not all shortest paths stop and warn user:
-    if (!all(x = shortest_path_stepmatrix == stepmatrix$stepmatrix)) stop("stepmatrix is not internally consistent (at least one path is shorter - lower cost - than stated). Fix using find_shortest_stepmatrix_path and try again.")
+    if (!all(x = shortest_path_stepmatrix == stepmatrix$stepmatrix)) stop("stepmatrix is not self consistent (at least one path is shorter - lower cost - than stated). Fix using find_shortest_stepmatrix_path and try again.")
   }
 
   # Return empty vector:
