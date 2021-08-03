@@ -22,6 +22,7 @@ Imports:
     graphics,
     grDevices,
     methods,
+    optrees,
     stats,
     utils
 Suggests: 
