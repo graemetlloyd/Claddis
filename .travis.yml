@@ -1,3 +1,6 @@
+# Attempting to migrate
+travis endpoint --com --set-default
+
 # Set language to R:
 language: r
 
