@@ -96,11 +96,17 @@ plot_rates_time <- function(test_rates_output, model_number, ...) {
   })
 
   # Get sampled rates for model:
-  time_rates <- cbind(lapply(X = time_bin_partitions[model_number], function(x) {
-    do.call(what = rbind, args = lapply(X = x, function(y) {
-      xs <- c(test_rates_output$time_bins_used[y[1]], test_rates_output$time_bins_used[(y[length(x = y)] + 1)])
-    }))
-  })[[1]], test_rates_output$time_test_results[[model_number]]$rates, test_rates_output$time_test_results[[model_number]]$rates)
+  time_rates <- cbind(
+    do.call(
+      rbind,
+      lapply(
+        X = time_bin_partitions[model_number][[1]],
+        function(x) rev(x = range(x = test_rates_output$time_bins_used[range(x = x), ]))
+      )
+    ),
+    test_rates_output$time_test_results[[model_number]]$rates,
+    test_rates_output$time_test_results[[model_number]]$rates
+  )
 
   # Create base plot of rates in each time bin with any other requested options paseed as ...:
   geoscale::geoscalePlot(ages = time_bin_midpoints, data = test_rates_output$time_rates[, "rate"], age.lim = c(max(test_rates_output$time_bins_used), min(test_rates_output$time_bins_used)), data.lim = c(0, max(test_rates_output$time_rates[, "rate"]) * 1.1), pch = 20, cex.pt = 2, label = "Character changes per lineage million years", ...)
