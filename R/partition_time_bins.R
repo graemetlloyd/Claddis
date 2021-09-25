@@ -55,7 +55,7 @@ partition_time_bins <- function(n_time_bins, partition_sizes_to_include = "all")
   # Work out partition sizes for subsetting below:
   partition_sizes <- unlist(x = lapply(X = strsplit(split_switches, split = ""), function(x) sum(as.numeric(x)))) + 1
 
-  # Collpase switches vector to just those of the reequired input size:
+  # Collpase switches vector to just those of the required input size:
   split_switches <- split_switches[!is.na(match(partition_sizes, partition_sizes_to_include))]
 
   # Subfunction to generate partition positions:
