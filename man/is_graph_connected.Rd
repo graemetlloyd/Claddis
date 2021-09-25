@@ -18,7 +18,7 @@ Is a graph connected?
 \details{
 Example graph:
 
-\preformatted{ 6---4---5
+\preformatted{6---4---5
     |   |\
     |   | 1
     |   |/

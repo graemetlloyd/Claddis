@@ -10,7 +10,7 @@
 #'
 #' Example graph:
 #'
-#' \preformatted{ 6---4---5
+#' \preformatted{6---4---5
 #'     |   |\
 #'     |   | 1
 #'     |   |/
@@ -96,5 +96,5 @@
 is_graph_connected <- function(laplacian_matrix) {
   
   #
-  eigen(x = laplacian_matrix)
+  eigen(x = laplacian_matrix)$values[2] > 0
 }
