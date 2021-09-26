@@ -50,10 +50,10 @@ This functions run through the following checks in order to confirm the connecti
   \item As the graph has more than one vertex then further checks are required (a single vertex graph is considered connected).
   \item As no vertice has degree zero (no links) then the graph \emph{may} be connected (further checks are required).
   \item As there are more than two vertices the graph may be disconnected (further checks are required).
-  \item As no "splits" are found (that would separate the graph into one or more disconnected subgraphs) then the graph must be connected.
+  \item As no missing paths are found (that would separate the graph into one or more disconnected subgraphs) then the graph must be connected.
 }
 
-The reason for the ordering is that the more complex queries are not triggered unless simpler tests do not provide a definitive answer.
+This ordering means more complex queries are not triggered unless simpler tests do not provide a definitive answer.
 }
 \examples{
 

@@ -42,10 +42,10 @@
 #'   \item As the graph has more than one vertex then further checks are required (a single vertex graph is considered connected).
 #'   \item As no vertice has degree zero (no links) then the graph \emph{may} be connected (further checks are required).
 #'   \item As there are more than two vertices the graph may be disconnected (further checks are required).
-#'   \item As no "splits" are found (that would separate the graph into one or more disconnected subgraphs) then the graph must be connected.
+#'   \item As no missing paths are found (that would separate the graph into one or more disconnected subgraphs) then the graph must be connected.
 #' }
 #'
-#' The reason for the ordering is that the more complex queries are not triggered unless simpler tests do not provide a definitive answer.
+#' This ordering means more complex queries are not triggered unless simpler tests do not provide a definitive answer.
 #'
 #' @return A logical (TRUE or FALSE).
 #'
@@ -84,22 +84,19 @@ is_graph_connected <- function(adjacency_matrix) {
   
   # If only two vertices - and above test passed - then graph must be considered connected (return TRUE)
   if (n_vertices == 2) return(TRUE)
-
-  # Get one-off diagonal coordinates:
-  x <- 1:(n_vertices - 1)
-  y <- 2:n_vertices
   
-  # For each one-off diagonal spot:
-  for(i in 1:(n_vertices - 1)) {
-    
-    # If one-off diagonal is zero (a missing connection):
-    if (adjacency_matrix[x[i], y[i]] == 0) {
-      
-      # Check for a full split into two subgraphs and return FALSE if TRUE:
-      if (sum(x = adjacency_matrix[1:x[i], y[i]:n_vertices]) == 0) return(FALSE)
-    }
-  }
+  # Set exponent for matrix power (i.e., maximum path length):
+  k <- n_vertices - 1
   
-  # If still here then graph must be connected (return TRUE):
-  return(TRUE)
+  # Make diagonal one:
+  diag(adjacency_matrix) <- 1
+  
+  # Store unadulterated matrix:
+  start_matrix <- adjacency_matrix
+  
+  # Iteratively multiply matrix to return kth power:
+  for(i in 1:(k - 1)) adjacency_matrix <- adjacency_matrix %*% start_matrix
+  
+  # Any zeroes mean matrix is not connected, is all positive then everything is connected:
+  return(!any(x = adjacency_matrix == 0))
 }
