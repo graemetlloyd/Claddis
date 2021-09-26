@@ -80,7 +80,7 @@ is_graph_connected <- function(adjacency_matrix) {
   if (n_vertices == 1) return(TRUE)
   
   # If any individual vertice has degree zero then graph is not connected (return FALSE):
-  if (any(x = apply(X = x, MARGIN = 1, FUN = sum) == 0)) return(FALSE)
+  if (any(x = apply(X = adjacency_matrix, MARGIN = 1, FUN = sum) == 0)) return(FALSE)
   
   # If only two vertices - and above test passed - then graph must be considered connected (return TRUE)
   if (n_vertices == 2) return(TRUE)
