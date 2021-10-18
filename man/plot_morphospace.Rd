@@ -23,7 +23,16 @@ plot_morphospace(
   z_legend_position = "bottom_right",
   inform = TRUE,
   x_limits = NULL,
-  y_limits = NULL
+  y_limits = NULL,
+  plot_size_landscape = FALSE,
+  size_variable = NULL,
+  n_x_tiles = 20,
+  n_y_tiles = 20,
+  landscape_colour = "green",
+  landscape_transparency = 0.5,
+  landscape_weight = 0.1,
+  x_tile_apron = 1.2,
+  y_tile_apron = 1.2
 )
 }
 \arguments{
@@ -64,6 +73,24 @@ plot_morphospace(
 \item{x_limits}{Plot limits to use for x-axis. Only intended for use by \link{plot_multi_morphospace}.}
 
 \item{y_limits}{Plot limits to use for y-axis. Only intended for use by \link{plot_multi_morphospace}.}
+
+\item{plot_size_landscape}{Logical indicating whether or not to plot a body size "landscape". If \code{TRUE} then \code{size_variable} must be set.}
+
+\item{size_variable}{A numeric vector with taxon names matching \code{pcoa_input}. Size can be measured anyway the user wishes (length, mass etc.).}
+
+\item{n_x_tiles}{The number of horizontal "tiles" to plot a size landscape with.}
+
+\item{n_y_tiles}{The number of vertical "tiles" to plot a size landscape with.}
+
+\item{landscape_colour}{The colour of the size landscape. Must be one of \code{"blue"}, \code{"green"} or \code{"red"}.}
+
+\item{landscape_transparency}{The transparency value to use for the size landscape. Must be on a zero to one scale. Default is \code{0.5}.}
+
+\item{landscape_weight}{The "weight" to use for interpolating the colour of each size landscape tile. This is used to vary how much proximity to the tile is taken into account and can be any positive number (default is \{code{0.1}).}
+
+\item{x_tile_apron}{How far to extend the size landscape horizontally beyond the data points. Should be a number greater than 1 (default is \code{1.2}). By 50% would be 1.5.}
+
+\item{y_tile_apron}{How far to extend the size landscape vertically beyond the data points. Should be a number greater than 1 (default is \code{1.2}). By 50% would be 1.5.}
 }
 \description{
 Plots a morphospace using the output from ordinate_cladistic_matrix.
