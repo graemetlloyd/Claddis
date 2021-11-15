@@ -117,7 +117,7 @@ fix_stepmatrix <- function(stepmatrix, message = TRUE) {
     }
     
     # Sanity check for new stepmatrix symmetry:
-    new_symmetry <- ifelse(test = isSymmetric(object = stepmatrix$stepmatrix), yes = "Asymmetric", no = "Symmetric")
+    new_symmetry <- ifelse(test = isSymmetric(object = stepmatrix$stepmatrix), yes = "Symmetric", no = "Asymmetric")
     
     # If new shortest stepmatrix changes symmetry of input matrix:
     if (starting_stepmatrix$symmetry != new_symmetry) {
