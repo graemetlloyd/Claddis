@@ -92,35 +92,11 @@ check_stepMatrix <- function(stepmatrix) {
   # Check matrix makes sense (but only if custom):
   if (stepmatrix$type == "custom") {
     
-    # Subfunction to build shortest path stepmatrix:
-    build_shortest_path_stepmatrix <- function(stepmatrix) {
-      
-      # Get stepmatrix states:
-      states <- rownames(x = stepmatrix$stepmatrix)
-      
-      # Get length of each shortest path:
-      path_lengths <- apply(
-        X = expand.grid(start = states, end = states),
-        MARGIN = 1,
-        FUN = function(x) {
-          path <- find_shortest_stepmatrix_path(stepmatrix = stepmatrix, start = x[1], end = x[2])
-          lengths <- lapply(
-            X = as.list(x = 2:length(x = path)),
-            function(i) stepmatrix$stepmatrix[path[(i - 1)], path[i]]
-          )
-          sum(x = unlist(x = lengths))
-        }
-      )
-      
-      # Return shortest path stepmatrix:
-      matrix(data = path_lengths, nrow = stepmatrix$size, dimnames = list(states, states))
-    }
-    
     # Build stepmatrix where are costs are shortest path costs:
-    shortest_path_stepmatrix <- build_shortest_path_stepmatrix(stepmatrix = stepmatrix)
+    shortest_path_stepmatrix <- fix_stepmatrix(stepmatrix = stepmatrix, message = FALSE)
     
     # If stepmatrix is not all shortest paths stop and warn user:
-    if (!all(x = shortest_path_stepmatrix == stepmatrix$stepmatrix)) stop("stepmatrix is not self consistent (at least one path is shorter - lower cost - than stated). Fix using find_shortest_stepmatrix_path and try again.")
+    if (!all(x = shortest_path_stepmatrix == stepmatrix$stepmatrix)) stop("stepmatrix is not self-consistent (at least one path is shorter - lower cost - than stated). Fix using fix_stepmatrix and try again.")
   }
 
   # Return empty vector:
