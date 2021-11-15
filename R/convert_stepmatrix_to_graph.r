@@ -114,6 +114,7 @@
 #' @export convert_stepmatrix_to_graph
 convert_stepmatrix_to_graph <- function(stepmatrix) {
   
+  # Store original states for using as output:
   original_states <- colnames(x = stepmatrix$stepmatrix)
   
   # Set sampled states and stepmatrix rows and columns to simple numbers to work with optrees:
@@ -131,7 +132,7 @@ convert_stepmatrix_to_graph <- function(stepmatrix) {
   # Prune any Infinite weight edges:
   if (any(all_edges[, "weight"] == Inf)) all_edges <- all_edges[-which(x = all_edges[, "weight"] == Inf), , drop = FALSE]
   
-  # Make vector of redundnat edges to remove (may be empty):
+  # Make vector of redundant edges to remove (may be empty):
   to_remove <- unlist(
     x = lapply(
       X = as.list(x = 1:nrow(x = all_edges)),
@@ -168,7 +169,7 @@ convert_stepmatrix_to_graph <- function(stepmatrix) {
           # Find direct cost:
           direct_cost <- all_edges[i, "weight"]
       
-          # Importnat check that matrix is self-consistent (there is no indirect cost shorter than a direct cost) and stop and warn user if not:
+          # Important check that matrix is self-consistent (there is no indirect cost shorter than a direct cost) and stop and warn user if not:
           if (minimum_cost < direct_cost) stop("Matrix is not self-consistent!")
       
           # If minimum cost is same as direct cost:
