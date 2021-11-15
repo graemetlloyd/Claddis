@@ -12,7 +12,13 @@
 #'
 #' A common problem in graph theory is identifying the shortest path to take between two vertices of a connected graph. A stepmatrix also describes a graph, with transition costs representing edge weights that can be asymmetric (e.g., going from 0 to 1 can have a different weight than going from 1 to 0). Finding the shortest path between states - i.e., the path that minimises total weight (cost) - from a stepmatrix has two main applications in Claddis: 1. to check a stepmatrix is internally consistent (no cost is misidentified due to a "cheaper" route being available - solving a problem identified in Maddison and Maddison 2003), and 2. to identify the minimum number of steps a character could have on a tree (an essential aspect of various homoplasy metrics, see Hoyal Cuthill et al. 2010).
 #'
-#' This function implements a slightly modified version of Dijkstra's algorithm (Dijkstra 1959) to deal with the special case of a cladistic-style stepmatrix. The core code is taken from \link[https://www.r-bloggers.com/2020/10/finding-the-shortest-path-with-dijkstras-algorithm/]{this} R-bloggers post.
+#' The function returns a vector describing (one) shortest (i.e., lowest cost) path between \code{start} and \code{end}. If the direct path is shortest this will be simply \code{start} and \code{end}, but if an indirect route is cheaper then other node(s) will appear between these values.
+#'
+#' In operation the function is inspired by Dijkstra's algorithm (Dijkstra 1959) but differs in some aspects to deal with the special case of a cladistic-style stepmatrix. Essentially multiple paths are considered with the algorithm continuing until either the destination node (\code{end}) is reached or the accumulated cost (path length) exceeds the direct cost (meaning the path cannot be more optimal, lower cost, than the direct one).
+#'
+#' Note: that because infinite costs are allowed in step matrices to convey that a particular transition is not allowed these are not considered by the function and by default the direct path (\code{start} -> \code{end}) will be returned. (If this is the user's aim they should replaced any \\code{Inf} value with a high number instead.)
+#'
+#' Note: negative costs are not allowed in stepmatrices and will confound the algorithm.
 #'
 #' Note: if multiple equally optimal solutions are possible, the function will only return one of them. I.e., just because a solution is not presented it cannot be assumed it is suboptimal. For example, for any ordered character (of three or more states) there will always be multiple equally optimal solutions.
 #'
@@ -28,7 +34,7 @@
 #'
 #' @return
 #'
-#' A vector of states describing one optimal path in the order \code{start} to \code{end}.
+#' A vector of states describing (one) of the optimal path(s) in the order \code{start} to \code{end}.
 #'
 #' @seealso
 #'
@@ -63,126 +69,93 @@
 #'
 #' @export find_shortest_stepmatrix_path
 find_shortest_stepmatrix_path <- function(stepmatrix, start, end) {
+
+  # Check stepmatrix is correct class and stop and warn user if not:
+  if (class(stepmatrix) != "stepMatrix") stop("stepmatrix must be an object o class \"stepMatrix\".")
   
-  # THIS WOULD IDEALLY BE REFACTORED TO JUST USE STEPMATRIX DIRECTLY (I.E., WITHOUT CONVERTING TO THE GRAPH FORMAT.)
+  # Check start and end are in character format so that the correct stepmatrix rows and columns are called:
+  if (any(c(!is.character(x = start), !is.character(x = end)))) stop("start and end must be characters (i.e., \"0\" not 0).")
   
-  # If start and end are identical (on diagonal of matrix):
-  if (start == end) {
+  # If start and end are the same cost must be zero (and hence unbeatable) so return start and end:
+  if (start == end) return(c(start, end))
+  
+  # If an infinite cost then stop and return direct path as this indicates the path is not accessible:
+  if (stepmatrix$stepmatrix[start, end] == Inf) return(c(start, end))
+  
+  # Get all character states:
+  states <- rownames(x = stepmatrix$stepmatrix)
+
+  # Get direct cost of transition (default option unless a lower cost path is found):
+  direct_cost <- stepmatrix$stepmatrix[start, end]
+
+  # Set up a startng path format:
+  path <- list(
+    start_node = start,
+    destination_node = end,
+    current_node = start,
+    unvisited_nodes = setdiff(x = states, y = start),
+    visited_nodes = start,
+    length = 0,
+    reached_destination = FALSE
+  )
+  
+  # Set up a list of possile path(s):
+  paths <- list(path)
+  
+  # Start a while loop that will run until either destination node is always reached and/or costs are always higher than direct cost:
+  while(!all(unlist(x = lapply(X = paths, FUN = function(x) x$reached_destination))) || any(unlist(x = lapply(X = paths, FUN = function(x) ifelse(x$reached_destination, Inf, x$length))) < direct_cost)) {
+  
+    # Find which paths need to continue (have not reached destination or exceeded drect cost):
+    continuing_paths <- which(x = !unlist(x = lapply(X = paths, FUN = function(x) x$reached_destination)))
     
-    # Just return start and end (cost is zero):
-    return(value = c(start, end))
+    # For each continuing path (in reverse order so i doesn't get confused):
+    for(i in rev(x = continuing_paths)) {
     
-  # If start and end differ (not on diagonal of matrix):
-  } else {
+      # Isolate unvisited nodes:
+      unvisited_nodes <- paths[[i]]$unvisited_nodes
     
-    # Check stepmatrix has class stepMatrix and stop and warn user if not:
-    if (!inherits(x = stepmatrix, what = "stepMatrix")) stop("stepmatrix must be an object of class \"stepMatrix\".")
-    
-    # Create position version of matrix to check for all Inf triangles:
-    position_matrix <- matrix(data = 1:stepmatrix$size ^ 2, ncol = stepmatrix$size, dimnames = list(rownames(x = stepmatrix$stepmatrix), colnames(x = stepmatrix$stepmatrix)))
-    
-    # Find out whether the transition in upper triangle of stepmatrix:
-    is_in_upper_triangle <- ifelse(test = any(x = which(x = upper.tri(x = position_matrix)) == position_matrix[start, end]), yes = TRUE, no = FALSE)
-    
-    # If in upper triangle and upper triangle is all Inf values:
-    if (is_in_upper_triangle && all(x = stepmatrix$stepmatrix[upper.tri(x = stepmatrix$stepmatrix)] == Inf)) {
+      # Store previous node (about to update current one):
+      previous_node <- paths[[i]]$current_node
       
-      # Return start and end directly (cost is Inf):
-      return(value = c(start, end))
-      
-    # If not upper triangle or upper triangle is not all Inf values:
-    } else {
-      
-      # If in lower triangle and lower triangle is all Inf values:
-      if (!is_in_upper_triangle && all(x = stepmatrix$stepmatrix[lower.tri(x = stepmatrix$stepmatrix)] == Inf)) {
-        
-        # Return start and end directly (cost is Inf):
-        return(value = c(start, end))
-        
-      # If matrix triangle present in has finite values (can proceed to Dijkstra's algorithm):
-      } else {
-        
-        # Isolate states:
-        states <- rownames(x = stepmatrix$stepmatrix)
-        
-        # Restate stepmatrix as graph:
-        graph <- lapply(
-          X = as.list(x = states),
-          FUN = function(state) setdiff(x = states, y = state)
-        )
-        
-        # Use transition costs as weights of graph:
-        weights <- lapply(
-          X = as.list(x = states),
-          FUN = function(state) unname(obj = stepmatrix$stepmatrix[state, setdiff(x = states, y = state)])
-        )
-        
-        # Add names to graph:
-        names(graph) <- names(weights) <- states
-        
-        # Case if Inf edges are found (will need to be removed):
-        if (any(x = unlist(x = weights) == Inf)) {
-          
-          # Remove Inf edges from graph and weights:
-          graph <- mapply(FUN = function(graph, weights) graph[weights != Inf], graph = graph, weights = weights, SIMPLIFY = FALSE)
-          weights <- mapply(FUN = function(graph, weights) weights[weights != Inf], graph = graph, weights = weights, SIMPLIFY = FALSE)
+      # Build new paths list:
+      new_paths <- rep(paths[i], length(x = unvisited_nodes))
+    
+      # Set current node as each unviisted node:
+      for(j in 1:length(x = new_paths)) new_paths[[j]]$current_node <- unvisited_nodes[j]
+    
+      # Update new paths:
+      new_paths <- lapply(
+        X = new_paths,
+        FUN = function(x) {
+          x$unvisited_nodes <- setdiff(x = x$unvisited_nodes, y = x$current_node)
+          x$length <- x$length + stepmatrix$stepmatrix[previous_node, x$current_node]
+          x$visited_nodes <- c(x$visited_nodes, x$current_node)
+          if (x$current_node == x$destination_node) x$reached_destination <- TRUE
+          x
         }
-        
-        ### BELOW IS CODE TAKEN FROM https://www.r-bloggers.com/2020/10/finding-the-shortest-path-with-dijkstras-algorithm/ WITH LITTLE MODIFICATION
-        
-        # Create edgelist with weights
-        G <- data.frame(utils::stack(x = graph), weights = stack(weights)[[1]])
-        
-        # Sub function to give path length:
-        path_length <- function(path) {
-          
-          # If path is NULL return infinite length:
-          if (is.null(path)) return(Inf)
-          
-          # Get all consecutive nodes:
-          pairs <- cbind(values = path[-length(path)], ind = path[-1])
-          
-          # Join with G and sum over weights
-          sum(merge(x = pairs, y = G)[ , "weights"])
-        }
-        
-        # Recursive subfunction to find shortest path:
-        find_the_shortest_path <- function(graph, start, end, path = c()) {
-          
-          # if there are no nodes linked from current node (= dead end) return NULL
-          if (is.null(graph[[start]])) return(NULL)
-          
-          # add next node to path so far
-          path <- c(path, start)
-          
-          # base case of recursion: if end is reached return path
-          if (start == end) return(path)
-          
-          # initialize shortest path as NULL
-          shortest <- NULL
-          
-          # Loop through all nodes linked from the current node (given in start):
-          for (node in graph[[start]]) {
-            
-            # Proceed only if linked node is not already in path:
-            if (!(node %in% path)) {
-              
-              # Recursively call function for finding shortest path with node as start and assign it to newpath:
-              newpath <- find_the_shortest_path(graph, node, end, path)
-              
-              # If newpath is shorter than shortest so far assign newpath to shortest:
-              if (path_length(newpath) < path_length(shortest))
-              shortest <- newpath
-            }
-          }
-          
-          # Return shortest path:
-          shortest
-        }
-        
-        # Return shortest path:
-        return(value = find_the_shortest_path(graph = graph, start = start, end = end))
-      }
+      )
+    
+      # Add new paths to list:
+      paths <- c(paths, new_paths)
     }
+  
+    # Remove (now) old paths:
+    paths <- paths[-continuing_paths]
+  }
+  
+  # Make vector of discovered path lengths:
+  path_lengths <- unlist(x = lapply(X = paths, FUN = function(x) x$length))
+
+  # If any path lengths are lower than direct cost:
+  if (any(path_lengths < direct_cost)) {
+  
+    # Return first shortest path found:
+    return(paths[[which(x = path_lengths == min(x = path_lengths))[1]]]$visited_nodes)
+  
+  # If direct cost is best:
+  } else {
+  
+    # Return direct path:
+    return(c(start, end))
   }
 }
