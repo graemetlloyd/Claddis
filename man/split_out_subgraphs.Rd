@@ -2,7 +2,7 @@
 % Please edit documentation in R/split_out_subgraphs.R
 \name{split_out_subgraphs}
 \alias{split_out_subgraphs}
-\title{Split adjacenecy matrix into subgraphs}
+\title{Split adjacency matrix into subgraphs}
 \usage{
 split_out_subgraphs(adjacency_matrix)
 }
@@ -13,14 +13,14 @@ split_out_subgraphs(adjacency_matrix)
 A list of all connected subgraphs represented as adjacency matri(ces).
 }
 \description{
-Given a graph represented by an adjacenecy matrix splits into all connected subgraphs.
+Given a graph represented by an adjacency matrix splits into all connected subgraphs.
 }
 \details{
-This functions take any undirected graph (connected or unconnected) represented as an adjacenecy matrix and identifies all connected subgraphs and returns these as a list of adjacency matr(ices).
+This functions take any undirected graph (connected or unconnected) represented as an adjacency matrix and identifies all connected subgraphs and returns these as a list of adjacency matr(ices).
 }
 \examples{
 
-# Create a disconnected graph matrix:
+# Create an adjacency matrix representing an unconnected graph:
 adjacency_matrix <- matrix(
   data = c(
     0, 0, 0, 1, 1, 0,
