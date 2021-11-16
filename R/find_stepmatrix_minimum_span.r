@@ -79,6 +79,7 @@
 find_stepmatrix_minimum_span <- function(stepmatrix) {
   
   # ADD SOME DATA CHECKS?
+  # CANNOT DEAL WTH POLYMORPHISMS OR UNCERTAINTIES WITHOUT MODIFICATION!
 
   # Things are simple if character is invariant (one-by-one matrix) - there are no changes:
   if (stepmatrix$size == 1) return(0)
