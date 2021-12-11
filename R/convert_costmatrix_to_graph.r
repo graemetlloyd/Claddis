@@ -1,16 +1,16 @@
-#' Convert a stepmatrix to a minimal graph
+#' Convert a costmatrix to a minimal graph
 #'
 #' @description
 #'
-#' Given a stepmatrix, returns the smallest possible graph (fewest edges).
+#' Given a costmatrix, returns the smallest possible graph (fewest edges).
 #'
-#' @param stepmatrix An object of class \code{stepMatrix}.
+#' @param costmatrix An object of class \code{costMatrix}.
 #'
 #' @details
 #'
-#' A stepmatrix summarises all possible state-to-state transition costs and hence each entry could also be considered an edge of a directed state graph. However, many of these edges could be removed and a complete description of the graph still be provided. For example, the diagonal (any transition from a state to itself) can be removed, as can any edge with infinite cost (as this edge would never be traversed in practice). Finally, some edges are redundant as indirect paths already represent the same cost.
+#' A costmatrix summarises all possible state-to-state transition costs and hence each entry could also be considered an edge of a directed state graph. However, many of these edges could be removed and a complete description of the graph still be provided. For example, the diagonal (any transition from a state to itself) can be removed, as can any edge with infinite cost (as this edge would never be traversed in practice). Finally, some edges are redundant as indirect paths already represent the same cost.
 #'
-#' As an example, we can consider the linear ordered stepmatrix:
+#' As an example, we can consider the linear ordered costmatrix:
 #'
 #' \preformatted{    -------------
 #'     | 0 | 1 | 2 |
@@ -70,12 +70,12 @@
 #'
 #' @seealso
 #'
-#' \link{convert_adjacency_matrix_to_stepmatrix}
+#' \link{convert_adjacency_matrix_to_costmatrix}
 #'
 #' @examples
 #'
-#' # Make a six-state unordered character stepmatrix:
-#' unordered_stepmatrix <- make_stepmatrix(
+#' # Make a six-state unordered character costmatrix:
+#' unordered_costmatrix <- make_costmatrix(
 #'   min_state = 0,
 #'   max_state= 5,
 #'   character_type = "unordered",
@@ -84,10 +84,10 @@
 #' )
 #'
 #' # Find the minimal directed graph representation:
-#' convert_stepmatrix_to_graph(stepmatrix = unordered_stepmatrix)
+#' convert_costmatrix_to_graph(costmatrix = unordered_costmatrix)
 #'
-#' # Make a six-state ordered character stepmatrix:
-#' ordered_stepmatrix <- make_stepmatrix(
+#' # Make a six-state ordered character costmatrix:
+#' ordered_costmatrix <- make_costmatrix(
 #'   min_state = 0,
 #'   max_state= 5,
 #'   character_type = "ordered",
@@ -96,10 +96,10 @@
 #' )
 #'
 #' # Find the minimal directed graph representation:
-#' convert_stepmatrix_to_graph(stepmatrix = ordered_stepmatrix)
+#' convert_costmatrix_to_graph(costmatrix = ordered_costmatrix)
 #'
-#' # Make a six-state stratigraphic character stepmatrix:
-#' stratigraphic_stepmatrix <- make_stepmatrix(
+#' # Make a six-state stratigraphic character costmatrix:
+#' stratigraphic_costmatrix <- make_costmatrix(
 #'   min_state = 0,
 #'   max_state= 5,
 #'   character_type = "stratigraphy",
@@ -109,22 +109,22 @@
 #' )
 #'
 #' # Find the minimal directed graph representation:
-#' convert_stepmatrix_to_graph(stepmatrix = stratigraphic_stepmatrix)
+#' convert_costmatrix_to_graph(costmatrix = stratigraphic_costmatrix)
 #'
-#' @export convert_stepmatrix_to_graph
-convert_stepmatrix_to_graph <- function(stepmatrix) {
+#' @export convert_costmatrix_to_graph
+convert_costmatrix_to_graph <- function(costmatrix) {
   
   # Store original states for using as output:
-  original_states <- colnames(x = stepmatrix$stepmatrix)
+  original_states <- colnames(x = costmatrix$costmatrix)
   
-  # Set sampled states and stepmatrix rows and columns to simple numbers to work with optrees:
-  sampled_states <- rownames(x = stepmatrix$stepmatrix) <- colnames(x = stepmatrix$stepmatrix) <- 1:stepmatrix$size
+  # Set sampled states and costmatrix rows and columns to simple numbers to work with optrees:
+  sampled_states <- rownames(x = costmatrix$costmatrix) <- colnames(x = costmatrix$costmatrix) <- 1:costmatrix$size
   
   # Create table of all possible edges:
   all_edges <- expand.grid(from = sampled_states, to = sampled_states)
   
   # Add weight to edges:
-  all_edges <- cbind(from = all_edges[, "from"], to = all_edges[, "to"], weight = apply(X = all_edges, MARGIN = 1, function(x) stepmatrix$stepmatrix[x[1], x[2]]))
+  all_edges <- cbind(from = all_edges[, "from"], to = all_edges[, "to"], weight = apply(X = all_edges, MARGIN = 1, function(x) costmatrix$costmatrix[x[1], x[2]]))
   
   # Prune all zero weight edges (i.e., diagonal):
   all_edges <- all_edges[-which(x = all_edges[, "weight"] == 0), , drop = FALSE]

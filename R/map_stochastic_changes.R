@@ -116,8 +116,8 @@ map_stochastic_changes <- function(cladistic_matrix, time_tree, time_bins, n_sim
   # Check cladistic_matrix has class cladisticMatrix and stop and warn user if not:
   if (!inherits(x = cladistic_matrix, what = "cladisticMatrix")) stop("cladistic_matrix must be an object of class \"cladisticMatrix\".")
 
-  # Check for continuous and step matrices and stop and warn user if found:
-  if (length(x = setdiff(x = unique(x = unlist(x = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], function(x) x$ordering))), y = c("unordered", "ordered"))) > 0) stop("cladistic_matrix can only contain characters of type \"ordered\" or \"unordered\" (i.e., no step matrices or continuous characters).")
+  # Check for continuous and costmatrices and stop and warn user if found:
+  if (length(x = setdiff(x = unique(x = unlist(x = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], function(x) x$ordering))), y = c("unordered", "ordered"))) > 0) stop("cladistic_matrix can only contain characters of type \"ordered\" or \"unordered\" (i.e., no costmatrices or continuous characters).")
 
   # Check tree has branch lengths:
   if (is.null(time_tree$edge.length)) stop("time_tree does not have branch lengths (durations). Try timescaling the tree, e.g., with DatePhylo.")

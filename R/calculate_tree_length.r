@@ -9,26 +9,26 @@
 #' @param inapplicables_as_missing Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).
 #' @param polymorphism_behaviour One of either "missing", "uncertainty", "polymorphism", or "random". See details.
 #' @param uncertainty_behaviour One of either "missing", "uncertainty", "polymorphism", or "random". See details.
-#' @param polymorphism_shape Argument passed to \link{make_stepmatrix}.
-#' @param polymorphism_distance Argument passed to \link{make_stepmatrix}.
-#' @param state_ages Argument passed to \link{make_stepmatrix}.
-#' @param dollo_penalty Argument passed to \link{make_stepmatrix}.
+#' @param polymorphism_shape Argument passed to \link{make_costmatrix}.
+#' @param polymorphism_distance Argument passed to \link{make_costmatrix}.
+#' @param state_ages Argument passed to \link{make_costmatrix}.
+#' @param dollo_penalty Argument passed to \link{make_costmatrix}.
 #'
 #' @details
 #'
-#' Under the maximum parsimony criterion, a phylogenetic hypothesis is considered optimal if it requires the fewest number of evolutionary "steps". In order to evalulate this criterion we must therefore be able to calculate a tree's "length" (total steps assuming the fewest possible steps for every character used). Given a set of phylogenetic hypothes(es) and a cladistic matrix this function calculates the minimum length for each tree.
+#' Under the maximum parsimony criterion, a phylogenetic hypothesis is considered optimal if it requires the fewest number of evolutionary "steps" or - to generalise to non-discrete values - minimum total cost. In order to evalulate this criterion we must therefore be able to calculate a tree's "length" (total cost assuming the lowest cost for every character used). Given a set of phylogenetic hypothes(es) and a cladistic matrix this function calculates the minimum length for each tree.
 #'
 #' \bold{Input data format}
 #'
-#' This function operates on a phylogenetic tree, or trees (in \code{ape} format), and a cladistic matrix (in \code{cladisticMatrix} format). However, the algorithm used is based on the generalised stepmatrix approach of Swofford and Maddison (1992) and hence stepmatrices need to be defined for each character (this is done internally by calling \link{make_stepmatrix}), and some of the options are merely passed to this function.
+#' This function operates on a phylogenetic tree, or trees (in \code{ape} format), and a cladistic matrix (in \code{cladisticMatrix} format). However, the algorithm used is based on the generalised costmatrix approach of Swofford and Maddison (1992) and hence costmatrices need to be defined for each character (this is done internally by calling \link{make_costmatrix}), and some of the options are merely passed to this function.
 #'
 #' \bold{Algorithm}
 #'
-#' Technically the Swofford and Maddison (1992) algorithm is designed for ancestral state reconstruction, but as its' first pass of the tree assigns lengths for each possible state at each node the minimum value of these options at the root is also the tree length for that character and hence by skipping the later steps this can be used as a tree length algorithm by simply summing the values across each character. The choice of the Swofford and Maddison algorithm, rather than the Wagner or Fitch algorithms (for ordered and unordered characters, respectively) is to generalize to the broadest range of character types, including asymmetric characters (Camin-Sokal, Dollo, stratigraphic), custom character types (specified using stepmatrices or character state trees), as well as to any resolution of tree (i.e., including multifurcating trees - important for establishing maximum step counts for homoplasy indices). The only restriction here is that the tree must be rooted such that time's arrow is explicitly present. This is essential, as the root defines the lengths across the whole tree, but also for asymmetric characters directionality must be explicit, as well as some downstream appraoches (such as ACCTRAN and DELTRAN). The two obvious drawbacks to this algorithm are that it can be slower and that it is not appropriate for unrooted trees.
+#' Technically the Swofford and Maddison (1992) algorithm is designed for ancestral state reconstruction, but as its' first pass of the tree assigns lengths for each possible state at each node the minimum value of these options at the root is also the tree length for that character and hence by skipping the later steps this can be used as a tree length algorithm by simply summing the values across each character. The choice of the Swofford and Maddison algorithm, rather than the Wagner or Fitch algorithms (for ordered and unordered characters, respectively) is to generalize to the broadest range of character types, including asymmetric characters (Camin-Sokal, Dollo, stratigraphic), custom character types (specified using costmatrices or character state trees), as well as to any resolution of tree (i.e., including multifurcating trees - important for establishing maximum costs for homoplasy indices). The only restriction here is that the tree must be rooted such that time's arrow is explicitly present. This is essential, as the root defines the lengths across the whole tree, but also for asymmetric characters directionality must be explicit, as well as some downstream approaches (such as ACCTRAN and DELTRAN). The two obvious drawbacks to this algorithm are that it can be slower and that it is not appropriate for unrooted trees.
 #'
-#' \bold{Stepmatrices and stepmatrix options}
+#' \bold{Costmatrices and costmatrix options}
 #'
-#' Stepmatrices are described in detail in the \link{make_stepmatrix} manual, as are the options that are passed from this function to that one. Thus, the user is directed there for a more in-depth discussion of options.
+#' Costmatrices are described in detail in the \link{make_costmatrix} manual, as are the options that are passed from this function to that one. Thus, the user is directed there for a more in-depth discussion of options.
 #'
 #' \bold{Inapplicable and missing characters}
 #'
@@ -40,8 +40,8 @@
 #'
 #'  \enumerate{
 #'    \item{Missing (\code{polymorphism_behaviour = "missing"} or \code{uncertainty_behaviour = "missing"}). }{Here polymorphisms are simply replaced by the missing character (\code{NA}). This removes polymorphisms and uncertainties from the calculation process completely (likely leading to undercounts), and hence is not generally recommended.}
-#'    \item{Uncertainty (\code{polymorphism_behaviour = "uncertainty"} or \code{uncertainty_behaviour = "uncertainty"}). }{This is the intended use of uncertain codings (e.g., \code{0/1}) and constrains the tree length calculation to having to explain the \emph{least} costly transition of those in the uncertainty. This is recommended for uncertain characters (although note that it biases the result towards the shortest possible length), but not truly polymorphic characters (as one or more state acquisitions are being missed, see Nixon and Davis 1991 and \link{make_stepmatrix} for discussion of this). This is also - to the best of my knowledge - the approach used by most parsimony software, such as PAUP* (Swofford 2003) and TNT (Goloboff et al. 2008; Goloboff and Catalano 2016).}
-#'    \item{Polymorphism (\code{polymorphism_behaviour = "polymorphism"} or \code{uncertainty_behaviour = "polymorphism"}). }{If polymorphisms are real then some means of accounting for the changes that produce them seems appropriate, albeit difficult (see Nixon and Davis 1991 and Swofford and Maddison 1992 for discussions). If this option is applied it triggers the downstream options in \emph{make_stepmatrix} (by internally setting \code{include_polymorphisms = TRUE}), and the user should look there for more information. This is tentatively recommended for true polymorphisms (but note that it complicates interpretation), but not uncertainties.}
+#'    \item{Uncertainty (\code{polymorphism_behaviour = "uncertainty"} or \code{uncertainty_behaviour = "uncertainty"}). }{This is the intended use of uncertain codings (e.g., \code{0/1}) and constrains the tree length calculation to having to explain the \emph{least} costly transition of those in the uncertainty. This is recommended for uncertain characters (although note that it biases the result towards the shortest possible length), but not truly polymorphic characters (as one or more state acquisitions are being missed, see Nixon and Davis 1991 and \link{make_costmatrix} for discussion of this). This is also - to the best of my knowledge - the approach used by most parsimony software, such as PAUP* (Swofford 2003) and TNT (Goloboff et al. 2008; Goloboff and Catalano 2016).}
+#'    \item{Polymorphism (\code{polymorphism_behaviour = "polymorphism"} or \code{uncertainty_behaviour = "polymorphism"}). }{If polymorphisms are real then some means of accounting for the changes that produce them seems appropriate, albeit difficult (see Nixon and Davis 1991 and Swofford and Maddison 1992 for discussions). If this option is applied it triggers the downstream options in \emph{make_costmatrix} (by internally setting \code{include_polymorphisms = TRUE}), and the user should look there for more information. This is tentatively recommended for true polymorphisms (but note that it complicates interpretation), but not uncertainties.}
 #'    \item{Random (\code{polymorphism_behaviour = "random"} or \code{uncertainty_behaviour = "random"}). }{Another means of dealing with multiple-state characters is simply to sample a single state at random for each one, for example as Watanabe (2016) did with their PERDA algorithm. This simplifies the process, but also logically requires running the function multiple times to quantify uncertainty. This is not recommended for true polymorphisms (as interpretation is confounded), but may be appropriate for a less downwards biased tree count than \code{"uncertainty"}.}
 #' }
 #'
@@ -49,7 +49,7 @@
 #'
 #' \bold{Polytomies}
 #'
-#' Polytomies are explicitly allowed by the function, but will always be treated as "hard" (i.e., literal multifurcations). Note that typically these will lead to higher tree lengths than fully bifurcating trees and indeed that the maximum number of steps is typically calculated from the star tree (single multifurcation).
+#' Polytomies are explicitly allowed by the function, but will always be treated as "hard" (i.e., literal multifurcations). Note that typically these will lead to higher tree lengths than fully bifurcating trees and indeed that the maximum cost is typically calculated from the star tree (single multifurcation).
 #'
 #' \bold{Further constraints}
 #'
@@ -57,7 +57,7 @@
 #'
 #' \bold{Character weights}
 #'
-#' Tree lengths output already include corrections for character weights as supplied in the \code{cladistic_matrix} input. So, for example, if a binary character has two steps on the tree, but is weighted five then it will contribute a value of ten steps to the result.
+#' Tree lengths output already include corrections for character weights as supplied in the \code{cladistic_matrix} input. So, for example, if a binary character costs two on the tree, but is weighted five then it will contribute a total cosr of 10 to the result.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -90,16 +90,16 @@
 #' \item{input_trees}{The tree(s) used as input.}
 #' \item{input_matrix}{The raw (unmodified) \code{cladistic_matrix} input.}
 #' \item{input_options}{The various input options used. Output for use by downstream functions, such as ancestral state estimation and stochastic character mapping.}
-#' \item{stepmatrices}{The stepmatrices (one for each character) used. These are typically generated automatically by the funcion, but are output here for later use in ancestral state estimation and stochastic character mapping functions.}
+#' \item{costmatrices}{The costmatrices (one for each character) used. These are typically generated automatically by the funcion, but are output here for later use in ancestral state estimation and stochastic character mapping functions.}
 #' \item{character_matrix}{The single character matrix object used. Essentially the \code{input_matrix} modified by the \code{input_options}.}
-#' \item{character_lengths}{A matrix of characters (rows) and trees (columns) with values indicating the number of steps. The column sums of this matrix are the \code{tree_lengths} values. This output can also be used for homoplasy metrics.}
+#' \item{character_lengths}{A matrix of characters (rows) and trees (columns) with values indicating the costs. The column sums of this matrix are the \code{tree_lengths} values. This output can also be used for homoplasy metrics.}
 #' \item{character_weights}{A vector of the character weights used.}
-#' \item{tree_lengths}{The primary output - the length for each input tree in total steps.}
+#' \item{tree_lengths}{The primary output - the length for each input tree in total cost.}
 #' \item{node_values}{The values (lengths for each state) for each node acrss trees and characters. This is used by \link{reconstruct_ancestral_states} for ancestral state reconstruction.}
 #'
 #' @seealso
 #'
-#' \link{make_stepmatrix}, \link{reconstruct_ancestral_states}
+#' \link{make_costmatrix}, \link{reconstruct_ancestral_states}
 #'
 #' @examples
 #'
@@ -144,14 +144,14 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
   
   # CHECKS TO WRITE
   # - states are discrete
-  # - states in tip states are all available in stepmatrix and vice versa
-  # - stepmatrix values are zero or positive (don't have to be integers?)
+  # - states in tip states are all available in costmatrix and vice versa
+  # - costmatrix values are zero or positive (don't have to be integers?)
   # - Check there are enough states to do something with!
   # - Put checks at higher level to avoid repeating for every character in a matrix (slow?)
   
   # deal with dollo and irreversible root forcing? (and polymorphisms)
   # conditional to recode polymorphisms if stratigraphic character
-  # NEED DIFFERENT FUNCTION FOR CONTINUOUS CHARACTERS (AS STEPMATRIX MAKES LITTLE SENSE!).
+  # NEED DIFFERENT FUNCTION FOR CONTINUOUS CHARACTERS (AS COSTMATRIX MAKES LITTLE SENSE!).
   # CAN USE asr_squared_change_parsimony in castor but does mean adding a dependency
   
   # NEED TO COUNT DOLLO CHARACTERS DIFFERENTLY FOR PARSIMONY OR WILL OVERWHELM BROADER CHARACTER TRENDS.
@@ -165,7 +165,7 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
   # If trees is a single topology then reformat as a list of length one:
   if (class(x = trees) == "phylo") trees <- list(trees)
   
-  # Set include_polymorphisms for make_stepmatrix by polymorphism_behaviour or uncertainty_behaviour choice:
+  # Set include_polymorphisms for make_costmatrix by polymorphism_behaviour or uncertainty_behaviour choice:
   include_polymorphisms <- ifelse(test = polymorphism_behaviour == "polymorphism" || uncertainty_behaviour == "polymorphism", yes = TRUE, no = FALSE)
   
   # Combine all blocks into a single input matrix:
@@ -208,10 +208,10 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
     X = as.list(x = 1:length(x = single_input_matrix$ordering)),
     FUN = function(x) list(
       tip_states = single_input_matrix$matrix[, x],
-      stepmatrix = if (length(x = grep(pattern = "step", x = single_input_matrix$ordering[x])) == 1) {
-        cladistic_matrix$topper$step_matrices[[single_input_matrix$ordering[x]]]
+      costmatrix = if (length(x = grep(pattern = "step", x = single_input_matrix$ordering[x])) == 1) {
+        cladistic_matrix$topper$costmatrices[[single_input_matrix$ordering[x]]]
       } else {
-        make_stepmatrix(
+        make_costmatrix(
           min_state = single_input_matrix$minima[x],
           max_state = single_input_matrix$maxima[x],
           character_type = single_input_matrix$ordering[x],
@@ -228,7 +228,7 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
   )
   
   # Subfunction to do Swofford and Maddison 1992 first pass of tree:
-  first_pass <- function(tree, tip_states, stepmatrix, weight, node_constraints = NULL) {
+  first_pass <- function(tree, tip_states, costmatrix, weight, node_constraints = NULL) {
     
     # Reorder tip states (1 to N) and store an unmodified version:
     pristine_tip_states <- tip_states <- tip_states[tree$tip.label]
@@ -254,7 +254,7 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
     node_count <- tip_count + tree$Nnode
     
     # Initialise node_values matrix:
-    node_values <- matrix(data = 0, nrow = node_count, ncol = stepmatrix$size, dimnames = list(c(), colnames(stepmatrix$stepmatrix)))
+    node_values <- matrix(data = 0, nrow = node_count, ncol = costmatrix$size, dimnames = list(c(), colnames(costmatrix$costmatrix)))
     
     # Begin by inserting Inf as default tip value:
     node_values[1:tip_count, ] <- Inf
@@ -304,7 +304,7 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
             FUN = function(fromstate) {
               sum(x = unlist(x = lapply(
                 X = as.list(x = descendants),
-                FUN = function(descendant) min(x = node_values[descendant, ] + stepmatrix$stepmatrix[fromstate, ]))))
+                FUN = function(descendant) min(x = node_values[descendant, ] + costmatrix$costmatrix[fromstate, ]))))
             })
           )
         ),
@@ -320,7 +320,7 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
     tree_length <- min(x = node_values[tip_count + 1, ]) * weight
     
     # Build input value list:
-    input_values <- list(tree = tree, tip_states = pristine_tip_states, stepmatrix = stepmatrix, weight = weight, inapplicables_as_missing = inapplicables_as_missing, node_constraints = node_constraints)
+    input_values <- list(tree = tree, tip_states = pristine_tip_states, costmatrix = costmatrix, weight = weight, inapplicables_as_missing = inapplicables_as_missing, node_constraints = node_constraints)
     
     # Return output:
     list(length = tree_length, node_values = node_values)
@@ -336,7 +336,7 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
         function(x) first_pass(
           tree = y,
           tip_states = x$tip_states,
-          stepmatrix = x$stepmatrix,
+          costmatrix = x$costmatrix,
           weight = x$weight,
           node_constraints = node_constraints
         )
@@ -360,7 +360,7 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
       state_ages = state_ages,
       dollo_penalty = dollo_penalty
     ),
-    stepmatrices = lapply(X = character_list, FUN = function(x) x$stepmatrix),
+    costmatrices = lapply(X = character_list, FUN = function(x) x$costmatrix),
     character_matrix = single_input_matrix,
     character_lengths = character_lengths,
     character_weights = single_input_matrix$weights,

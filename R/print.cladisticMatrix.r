@@ -45,10 +45,10 @@ print.cladisticMatrix <- function(x, ...) {
   n_unordered_characters <- sum(character_ordering == "unordered")
   n_ordered_characters <- sum(character_ordering == "ordered")
   n_continuous_characters <- sum(character_ordering == "continuous")
-  n_stepmatrix_characters <- length(x = grep(pattern = "step", x = character_ordering))
+  n_costmatrix_characters <- length(x = grep(pattern = "step", x = character_ordering))
   
   # Calculate character sizes for ordering types:
-  character_sizes <- nchar(x = c(n_unordered_characters, n_ordered_characters, n_continuous_characters, n_stepmatrix_characters))
+  character_sizes <- nchar(x = c(n_unordered_characters, n_ordered_characters, n_continuous_characters, n_costmatrix_characters))
   character_spacings <- unlist(x = lapply(X = as.list(x = max(x = character_sizes) - character_sizes), function(x) paste(rep(x = " ", times = x), collapse = "")))
   
   # Get number of unique weights (excluding continuous characters):
@@ -74,7 +74,7 @@ print.cladisticMatrix <- function(x, ...) {
       paste0("  ", character_spacings[1], n_unordered_characters, " are unordered,\n"),
       paste0("  ", character_spacings[2], n_ordered_characters, " are ordered,\n"),
       paste0("  ", character_spacings[3], n_continuous_characters, " are continuous, and\n"),
-      paste0("  ", character_spacings[4], n_stepmatrix_characters, " are step-matrix characters\n"),
+      paste0("  ", character_spacings[4], n_costmatrix_characters, " are cost-matrix characters\n"),
       weight_line)
   )
 }

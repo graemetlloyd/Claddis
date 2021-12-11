@@ -46,11 +46,11 @@
 #'
 #' Note that here such matrices are also considered symmetric and hence the diagonal is also a line of reflection.
 #'
-#' In practice more complex relationships may be desired, including differential weighting of specific transitions (without additional intermediate states; where going from state X to state Y has a cost other than zero or one), or asymmetric models (where going from state X to state Y has a different "cost" than going from state Y to state X). These are still possible in Claddis, and phylogenetic analysis in general, but require "step-matrices" to define them. (Character state trees are insufficent.)
+#' In practice more complex relationships may be desired, including differential weighting of specific transitions (without additional intermediate states; where going from state X to state Y has a cost other than zero or one), or asymmetric models (where going from state X to state Y has a different "cost" than going from state Y to state X). These are still possible in Claddis, and phylogenetic analysis in general, but require "costmatrices" to define them. (Character state trees are insufficent.)
 #'
-#' Thus, step matrices (or their probablistic quivalent, Q-matrices) are the only generalisable form of defining \emph{any} Markov model.
+#' Thus, costmatrices (or their probabilistic equivalent, Q-matrices) are the only generalisable form of defining \emph{any} Markov model.
 #'
-#' The output from this function can also be represented as a step matrix with \link{convert_adjacency_matrix_to_stepmatrix}.
+#' The output from this function can also be represented as a costmatrix with \link{convert_adjacency_matrix_to_costmatrix}.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
@@ -68,16 +68,16 @@
 #'
 #' @seealso
 #'
-#' \link{convert_adjacency_matrix_to_stepmatrix}, \link{locate_bracket_positions}
+#' \link{convert_adjacency_matrix_to_costmatrix}, \link{locate_bracket_positions}
 #'
 #' @examples
 #'
-#' # Convert a simple state tree to an adjacenecy matrix:
+#' # Convert a simple state tree to an adjacency matrix:
 #' convert_state_tree_to_adjacency_matrix(
 #'  state_tree = "(3,(2)1)0"
 #' )
 #'
-#' # Convert a more complex state tree to an adjacenecy matrix:
+#' # Convert a more complex state tree to an adjacency matrix:
 #' convert_state_tree_to_adjacency_matrix(
 #'   state_tree = "(((5)4)3,(2)1)0"
 #' )

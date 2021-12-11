@@ -8,20 +8,25 @@
 #' @param cladistic_matrix A character-taxon matrix in the format imported by \link{read_nexus_matrix}. These should be discrete with labels matching the tip labels of \code{tree}.
 #' @param estimate_all_nodes Logical that allows the user to make estimates for all ancestral values. The default (\code{FALSE}) will only make estimates for nodes that link coded terminals (recommended).
 #' @param estimate_tip_values Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).
-#' @param inapplicables_as_missing Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).
-#' @param polymorphism_behaviour One of either "missing", "uncertainty", "polymorphism", or "random". See details.
-#' @param uncertainty_behaviour One of either "missing", "uncertainty", "polymorphism", or "random". See details.
-#' @param polymorphism_shape Argument passed to \link{make_stepmatrix}.
-#' @param polymorphism_distance Argument passed to \link{make_stepmatrix}.
-#' @param state_ages Argument passed to \link{make_stepmatrix}.
-#' @param dollo_penalty Argument passed to \link{make_stepmatrix}.
+#' @param inapplicables_as_missing Argument passed to \link{calculate_tree_length}.
+#' @param polymorphism_behaviour Argument passed to \link{calculate_tree_length}.
+#' @param uncertainty_behaviour Argument passed to \link{calculate_tree_length}.
+#' @param polymorphism_shape Argument passed to \link{make_costmatrix}.
+#' @param polymorphism_distance Argument passed to \link{make_costmatrix}.
+#' @param state_ages Argument passed to \link{make_costmatrix}.
+#' @param dollo_penalty Argument passed to \link{make_costmatrix}.
 #'
 #' @details
 #'
-#' Users may also wish to refer to the more complex whole-matrix, likelihood-based function \link{estimate_ancestral_states}. Although, note that eventually parsimony will simply be an option to that function.
+#' Although most phylogenetic inference considers character evolution on a tree, they rarely explicitly assign states to internal nodes in the process, and hence this is normally done \emph{a posteriori} using some form of ancestral state estimation algorithm. This function uses the parsimony optimality criterion (i.e., maximum parsimony, or the process that involves the fewest possible transitions, or, more accurately, the lowest total transition cost).
+#'
+#' \bold{Algorithm}
+#'
+#' Like \link{calculate_tree_length}, this function is built around the generalised Swofford and Maddison (1992) algorithm, but adds the second pass as this is the one that explicitly generates \emph{all} most parsimonious reconstructions. As it is a generalised approach it can work with the broadest range of character types and (rooted) trees of any degree of resolution - treating polytomies as hard.
+#'
 #'
 
-
+# estimate all nodes/estimate tips cite Lloyd 2018
 # REFERENCE castor asr_max_parsimony and phangorn acctran as alternates
 
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
@@ -40,7 +45,7 @@
 #'
 #' @seealso
 #'
-#' \link{estimate_ancestral_states}
+#' \link{calculate_tree_length}, \link{estimate_ancestral_states}
 #'
 #' @examples
 #'
@@ -92,7 +97,7 @@ reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_n
   # - WEIGHTED BY BRANCH DURATION? (E.G., ((0:1,1:4)); SHOULD FAVOUR A 0 ROOT STATE). NEED WAY TO "SCORE" THESE SUCH THAT CAN FIND MPR WITH BEST SCORE.
   # - ALLOW ROOT TO LEAN TOWARDS LOWEST STATE? (e.g., 0 > 1).
   
-  # ALLOW RECONSTRUCTIONS N STEPS LONGER SOMEHOW? PROBABLY A BACKBURNER/LONG TERM THING
+  # ALLOW RECONSTRUCTIONS OF SOME COST LONGER SOMEHOW? PROBABLY A BACKBURNER/LONG TERM THING
   
   # TO ADD INTO NODE ESTIMATE VERSION OF FUNCTION:
   #estimate_all_nodes <- FALSE
@@ -113,18 +118,8 @@ reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_n
     dollo_penalty = dollo_penalty
   )
   
-  
-  # THEN:
-  # second_pass # All MPRs (OUTPUTS: all_mprs)
-  # third_pass # Missing/inapplicables applied to internal nodes (OUTPUTS: modified_mprs)
-  
-  
-  
-  
-  
-  
   # Subfunction to perform Swofford and Maddison (1992) second pass (generates all most parsimonious reconstructions):
-  second_pass <- function(tree, node_values, tip_count, node_count, stepmatrix) {
+  second_pass <- function(tree, node_values, tip_count, node_count, costmatrix) {
     
     # Build node estimates from single state results:
     node_estimates <- matrix(
@@ -172,7 +167,7 @@ reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_n
         node_estimates <- do.call(what = cbind, args = lapply(X = node_estimates, FUN = function(x) {
           
           # Get updated tree lengths for current node as per Swofford and Maddison 1992 second pass:
-          updated_tree_lengths <- stepmatrix$stepmatrix[x[ancestor_node], ] + node_values[needle, ]
+          updated_tree_lengths <- costmatrix$costmatrix[x[ancestor_node], ] + node_values[needle, ]
           
           # Store all possible most parsimonious state(s) for current node:
           possible_states <- names(x = updated_tree_lengths[updated_tree_lengths == min(x = updated_tree_lengths)])
@@ -210,27 +205,28 @@ reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_n
       lapply(
         X = as.list(1:ncol(x = first_pass_output$character_matrix$matrix)),
         FUN = function(character_n) {
-          stepmatrix <- first_pass_output$stepmatrices[[character_n]]
+          costmatrix <- first_pass_output$costmatrices[[character_n]]
           node_values <- first_pass_output$node_values[[tree_n]][[character_n]]
           second_pass(
             tree = tree,
             node_values = node_values,
             tip_count = tip_count,
             node_count = node_count,
-            stepmatrix = stepmatrix
+            costmatrix = costmatrix
           )
         }
       )
     }
   )
   
-  ### NEED TO DEAL WITH MISSING/UNCERTIANTY AND GENERAL THIRD PASS STUFF IN HERE
+  ### NEED TO DEAL WITH MISSING/INAPPLICABLE AND GENERAL THIRD PASS STUFF IN HERE
+  ### ALSO WHAT TO SET TIP STATES AS (MAYBE RAW INPUT BUT THINK ABOUT SCM IMPLICATIONS)?
   
   # Return already compiled output:
   first_pass_output
 }
 
-# WHAT IF ALL CHARACTERS ARE UNCERTAIN!!!!!!
+# WHAT IF ALL CHARACTERS ARE UNCERTAIN!!!!!! (WHAT ARE ANCESTRAL STATES?)
 # MANUAL: Swofford and Maddison (1992; p210): "Both [ACCTRAN and DELTRAN] start by either assuming that the ancestral state is known or by choosing a state from the set of optimal assignments to the root node" - i.e., always an arbitrainess problem at root!
 
 
@@ -240,7 +236,7 @@ reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_n
 
 
 
-# Record in manual that weighted parsimony is folly, but could use to chose between MPRs (maybe?)
+# Record in manual that "weighted" discrete parsimony is folly (unlike square changed parsimony) - will lead to more changes than "unweighted" parsimony, but could use to chose between MPRs (maybe?)
 
 
 
@@ -248,31 +244,17 @@ reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_n
 # OUTPUT:
 # - Ambiguities?
 # - Tip states used
-# - How root value was chosen (arbitrary forced, unambiguous?)
+# - How root value was chosen (arbitrary forced, unambiguous?) - ADD ROOT OPTION A LA PAUP*
 # - Algorithm (parsimony, ML, etc.) - for later integration into single ASR function with other options (likelihood, rerooting etc.)
 # - Character map? (need to think carefully what this format should be and hence how stuff like ASE needs to inform it.)
 # - MAKE THIS A CLASS TOO!
 
+# NEED TO COVER SWOFFORD AND MADDISON 1992 ROOT VALUE CAVEAT SOMEWHERE, MAYBE TREE LENGTH FUNCTION? BUT RELATES HERE TOO
 
-
-# MORE OUTPUT OR SUMMARY OPTIONS COULD BE N CHANGES ON EACH BRANCH ACROSS MPRS, MEAN OF SAME, MIN AND MAX OF SAME. SIMILAR FOR CHANGE TYPES I.E., STEP MATRIX BUT ACTUALLY FREQUENCY OF CHANGES FOR EACH TRANSITION (THIS IS REALLY AN SCM OUTPUT).
+# MORE OUTPUT OR SUMMARY OPTIONS COULD BE N CHANGES ON EACH BRANCH ACROSS MPRS, MEAN OF SAME, MIN AND MAX OF SAME. SIMILAR FOR CHANGE TYPES I.E., COSTMATRIX BUT ACTUALLY FREQUENCY OF CHANGES FOR EACH TRANSITION (THIS IS REALLY AN SCM OUTPUT).
 # AS RATE TENDS TOWARD INFINITY THEN RECONSTRUCTION AT A NODE TENDS TOWARDS EQUAL FREQUENCY OF EACH STATE (I.E., MAXIMAL UNCERTAINTY).
 # "This illustrates the fact that ACCTRAN and DELTRAN do not always choose a single one of the most parsimonious reconstructions." MacClade 4 manual, page 99).
 # "Note that MacClade, unlike PAUP*, does not choose the lowest-valued state at the root to begin these processes. Thus MacClade's ACCTRAN and DELTRAN may not fully resolve ambiguity in the ancestral state reconstruction."
-# INTERMEDIATES ARE GONNA MATTER IF MOVING TO CHARACTER MAPS. E.G., IF ONLY 0 AND 2 ARE SAMPLED BUT A CHARACTER IS ORDERED THEN THERE ARE TWO CHANGES ALONG THE BRANCH NOT ONE TWO-STEP CHANGE.
+# INTERMEDIATES ARE GONNA MATTER IF MOVING TO CHARACTER MAPS. E.G., IF ONLY 0 AND 2 ARE SAMPLED BUT A CHARACTER IS ORDERED THEN THERE ARE TWO CHANGES ALONG THE BRANCH NOT ONE TWO-COST CHANGE.
 # TEST WEIGHTING OF STRATOCLADISTICS BY USING A STRATIGRAPHIC CHARACTER AND WEIGHTING IT MULTIPLE WAYS (AS A SLIDER) AND SHOW HOW IT EFFECTS PARSIMONY VS STRAT CONGRUENCE TREE LANDSCAPES
 # MONOFURCATIONS IDEA IN CASTOR IS INTERESTING AS ALLOWS POINT ESTIMATES ALONG BRANCHES (E.G., FOR SCM OF A CONTINUOUS CHARACTER)
-
-
-# HOMOPLASY FUNCTION:
-# - Option to define outgroup (root state?) as will affect min steps value
-# - Otherwise need to do path both ways, e.g., 0->1->2 and 2->1->0 in case of asymmetric characters
-# - Keep check for variance as no changes at all if invariant.
-# - How to handle uncertainties?
-# TO INCLUDE:
-# - CI? (Characters as vector then can do summed for matrix)
-# - RI? (Need to know max value which is just fit on star tree)
-# - N reversals (Will depend on root and "direction")
-# - N parallelisms (Will depend on root and "direction")
-# - Record character types too (Dollo important as really want to count single steps but will affect min and max values)
-

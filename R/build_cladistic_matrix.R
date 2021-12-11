@@ -16,11 +16,11 @@
 #'
 #' Claddis generally assumes that matrices will be imported into R from the #NEXUS format, but in some cases (e.g., when using simulated data) it might be desirable to build a matrix within R. This function allows the user to convert such a matrix into the format required by other Claddis functions as long as it only contains a single block.
 #'
-#' NB: Currently the function cannot deal directly with step matrices or continuous characters.
+#' NB: Currently the function cannot deal directly with costmatrices or continuous characters.
 #'
 #' @return
 #'
-#' \item{topper}{Contains any header text or step matrices and pertains to the entire file.}
+#' \item{topper}{Contains any header text or costmatrices and pertains to the entire file.}
 #' \item{matrix_N}{One or more matrix blocks (numbered 1 to N) with associated information pertaining only to that matrix block. This includes the block name (if specificed, NA if not), the block datatype (one of "CONTINUOUS", "DNA", "NUCLEOTIDE", "PROTEIN", "RESTRICTION", "RNA", or "STANDARD"), the actual matrix (taxa as rows, names stored as rownames and characters as columns), the ordering type of each character (\code{"ordered"}, \code{"unordered"} etc.), the character weights, the minimum and maximum values (used by Claddis' distance functions), and the original characters (symbols, missing, and gap values) used for writing out the data.}
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
@@ -50,6 +50,7 @@
 build_cladistic_matrix <- function(character_taxon_matrix, header = "", character_weights = NULL, ordering = NULL, symbols = NULL, equalise.weights = FALSE, ignore_duplicate_taxa = FALSE) {
 
   # Use manual to inform user about defaults for weighting and ordering etc.
+  # Costmatrices will break currently as weights on max which can be Infinity!
 
   # Check input is a matrix:
   if (!is.matrix(character_taxon_matrix)) stop("character_taxon_matrix must be a matrix.")
@@ -124,8 +125,8 @@ build_cladistic_matrix <- function(character_taxon_matrix, header = "", characte
   # If any NAs in maximum_values replace with zero:
   if (any(is.na(maximum_values))) maximum_values[is.na(maximum_values)] <- 0
 
-  # Default step matrices to NULL for now (may add this option in future):
-  step_matrices <- NULL
+  # Default costmatrices to NULL for now (may add this option in future):
+  costmatrices <- NULL
 
   # If symbols were not set:
   if (is.null(symbols)) symbols <- c(c(0:9), LETTERS[1:22])[c(min(minimum_values):max(maximum_values)) + 1]
@@ -142,14 +143,14 @@ build_cladistic_matrix <- function(character_taxon_matrix, header = "", characte
     # Update weights for ordered characters:
     character_weights[ordering == "ordered"] <- 1 / character_weights[ordering == "ordered"]
 
-    # If there are step matrices (not technically using these yet, but I guess this will have to exist eventually):
-    if (!is.null(step_matrices)) {
+    # If there are costmatrices (not technically using these yet, but I guess this will have to exist eventually):
+    if (!is.null(costmatrices)) {
 
-      # Get maximum distances for each step matrix:
-      step_maxima <- unlist(x = lapply(X = lapply(X = step_matrices, as.numeric), max))
+      # Get maximum distances for each costmatrix:
+      cost_maxima <- unlist(x = lapply(X = lapply(X = costmatrices, as.numeric), max))
 
-      # Update weights for step matrices:
-      for (i in 1:length(x = step_maxima)) character_weights[ordering == names(step_matrices)[i]] <- 1 / step_maxima[i]
+      # Update weights for costmatrices:
+      for (i in 1:length(x = cost_maxima)) character_weights[ordering == names(costmatrices)[i]] <- 1 / cost_maxima[i]
     }
 
     # Ensure all weights are integers by multiplying by product of all reciprocals:
@@ -186,7 +187,7 @@ build_cladistic_matrix <- function(character_taxon_matrix, header = "", characte
   }
 
   # Build matrix topper:
-  topper <- list(header = header, step_matrices = step_matrices)
+  topper <- list(header = header, costmatrices = costmatrices)
 
   # Build characters list:
   characters <- list(symbols = symbols, missing = "?", gap = "-")

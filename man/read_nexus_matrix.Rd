@@ -12,7 +12,7 @@ read_nexus_matrix(file_name, equalize_weights = FALSE)
 \item{equalize_weights}{Optional that overrides the weights specified in the file to make all characters truly equally weighted.}
 }
 \value{
-\item{topper}{Contains any header text or step matrices and pertains to the entire file.}
+\item{topper}{Contains any header text or costmatrices and pertains to the entire file.}
 \item{matrix_N}{One or more matrix blocks (numbered 1 to N) with associated information pertaining only to that matrix block. This includes the block name (if specificed, NA if not), the block datatype (one of "CONTINUOUS", "DNA", "NUCLEOTIDE", "PROTEIN", "RESTRICTION", "RNA", or "STANDARD"), the actual matrix (taxa as rows, names stored as rownames and characters as columns), the ordering type of each character (\code{"ordered"}, \code{"unordered"}), the character weights, the minimum and maximum values (used by Claddis' distance functions), and the original characters (symbols, missing, and gap values) used for writing out the data.}
 }
 \description{

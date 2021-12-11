@@ -428,8 +428,8 @@ calculate_morphological_distances <- function(cladistic_matrix, distance_metric 
     differences
   }
 
-  # Check for step matrices and stop and warn user if found:
-  if (is.list(cladistic_matrix$topper$step_matrices)) stop("Function cannot currently deal with step matrices.")
+  # Check for costmatrices and stop and warn user if found:
+  if (is.list(cladistic_matrix$topper$costmatrices)) stop("Function cannot currently deal with costmatrices.")
 
   # Check input of distance_transformation is valid and stop and warn if not:
   if (length(x = setdiff(x = distance_transformation, y = c("arcsine_sqrt", "none", "sqrt"))) > 0) stop("distance_transformation must be one of \"none\", \"sqrt\", or \"arcsine_sqrt\".")

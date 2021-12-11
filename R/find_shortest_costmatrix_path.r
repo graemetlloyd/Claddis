@@ -1,24 +1,24 @@
-#' Finds the shortest path between two states in a stepmatrix
+#' Finds the shortest path between two states in a costmatrix
 #'
 #' @description
 #'
-#' Given a start and end state, returns the shortest path through a stepmatrix.
+#' Given a start and end state, returns the shortest path through a costmatrix.
 #'
-#' @param stepmatrix An object of class \code{stepMatrix}.
+#' @param costmatrix An object of class \code{costMatrix}.
 #' @param start The start state for the requested path.
 #' @param end The end state of the requested path.
 #'
 #' @details
 #'
-#' A common problem in graph theory is identifying the shortest path to take between two vertices of a connected graph. A stepmatrix also describes a graph, with transition costs representing edge weights that can be asymmetric (e.g., going from 0 to 1 can have a different weight than going from 1 to 0). Finding the shortest path between states - i.e., the path that minimises total weight (cost) - from a stepmatrix has two main applications in Claddis: 1. to check a stepmatrix is internally consistent (no cost is misidentified due to a "cheaper" route being available - solving a problem identified in Maddison and Maddison 2003), and 2. to identify the minimum number of steps a character could have on a tree (an essential aspect of various homoplasy metrics, see Hoyal Cuthill et al. 2010).
+#' A common problem in graph theory is identifying the shortest path to take between two vertices of a connected graph. A costmatrix also describes a graph, with transition costs representing edge weights that can be asymmetric (e.g., going from 0 to 1 can have a different weight than going from 1 to 0). Finding the shortest path between states - i.e., the path that minimises total weight (cost) - from a costmatrix has two main applications in Claddis: 1. to check a costmatrix is internally consistent (no cost is misidentified due to a "cheaper" route being available - solving a problem identified in Maddison and Maddison 2003), and 2. to identify the minimum cost a character could have on a tree (an essential aspect of various homoplasy metrics, see Hoyal Cuthill et al. 2010).
 #'
 #' The function returns a vector describing (one) shortest (i.e., lowest cost) path between \code{start} and \code{end}. If the direct path is shortest this will be simply \code{start} and \code{end}, but if an indirect route is cheaper then other node(s) will appear between these values.
 #'
-#' In operation the function is inspired by Dijkstra's algorithm (Dijkstra 1959) but differs in some aspects to deal with the special case of a cladistic-style stepmatrix. Essentially multiple paths are considered with the algorithm continuing until either the destination node (\code{end}) is reached or the accumulated cost (path length) exceeds the direct cost (meaning the path cannot be more optimal, lower cost, than the direct one).
+#' In operation the function is inspired by Dijkstra's algorithm (Dijkstra 1959) but differs in some aspects to deal with the special case of a cladistic-style costmatrix. Essentially multiple paths are considered with the algorithm continuing until either the destination node (\code{end}) is reached or the accumulated cost (path length) exceeds the direct cost (meaning the path cannot be more optimal, lower cost, than the direct one).
 #'
-#' Note: that because infinite costs are allowed in step matrices to convey that a particular transition is not allowed these are not considered by the function and by default the direct path (\code{start} -> \code{end}) will be returned. (If this is the user's aim they should replaced any \\code{Inf} value with a high number instead.)
+#' Note: that because infinite costs are allowed in costmatrices to convey that a particular transition is not allowed these are not considered by the function and by default the direct path (\code{start} -> \code{end}) will be returned when the cost is Inf. If the user \emph{does] wish to know if there is a shorter cost for an infinite value then they should replace any \\code{Inf} value with an arbitrary high number instead.
 #'
-#' Note: negative costs are not allowed in stepmatrices and will confound the algorithm.
+#' Note: negative costs are not allowed in costmatrices as they will confound the halting criteria of the algorithm.
 #'
 #' Note: if multiple equally optimal solutions are possible, the function will only return one of them. I.e., just because a solution is not presented it cannot be assumed it is suboptimal. For example, for any ordered character (of three or more states) there will always be multiple equally optimal solutions.
 #'
@@ -38,12 +38,12 @@
 #'
 #' @seealso
 #'
-#' \link{convert_adjacency_matrix_to_stepmatrix}, \link{make_stepmatrix}
+#' \link{convert_adjacency_matrix_to_costmatrix}, \link{make_costmatrix}
 #'
 #' @examples
 #'
-#' # Make a four-state Dollo stepmatrix:
-#' stepmatrix <- Claddis::make_stepmatrix(
+#' # Make a four-state Dollo costmatrix:
+#' costmatrix <- make_costmatrix(
 #'   min_state = 0,
 #'   max_state = 3,
 #'   character_type = "dollo",
@@ -54,39 +54,39 @@
 #' )
 #'
 #' # Find the shortest path from state 0 to state 3:
-#' find_shortest_stepmatrix_path(
-#'   stepmatrix = stepmatrix,
+#' find_shortest_costmatrix_path(
+#'   costmatrix = costmatrix,
 #'   start = "0",
 #'   end = "3"
 #' )
 #'
 #' # Show that this is directional by asking for the reverse path:
-#' find_shortest_stepmatrix_path(
-#'   stepmatrix = stepmatrix,
+#' find_shortest_costmatrix_path(
+#'   costmatrix = costmatrix,
 #'   start = "3",
 #'   end = "0"
 #' )
 #'
-#' @export find_shortest_stepmatrix_path
-find_shortest_stepmatrix_path <- function(stepmatrix, start, end) {
+#' @export find_shortest_costmatrix_path
+find_shortest_costmatrix_path <- function(costmatrix, start, end) {
 
-  # Check stepmatrix is correct class and stop and warn user if not:
-  if (class(stepmatrix) != "stepMatrix") stop("stepmatrix must be an object o class \"stepMatrix\".")
+  # Check costmatrix is correct class and stop and warn user if not:
+  if (class(costmatrix) != "costMatrix") stop("costmatrix must be an object o class \"costMatrix\".")
   
-  # Check start and end are in character format so that the correct stepmatrix rows and columns are called:
+  # Check start and end are in character format so that the correct costmatrix rows and columns are called:
   if (any(c(!is.character(x = start), !is.character(x = end)))) stop("start and end must be characters (i.e., \"0\" not 0).")
   
   # If start and end are the same cost must be zero (and hence unbeatable) so return start and end:
   if (start == end) return(c(start, end))
   
   # If an infinite cost then stop and return direct path as this indicates the path is not accessible:
-  if (stepmatrix$stepmatrix[start, end] == Inf) return(c(start, end))
+  if (costmatrix$costmatrix[start, end] == Inf) return(c(start, end))
   
   # Get all character states:
-  states <- rownames(x = stepmatrix$stepmatrix)
+  states <- rownames(x = costmatrix$costmatrix)
 
   # Get direct cost of transition (default option unless a lower cost path is found):
-  direct_cost <- stepmatrix$stepmatrix[start, end]
+  direct_cost <- costmatrix$costmatrix[start, end]
 
   # Set up a startng path format:
   path <- list(
@@ -128,7 +128,7 @@ find_shortest_stepmatrix_path <- function(stepmatrix, start, end) {
         X = new_paths,
         FUN = function(x) {
           x$unvisited_nodes <- setdiff(x = x$unvisited_nodes, y = x$current_node)
-          x$length <- x$length + stepmatrix$stepmatrix[previous_node, x$current_node]
+          x$length <- x$length + costmatrix$costmatrix[previous_node, x$current_node]
           x$visited_nodes <- c(x$visited_nodes, x$current_node)
           if (x$current_node == x$destination_node) x$reached_destination <- TRUE
           x

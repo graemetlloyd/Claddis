@@ -27,19 +27,19 @@ reconstruct_ancestral_states(
 
 \item{estimate_tip_values}{Logical that allows the user to make estimates for tip values. The default (\code{FALSE}) will only makes estimates for internal nodes (recommended).}
 
-\item{inapplicables_as_missing}{Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).}
+\item{inapplicables_as_missing}{Argument passed to \link{calculate_tree_length}.}
 
-\item{polymorphism_behaviour}{One of either "missing", "uncertainty", "polymorphism", or "random". See details.}
+\item{polymorphism_behaviour}{Argument passed to \link{calculate_tree_length}.}
 
-\item{uncertainty_behaviour}{One of either "missing", "uncertainty", "polymorphism", or "random". See details.}
+\item{uncertainty_behaviour}{Argument passed to \link{calculate_tree_length}.}
 
-\item{polymorphism_shape}{Argument passed to \link{make_stepmatrix}.}
+\item{polymorphism_shape}{Argument passed to \link{make_costmatrix}.}
 
-\item{polymorphism_distance}{Argument passed to \link{make_stepmatrix}.}
+\item{polymorphism_distance}{Argument passed to \link{make_costmatrix}.}
 
-\item{state_ages}{Argument passed to \link{make_stepmatrix}.}
+\item{state_ages}{Argument passed to \link{make_costmatrix}.}
 
-\item{dollo_penalty}{Argument passed to \link{make_stepmatrix}.}
+\item{dollo_penalty}{Argument passed to \link{make_costmatrix}.}
 }
 \value{
 A list with multiple components, including:
@@ -50,7 +50,11 @@ A list with multiple components, including:
 Given a tree, or set of trees, and a cladistic matrix returns all most parsimonious reconstruction(s) for every character.
 }
 \details{
-Users may also wish to refer to the more complex whole-matrix, likelihood-based function \link{estimate_ancestral_states}. Although, note that eventually parsimony will simply be an option to that function.
+Although most phylogenetic inference considers character evolution on a tree, they rarely explicitly assign states to internal nodes in the process, and hence this is normally done \emph{a posteriori} using some form of ancestral state estimation algorithm. This function uses the parsimony optimality criterion (i.e., maximum parsimony, or the process that involves the fewest possible transitions, or, more accurately, the lowest total transition cost).
+
+\bold{Algorithm}
+
+Like \link{calculate_tree_length}, this function is built around the generalised Swofford and Maddison (1992) algorithm, but adds the second pass as this is the one that explicitly generates \emph{all} most parsimonious reconstructions. As it is a generalised approach it can work with the broadest range of character types and (rooted) trees of any degree of resolution - treating polytomies as hard.
 }
 \examples{
 
@@ -97,7 +101,7 @@ Lloyd, G. T., 2018. Journeys through discrete-character morphospace: synthesizin
 Swofford, D. L. and Maddison, W. P., 1992. Parsimony, character-state reconstructions, and evolutionary inferences. \emph{In} R. L. Mayden (ed.) Systematics, Historical Ecology, and North American Freshwater Fishes. Stanford University Press, Stanford, p187-223.
 }
 \seealso{
-\link{estimate_ancestral_states}
+\link{calculate_tree_length}, \link{estimate_ancestral_states}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

@@ -49,7 +49,7 @@ make_all_polymorphisms(single_states = 0:2)
 
 }
 \seealso{
-\link{make_stepmatrix}
+\link{make_costmatrix}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

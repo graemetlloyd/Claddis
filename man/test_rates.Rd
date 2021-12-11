@@ -159,7 +159,7 @@ Sixthly, all character changes are weighted according to the weights provided in
 
 Finally, the remaining options (\code{estimate_all_nodes}, \code{estimate_tip_values}, \code{inapplicables_as_missing}, \code{polymorphism_behaviour}, \code{uncertainty_behaviour}, and \code{threshold}) are all simply passed directly to \link{estimate_ancestral_states} for estimating the ancestral states and users should consult the help file for that function for further details.
 
-Note that currently the function cannot deal with step matrices and that the terminal versus internal option from Brusatte et al. (2014) is yet to be implemented.
+Note that currently the function cannot deal with costmatrices and that the terminal versus internal option from Brusatte et al. (2014) is yet to be implemented.
 
 \bold{Output}
 

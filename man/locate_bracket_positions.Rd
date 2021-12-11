@@ -34,7 +34,7 @@ locate_bracket_positions(
 
 }
 \seealso{
-\link{convert_adjacency_matrix_to_stepmatrix}, \link{convert_state_tree_to_adjacency_matrix}
+\link{convert_state_tree_to_adjacency_matrix}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

@@ -1,8 +1,8 @@
-#' Converts an adjacency matrix to a stepmatrix
+#' Converts an adjacency matrix to a costmatrix
 #'
 #' @description
 #'
-#' Takes an adjacency matrix as input and returns the corresponding stepmatrix.
+#' Takes an adjacency matrix as input and returns the corresponding costmatrix.
 #'
 #' @param adjacency_matrix A labelled square matrix with zeroes denoting non-adjacencies and ones denoting adjacencies.
 #'
@@ -40,13 +40,13 @@
 #'
 #' But what such matrices do not tell us is how far every vertex-to-vertex path is in terms of edge counts. E.g., the path length from vertex 3 to vertex 2.
 #'
-#' This function simply takes the adjacency matrix and returns the corresponding stepmatrix, corresponding to every minimum vertex-to-vertex path length.
+#' This function simply takes the adjacency matrix and returns the corresponding costmatrix, corresponding to every minimum vertex-to-vertex path length.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
 #' @return
 #'
-#' An object of class \code{stepMatrix}.
+#' An object of class \code{costMatrix}.
 #'
 #' @seealso
 #'
@@ -62,13 +62,13 @@
 #'   dimnames = list(0:3, 0:3)
 #' )
 #'
-#' # Convert this to a step matrix:
-#' convert_adjacency_matrix_to_stepmatrix(
+#' # Convert this to a costmatrix:
+#' convert_adjacency_matrix_to_costmatrix(
 #'   adjacency_matrix = adjacency_matrix
 #' )
 #'
-#' @export convert_adjacency_matrix_to_stepmatrix
-convert_adjacency_matrix_to_stepmatrix <- function(adjacency_matrix) {
+#' @export convert_adjacency_matrix_to_costmatrix
+convert_adjacency_matrix_to_costmatrix <- function(adjacency_matrix) {
   
   # TO DO:
   #
@@ -77,20 +77,20 @@ convert_adjacency_matrix_to_stepmatrix <- function(adjacency_matrix) {
   # Check adjacency_matrix is symmetric and stop and warn user if not:
   if (!isSymmetric(object = adjacency_matrix)) stop("adjacency_matrix must be symmetric. Fix and try again.")
   
-  # Set initial stepmatrix as adjacency matrix:
-  stepmatrix <- adjacency_matrix
+  # Set initial costmatrix as adjacency matrix:
+  costmatrix <- adjacency_matrix
   
-  # Set all zero values to NA (steps that need to be calculated):
-  stepmatrix[stepmatrix == 0] <- NA
+  # Set all zero values to NA (costs that need to be calculated):
+  costmatrix[costmatrix == 0] <- NA
   
-  # Set diagional as zero (the distance from any value to itself):
-  diag(stepmatrix) <- 0
+  # Set diagonal as zero (the distance from any value to itself):
+  diag(costmatrix) <- 0
   
   # Only continue as long as there are unknown path lengths:
-  while(any(x = is.na(x = stepmatrix))) {
+  while(any(x = is.na(x = costmatrix))) {
     
     # Start with first path of unknown length:
-    current_path <- which(x = is.na(x = stepmatrix), arr.ind = TRUE)[1, ]
+    current_path <- which(x = is.na(x = costmatrix), arr.ind = TRUE)[1, ]
     
     # Isolate path start:
     path_start <- colnames(x = adjacency_matrix)[current_path][1]
@@ -112,8 +112,8 @@ convert_adjacency_matrix_to_stepmatrix <- function(adjacency_matrix) {
       
     }
     
-    # Update stepmatrix with path length (minimum length to connect path_start to path_end):
-    stepmatrix[current_path[1], current_path[2]] <- stepmatrix[current_path[2], current_path[1]] <- length(path_list)
+    # Update costmatrix with path length (minimum length to connect path_start to path_end):
+    costmatrix[current_path[1], current_path[2]] <- costmatrix[current_path[2], current_path[1]] <- length(path_list)
     
   }
   
@@ -129,13 +129,12 @@ convert_adjacency_matrix_to_stepmatrix <- function(adjacency_matrix) {
   # If adjacency matrix matches an ordered character (everything is adjacent) then store character type as such:
   if (all(adjacency_matrix[c(2, cumsum(x = rep(x = matrix_size + 1, length.out = matrix_size - 2)) + 2)] == 1) && sum(adjacency_matrix) == ((2 * matrix_size) - 2)) character_type <- "unordered"
   
-  # Create full stepmatrix object:
-  stepmatrix <- list(size = ncol(x = stepmatrix), type = character_type, stepmatrix = stepmatrix, symmetry = "Symmetric", includes_polymorphisms = ifelse(test = length(x = grep(pattern = "&", x = colnames(x = stepmatrix))) > 0, yes = TRUE, no = FALSE))
+  # Create full costmatrix object:
+  costmatrix <- list(size = ncol(x = costmatrix), type = character_type, costmatrix = costmatrix, symmetry = "Symmetric", includes_polymorphisms = ifelse(test = length(x = grep(pattern = "&", x = colnames(x = costmatrix))) > 0, yes = TRUE, no = FALSE))
 
-  # Set class of output as stepMatrix:
-  class(stepmatrix) <- "stepMatrix"
+  # Set class of output as costMatrix:
+  class(costmatrix) <- "costMatrix"
   
-  # Return complete stepmatrix:
-  stepmatrix
-  
+  # Return complete costmatrix:
+  costmatrix
 }

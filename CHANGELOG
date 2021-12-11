@@ -1,16 +1,26 @@
+- Changed all stepmatrix terms to costmatrix as this is the true general term.
 - Added calculate_tree_length function to get parsimony tree lengths and also generate data for use in ancestral state reconstructions.
 - Added make_all_polymorphisms to generate all possible polymorphisms for a set of states.
-- Added make_stepmatrix to automate building common stepmatrix types (ordered, unordered, irreversible, Dollo, stratigraphy).
-- Fixed broken links in convert_adjacency_matrix_to_stepmatrix.
+- Added make_costmatrix to automate building common costmatrix types (ordered, unordered, irreversible, Dollo, stratigraphy).
+- Fixed broken links in convert_adjacency_matrix_to_costmatrix.
 - Changed character types from abbreviated versions (cont, ord and unord) to full names (continuous, ordered and unordered) across package.
-- Added new class of "stepMatrix" to package.
-- Added check_stepMatrix, is.stepMatrix, and print.stepMatrix functions to support new class.
-- Added find_shortest_stepmatrix_path function to find shortest state-to-state path from a stepmatrix.
+- Added new class of "costMatrix" to package.
+- Added check_costMatrix, is.costMatrix, and print.costMatrix functions to support new class.
+- Added find_shortest_costmatrix_path function to find shortest state-to-state path from a costmatrix.
 - Added reconstruct_ancestral_states to generate parsimony-based ancestral state estimates.
 - Added calculate_homoplasy_indices to calculate common homoplasy indices for a given set of tree(s) and matching cladistic matrix.
-- Added find_stepmatrix_minimum_span function to find minimum steps a character could have on a tree.
+- Added find_costmatrix_minimum_span function to find minimum cost a character could have on a tree.
 - Added find_unique_trees function as a faster alternative to ape::unique.multiPhylo for isolating just unique topologies from a larger set.
 - Added calculate_kardashian_index to calculate the Kardashian Index.
+- Fixed some typos and manual issues in find_unique_trees.
+- Fixed bug in plot_rates_time where partitions appeared in wrong place.
+- Added is_graph_connected to check whether a graph is connected.
+- Added split_out_subgraphs to generate separate adjacency matrices for every connected component of a graph.
+- Added permute_graph_splits to permute all possible ways to remove edges from a connected graph.
+- Added convert_costmatrix_to_graph to find the minimal directed graph representation of a costmatrix.
+- Added option to add size landscape to plot_morphospace.
+- Added count_cherries function to count number of cherries on a given phylogenetic tree or set of trees.
+- Added fix_costmatrix function to ensure all state-to-state transtion costs are self-consistent.
 
 Version - 0.6.6 - 2021-02-21
 

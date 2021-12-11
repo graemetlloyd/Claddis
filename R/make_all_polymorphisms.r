@@ -42,7 +42,7 @@
 #'
 #' @seealso
 #'
-#' \link{make_stepmatrix}
+#' \link{make_costmatrix}
 #'
 #' @examples
 #'
