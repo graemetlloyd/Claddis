@@ -845,53 +845,51 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   # Get rid of spaces around dashes to make later regular expresssions work:
   while(length(x = grep(" - |- | -", raw_nexus))) raw_nexus <- gsub(pattern = " - |- | -", replacement = "-", x = raw_nexus)
   
-  # Create null variable for step matrices:
-  step_matrices <- NULL
+  # Create null variable for costmatrices:
+  costmatrices <- NULL
   
-  # Special case if there are user-defined characters, i.e. step matrices:
+  # Special case if there are user-defined characters, i.e. costmatrices:
   if (length(x = grep("USERTYPE", raw_nexus, ignore.case = TRUE)) > 0) {
     
-    # Set available letters for naming stepmatrices (limits number of stepmatrices allowed):
+    # Set available letters for naming costmatrices (limits number of costmatrices allowed):
     available_letters <- c(LETTERS, unlist(lapply(as.list(LETTERS), function(x) paste(x, LETTERS, sep = ""))))
     
-    # Get rows corresponding to start of stepmatrices:
-    step_matrix_rows <- grep("USERTYPE", raw_nexus, ignore.case = TRUE)
+    # Get rows corresponding to start of costmatrices:
+    costmatrix_rows <- grep("USERTYPE", raw_nexus, ignore.case = TRUE)
     
-    # Create empty list to store step matrices:
-    step_matrices <- list()
+    # Create empty list to store costmatrices:
+    costmatrices <- list()
     
-    # Little check in case of abnormally large number of step matrices:
-    if (length(x = step_matrix_rows) > length(x = available_letters)) stop("Not enough available letters to store the number of different step matrices. Ask Graeme to up the available number!")
+    # Little check in case of abnormally large number of costmatrices:
+    if (length(x = costmatrix_rows) > length(x = available_letters)) stop("Not enough available letters to store the number of different costmatrices. Ask Graeme to up the available number!")
     
-    # For each step matrix:
-    for(i in step_matrix_rows) {
+    # For each costmatrix:
+    for(i in costmatrix_rows) {
       
-      # Grab text block corresponding to step matrix:
-      step_matrix_block <- trim_marginal_whitespace(x = raw_nexus[i:(i + as.numeric(strsplit(raw_nexus[i], "\\(STEPMATRIX\\)=")[[1]][2]) + 1)])
+      # Grab text block corresponding to costmatrix:
+      costmatrix_block <- trim_marginal_whitespace(x = raw_nexus[i:(i + as.numeric(strsplit(raw_nexus[i], "\\(STEPMATRIX\\)=")[[1]][2]) + 1)])
       
       # Remove [] labels for rows:
-      step_matrix_block <- gsub(pattern = "\\[[:A-Z:]\\] |\\[[:0-9:]\\] ", replacement = "", x = step_matrix_block)
+      costmatrix_block <- gsub(pattern = "\\[[:A-Z:]\\] |\\[[:0-9:]\\] ", replacement = "", x = costmatrix_block)
       
-      # Get the step matrix as a matrix (might still need to think about how to define e.g. infinity):
-      step_matrix <- gsub(pattern = "\\.", replacement = "0", x = matrix(unlist(x = strsplit(step_matrix_block[3:length(x = step_matrix_block)], " ")), ncol = as.numeric(strsplit(raw_nexus[i], "\\(STEPMATRIX\\)=")[[1]][2]), byrow = TRUE))
+      # Get the costmatrix as a matrix (might still need to think about how to define e.g. infinity):
+      costmatrix <- gsub(pattern = "\\.", replacement = "0", x = matrix(unlist(x = strsplit(costmatrix_block[3:length(x = costmatrix_block)], " ")), ncol = as.numeric(strsplit(raw_nexus[i], "\\(STEPMATRIX\\)=")[[1]][2]), byrow = TRUE))
       
       # Add row and column names (assumes they start at zero and climb from there - i.e., should match symbols in order from 0 to N - 1):
-      rownames(x = step_matrix) <- colnames(x = step_matrix) <- as.character(0:(ncol(step_matrix) - 1))
+      rownames(x = costmatrix) <- colnames(x = costmatrix) <- as.character(0:(ncol(costmatrix) - 1))
       
-      # Add step matrix to list:
-      step_matrices[[length(x = step_matrices) + 1]] <- step_matrix
+      # Add costmatrix to list:
+      costmatrices[[length(x = costmatrices) + 1]] <- costmatrix
       
-      # Find step matrix name:
-      step_matrix_name <- strsplit(strsplit(raw_nexus[i], "USERTYPE ")[[1]][2], " ")[[1]][1]
+      # Find costmatrix name:
+      costmatrix_name <- strsplit(strsplit(raw_nexus[i], "USERTYPE ")[[1]][2], " ")[[1]][1]
       
-      # Replace step matrix name with step_N:
-      raw_nexus <- gsub(pattern = step_matrix_name, replacement = paste("step_", available_letters[length(x = step_matrices)], sep = ""), x = raw_nexus)
+      # Replace costmatrix name with step_N:
+      raw_nexus <- gsub(pattern = costmatrix_name, replacement = paste("step_", available_letters[length(x = costmatrices)], sep = ""), x = raw_nexus)
       
-      # Use step matrix name (step_N) in list for later calling:
-      names(step_matrices)[length(x = step_matrices)] <- paste("step_", available_letters[length(x = step_matrices)], sep = "")
-      
+      # Use costmatrix name (step_N) in list for later calling:
+      names(costmatrices)[length(x = costmatrices)] <- paste("step_", available_letters[length(x = costmatrices)], sep = "")
     }
-    
   }
   
   # Set default weights as 1:
@@ -1031,11 +1029,11 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
     x
   })
   
-  # Look for any non-standard ordering (i.e., not cont, ord, unord, or Step_X):
-  nonstandard_ordering <- setdiff(x = unique(x = unlist(x = ordering)), y = c("continuous", "ordered", "unordered", names(step_matrices)))
+  # Look for any non-standard ordering (i.e., not cont, ord, unord, or step_X):
+  nonstandard_ordering <- setdiff(x = unique(x = unlist(x = ordering)), y = c("continuous", "ordered", "unordered", names(costmatrices)))
   
   # If any non-standard ordering is found stop and warn user:
-  if (length(x = nonstandard_ordering) > 0) stop(paste("The following non-standard character ordering(s) were found: ", paste(nonstandard_ordering, collapse = ", "), ". These should be one of type \"continuous\", \"ordered\", \"unordered\", or step matrix.", sep = ""))
+  if (length(x = nonstandard_ordering) > 0) stop(paste("The following non-standard character ordering(s) were found: ", paste(nonstandard_ordering, collapse = ", "), ". These should be one of type \"continuous\", \"ordered\", \"unordered\", or costmatrix.", sep = ""))
   
   # Find any WTSET lines:
   weightset_lines <- raw_nexus[lapply(X = lapply(X = strsplit(raw_nexus, split = ""), '[', 1:5), paste, collapse = "") == "WTSET"]
@@ -1135,23 +1133,21 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
       
     }
     
-    # If there are any step matrices specified:
+    # If there are any costmatrices specified:
     if (any(unlist(x = lapply(X = lapply(X = ordering, grep, pattern = "step_"), length)) > 0)) {
       
-      # Get numbers of blocks with step matrix characters:
-      blocks_with_stepmatrix_characters <- which(x = unlist(x = lapply(X = lapply(X = ordering, grep, pattern = "step_"), length)) > 0)
+      # Get numbers of blocks with costmatrix characters:
+      blocks_with_costmatrix_characters <- which(x = unlist(x = lapply(X = lapply(X = ordering, grep, pattern = "step_"), length)) > 0)
       
-      # for each block with step matrix characters:
-      for(i in blocks_with_stepmatrix_characters) {
+      # for each block with costmatrix characters:
+      for(i in blocks_with_costmatrix_characters) {
         
-        # Get step matrix characters:
-        step_characters <- grep("step_", ordering[[i]])
+        # Get costmatrix characters:
+        cost_characters <- grep("step_", ordering[[i]])
         
-        # Set step matrix character as maximum possible value in step matrix (again, should be reciprocal, but that will happen later:
-        for(j in step_characters) starting_weights[[i]][j] <- max(as.numeric(step_matrices[[ordering[[i]][j]]]))
-        
+        # Set costmatrix character as maximum possible value in costmatrix (again, should be reciprocal, but that will happen later:
+        for(j in cost_characters) starting_weights[[i]][j] <- max(as.numeric(costmatrices[[ordering[[i]][j]]]))
       }
-      
     }
     
     # Take reciprocal of weights so they are actual weights:
@@ -1210,24 +1206,24 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
     
   }
   
-  # If stepmatrices exist they will need to be formatted correctly for Claddis:
-  if (is.list(x = step_matrices)) {
+  # If costmatrices exist they will need to be formatted correctly for Claddis:
+  if (is.list(x = costmatrices)) {
     
-    # Reformat any stepmatrices in Claddis format (character type defaults to custom as cannot know for sure what other types might fit):
-    step_matrices <- lapply(X = step_matrices, function(x) {
+    # Reformat any costmatrices in Claddis format (character type defaults to custom as cannot know for sure what other types might fit):
+    costmatrices <- lapply(X = costmatrices, function(x) {
       matrix_size <- ncol(x = x)
       matrix_labels <- colnames(x = x)
-      stepmatrix <- matrix(data = as.numeric(x = x), nrow = matrix_size, dimnames = list(matrix_labels, matrix_labels))
-      symmetry <- ifelse(test = isSymmetric(object = stepmatrix), yes = "Symmetric", no = "Asymmetric")
+      costmatrix <- matrix(data = as.numeric(x = x), nrow = matrix_size, dimnames = list(matrix_labels, matrix_labels))
+      symmetry <- ifelse(test = isSymmetric(object = costmatrix), yes = "Symmetric", no = "Asymmetric")
       includes_polymorphisms <- ifelse(test = length(x = grep(pattern = "&", x = matrix_labels)) > 0, yes = TRUE, no = FALSE)
-      stepmatrix <- list(size = matrix_size, type = "custom", stepmatrix = stepmatrix, symmetry = symmetry, includes_polymorphisms = includes_polymorphisms)
-      class(stepmatrix) <- "stepMatrix"
-      stepmatrix
+      costmatrix <- list(size = matrix_size, type = "custom", costmatrix = costmatrix, symmetry = symmetry, includes_polymorphisms = includes_polymorphisms)
+      class(costmatrix) <- "costMatrix"
+      costmatrix
     })
   }
   
   # Create top list:
-  top_list <- list(header = text_lines, step_matrices = step_matrices)
+  top_list <- list(header = text_lines, costmatrices = costmatrices)
   
   # Start to compile output starting with top list:
   cladistic_matrix <- list(topper = top_list)

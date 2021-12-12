@@ -160,72 +160,72 @@ write_tnt_matrix <- function(cladistic_matrix, file_name, add_analysis_block = F
   # Get weights of all characters in sequence:
   character_weights <- unname(unlist(x = lapply(X = data_blocks, "[[", "character_weights")))
 
-  # Make sure step matrices are a list if null:
-  if (!is.list(cladistic_matrix$topper$step_matrices)) cladistic_matrix$topper$step_matrices <- list(NULL)
+  # Make sure costmatrices are a list if null:
+  if (!is.list(cladistic_matrix$topper$costmatrices)) cladistic_matrix$topper$costmatrices <- list(NULL)
 
-  # If there are step matrices:
-  if (any(!unlist(x = lapply(X = cladistic_matrix$topper$step_matrices, is.null)))) {
+  # If there are costmatrices:
+  if (any(!unlist(x = lapply(X = cladistic_matrix$topper$costmatrices, is.null)))) {
 
-    # Empty vector to store hits (characters assigned to a step matrix):
+    # Empty vector to store hits (characters assigned to a costmatrix):
     global_hits <- vector(mode = "numeric")
 
-    # Empty vector to store all step matrix lines:
-    all_step_matrix_lines <- vector(mode = "character")
+    # Empty vector to store all costmatrix lines:
+    all_costmatrix_lines <- vector(mode = "character")
 
-    # Check there are not too many step matrices:
-    if (length(x = cladistic_matrix$topper$step_matrices) > 32) stop("Too many (>32) step matrices for TNT!")
+    # Check there are not too many costmatrices:
+    if (length(x = cladistic_matrix$topper$costmatrices) > 32) stop("Too many (>32) costmatrices for TNT!")
 
-    # For each step matrix:
-    for (i in 1:length(x = cladistic_matrix$topper$step_matrices)) {
+    # For each costmatrix:
+    for (i in 1:length(x = cladistic_matrix$topper$costmatrices)) {
 
       # Set up costs vector:
       costs <- vector(mode = "character")
 
       # For each row state (from):
-      for (j in rownames(x = cladistic_matrix$topper$step_matrices[[i]]$stepmatrix)) {
+      for (j in rownames(x = cladistic_matrix$topper$costmatrices[[i]]$costmatrix)) {
 
         # For each column state (to):
-        for (k in colnames(x = cladistic_matrix$topper$step_matrices[[i]]$stepmatrix)) {
+        for (k in colnames(x = cladistic_matrix$topper$costmatrices[[i]]$costmatrix)) {
 
           # Add cost of j to k transition to costs vector:
-          costs <- c(costs, paste(j, ">", k, " ", cladistic_matrix$topper$step_matrices[[i]]$stepmatrix[j, k], sep = ""))
+          costs <- c(costs, paste(j, ">", k, " ", cladistic_matrix$topper$costmatrices[[i]]$costmatrix[j, k], sep = ""))
         }
       }
 
-      # Format top of step matrix code:
-      step_matrix_top <- paste("smatrix = ", i - 1, " (", names(cladistic_matrix$topper$step_matrices)[i], ")", sep = "")
+      # Format top of costmatrix code:
+      costmatrix_top <- paste("smatrix = ", i - 1, " (", names(cladistic_matrix$topper$costmatrices)[i], ")", sep = "")
 
-      # Get hits (characters assigned to ith step matrix):
-      hits <- which(x = ordering == names(cladistic_matrix$topper$step_matrices)[i])
+      # Get hits (characters assigned to ith costmatrix):
+      hits <- which(x = ordering == names(cladistic_matrix$topper$costmatrices)[i])
 
-      # Add hits to global hits for all step matrices:
+      # Add hits to global hits for all costmatrices:
       global_hits <- c(global_hits, hits)
 
       # Stop if no hits!:
-      if (length(x = hits) == 0) stop(paste("No characters assigned to step matrix: ", names(cladistic_matrix$topper$step_matrices)[i], ".", sep = ""))
+      if (length(x = hits) == 0) stop(paste("No characters assigned to costmatrix: ", names(cladistic_matrix$topper$costmatrices)[i], ".", sep = ""))
 
-      # Build step matrix lines:
-      step_matrix_lines <- paste(c(step_matrix_top, costs, ";", paste("smatrix + ", names(cladistic_matrix$topper$step_matrices)[i], " ", paste(hits - 1, collapse = " "), ";", sep = "")), collapse = "\n")
+      # Build costmatrix lines:
+      costmatrix_lines <- paste(c(costmatrix_top, costs, ";", paste("smatrix + ", names(cladistic_matrix$topper$costmatrices)[i], " ", paste(hits - 1, collapse = " "), ";", sep = "")), collapse = "\n")
 
-      # Add step matrix lines to all step matrix lines:
-      all_step_matrix_lines <- c(all_step_matrix_lines, step_matrix_lines)
+      # Add costmatrix lines to all costmatrix lines:
+      all_costmatrix_lines <- c(all_costmatrix_lines, costmatrix_lines)
     }
 
-    # Make step matrix block:
-    stepmatrix_block <- paste(paste(c(all_step_matrix_lines, paste("ccode ( ", paste(sort(x = global_hits - 1), collapse = " "), ";", sep = "")), collapse = "\n"), "\n", sep = "")
+    # Make costmatrix block:
+    costmatrix_block <- paste(paste(c(all_costmatrix_lines, paste("ccode ( ", paste(sort(x = global_hits - 1), collapse = " "), ";", sep = "")), collapse = "\n"), "\n", sep = "")
 
-  # If no step matri(ces):
+  # If no costmatri(ces):
   } else {
 
-    # Create empty step matrix block:
-    stepmatrix_block <- ""
+    # Create empty costmatrix block:
+    costmatrix_block <- ""
   }
 
   # Build ccode block:
   ccode_block <- paste("ccode ", paste(paste(ifelse(ifelse(ordering == "continuous", "ord", ordering) == "ord", "+", "-"), ifelse(character_weights == 0, "]", "["), "/", ifelse(ordering == "continuous", "1", ifelse(character_weights == 0, 1, character_weights)), " ", paste(1:sum(n_characters) - 1), sep = ""), collapse = " "), " ;\n", sep = "")
 
   # Build full string with all blocks together:
-  full_string <- paste("taxname=;\nmxram 4096;\ntaxname +", max(nchar(x = rownames(x = cladistic_matrix$matrix_1$matrix))), ";\nnstates num 32;\nxread\n", header_block, sum(n_characters), " ", n_taxa, "\n", matrix_block, ";\n", ccode_block, stepmatrix_block, "proc/;\n", sep = "")
+  full_string <- paste("taxname=;\nmxram 4096;\ntaxname +", max(nchar(x = rownames(x = cladistic_matrix$matrix_1$matrix))), ";\nnstates num 32;\nxread\n", header_block, sum(n_characters), " ", n_taxa, "\n", matrix_block, ";\n", ccode_block, costmatrix_block, "proc/;\n", sep = "")
 
   # If adding analysis block:
   if (add_analysis_block) {

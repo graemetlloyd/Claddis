@@ -173,13 +173,13 @@ write_nexus_matrix <- function(cladistic_matrix, file_name) {
   # Take character block and meld with matri(ces) into matrix block(s):
   matrix_block <- paste(paste(character_block, unlist(x = lapply(X = data_block_strings, paste, collapse = "\n")), "\n;\nEND;\n\n", sep = ""), collapse = "")
 
-  # Make sure step matrices are a list if null:
-  if (!is.list(cladistic_matrix$topper$step_matrices)) cladistic_matrix$topper$step_matrices <- list(NULL)
+  # Make sure costmatrices are a list if null:
+  if (!is.list(cladistic_matrix$topper$costmatrices)) cladistic_matrix$topper$costmatrices <- list(NULL)
 
-  # Create step matrix block:
-  stepmatrix_block <- paste(ifelse(!unlist(x = lapply(X = cladistic_matrix$topper$step_matrices, is.null)), paste(paste("\tUSERTYPE '", names(cladistic_matrix$topper$step_matrices), "' (STEPMATRIX) = ", unlist(x = lapply(X = cladistic_matrix$topper$step_matrices, function(x) ncol(x = x$stepmatrix))), "\n", sep = ""), paste("\t", unlist(x = lapply(X = lapply(X = cladistic_matrix$topper$step_matrices, function(x) colnames(x = x$stepmatrix)), paste, collapse = " ")), "\n\t", sep = ""), unlist(x = lapply(X = lapply(X = lapply(X = cladistic_matrix$topper$step_matrices, function(x) {
-    diag(x = x$stepmatrix) <- "."
-    return(x$stepmatrix)
+  # Create costmatrix block:
+  costmatrix_block <- paste(ifelse(!unlist(x = lapply(X = cladistic_matrix$topper$costmatrices, is.null)), paste(paste("\tUSERTYPE '", names(cladistic_matrix$topper$costmatrices), "' (STEPMATRIX) = ", unlist(x = lapply(X = cladistic_matrix$topper$costmatrices, function(x) ncol(x = x$costmatrix))), "\n", sep = ""), paste("\t", unlist(x = lapply(X = lapply(X = cladistic_matrix$topper$costmatrices, function(x) colnames(x = x$costmatrix)), paste, collapse = " ")), "\n\t", sep = ""), unlist(x = lapply(X = lapply(X = lapply(X = cladistic_matrix$topper$costmatrices, function(x) {
+    diag(x = x$costmatrix) <- "."
+    return(x$costmatrix)
   }), apply, 1, paste, collapse = " "), paste, collapse = "\n\t")), "\n\t;\n", sep = ""), ""), collapse = "")
 
   # Get ordering of all characters in sequence:
@@ -210,7 +210,7 @@ write_nexus_matrix <- function(cladistic_matrix, file_name) {
   if (!all(is.na(unlist(x = block_names)))) weights_block <- paste(paste("\tWTSET * UNTITLED  (CHARACTERS = ", block_names, ")  =  ", unlist(x = lapply(X = lapply(X = data_blocks, "[[", "character_weights"), function(x) paste(paste(paste(sort(x = unique(x = x)), unlist(x = lapply(X = lapply(X = lapply(X = as.list(x = sort(x = unique(x = x))), "==", x), which), zip_string)), sep = ": "), collapse = ", "), sep = ""))), ";\n", sep = ""), collapse = "")
 
   # Build assumptions block:
-  assumptions_block <- paste("BEGIN ASSUMPTIONS;\n", stepmatrix_block, options_block, weights_block, "END;\n", sep = "")
+  assumptions_block <- paste("BEGIN ASSUMPTIONS;\n", costmatrix_block, options_block, weights_block, "END;\n", sep = "")
 
   # Build full string with all blocks together:
   full_string <- paste("#NEXUS\n\n", header_block, taxa_block, data_block, matrix_block, assumptions_block, sep = "")
