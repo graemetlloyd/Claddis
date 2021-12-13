@@ -112,7 +112,7 @@ tree <- ape::read.tree(
 calculate_tree_length(
   trees = tree,
   cladistic_matrix = cladistic_matrix,
-  inapplicables_as_missing = FALSE,
+  inapplicables_as_missing = TRUE,
   polymorphism_behaviour = "uncertainty",
   uncertainty_behaviour = "uncertainty",
   polymorphism_shape = "hypersphere",
