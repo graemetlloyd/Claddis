@@ -4,10 +4,10 @@
 \alias{check_costMatrix}
 \title{Check costMatrix object for errors}
 \usage{
-check_costMatrix(costMatrix)
+check_costMatrix(costmatrix)
 }
 \arguments{
-\item{costMatrix}{A costMatrix object.}
+\item{costmatrix}{A costMatrix object.}
 }
 \value{
 An error message or empty vector if no errors found.
@@ -22,8 +22,8 @@ Solves issue raised in Maddison and Maddison (2003) by checking custom costmatri
 }
 \examples{
 
-# Make an unordered costMatrix:
-costMatrix <- make_costMatrix(
+# Make an unordered costmatrix:
+costmatrix <- make_costmatrix(
   min_state = 0,
   max_state = 2,
   character_type = "unordered",
@@ -33,7 +33,7 @@ costMatrix <- make_costMatrix(
 )
 
 # Check that this is a valid costMatrix object (should return empty vector):
-check_costMatrix(costMatrix = costMatrix)
+check_costMatrix(costmatrix = costmatrix)
 
 }
 \references{
