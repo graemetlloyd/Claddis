@@ -161,6 +161,9 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
   ### ALSO NEEDS TO BE ADDED TO OUTPUT LATER SOMEHOW
   ### MAYBE MAKE THIS A CLASS AND/OR "APPEND" IT TO A "phylo" CLASS OBJECT
   node_constraints = NULL
+  
+  # EXPAND THIS IN BOTH DIRECTIONS AND ADD INROMATIVE RESOLUTION!
+  if (any(x = is.na(x = match(x = trees[[1]]$tip.label, table = rownames(x = cladistic_matrix$matrix_1$matrix))))) stop("Names in trees and names in cladistic_matrix do not match.")
 
   # If trees is a single topology then reformat as a list of length one:
   if (class(x = trees) == "phylo") trees <- list(trees)
