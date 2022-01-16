@@ -23,6 +23,7 @@ Imports:
     grDevices,
     methods,
     optrees,
+    partitions,
     stats,
     utils
 Suggests: 
