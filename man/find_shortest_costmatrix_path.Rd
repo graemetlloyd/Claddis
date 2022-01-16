@@ -20,7 +20,17 @@ A vector of states describing (one) of the optimal path(s) in the order \code{st
 Given a start and end state, returns the shortest path through a costmatrix.
 }
 \details{
+A common problem in graph theory is identifying the shortest path to take between two vertices of a connected graph. A costmatrix also describes a graph, with transition costs representing edge weights that can be asymmetric (e.g., going from 0 to 1 can have a different weight than going from 1 to 0). Finding the shortest path between states - i.e., the path that minimises total weight (cost) - from a costmatrix has two main applications in Claddis: 1. to check a costmatrix is internally consistent (no cost is misidentified due to a "cheaper" route being available - solving a problem identified in Maddison and Maddison 2003), and 2. to identify the minimum cost a character could have on a tree (an essential aspect of various homoplasy metrics, see Hoyal Cuthill et al. 2010).
 
+The function returns a vector describing (one) shortest (i.e., lowest cost) path between \code{start} and \code{end}. If the direct path is shortest this will be simply \code{start} and \code{end}, but if an indirect route is cheaper then other node(s) will appear between these values.
+
+In operation the function is inspired by Dijkstra's algorithm (Dijkstra 1959) but differs in some aspects to deal with the special case of a cladistic-style costmatrix. Essentially multiple paths are considered with the algorithm continuing until either the destination node (\code{end}) is reached or the accumulated cost (path length) exceeds the direct cost (meaning the path cannot be more optimal, lower cost, than the direct one).
+
+Note: that because infinite costs are allowed in costmatrices to convey that a particular transition is not allowed these are not considered by the function and by default the direct path (\code{start} -> \code{end}) will be returned when the cost is \code{Inf}. If the user \emph{does} wish to know if there is a shorter cost for an infinite value then they should replace any \code{Inf} value with an arbitrary high number instead.
+
+Note: negative costs are not allowed in costmatrices as they will confound the halting criteria of the algorithm.
+
+Note: if multiple equally optimal solutions are possible, the function will only return one of them. I.e., just because a solution is not presented it cannot be assumed it is suboptimal. For example, for any ordered character (of three or more states) there will always be multiple equally optimal solutions.
 }
 \examples{
 

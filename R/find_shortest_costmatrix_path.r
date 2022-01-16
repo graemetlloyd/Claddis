@@ -16,7 +16,7 @@
 #'
 #' In operation the function is inspired by Dijkstra's algorithm (Dijkstra 1959) but differs in some aspects to deal with the special case of a cladistic-style costmatrix. Essentially multiple paths are considered with the algorithm continuing until either the destination node (\code{end}) is reached or the accumulated cost (path length) exceeds the direct cost (meaning the path cannot be more optimal, lower cost, than the direct one).
 #'
-#' Note: that because infinite costs are allowed in costmatrices to convey that a particular transition is not allowed these are not considered by the function and by default the direct path (\code{start} -> \code{end}) will be returned when the cost is Inf. If the user \emph{does] wish to know if there is a shorter cost for an infinite value then they should replace any \\code{Inf} value with an arbitrary high number instead.
+#' Note: that because infinite costs are allowed in costmatrices to convey that a particular transition is not allowed these are not considered by the function and by default the direct path (\code{start} -> \code{end}) will be returned when the cost is \code{Inf}. If the user \emph{does} wish to know if there is a shorter cost for an infinite value then they should replace any \code{Inf} value with an arbitrary high number instead.
 #'
 #' Note: negative costs are not allowed in costmatrices as they will confound the halting criteria of the algorithm.
 #'
