@@ -43,6 +43,9 @@ generate_all_treeshapes <- function(n_tips, sort_by_resolution = TRUE) {
   # Life is easy if only two tips were asked for:
   if (n_tips == 2) return("(2);")
   
+  # As still broken above eight tips stop and warn user if requested:
+  if (n_tips > 8) stop("Currently this function does not generate all treeshapes for tip counts above eight.")
+  
   # Subfunction to make initial tree partitions of n_tips:
   make_partitions <- function(n_tips) {
   
@@ -158,16 +161,20 @@ generate_all_treeshapes <- function(n_tips, sort_by_resolution = TRUE) {
           )
         }
 
-        # Read innto ape as trees:
+        # Read into ape as trees:
         trees <- ape::read.tree(text = multihit_treeshapes)
         
         # If only one tree convert to a list so below wll work:
         if (class(trees) == "phylo") trees <- list(trees)
         
+        # Generate all new multihit treeshapes:
+        new_multihit_treeshapes <- lapply(
         
-        lapply(
+          # For each tree with multiple hits for a clade of size i:
           X = trees,
           FUN = function(tree) {
+            
+            # Isolate the nodes corresponding to clades:
             clade_nodes <- tree$edge[apply(
               X = do.call(
                 what = cbind,
@@ -181,34 +188,283 @@ generate_all_treeshapes <- function(n_tips, sort_by_resolution = TRUE) {
               MARGIN = 1,
               FUN = any
             ), 1]
+            
+            # Get frequencies of nodes (to help identify the berries of size i):
             node_freqs <- rle(x = sort(x = clade_nodes))
+            
+            # Isolate just the berry nodes of size i:
             berry_nodes <- node_freqs$values[node_freqs$lengths == numeric_i]
-            berry_ancestors <- unlist(x = lapply(X = as.list(x = berry_nodes), FUN = function(berry) tree$edge[tree$edge[, 2] == berry, 1]))
             
+            # Find the ancestors of each size i berry (to use for identifying symmetries):
+            berry_ancestors <- unlist(
+              x = lapply(
+                X = as.list(x = berry_nodes),
+                FUN = function(berry) tree$edge[tree$edge[, 2] == berry, 1]
+              )
+            )
             
-            #make_labels(32)
-            #tree$node.label <- LETTERS[2:(tree$Nnode + 1)] # SOMETHING LIKE THIS:
+            # Label the nodes of the tree (will need later for gsub to work), excludes "A" to avoid conflict with tip labels:
+            tree$node.label <- make_labels(N = (tree$Nnode + 1))[2:(tree$Nnode + 1)]
             
-            #NEED TO LABEL NODES AND SPIT OUT THAT STRING TO KNOW WHAT REPLACEMENTS ARE!
-            #actual things to permute: c(i, unlist(x = i_treeshapes))
+            # Make vector of permutation elements (what matters for symmetry is how these are permuted not what):
+            permutation_elements <- c(i, i_treeshapes)
+            
+            # Convert permutation elements to "labelled" versions:
+            for(j in n_tips:1) permutation_elements <- gsub(
+              pattern = as.character(x = j),
+              replacement = paste(rep(x = "A", times = j), collapse = ","),
+              x = permutation_elements
+            )
+            
+            # Set up a list to store items to expand.grid for full permutation set:
+            grid_list <- list()
+            
+            # If any symmetries are found (i.e., cases where berries of size i share an ancestor):
+            if (any(x = duplicated(x = berry_ancestors))) {
+              
+              # Get frequencies of each berry ancestor node:
+              ancestor_freqs <- rle(x = sort(x = berry_ancestors))
+              
+              # Isolate just those ancestors with symmetric (i.e., multiple berry) descendants:
+              symmetric_ancestors <- ancestor_freqs$values[ancestor_freqs$lengths > 1]
+              
+              # For each set of symmetric ancestors:
+              for(j in symmetric_ancestors) {
+                
+                # Get the numbers of the descendant (berry) nodes:
+                j_descendants_number <- berry_nodes[berry_ancestors == j]
+                
+                # Get the labels of those nodes:
+                j_descendants_label <- tree$node.label[(j_descendants_number - n_tips)]
+                
+                # Permute the parts:
+                permuted_parts <- do.call(
+                  what = rbind,
+                  args = apply(
+                    X = partitions::restrictedparts(n = length(x = j_descendants), m = length(x = permutation_elements)),
+                    MARGIN = 2,
+                    FUN = function(x) {
+                      multicool::allPerm(mcObj = multicool::initMC(x = x))
+                    },
+                    simplify = FALSE
+                  )
+                )
+                
+                # Add permutation_elements as column names to permuted parts to give them meaning:
+                colnames(x = permuted_parts) <- permutation_elements
+                
+                # Now convert permuted parts to strings and store in symmetric_parts:
+                grid_list[[(length(x = grid_list) + 1)]] <- apply(
+                  X = permuted_parts,
+                  MARGIN = 1,
+                  FUN = function(k)
+                    paste(
+                      paste(
+                        unlist(
+                          x = lapply(
+                            X = as.list(x = 1:ncol(x = permuted_parts)),
+                            FUN = function(l) rep(
+                              x = colnames(x = permuted_parts)[l],
+                              times = k[l]
+                            )
+                          )
+                        ),
+                        j_descendants_label,
+                        sep = ""
+                      ),
+                    collapse = "&"
+                  )
+                )
+              }
+            }
+            
+            # Find any asymmetric ancestors:
+            asymmetric_ancestors <- setdiff(x = berry_ancestors, y = berry_ancestors[duplicated(x = berry_ancestors)])
+            
+            # As long as there are asymmetric ancestors:
+            if (length(x = asymmetric_ancestors) > 0) {
+              
+              # For each set of symmetric ancestors:
+              for(j in asymmetric_ancestors) {
+                
+                # Get the numbers of the descendant (berry) nodes:
+                j_descendants_number <- berry_nodes[berry_ancestors == j]
+                
+                # Get the labels of those nodes:
+                j_descendants_label <- tree$node.label[(j_descendants_number - n_tips)]
+                
+                # Add permutations to grid_list (with node label appended):
+                grid_list[[(length(x = grid_list) + 1)]] <- paste(permutation_elements, j_descendants_label, sep = "")
+              }
+            }
+            
+            # Generate final set of multihit permutations:
+            multihit_permutations <- apply(
+              X = expand.grid(grid_list),
+              MARGIN = 1,
+              FUN = function(j) unname(
+                obj = unlist(
+                  x = strsplit(
+                    x = j,
+                    split = "&"
+                  )
+                )
+              ),
+              simplify = FALSE
+            )
+            
+            # Find patterns to replace with permutations:
+            pattern_to_replace <- paste(
+              "(",
+              paste(rep(x = "A", times = numeric_i), collapse = ","),
+              ")",
+              sort(x = tree$node.label[(berry_nodes - n_tips)]),
+              sep = ""
+            )
+            
+            # Generate Newick strings for each permutation:
+            newick_strings <- unlist(
+              x = lapply(
+                X = multihit_permutations,
+                FUN = function(j) {
+                  names(x = j) <- unlist(x = lapply(X = as.list(x = j), FUN = function(k) rev(x = strsplit(x = k, split = "\\)")[[1]])[1]))
+                  j <- j[sort(x = names(x = j))]
+                  newick_string <- ape::write.tree(phy = tree)
+                  for(k in 1:length(x = j)) newick_string <- gsub(
+                    pattern = pattern_to_replace[k],
+                    replacement = j[k],
+                    x = newick_string,
+                    fixed = TRUE
+                  )
+                  newick_string
+                }
+              )
+            )
+            
+            # Prune out starting tree (just want new ones):
+            newick_strings <- setdiff(x = newick_strings, ape::write.tree(phy = tree))
+            
+            # Read back in as phylo objects:
+            new_trees <- ape::read.tree(text = newick_strings)
+            
+            # Strip node labels out:
+            new_trees <- lapply(X = new_trees, FUN = function(k) {k$node.label <- NULL; k})
+            
+            # Reset class as multiPhylo:
+            class(new_trees) <- "multiPhylo"
+            
+            # Output Newick strings:
+            newick_strings <- ape::write.tree(phy = new_trees)
+            
+            # Convert back to numeric strings:
+            for(j in n_tips:1) newick_strings <- gsub(
+              pattern = paste(rep(x = "A", times = j), collapse = ","),
+              replacement = as.character(x = j),
+              x = newick_strings
+            )
+            
+            # Output numeric newick strings:
+            newick_strings
           }
         )
         
-        ### THIS IS THE HARD BIT!
-        ### NEED TO DISTINGUISH BETWEEN "SYMMETRIC" AND NON-SYMMETRIC MULTIPLE HITS
-        
-        # If not "symmetric" then expand.grid
-        # If "symmetric" need to do unordered permutations
-        # If both then symmetric permutations must be done first? Add to treeshapes then do like above? Possibly bad if lots of hits...
-        
-        # Update below once there is actal output!:
-        new_multiple_hit_treeshapes <- list()
+        # Restructure output as list of single treeshapes:
+        new_multiple_hit_treeshapes <- as.list(x = unlist(x = new_multihit_treeshapes))
       }
       
       # Add new treeshapes to treeshapes list:
       treeshapes <- c(treeshapes, new_single_hit_treeshapes, new_multiple_hit_treeshapes)
     }
   }
+  
+  # Subfunction to encode treeshapes:
+  encode_treeshape <- function(treeshape) {
+    
+    # Calculate number of tips:
+    n_tips <- sum(x = as.numeric(x = strsplit(x = gsub(pattern = "\\)|\\(|;", replacement = "", x = treeshape), split = ",")[[1]]))
+    
+    # Enter a single dummy label for each tip to make it readable as regular Newick string:
+    for(i in n_tips:1) treeshape <- gsub(pattern = as.character(x = i), replacement = paste(rep(x = "A", times = i), collapse = ","), x = treeshape)
+    
+    # Store as regular phylo object:
+    tree <- ape::read.tree(text = treeshape)
+    
+    # Find all (candidate) penultimate nodes:
+    penultimate_nodes <- rle(x = sort(x = unlist(x = lapply(X = 1:n_tips, FUN = function(i) tree$edge[tree$edge[, 2] == i, 1]))))
+
+    # Reduce to just those with at least two tips ("berries")
+    berries <- penultimate_nodes$values[penultimate_nodes$lengths > 1]
+    
+    # Confirm these are termini by removing any that also have internal node descendants (removes if not):
+    berries <- berries[unlist(x = lapply(X = berries, FUN = function(i) !any(tree$edge[tree$edge[, 1] == i, 2] > n_tips)))]
+    
+    # Store root node number:
+    root_node <- n_tips + 1
+    
+    # Get N descendants for each node in order from 1:N (used as a lookup later):
+    n_descendants <- ape::node.depth(phy = tree)
+    
+    # Get list of termini strings:
+    termini_strings <- lapply(
+    
+      # For each starter berry node:
+      X = (n_tips + 1):(n_tips + tree$Nnode),
+      FUN = function(i) {
+        
+        # Get initial descendant count:
+        descendant_counts <- n_descendants[i]
+        
+        # Only need to continue of not a star tree:
+        if (i > root_node) {
+          
+          # Set starting current node as i:
+          current_node <- i
+          
+          # Find ancestor of current node:
+          ancestor_node <- tree$edge[tree$edge[, 2] == current_node, 1]
+          
+          # Add descendant count of ancestor node to end of vector:
+          descendant_counts <- c(descendant_counts, n_descendants[ancestor_node])
+          
+          # Update current node:
+          current_node <- ancestor_node
+          
+          # Until the root is reached:
+          while(current_node > root_node) {
+            
+            # Update ancestor ode with ancestor of current node:
+            ancestor_node <- tree$edge[tree$edge[, 2] == current_node, 1]
+            
+            # Add descednant count to end of vector:
+            descendant_counts <- c(descendant_counts, n_descendants[ancestor_node])
+            
+            # Update current node:
+            current_node <- ancestor_node
+          }
+        }
+        
+        # If not a berry then reverse descendant_counts to indicate this:
+        if (length(x = setdiff(x = i, y = berries)) > 0) descendant_counts <- rev(x = descendant_counts)
+        
+        # Now encode successive tip-to-root descendant counts as single string with descendant counts separated by a hyphen:
+        paste(descendant_counts, collapse = "-")
+      }
+    )
+    
+    # Return a string that uniquely encodes treeshape (i.e., any rotation will give same encoding):
+    paste(sort(x = unlist(x = termini_strings)), collapse = "&")
+  }
+  
+  # Generate encodings of trees:
+  encodings <- unlist(
+    x = lapply(
+      X = treeshapes,
+      FUN = function(shape) encode_treeshape(shape)
+    )
+  )
+  
+  # Remove any duplictaes treeshapes (dont know why these exist :/):
+  treeshapes <- treeshapes[!duplicated(x = encodings)]
   
   # If sorting by resolution:
   if (sort_by_resolution) {
