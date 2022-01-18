@@ -86,12 +86,24 @@
 #' )$node_estimates
 #'
 #' @export reconstruct_ancestral_states
-reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, polymorphism_behaviour = "uncertainty", uncertainty_behaviour = "uncertainty", polymorphism_shape, polymorphism_distance, state_ages, dollo_penalty) {
+reconstruct_ancestral_states <- function(
+  trees,
+  cladistic_matrix,
+  estimate_all_nodes = FALSE,
+  estimate_tip_values = FALSE,
+  inapplicables_as_missing = FALSE,
+  polymorphism_behaviour = "uncertainty",
+  uncertainty_behaviour = "uncertainty",
+  polymorphism_shape,
+  polymorphism_distance,
+  state_ages,
+  dollo_penalty
+) {
   
   # COLLAPSE OPTIONS (MAYBE ANOTHER FUNCTION?):
   # - ACCTRAN
   # - DELTRAN
-  # - MINF (Swofford and Maddison 1987) - I THINK NOT!
+  # - MINF (Swofford and Maddison 1987) - I THINK NOT! FREQUENCIES IN GENERAL THOUGH? MOST EQUAL DISTRIBUTION OF STATES?
   # - MINSTATE *shrug emoji*
   # - MAXSTATE *shrug emoji*
   # - WEIGHTED BY BRANCH DURATION? (E.G., ((0:1,1:4)); SHOULD FAVOUR A 0 ROOT STATE). NEED WAY TO "SCORE" THESE SUCH THAT CAN FIND MPR WITH BEST SCORE.
@@ -152,7 +164,17 @@ reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_n
       possible_root_states <- colnames(x = node_values)[node_values[tip_count + 1, ] == min(x = node_values[tip_count + 1, ])]
       
       # Make new node estimates with every possible root state:
-      node_estimates <- do.call(what = cbind, args = lapply(X = as.list(x = possible_root_states), FUN = function(x) {y <- node_estimates; y[tip_count + 1, ] <- x; y}))
+      node_estimates <- do.call(
+        what = cbind,
+        args = lapply(
+          X = as.list(x = possible_root_states),
+          FUN = function(x) {
+            y <- node_estimates
+            y[tip_count + 1, ] <- x
+            y
+          }
+        )
+      )
       
       # For each internal node above the root to the tips:
       for(needle in (tip_count + 2):(tip_count + node_count - tip_count)) {
@@ -164,35 +186,37 @@ reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_n
         node_estimates <- split(x = node_estimates, f = col(x = node_estimates))
         
         # Permute all possible values and reformat as matrix:
-        node_estimates <- do.call(what = cbind, args = lapply(X = node_estimates, FUN = function(x) {
+        node_estimates <- do.call(
+          what = cbind,
+          args = lapply(
+            X = node_estimates,
+            FUN = function(x) {
           
-          # Get updated tree lengths for current node as per Swofford and Maddison 1992 second pass:
-          updated_tree_lengths <- costmatrix$costmatrix[x[ancestor_node], ] + node_values[needle, ]
+              # Get updated tree lengths for current node as per Swofford and Maddison 1992 second pass:
+              updated_tree_lengths <- costmatrix$costmatrix[x[ancestor_node], ] + node_values[needle, ]
           
-          # Store all possible most parsimonious state(s) for current node:
-          possible_states <- names(x = updated_tree_lengths[updated_tree_lengths == min(x = updated_tree_lengths)])
+              # Store all possible most parsimonious state(s) for current node:
+              possible_states <- names(x = updated_tree_lengths[updated_tree_lengths == min(x = updated_tree_lengths)])
           
-          # Store total number of possible states:
-          n_states <- length(x = possible_states)
+              # Store total number of possible states:
+              n_states <- length(x = possible_states)
           
-          # Create new node estimates to store possible state(s):
-          new_estimates <- matrix(data = rep(x = x, times = n_states), ncol = n_states)
+              # Create new node estimates to store possible state(s):
+              new_estimates <- matrix(data = rep(x = x, times = n_states), ncol = n_states)
           
-          # Add possible state(s)
-          new_estimates[needle, ] <- possible_states
+              # Add possible state(s)
+              new_estimates[needle, ] <- possible_states
           
-          # Return new estimates only:
-          new_estimates
-          
-        }))
-        
+              # Return new estimates only:
+              new_estimates
+            }
+          )
+        )
       }
-      
     }
     
     # Return node estimates:
     node_estimates
-    
   }
   
   # Perform second pass and add to first pass output:
@@ -220,7 +244,7 @@ reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_n
   )
   
   ### NEED TO DEAL WITH MISSING/INAPPLICABLE AND GENERAL THIRD PASS STUFF IN HERE
-  ### ALSO WHAT TO SET TIP STATES AS (MAYBE RAW INPUT BUT THINK ABOUT SCM IMPLICATIONS)?
+  ### ALSO WHAT TO SET TIP STATES AS (MAYBE RAW INPUT BUT THINK ABOUT STOCHASTIC CHARACTER MAP IMPLICATIONS)?
   
   # Return already compiled output:
   first_pass_output
@@ -251,10 +275,10 @@ reconstruct_ancestral_states <- function(trees, cladistic_matrix, estimate_all_n
 
 # NEED TO COVER SWOFFORD AND MADDISON 1992 ROOT VALUE CAVEAT SOMEWHERE, MAYBE TREE LENGTH FUNCTION? BUT RELATES HERE TOO
 
-# MORE OUTPUT OR SUMMARY OPTIONS COULD BE N CHANGES ON EACH BRANCH ACROSS MPRS, MEAN OF SAME, MIN AND MAX OF SAME. SIMILAR FOR CHANGE TYPES I.E., COSTMATRIX BUT ACTUALLY FREQUENCY OF CHANGES FOR EACH TRANSITION (THIS IS REALLY AN SCM OUTPUT).
+# MORE OUTPUT OR SUMMARY OPTIONS COULD BE N CHANGES ON EACH BRANCH ACROSS MPRS, MEAN OF SAME, MIN AND MAX OF SAME. SIMILAR FOR CHANGE TYPES I.E., COSTMATRIX BUT ACTUALLY FREQUENCY OF CHANGES FOR EACH TRANSITION (THIS IS REALLY AN STOCHASTIC CHARACTER MAP OUTPUT).
 # AS RATE TENDS TOWARD INFINITY THEN RECONSTRUCTION AT A NODE TENDS TOWARDS EQUAL FREQUENCY OF EACH STATE (I.E., MAXIMAL UNCERTAINTY).
 # "This illustrates the fact that ACCTRAN and DELTRAN do not always choose a single one of the most parsimonious reconstructions." MacClade 4 manual, page 99).
 # "Note that MacClade, unlike PAUP*, does not choose the lowest-valued state at the root to begin these processes. Thus MacClade's ACCTRAN and DELTRAN may not fully resolve ambiguity in the ancestral state reconstruction."
 # INTERMEDIATES ARE GONNA MATTER IF MOVING TO CHARACTER MAPS. E.G., IF ONLY 0 AND 2 ARE SAMPLED BUT A CHARACTER IS ORDERED THEN THERE ARE TWO CHANGES ALONG THE BRANCH NOT ONE TWO-COST CHANGE.
 # TEST WEIGHTING OF STRATOCLADISTICS BY USING A STRATIGRAPHIC CHARACTER AND WEIGHTING IT MULTIPLE WAYS (AS A SLIDER) AND SHOW HOW IT EFFECTS PARSIMONY VS STRAT CONGRUENCE TREE LANDSCAPES
-# MONOFURCATIONS IDEA IN CASTOR IS INTERESTING AS ALLOWS POINT ESTIMATES ALONG BRANCHES (E.G., FOR SCM OF A CONTINUOUS CHARACTER)
+# MONOFURCATIONS IDEA IN CASTOR IS INTERESTING AS ALLOWS POINT ESTIMATES ALONG BRANCHES (E.G., FOR STOCHASTIC CHARACTER MAP OF A CONTINUOUS CHARACTER)
