@@ -1,17 +1,17 @@
-#' Generate all treeshapes of N tips
+#' Permute all treeshapes of N tips
 #'
 #' @description
 #'
-#' Given a number of tips, generates all unlabelled multifurcating trees (i.e., treeshapes).
+#' Given a number of tips, permutes all rooted unlabelled multifurcating trees (i.e., treeshapes).
 #'
 #' @param n_tips The number of tips required. Note that it may be very slow or not run at all if this value is too large.
-#' @param sort_by_resolution Whther or not to sort the output by number of internal nodes (from 1 to N - 1). Defaults to \code{TRUE}.
+#' @param sort_by_resolution Whether or not to sort the output by number of internal nodes (from 1 to N - 1). Defaults to \code{TRUE}.
 #'
 #' @details
 #'
-#' A treeshape is essentially an unlabelled phylogenetic tree. Like other phylogenetic trees it has a root and tips, but (as you might expect) because it is unlabelled the tips have no specific identity. Thus the only information it contains is its' "shape" - the number of internal nodes and their descendants. This function generates all \emph{unique} treeshapes and allows for multifurcations.
+#' A treeshape is essentially an unlabelled phylogenetic tree. Like other phylogenetic trees it has a root and tips, but (as you might expect) because it is unlabelled the tips have no specific identity. Thus the only information it contains is its' "shape" - the number of internal nodes and their descendants. This function permutes all \emph{unique} treeshapes and allows for multifurcations.
 #'
-#' Note that unique means it excludes alternative rotations of individual branch points. For example, the trees ((2),1); and (1,(2)); are identical in information content and this function will only generate one of them.
+#' Note that unique means it excludes alternative rotations of individual branch points. For example, the trees ((2),1); and (1,(2)); are identical in information content and this function would only permute one of them.
 #'
 #' The algorithm used here is loosely based on the partitions approach suggested in Felsenstein (2004), although to the best of my knowledge nobody else has formally created an algorithm to do this. (Felsenstein also lays out the expected number of such treeshapes for each value of N.)
 #'
@@ -31,11 +31,11 @@
 #'
 #' @examples
 #'
-#' # Generate all treeshapes of six tips:
-#' generate_all_treeshapes(n_tips = 6)
+#' # Permute all treeshapes of six tips:
+#' permute_treeshapes(n_tips = 6)
 #'
-#' @export generate_all_treeshapes
-generate_all_treeshapes <- function(n_tips, sort_by_resolution = TRUE) {
+#' @export permute_treeshapes
+permute_treeshapes <- function(n_tips, sort_by_resolution = TRUE) {
 
   # If one of fewer tips stop and warn user:
   if (n_tips <= 1) stop("n_tips must be at least 2.")
@@ -44,7 +44,7 @@ generate_all_treeshapes <- function(n_tips, sort_by_resolution = TRUE) {
   if (n_tips == 2) return("(2);")
   
   # As still broken above eight tips stop and warn user if requested:
-  if (n_tips > 8) stop("Currently this function does not generate all treeshapes for tip counts above eight.")
+  if (n_tips > 8) stop("Currently this function does not permute all treeshapes for tip counts above eight.")
   
   # Subfunction to make initial tree partitions of n_tips:
   make_partitions <- function(n_tips) {
@@ -167,7 +167,7 @@ generate_all_treeshapes <- function(n_tips, sort_by_resolution = TRUE) {
         # If only one tree convert to a list so below wll work:
         if (class(trees) == "phylo") trees <- list(trees)
         
-        # Generate all new multihit treeshapes:
+        # Permute all new multihit treeshapes:
         new_multihit_treeshapes <- lapply(
         
           # For each tree with multiple hits for a clade of size i:
