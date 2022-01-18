@@ -21,6 +21,8 @@
 - Added option to add size landscape to plot_morphospace.
 - Added count_cherries function to count number of cherries on a given phylogenetic tree or set of trees.
 - Added fix_costmatrix function to ensure all state-to-state transtion costs are self-consistent.
+- Added generate_all_treeshapes function to geneertae all unique treeshapes (i.e., all unlabelled multifurcating trees).
+- Added make_labels function to generate N unique text labels.
 
 Version - 0.6.6 - 2021-02-21
 
