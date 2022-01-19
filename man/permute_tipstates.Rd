@@ -2,11 +2,26 @@
 % Please edit documentation in R/permute_tipstates.r
 \name{permute_tipstates}
 \alias{permute_tipstates}
-\title{When calculating g_max or otherwise determining the limits for a given character type it can be useful to generate (permute) all possible combinations of tip states for a given tree. For example, let's imagine we have a binary character (states 0 and 1) and four tips (labelled A-D). We could simply assign each possible state to each possible label to get the following sixteen permutations:}
+\title{Permute all tip states on a tree}
 \usage{
 permute_tipstates(tree, states, all_states_present = TRUE)
 }
+\arguments{
+\item{tree}{A phylogenetic tree in \link{ape} format.}
+
+\item{states}{A vector of character states.}
+
+\item{all_states_present}{A logical indicating whether or not all states should appear at least once. (Defaults to \code{TRUE}.)}
+}
+\value{
+A matrix where each row is a unique suite of states and each column a lebelled tip of the input tree.
+}
 \description{
+Given a phylogenetic tree and a set of states, permutes all possible tip state combinations.
+}
+\details{
+When calculating g_max or otherwise determining the limits for a given character type it can be useful to generate (permute) all possible combinations of tip states for a given tree. For example, let's imagine we have a binary character (states 0 and 1) and four tips (labelled A-D). We could simply assign each possible state to each possible label to get the following sixteen permutations:
+
 ______________________
 | #  | A | B | C | D |
 ----------------------
@@ -27,11 +42,10 @@ ______________________
 | 15 | 0 | 1 | 1 | 1 |
 | 16 | 1 | 1 | 1 | 1 |
 ----------------------
-}
-\details{
+
 We can know there are sixteen permutations before we even check as logially for any N states we simply multiply T times (for T tips). I.e., the answer is given by N^T. As here is N is 2 and T is 4 this is 2^4 = 2 x 2 x 2 x 2 = 16.
 
-Technically this achieves our goal - we have generated all possible tip states, but there are at least two reasons this approach might be suboptimal. Firstly, permutations 1 and 16 are invariant (all tip states are the same) and so are unlikely to be of interest. Or, to generalise this, we might not want to consider permutations where not all possible states are sampled - i.e., we may wish to stipulate that eery state appear at least once. Secondly, this approach does not consider the structure of the phylogenetic tree of interest. It might not be immediately obvious why this matters, so let's consider another example, Sticking with our bianry character and four tips let's consider the tree:
+Technically this achieves our goal - we have generated all possible tip states, but there are at least two reasons this approach is suboptimal. Firstly, permutations 1 and 16 are invariant (all tip states are the same) and so are unlikely to be of interest. Or, to generalise this, we might not want to consider permutations where not all possible states are sampled - i.e., we may wish to stipulate that every state appear at least once. Secondly, this approach does not consider the structure of the phylogenetic tree of interest. It might not be immediately obvious why this matters, so let's consider another example, Sticking with our binary character and four tips let's consider the tree:
 
 A   B   C   D
  \   \   \ /
@@ -70,7 +84,7 @@ Thus, there are two ways in which the simple ordered permutation method ineffici
 |     5    | 3,125 | 9,765,625 |  9.54 x 10^13 | 8.88 x 10^34 | 7.89 x 10^69 |
 ------------------------------------------------------------------------------
 
-Thus for many empirically realistic examples the computational expense is too great and a more complex, less redundant, generating algorithm is desirable that directly considers both tree structure and the desire for full variance sampling.
+Thus for many empirically realistic examples the computational expense is too great and a more complex, less redundant, permutation algorithm is desirable that directly considers both tree structure and the desire for full variance sampling.
 
 As this is not a simple algorithm let's begin by consider a simple and limiting case - the star tree:
 
@@ -89,7 +103,7 @@ ______________________
 | 12 | 1 | 1 | 1 | 0 |
 ----------------------
 
-Put simply, these are the cases where there is one, two, or three of state one and three, two or one of state zero. Thus we have dramatically reduced the number of permutations by over 80%. The number of permutations in this case is now just T - 1, which scales much better:
+Put simply, these are the cases where there is one, two, or three of state 1, and three, two or one of state 0. Thus we have dramatically reduced the number of permutations, here by over 80%. The number of permutations in this case is now just T - 1, which scales much better:
 
            __________________________
            |      Number of tips    |
@@ -176,5 +190,57 @@ We see, then, that this scales much more reasonably than our initial approach, a
 ---------------------------------------------------------
 
 These are larger, but not intolerably so.
-We can, however, begin to breakdown the problem by these two steps. The first of these is in efect a special kind of partitioning of the data.
+
+In practice things can become more complex when the full variety of possible treeshapes are considered and in fact the present algorithm is not without the possibility of redundancies. Specifically, because trees can contain repeating "motifs" where these share a common ancestor fewer permutations would still cover the full range of possibilities. For example, consider the tree:
+
+A   B   C   D   E   F
+ \   \ /     \   \ /
+  \   /       \   /
+   \ /         \ /
+    \           /
+     \         /
+      \       /
+       \     /
+        \   /
+         \ /
+
+Here the motifs:
+
+A   B   C          D   E   F
+ \   \ /            \   \ /
+  \   /     and      \   /
+   \ /                \ /
+
+Are the same as such so would be the permutations:
+
+_________________________
+| A | B | C | D | E | F |
+-------------------------
+| 0 | 1 | 1 | 1 | 0 | 0 |
+| 1 | 0 | 0 | 0 | 1 | 1 |
+-------------------------
+
+Currently the function does not account for these, nor is a closed form equation known that would generate the true smallest number of unique permtations.
+
+Instead, it simply permutes each "berry" (a node where all descendants are terminals, an extension of the notion pf phylogenetic "cherries") as though it is the star tree, and permuting all other tips as simple labellings.
+}
+\examples{
+
+# Permute four tip states (A, C, G, T) on a six-taxon tree:
+permute_tipstates(
+  tree = ape::read.tree(text = "((A,B),(C,(D,(E,F))));"),
+  states = c("A", "C", "G", "T"),
+  all_states_present = TRUE
+)
+
+# Permute three tip states (0, 1, 2) on a ten-taxon star tree:
+permute_tipstates(
+  tree = ape::read.tree(text = "(A,B,C,D,E,F,G,H,I);"),
+  states = c("0", "1", "2"),
+  all_states_present = TRUE
+)
+
+}
+\author{
+Graeme T. Lloyd \email{graemetlloyd@gmail.com}
 }
