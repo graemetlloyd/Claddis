@@ -22,7 +22,7 @@ Given a phylogenetic tree and a set of states, permutes all possible tip state c
 \details{
 When calculating g_max or otherwise determining the limits for a given character type it can be useful to generate (permute) all possible combinations of tip states for a given tree. For example, let's imagine we have a binary character (states 0 and 1) and four tips (labelled A-D). We could simply assign each possible state to each possible label to get the following sixteen permutations:
 
-______________________
+\preformatted{______________________
 | #  | A | B | C | D |
 ----------------------
 | 1  | 0 | 0 | 0 | 0 |
@@ -41,22 +41,22 @@ ______________________
 | 14 | 1 | 0 | 1 | 1 |
 | 15 | 0 | 1 | 1 | 1 |
 | 16 | 1 | 1 | 1 | 1 |
-----------------------
+----------------------}
 
 We can know there are sixteen permutations before we even check as logially for any N states we simply multiply T times (for T tips). I.e., the answer is given by N^T. As here is N is 2 and T is 4 this is 2^4 = 2 x 2 x 2 x 2 = 16.
 
 Technically this achieves our goal - we have generated all possible tip states, but there are at least two reasons this approach is suboptimal. Firstly, permutations 1 and 16 are invariant (all tip states are the same) and so are unlikely to be of interest. Or, to generalise this, we might not want to consider permutations where not all possible states are sampled - i.e., we may wish to stipulate that every state appear at least once. Secondly, this approach does not consider the structure of the phylogenetic tree of interest. It might not be immediately obvious why this matters, so let's consider another example, Sticking with our binary character and four tips let's consider the tree:
 
-A   B   C   D
+\preformatted{A   B   C   D
  \   \   \ /
   \   \   /
    \   \ /
     \   /
-     \ /
+     \ /}
 
 And the following permutations (from above):
 
-______________________
+\preformatted{______________________
 | #  | A | B | C | D |
 ----------------------
 | 4  | 0 | 0 | 1 | 0 |
@@ -67,13 +67,13 @@ ______________________
 | 10 | 0 | 1 | 0 | 1 |
 | 12 | 1 | 1 | 1 | 0 |
 | 13 | 1 | 1 | 0 | 1 |
-----------------------
+----------------------}
 
 Here are the eight permutations where C and D are assigned different states. However, in practical terms there is no need to generate half of these permutations as the order CD/DC doesn't matter (due to the principal of free rotation). In other words, the "identity" (i.e., the label of a tip) is not as important as the structure of the tree.
 
 Thus, there are two ways in which the simple ordered permutation method inefficiently generates permutations that are redundant with respect to a given tree. This is important as scaling the simple assignment of states to labels (N^T) can rapidly lead to very large numbers of permutations:
 
-           ___________________________________________________________________
+\preformatted{           ___________________________________________________________________
            |                          Number of tips                         |
 ------------------------------------------------------------------------------
 | N States |  5    |    10     |       20      |      50      |      100     |
@@ -82,60 +82,60 @@ Thus, there are two ways in which the simple ordered permutation method ineffici
 |     3    |   243 |    59,049 | 3,486,784,401 | 7.18 x 10^23 | 5.15 x 10^47 |
 |     4    | 1,024 | 1,048,576 |  1.10 x 10^12 | 1.27 x 10^30 | 1.61 x 10^60 |
 |     5    | 3,125 | 9,765,625 |  9.54 x 10^13 | 8.88 x 10^34 | 7.89 x 10^69 |
-------------------------------------------------------------------------------
+------------------------------------------------------------------------------}
 
 Thus for many empirically realistic examples the computational expense is too great and a more complex, less redundant, permutation algorithm is desirable that directly considers both tree structure and the desire for full variance sampling.
 
 As this is not a simple algorithm let's begin by consider a simple and limiting case - the star tree:
 
-A   B   C   D
+\preformatted{A   B   C   D
 |   |   |   |
 |   |   |   |
--------------
+-------------}
 
 Here there is no "normal" tree structure, but in practical terms this means there is no reason to consider \emph{which} label a tip state is assigned to. If we again consider our binary character from above this means by pruning invariant and redundant partitions we get just three permutations:
 
-______________________
+\preformatted{______________________
 | #  | A | B | C | D |
 ----------------------
 | 2  | 1 | 0 | 0 | 0 |
 | 6  | 1 | 1 | 0 | 0 |
 | 12 | 1 | 1 | 1 | 0 |
-----------------------
+----------------------}
 
 Put simply, these are the cases where there is one, two, or three of state 1, and three, two or one of state 0. Thus we have dramatically reduced the number of permutations, here by over 80%. The number of permutations in this case is now just T - 1, which scales much better:
 
-           __________________________
+\preformatted{           __________________________
            |      Number of tips    |
 -------------------------------------
 | N States | 5 | 10 | 20 | 50 | 100 |
 -------------------------------------
 |     2    | 4 |  9 | 19 | 49 |  99 |
--------------------------------------
+-------------------------------------}
 
 However, things become a little more complex when we consider a third state. It also makes more sense to start tabulating these permutations by the number of times a state appears instead of arbitrarily assigning states to a particular label. So our binary example would look like this:
 
-_________
+\preformatted{_________
 | 0 | 1 |
 ---------
 | 3 | 1 |
 | 2 | 2 |
 | 1 | 3 |
----------
+---------}
 
 If we now add a third possible state (2) we can permute all the possible scenarios (excluding those where a state doesn't appear at all) as:
 
-_____________
+\preformatted{_____________
 | 0 | 1 | 2 |
 -------------
 | 2 | 1 | 1 |
 | 1 | 2 | 1 |
 | 1 | 1 | 2 |
--------------
+-------------}
 
 Thus for this example there are still only three options. This is because stipulating that every state appears at least once means there is only one "free" assignment that can be allocated as either state 0, state 1 or state 2 - accounting for the three permutations. In other words, the assignments here had to be 2, 1, and 1, the only distinction is the "order" of these assignments. Let's consider a fifth tip but stick with a star tree. Now the assignments can be 3, 1, and 1 or 2, 2, and 1:
 
-_____________
+\preformatted{_____________
 | 0 | 1 | 2 |
 -------------
 | 3 | 1 | 1 |
@@ -144,11 +144,11 @@ _____________
 | 2 | 2 | 1 |
 | 2 | 1 | 2 |
 | 1 | 2 | 2 |
--------------
+-------------}
 
 Thus by increasing the number of tips by one in this instance we have also doubled the permutations. Note, though, that we do not need an additional column to represent this, just additional rows. Adding a sixth tip we get:
 
-_____________
+\preformatted{_____________
 | 0 | 1 | 2 |
 -------------
 | 4 | 1 | 1 |
@@ -161,11 +161,11 @@ _____________
 | 1 | 2 | 3 |
 | 2 | 1 | 3 |
 | 2 | 2 | 2 |
--------------
+-------------}
 
 Now we have three possible assignments (4-1-1, 3-2-1 and 2-2-2), but find the ways to permute these are no longer equal (3, 6 and 1, respectively). This makes it harder to derive an equation that will allow us to scale the problem to any value of N or T. We can repeat our table from above though to get a general sense of scale. Remember that this is for the star tree with the additional stipulation that every state appears at least once:
 
-           __________________________________________
+\preformatted{           __________________________________________
            |             Number of tips             |
 -----------------------------------------------------
 | N States |  5 |  10 |    20 |      50 |       100 |
@@ -174,11 +174,11 @@ Now we have three possible assignments (4-1-1, 3-2-1 and 2-2-2), but find the wa
 |     3    |  6 |  36 |   171 |   1,176 |     4,851 |
 |     4    |  4 |  84 |   969 |  18,424 |   156,849 |
 |     5    |  1 | 126 | 3,876 | 211,876 | 3,764,376 |
------------------------------------------------------
+-----------------------------------------------------}
 
 We see, then, that this scales much more reasonably than our initial approach, although this is the "best case" scenario of no tree structure. We can also relax things a little by allowing states to not always appear:
 
-           ______________________________________________
+\preformatted{           ______________________________________________
            |               Number of tips               |
 ---------------------------------------------------------
 | N States |   5 |    10 |     20 |      50 |       100 |
@@ -187,13 +187,13 @@ We see, then, that this scales much more reasonably than our initial approach, a
 |     3    |  21 |    66 |    231 |   1,326 |     5,151 |
 |     4    |  56 |   286 |  1,771 |  23,426 |   176,851 |
 |     5    | 126 | 1,001 | 10,626 | 316,251 | 4,598,126 |
----------------------------------------------------------
+---------------------------------------------------------}
 
 These are larger, but not intolerably so.
 
-In practice things can become more complex when the full variety of possible treeshapes are considered and in fact the present algorithm is not without the possibility of redundancies. Specifically, because trees can contain repeating "motifs" where these share a common ancestor fewer permutations would still cover the full range of possibilities. For example, consider the tree:
+In practice things can become more complex when the full variety of possible treeshapes are considered and in fact the present algorithm is not without the possibility of redundancies. Specifically, because trees can contain repeating "motifs" that share a common ancestor fewer permutations would still cover the full range of possibilities. For example, consider the tree:
 
-A   B   C   D   E   F
+\preformatted{A   B   C   D   E   F
  \   \ /     \   \ /
   \   /       \   /
    \ /         \ /
@@ -202,23 +202,23 @@ A   B   C   D   E   F
       \       /
        \     /
         \   /
-         \ /
+         \ /}
 
 Here the motifs:
 
-A   B   C          D   E   F
+\preformatted{A   B   C          D   E   F
  \   \ /            \   \ /
   \   /     and      \   /
-   \ /                \ /
+   \ /                \ /}
 
 Are the same as such so would be the permutations:
 
-_________________________
+\preformatted{_________________________
 | A | B | C | D | E | F |
 -------------------------
 | 0 | 1 | 1 | 1 | 0 | 0 |
 | 1 | 0 | 0 | 0 | 1 | 1 |
--------------------------
+-------------------------}
 
 Currently the function does not account for these, nor is a closed form equation known that would generate the true smallest number of unique permtations.
 
