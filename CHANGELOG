@@ -21,8 +21,10 @@
 - Added option to add size landscape to plot_morphospace.
 - Added count_cherries function to count number of cherries on a given phylogenetic tree or set of trees.
 - Added fix_costmatrix function to ensure all state-to-state transtion costs are self-consistent.
-- Added generate_all_treeshapes function to geneertae all unique treeshapes (i.e., all unlabelled multifurcating trees).
+- Added permute_treeshapes function to permute all unique treeshapes (i.e., all rooted unlabelled multifurcating trees).
 - Added make_labels function to generate N unique text labels.
+- Added permute_tipstates to permute all possible tip states given a specific tree.
+- Added permute_restricted_compositions (initallly a subfunction of permute_tipstates) to permute all restricted compositions (e.g., for permuting tip states on the star tree).
 
 Version - 0.6.6 - 2021-02-21
 
