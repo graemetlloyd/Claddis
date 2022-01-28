@@ -25,6 +25,7 @@
 - Added make_labels function to generate N unique text labels.
 - Added permute_tipstates to permute all possible tip states given a specific tree.
 - Added permute_restricted_compositions (initallly a subfunction of permute_tipstates) to permute all restricted compositions (e.g., for permuting tip states on the star tree).
+- Added label_treeshapes function to generate (permute) all labelled trees from a treeshape and label set.
 
 Version - 0.6.6 - 2021-02-21
 
