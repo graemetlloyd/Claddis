@@ -241,7 +241,7 @@ permute_treeshapes <- function(n_tips, sort_by_resolution = TRUE) {
                 permuted_parts <- do.call(
                   what = rbind,
                   args = apply(
-                    X = partitions::restrictedparts(n = length(x = j_descendants), m = length(x = permutation_elements)),
+                    X = partitions::restrictedparts(n = length(x = j_descendants_number), m = length(x = permutation_elements)),
                     MARGIN = 2,
                     FUN = function(x) {
                       multicool::allPerm(mcObj = multicool::initMC(x = x))
