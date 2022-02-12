@@ -8,7 +8,7 @@
 #'
 #' @details
 #'
-#' A costmatrix summarises all possible state-to-state transition costs and hence each entry could also be considered an edge of a directed state graph. However, many of these edges could be removed and a complete description of the graph still be provided. For example, the diagonal (any transition from a state to itself) can be removed, as can any edge with infinite cost (as this edge would never be traversed in practice). Finally, some edges are redundant as indirect paths already represent the same cost.
+#' A costmatrix summarises all possible state-to-state transition costs and hence each entry can also be considered as an edge of a directed state graph. However, many of these edges could be removed and a complete description of the graph still be provided. For example, the diagonal (any transition from a state to itself) can be removed, as can any edge with infinite cost (as this edge would never be traversed in practice). Finally, some edges are redundant as indirect paths already represent the same cost.
 #'
 #' As an example, we can consider the linear ordered costmatrix:
 #'
