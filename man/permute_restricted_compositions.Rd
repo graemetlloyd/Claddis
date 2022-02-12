@@ -17,7 +17,7 @@ permute_restricted_compositions(n, m_labels, allow_zero = TRUE)
 A matrix where each row is a unique restricted composition of n and each column is a labelled bin.
 }
 \description{
-Given a pisitive integer, n, and a number of bins (m), permutes all possible compositions.
+Given a positive integer, n, and a number of bins (m), permutes all possible compositions.
 }
 \details{
 Every way that an integer (\code{n}) can be divided up into \code{m} bins can be permuted using a restricted version of the mathematical concept of compositions. In practice this function is designed to distribute the states for \code{n} tips across \code{m} states (e.g., with \link{permute_tipstates}), but many other uses are conceivable and hence this is included here as a general function.

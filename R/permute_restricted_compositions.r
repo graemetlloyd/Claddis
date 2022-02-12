@@ -2,7 +2,7 @@
 #'
 #' @description
 #'
-#' Given a pisitive integer, n, and a number of bins (m), permutes all possible compositions.
+#' Given a positive integer, n, and a number of bins (m), permutes all possible compositions.
 #'
 #' @param n A positive integer.
 #' @param m_labels A character vector of labels for m.
