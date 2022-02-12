@@ -10,7 +10,7 @@ convert_costmatrix_to_graph(costmatrix)
 \item{costmatrix}{An object of class \code{costMatrix}.}
 }
 \value{
-A matrix representing the minimum graph as directed edges (from, to, and edge weight). For an undirected graph both ways an edge can be defined are included.
+A data frame representing the minimum directed graph as edges (from, to, and edge weight). For an undirected graph both ways an edge can be defined are included.
 }
 \description{
 Given a costmatrix, returns the smallest possible graph (fewest edges).

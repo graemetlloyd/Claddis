@@ -66,7 +66,7 @@
 #'
 #' @return
 #'
-#' A matrix representing the minimum graph as directed edges (from, to, and edge weight). For an undirected graph both ways an edge can be defined are included.
+#' A data frame representing the minimum directed graph as edges (from, to, and edge weight). For an undirected graph both ways an edge can be defined are included.
 #'
 #' @seealso
 #'
@@ -124,7 +124,15 @@ convert_costmatrix_to_graph <- function(costmatrix) {
   all_edges <- expand.grid(from = sampled_states, to = sampled_states)
   
   # Add weight to edges:
-  all_edges <- cbind(from = all_edges[, "from"], to = all_edges[, "to"], weight = apply(X = all_edges, MARGIN = 1, function(x) costmatrix$costmatrix[x[1], x[2]]))
+  all_edges <- cbind(
+    from = all_edges[, "from"],
+    to = all_edges[, "to"],
+    weight = apply(
+      X = all_edges,
+      MARGIN = 1,
+      FUN = function(x) costmatrix$costmatrix[x[1], x[2]]
+    )
+  )
   
   # Prune all zero weight edges (i.e., diagonal):
   all_edges <- all_edges[-which(x = all_edges[, "weight"] == 0), , drop = FALSE]
@@ -198,15 +206,10 @@ convert_costmatrix_to_graph <- function(costmatrix) {
   # If there are redundant edges to remove then remove them:
   if (length(x = to_remove) > 0) all_edges <- all_edges[-to_remove, ]
   
-  ###
-  # CHECK GRAPH IS *CONNECTED*
-  #optrees::checkArbor
-  #optrees::checkGraph
-  
   # Return graph as edges:
-  cbind(
-    from = as.numeric(x = original_states[all_edges[, "from"]]),
-    to = as.numeric(x = original_states[all_edges[, "to"]]),
+  data.frame(
+    from = original_states[all_edges[, "from"]],
+    to = original_states[all_edges[, "to"]],
     weight = as.numeric(x = all_edges[, "weight"])
   )
 }
