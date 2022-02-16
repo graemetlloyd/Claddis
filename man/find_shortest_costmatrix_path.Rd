@@ -26,9 +26,9 @@ The function returns a vector describing (one) shortest (i.e., lowest cost) path
 
 In operation the function is inspired by Dijkstra's algorithm (Dijkstra 1959) but differs in some aspects to deal with the special case of a cladistic-style costmatrix. Essentially multiple paths are considered with the algorithm continuing until either the destination node (\code{end}) is reached or the accumulated cost (path length) exceeds the direct cost (meaning the path cannot be more optimal, lower cost, than the direct one).
 
-Note: that because infinite costs are allowed in costmatrices to convey that a particular transition is not allowed these are not considered by the function and by default the direct path (\code{start} -> \code{end}) will be returned when the cost is \code{Inf}. If the user \emph{does} wish to know if there is a shorter cost for an infinite value then they should replace any \code{Inf} value with an arbitrary high number instead.
+Note: that because infinite costs are allowed in costmatrices to convey that a particular transition is not allowed these are always likely to be replaced (meanng the path does become possible) unless they apply to entire rows or columns of a costmatrix.
 
-Note: negative costs are not allowed in costmatrices as they will confound the halting criteria of the algorithm.
+Note: negative costs are not allowed in costmatrices as they will confound the halting criteria of the algorithm. (They also do not make logical sense in a costmatrix anyway!)
 
 Note: if multiple equally optimal solutions are possible, the function will only return one of them. I.e., just because a solution is not presented it cannot be assumed it is suboptimal. For example, for any ordered character (of three or more states) there will always be multiple equally optimal solutions.
 }

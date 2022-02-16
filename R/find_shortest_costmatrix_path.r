@@ -16,9 +16,9 @@
 #'
 #' In operation the function is inspired by Dijkstra's algorithm (Dijkstra 1959) but differs in some aspects to deal with the special case of a cladistic-style costmatrix. Essentially multiple paths are considered with the algorithm continuing until either the destination node (\code{end}) is reached or the accumulated cost (path length) exceeds the direct cost (meaning the path cannot be more optimal, lower cost, than the direct one).
 #'
-#' Note: that because infinite costs are allowed in costmatrices to convey that a particular transition is not allowed these are not considered by the function and by default the direct path (\code{start} -> \code{end}) will be returned when the cost is \code{Inf}. If the user \emph{does} wish to know if there is a shorter cost for an infinite value then they should replace any \code{Inf} value with an arbitrary high number instead.
+#' Note: that because infinite costs are allowed in costmatrices to convey that a particular transition is not allowed these are always likely to be replaced (meanng the path does become possible) unless they apply to entire rows or columns of a costmatrix.
 #'
-#' Note: negative costs are not allowed in costmatrices as they will confound the halting criteria of the algorithm.
+#' Note: negative costs are not allowed in costmatrices as they will confound the halting criteria of the algorithm. (They also do not make logical sense in a costmatrix anyway!)
 #'
 #' Note: if multiple equally optimal solutions are possible, the function will only return one of them. I.e., just because a solution is not presented it cannot be assumed it is suboptimal. For example, for any ordered character (of three or more states) there will always be multiple equally optimal solutions.
 #'
@@ -80,7 +80,7 @@ find_shortest_costmatrix_path <- function(costmatrix, start, end) {
   if (start == end) return(c(start, end))
   
   # If an infinite cost then stop and return direct path as this indicates the path is not accessible:
-  if (costmatrix$costmatrix[start, end] == Inf) return(c(start, end))
+  #if (costmatrix$costmatrix[start, end] == Inf) return(c(start, end))
   
   # Get all character states:
   states <- rownames(x = costmatrix$costmatrix)
@@ -99,13 +99,13 @@ find_shortest_costmatrix_path <- function(costmatrix, start, end) {
     reached_destination = FALSE
   )
   
-  # Set up a list of possile path(s):
+  # Set up a list of possible path(s):
   paths <- list(path)
   
   # Start a while loop that will run until either destination node is always reached and/or costs are always higher than direct cost:
-  while(!all(unlist(x = lapply(X = paths, FUN = function(x) x$reached_destination))) || any(unlist(x = lapply(X = paths, FUN = function(x) ifelse(x$reached_destination, Inf, x$length))) < direct_cost)) {
+  while(!all(unlist(x = lapply(X = paths, FUN = function(x) x$reached_destination))) || any(unlist(x = lapply(X = paths, FUN = function(x) ifelse(test = x$reached_destination, yes = Inf, no = x$length))) < direct_cost)) {
   
-    # Find which paths need to continue (have not reached destination or exceeded drect cost):
+    # Find which paths need to continue (have not reached destination or exceeded direct cost):
     continuing_paths <- which(x = !unlist(x = lapply(X = paths, FUN = function(x) x$reached_destination)))
     
     # For each continuing path (in reverse order so i doesn't get confused):
@@ -120,7 +120,7 @@ find_shortest_costmatrix_path <- function(costmatrix, start, end) {
       # Build new paths list:
       new_paths <- rep(paths[i], length(x = unvisited_nodes))
     
-      # Set current node as each unviisted node:
+      # Set current node as each unvisited node:
       for(j in 1:length(x = new_paths)) new_paths[[j]]$current_node <- unvisited_nodes[j]
     
       # Update new paths:

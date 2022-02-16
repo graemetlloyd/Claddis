@@ -9,11 +9,13 @@
 #'
 #' @details
 #'
-#' A user may wish to consider a complicated set of transition costs between states when modelling discrete character evolution. This can be achieved with a custom costmatrix in Claddis (and elsewhere). However, some caution is urged when using such matrices to ensure that these costs are \emph{self-consistent}. More specifically, no direct state-to-state transition cost (excluding infinite costs) should be greater than is possible with an indirect path via one or more intermediate states.
+#' A user may wish to consider a complicated set of transition costs between states when modelling discrete character evolution. This can be achieved with a custom costmatrix in Claddis (and elsewhere). However, some caution is urged when using such matrices to ensure that these costs are \emph{self-consistent}. More specifically, no direct state-to-state transition cost should be greater than is possible with an indirect path via one or more intermediate states.
 #'
 #' This problem was first recognised (to the best of my knowledge) by Maddison and Maddison (2003), although they offered no direct solution.
 #'
-#' This function offers a solution through an algorithm that will iteratively alter a costmatrix until all direct transition costs are self-consistent. It does so by finding the shortest state-to-state path for all possible transitions using the \link{find_shortest_costmatrix_path} function. Because the first solution may itself be inconsistent (as it relied on costs that have since updated) the algorithm is repeated until an equilbirum is reached. (This scenario is unlikely in most real world cases, but may be possible with very large matrices representing many states so was implemented here for safety.)
+#' This function offers a solution through an algorithm that will iteratively alter a costmatrix until all direct transition costs are self-consistent. It does so by finding the shortest state-to-state path for all possible transitions using the \link{find_shortest_costmatrix_path} function. Because the first solution may itself be inconsistent (as it relied on costs that have since updated) the algorithm is repeated until an equilibrium is reached. (This scenario is unlikely in most real world cases, but may be possible with very large matrices representing many states so was implemented here for safety.)
+#'
+#' Note: infinite costs are allowed in costmatrices but unless they fill entire rows or columns (excluding the diagonal they will not be self-consistent as there will always be a cheaper indirect cost).
 #'
 #' Note: that TNT (Goloboff et al. 2008; Goloboff and Catalano, 2016) offers a correction based on the triangle inequality which appears to be an attempt to solve the same problem.
 #'
