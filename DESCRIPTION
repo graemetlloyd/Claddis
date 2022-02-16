@@ -57,7 +57,7 @@ Description: Measures morphological diversity from discrete character data and
     the Dollo stochastic character mapping of Tarver et al. (2018)
     <doi:10.1093/gbe/evy096>, and estimate_ancestral_states() implements
     the ancestral state options of Lloyd (2018) <doi:10.1111/pala.12380>.
-    calculate_tree_length() and reconstruct_ancestral_states() implement
+    calculate_tree_length() and reconstruct_ancestral_states() implements
     the generalised algorithms from Swofford and Maddison (1992; no doi).
 Encoding: UTF-8
 License: GPL (>=2)
