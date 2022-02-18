@@ -161,7 +161,7 @@ permute_costmatrices <- function(states = c("0", "1"), costs = c(1:3)) {
       # Insert permuted scores (to complete costmatrix):
       i_costmatrix$costmatrix[is.na(x = i_costmatrix$costmatrix)] <- unname(obj = permutations[i, ])
       
-      # Set satet infinities (i.e., infinite costs for each state row and column):
+      # Set state infinities (i.e., infinite costs for each state row and column):
       state_infinities <- lapply(
         X = as.list(x = states),
         FUN = function(j) rbind(
@@ -203,6 +203,9 @@ permute_costmatrices <- function(states = c("0", "1"), costs = c(1:3)) {
   
   # Remove any duplicate costmatrices:
   costmatrices <- costmatrices[!duplicated(x = unlist(x = lapply(X = costmatrices, FUN = function(costmatrix) paste(unlist(x = lapply(X = costmatrix, FUN = function(j) paste(as.vector(x = j), collapse = "%"))), collapse = "&"))))]
+  
+  # Final removal of any further ratio duplicates (only relevant if corrections for infinite costs were made):
+  if (any(costs == Inf)) costmatrices <- costmatrices[!duplicated(x = unlist(x = lapply(X = costmatrices, function(i) paste(as.vector(x = i$costmatrix / min(x = i$costmatrix[(upper.tri(x = i$costmatrix) + lower.tri(x = i$costmatrix)) == 1])), collapse = "%"))))]
   
   # Return list of costmatrices:
   return(costmatrices)
