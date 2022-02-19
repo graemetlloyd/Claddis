@@ -42,7 +42,7 @@
 #'
 #' @seealso
 #'
-#' \link{make_costmatrix}
+#' \link{make_costmatrix} and \link{make_all_uncertainties}
 #'
 #' @examples
 #'

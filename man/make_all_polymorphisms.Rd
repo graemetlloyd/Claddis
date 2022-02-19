@@ -49,7 +49,7 @@ make_all_polymorphisms(single_states = 0:2)
 
 }
 \seealso{
-\link{make_costmatrix}
+\link{make_costmatrix} and \link{make_all_uncertainties}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
