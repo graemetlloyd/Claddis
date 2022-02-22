@@ -79,9 +79,6 @@ find_shortest_costmatrix_path <- function(costmatrix, start, end) {
   # If start and end are the same cost must be zero (and hence unbeatable) so return start and end:
   if (start == end) return(c(start, end))
   
-  # If an infinite cost then stop and return direct path as this indicates the path is not accessible:
-  #if (costmatrix$costmatrix[start, end] == Inf) return(c(start, end))
-  
   # Get all character states:
   states <- rownames(x = costmatrix$costmatrix)
 
