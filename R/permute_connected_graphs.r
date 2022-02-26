@@ -4,7 +4,7 @@
 #'
 #' Given a vertex count, permutes all connected graphs.
 #'
-#' @param min_state The minimum character state (defaults to \code{0}).
+#' @param n_vertices The number of vertices to connect.
 #'
 #' @details
 #'
@@ -12,9 +12,9 @@
 #'
 #' \preformatted{A---B}
 #'
-#' (The labels A and B here simply indicte the two vertices and are not a true labelling.)
+#' (The labels A and B here simply indicate the two vertices and are not a true labelling.)
 #'
-#' If we add a third vertex, there are tw connected graphs:
+#' If we add a third vertex, there are two connected graphs:
 #'
 #' \preformatted{A---B
 #'  \ /
@@ -24,7 +24,7 @@
 #'
 #' \preformatted{A---B---C}
 #'
-#' This function permutes all such connected graphs for any vertex count.
+#' This function permutes all such connected graphs for a given vertex count.
 #'
 #' Note that the output is in the form of a matrix of edges. For the three vertex case above these would be:
 #'
@@ -39,7 +39,7 @@
 #' [1,] "A"  "B"
 #' [2,] "B"  "C"}
 #'
-#' Again, it is important to note that the labels A, B, and C here are urely "dummy" labels and should not be considered a graph labelling. To use the second graph as an example there would be multiple possible labellings of this graph:
+#' Again, it is important to note that the labels A, B, and C here are purely "dummy" labels and should not be considered a graph labelling. To use the second graph as an example there are multiple labellings of this graph:
 #'
 #' \preformatted{A---B---C}
 #'
@@ -51,7 +51,7 @@
 #'
 #' \preformatted{A---C---B}
 #'
-#' However, these are all isomorphisms of the same unlabelled graph. Hence only the unique graphs themselves are what is being returned here.
+#' However, these are all isomorphisms of the same unlabelled graph. Only the unique graphs themselves are returned here.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
