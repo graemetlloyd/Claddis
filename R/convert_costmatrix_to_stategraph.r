@@ -1,8 +1,8 @@
-#' Convert a costmatrix to a minimal graph
+#' Convert a costmatrix to a minimal state graph
 #'
 #' @description
 #'
-#' Given a costmatrix, returns the smallest possible graph (fewest edges).
+#' Given a costmatrix, returns the smallest possible state graph (fewest edges).
 #'
 #' @param costmatrix An object of class \code{costMatrix}.
 #'
@@ -66,7 +66,7 @@
 #'
 #' @return
 #'
-#' A data frame representing the minimum directed graph as edges (from, to, and edge weight). For an undirected graph both ways an edge can be defined are included.
+#' A data frame representing the minimum directed graph as edges (from, to, and edge weight). For an undirected graph both to and from edges are included.
 #'
 #' @seealso
 #'
@@ -84,7 +84,7 @@
 #' )
 #'
 #' # Find the minimal directed graph representation:
-#' convert_costmatrix_to_graph(costmatrix = unordered_costmatrix)
+#' convert_costmatrix_to_stategraph(costmatrix = unordered_costmatrix)
 #'
 #' # Make a six-state ordered character costmatrix:
 #' ordered_costmatrix <- make_costmatrix(
@@ -96,7 +96,7 @@
 #' )
 #'
 #' # Find the minimal directed graph representation:
-#' convert_costmatrix_to_graph(costmatrix = ordered_costmatrix)
+#' convert_costmatrix_to_stategraph(costmatrix = ordered_costmatrix)
 #'
 #' # Make a six-state stratigraphic character costmatrix:
 #' stratigraphic_costmatrix <- make_costmatrix(
@@ -109,10 +109,10 @@
 #' )
 #'
 #' # Find the minimal directed graph representation:
-#' convert_costmatrix_to_graph(costmatrix = stratigraphic_costmatrix)
+#' convert_costmatrix_to_stategraph(costmatrix = stratigraphic_costmatrix)
 #'
-#' @export convert_costmatrix_to_graph
-convert_costmatrix_to_graph <- function(costmatrix) {
+#' @export convert_costmatrix_to_stategraph
+convert_costmatrix_to_stategraph <- function(costmatrix) {
   
   # Store original states for using as output:
   original_states <- colnames(x = costmatrix$costmatrix)
