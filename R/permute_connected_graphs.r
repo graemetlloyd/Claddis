@@ -73,7 +73,7 @@ permute_connected_graphs <- function(n_vertices) {
   if (n_vertices < 2) stop("n_vertices must be at least 2.")
   
   # Special case of two vertices (single possible graph) - return single fully conected graph):
-  if (n_vertices == 2) return(value = list(matrix(data = make_labels(N = n_vertices), nrow = 1)))
+  if (n_vertices == 2) return(value = data.frame(from = c("A", "B"), to = c("B", "A"), weight = c(1, 1)))
   
   # Generate vertex labels:
   vertices <- make_labels(N = n_vertices)
@@ -151,6 +151,21 @@ permute_connected_graphs <- function(n_vertices) {
     graphs[[(length(x = graphs) + 1)]] <- new_graphs
   }
 
+  # Recompile into a single list of graphs:
+  graphs <- do.call(what = c, args = graphs)
+  
+  # Construct as proper graphs (with return edges and dummy weights of one):
+  graphs <- lapply(
+    X = graphs,
+    FUN = function(graph) {
+      data.frame(
+        from = c(graph[, 1], graph[, 2]),
+        to = c(graph[, 2], graph[, 1]),
+        weight = rep(x = 1, times = nrow(x = graph) * 2)
+      )
+    }
+  )
+  
   # Return (dummy labelled) graphs as a list:
-  return(value = do.call(what = c, args = graphs))
+  return(value = graphs)
 }
