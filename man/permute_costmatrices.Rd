@@ -4,7 +4,7 @@
 \alias{permute_costmatrices}
 \title{Permute costmatrices}
 \usage{
-permute_costmatrices(states = c("0", "1"), costs = c(1:3))
+permute_costmatrices(states = c("0", "1"), costs = c(1:3), symmetry = "both")
 }
 \arguments{
 \item{states}{A vector of character states, e.g., "0", "1", "2".}
@@ -40,7 +40,11 @@ permute_costmatrices(states = c("0", "1"), costs = c(1:3, Inf))
 
 # Permute all the ways to assign the costs 1 and 2 for a three state
 # character:
-permute_costmatrices(states = c("0", "1", "2"), costs = c(1, 2))
+permute_costmatrices(
+  states = c("0", "1", "2"),
+  costs = c(1, 2),
+  symmetry = "both"
+)
 
 }
 \references{

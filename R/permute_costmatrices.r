@@ -43,10 +43,182 @@
 #'
 #' # Permute all the ways to assign the costs 1 and 2 for a three state
 #' # character:
-#' permute_costmatrices(states = c("0", "1", "2"), costs = c(1, 2))
+#' permute_costmatrices(
+#'   states = c("0", "1", "2"),
+#'   costs = c(1, 2),
+#'   symmetry = "both"
+#' )
 #'
 #' @export permute_costmatrices
-permute_costmatrices <- function(states = c("0", "1"), costs = c(1:3)) {
+permute_costmatrices <- function(
+  states = c("0", "1"),
+  costs = c(1:3),
+  symmetry = "both"
+) {
+  
+  ### ADD CHECKS FOR SYMMETRY VARIABLE!!!!
+  
+  ### DUMMY DATA FOR EXAMPLE
+  #states = c("0", "1", "2", "3"); costs = c(1:2); symmetry = "both"
+  
+  # DIRECTED, UNDIRECTED OR BOTH?
+  
+  n_vertices <- length(x = states)
+  n_costs <- length(x = costs)
+
+  
+  
+  # If symmetric costmatries (undirected graphs) are requested:
+  if (symmetry == "both" || symmetry == "symmetric") {
+  
+    # First generate all possible connected graphs of n vertices:
+    state_graphs <- permute_connected_graphs(n_vertices = n_vertices)
+  
+    # Now generate all possible edge weightings of these graphs using costs:
+    undirected_graphs <- lapply(
+      X = state_graphs,
+      FUN = function(state_graph) {
+      
+        # Prune returning edges and weights from state graph:
+        state_graph <- state_graph[1:(nrow(x = state_graph) / 2), c("from", "to")]
+      
+        # Create a matrix of costs (will be converted to a list for permutation below):
+        costs_matrix <- matrix(
+          data = rep(x = costs, times = nrow(x = state_graph)),
+          ncol = n_costs,
+          byrow = TRUE
+        )
+      
+        # Permute all combos of edge weights (many will be redundant - this will be checked below):
+        edge_weights <- t(
+          expand.grid(
+            apply(
+              X = costs_matrix,
+              MARGIN = 1,
+              FUN = function(i) i,
+              simplify = FALSE
+            )
+          )
+        )
+      
+        # Get rid of annoying names:
+        edge_weights <- unname(obj = edge_weights)
+      
+        # Make new state graphs using edge_weights:
+        new_state_graphs <- apply(
+          X = edge_weights,
+          MARGIN = 2,
+          function(weights) {
+            data.frame(
+              from = state_graph[, 1],
+              to = state_graph[, 2],
+              weight = weights
+            )
+          }
+        )
+      
+        # Get graph encodings (vertex degrees plus weights for each edge, sorted):
+        new_graph_encodings <- unlist(
+          x = lapply(
+            X = new_state_graphs,
+            FUN = function(new_state_graph) {
+              vertex_rle <- rle(x = sort(x = c(new_state_graph[, "from"], new_state_graph[, "to"])))
+              vertex_degrees <- vertex_rle$lengths
+              names(x = vertex_degrees) <- vertex_rle$values
+              degrees_and_weights_matrix <- cbind(
+                from = vertex_degrees[new_state_graph[, "from"]],
+                weight = new_state_graph[, "weight"],
+                to = vertex_degrees[new_state_graph[, "to"]]
+              )
+              edges_vector <- apply(
+                X = degrees_and_weights_matrix,
+                MARGIN = 1,
+                FUN = paste,
+                collapse = "-"
+              )
+              edges_vector <- unname(obj = edges_vector)
+          
+              # Return graph encoding:
+              paste(sort(x = edges_vector), collapse = "%")
+            }
+          )
+        )
+      
+        # Prune out duplicates to return just unique new state graphs:
+        new_state_graphs <- new_state_graphs[!duplicated(x = new_graph_encodings)]
+      }
+    )
+    
+    # Remove any idetnical ratio graphs:
+    undirected_graphs <- lapply(
+      X = undirected_graphs,
+      FUN = function(graph) {
+        weight_sets <- do.call(
+          what = rbind,
+          args = lapply(
+            X = graph,
+            FUN = function(weight_sets) weight_sets[, "weight"] / min(x = weight_sets[, "weight"])
+          )
+        )
+        ratio_costs <- apply(
+          X = weight_sets,
+          MARGIN = 1,
+          FUN = paste,
+          collapse = "-"
+        )
+        graph[!duplicated(x = ratio_costs)]
+      }
+    )
+    
+    # Recompile as a single list:
+    undirected_graphs <- do.call(what = c, args = undirected_graphs)
+    
+    # Identify current graph labels (to replace with states):
+    names(x = states) <- unique(
+      x = sort(
+        x = c(
+          undirected_graphs[[1]][, "from"],
+          undirected_graphs[[1]][, "to"]
+        )
+      )
+    )
+    
+    # Use states to relabel graphs:
+    undirected_graphs <- lapply(
+      X = undirected_graphs,
+      FUN = function(graph) {
+        data.frame(
+          from = unname(obj = states[graph[, "from"]]),
+          to = unname(obj = states[graph[, "to"]]),
+          weight = graph[, "weight"]
+        )
+      }
+    )
+    
+    # Add complementary edges to make symmetric graph
+    undirected_graphs <- lapply(
+      X = undirected_graphs,
+      FUN = function(graph) {
+        data.frame(
+          from = c(graph[, "from"], graph[, "to"]),
+          to = c(graph[, "to"], graph[, "from"]),
+          weight = c(graph[, "weight"], graph[, "weight"])
+        )
+      }
+    )
+    
+    #
+    symmetric_costmatrices <- lapply(
+      X = undirected_graphs,
+      FUN = convert_graph_to_costmatrix
+    )
+  }
+  
+  
+  
+
+  
+  
   
   # PERMUTE STATE GRAPHS THEN EDGE WEIGHTS AS AN ALTERNATE APPROACH?
   # WOULD REQUIRE A FUNCTION TO CONVERT A GRAPH TO A COSTMATRIX
