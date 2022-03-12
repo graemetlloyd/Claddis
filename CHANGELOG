@@ -1,6 +1,7 @@
 - Changed all stepmatrix terms to costmatrix as this is the true general term.
 - Added calculate_tree_length function to get parsimony tree lengths and also generate data for use in ancestral state reconstructions.
 - Added make_all_polymorphisms to generate all possible polymorphisms for a set of states.
+- Added make_all_uncertainties to generate all possible uncertainties for a set of states.
 - Added make_costmatrix to automate building common costmatrix types (ordered, unordered, irreversible, Dollo, stratigraphy).
 - Fixed broken links in convert_adjacency_matrix_to_costmatrix.
 - Changed character types from abbreviated versions (cont, ord and unord) to full names (continuous, ordered and unordered) across package.
@@ -17,7 +18,7 @@
 - Added is_graph_connected to check whether a graph is connected.
 - Added split_out_subgraphs to generate separate adjacency matrices for every connected component of a graph.
 - Added permute_graph_splits to permute all possible ways to remove edges from a connected graph.
-- Added convert_costmatrix_to_graph to find the minimal directed graph representation of a costmatrix.
+- Added convert_costmatrix_to_stategraph to find the minimal directed graph representation of a costmatrix.
 - Added option to add size landscape to plot_morphospace.
 - Added count_cherries function to count number of cherries on a given phylogenetic tree or set of trees.
 - Added fix_costmatrix function to ensure all state-to-state transtion costs are self-consistent.
@@ -26,6 +27,8 @@
 - Added permute_tipstates to permute all possible tip states given a specific tree.
 - Added permute_restricted_compositions (initallly a subfunction of permute_tipstates) to permute all restricted compositions (e.g., for permuting tip states on the star tree).
 - Added label_treeshapes function to generate (permute) all labelled trees from a treeshape and label set.
+- Added permute_costmatrices function to generate all valid costmatrices from a restricted set of states and cost values.
+- Added permute_connected_graphs function to generate all connected graphs for a particular vertex count.
 
 Version - 0.6.6 - 2021-02-21
 
