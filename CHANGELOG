@@ -30,7 +30,8 @@
 - Added label_treeshapes function to generate (permute) all labelled trees from a treeshape and label set.
 - Added permute_costmatrices function to generate all valid costmatrices from a restricted set of states and cost values.
 - Added permute_connected_graphs function to generate all connected graphs for a particular vertex count.
-
+- Added add_polymorphisms_to_costmatrix function to add polymorphisms to costmatrices and offering multiple approaches to do so.
+- Added add_uncertainties_to_costmatrix function to add uncertainties to costmatrices using the minimum cost rule.
 
 Version - 0.6.6 - 2021-02-21
 
