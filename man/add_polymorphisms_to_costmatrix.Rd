@@ -226,6 +226,7 @@ ordered_uncertainty_costmatrix <- list(
   weight = 1
 )
 class(ordered_uncertainty_costmatrix) <- "costMatrix"
+
 # Generate an example five-state stratigraphic character costmatrix:
 stratigraphic_costmatrix <- list(
   size = 5,

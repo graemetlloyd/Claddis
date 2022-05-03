@@ -232,10 +232,7 @@
 #'   weight = 1
 #' )
 #' class(ordered_uncertainty_costmatrix) <- "costMatrix"
-
-
-
-
+#'
 #' # Generate an example five-state stratigraphic character costmatrix:
 #' stratigraphic_costmatrix <- list(
 #'   size = 5,
@@ -262,9 +259,6 @@
 #'   weight = 1
 #' )
 #' class(stratigraphic_costmatrix) <- "costMatrix"
-
-
-
 #'
 #' # Add polymorphisms to unordered costmatrix using additive method:
 #' unordered_costmatrix_additive_polymorphisms <- add_polymorphisms_to_costmatrix(
