@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_costMatrix.R
 \name{check_costMatrix}
 \alias{check_costMatrix}
-\title{Check costMatrix object for errors}
+\title{Check a costMatrix object for errors}
 \usage{
 check_costMatrix(costmatrix)
 }
@@ -13,12 +13,12 @@ check_costMatrix(costmatrix)
 An error message or empty vector if no errors found.
 }
 \description{
-Internal function to check costMatrix object for errors.
+Internal function to check a costMatrix object for errors.
 }
 \details{
-Internal Claddis function. Nothing to see here. Carry on.
+Costmatrix objects are more complex than what will typically be shown to the user. This function checks this hidden structure and reports any errors it finds.
 
-Solves issue raised in Maddison and Maddison (2003) by checking custom costmatrices are internally consistent such that each transition cost represents the cost of the shortest possible path.
+These checks include rules 1-7 from Hoyal Cuthill and lloyd (i prep.).
 }
 \examples{
 
@@ -26,18 +26,12 @@ Solves issue raised in Maddison and Maddison (2003) by checking custom costmatri
 costmatrix <- make_costmatrix(
   min_state = 0,
   max_state = 2,
-  character_type = "unordered",
-  include_polymorphisms = FALSE,
-  polymorphism_shape = "hypersphere",
-  polymorphism_distance = "great_circle"
+  character_type = "unordered"
 )
 
 # Check that this is a valid costMatrix object (should return empty vector):
 check_costMatrix(costmatrix = costmatrix)
 
-}
-\references{
-Maddison, D. R. and Maddison, W. P., 2003. \emph{MacClade 4: Analysis of phylogeny and character evolution}. Version 4.06. Sinauer Associates, Sunderland, Massachusetts.
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
