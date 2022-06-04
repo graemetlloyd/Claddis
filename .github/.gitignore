@@ -1,4 +1,5 @@
 *.DS_Store
+.DS_Store
 .gitignore_global.swp
 .Rapp.history
 R/.Rhistory
