@@ -369,7 +369,7 @@ add_polymorphisms_to_costmatrix <- function(
   # Check polymorphism_costs is a valid value and stop and warn user if not:
   if (length(x = setdiff(x = polymorphism_costs, y = c("additive", "geometric", "maddison", "stratigraphic"))) > 0) stop("polymorphism_costs must be one of \"additive\", \"geometric\", \"maddison\", \"stratigraphic\".")
   
-  # Check polymorphism_shape is a valid value and stop and warn user if not:
+  # Check polymorphism_geometry is a valid value and stop and warn user if not:
   if (length(x = setdiff(x = polymorphism_geometry, y = c("hypercube", "hypersphere", "simplex"))) > 0) stop("polymorphism_geometry must be one of \"hypercube\", \"hypersphere\", \"simplex\".")
   
   # Check polymorphism_distance is a valid value and stop and warn user if not:
