@@ -38,7 +38,7 @@ check_costMatrix <- function(costmatrix) {
   if (!is.list(x = costmatrix)) return("costmatrix must be in the form of a list.")
   
   # Check length of list is at least fifteen and add error message to output if false:
-  if (length(x = costmatrix) >= 15) return("costmatrix must be a list with fifteen items (size, n_states, single_states, type, costmatrix, symmetry, includes_polymorphisms, polymorphism_costs, polymorphism_geometry, polymorphism_distance, includes_uncertainties, pruned, dollo_penalty, base_age, and weight).")
+  if (length(x = costmatrix) < 15) return("costmatrix must be a list with fifteen items (size, n_states, single_states, type, costmatrix, symmetry, includes_polymorphisms, polymorphism_costs, polymorphism_geometry, polymorphism_distance, includes_uncertainties, pruned, dollo_penalty, base_age, and weight).")
   
   # Check names are correct and in order add error message to output if false:
   if (!all(x = names(x = costmatrix) == c("size", "n_states", "single_states", "type", "costmatrix", "symmetry", "includes_polymorphisms", "polymorphism_costs", "polymorphism_geometry", "polymorphism_distance", "includes_uncertainties", "pruned", "dollo_penalty", "base_age", "weight"))) return("Elements of costmatrix must be \"size\", \"n_states\", \"single_states\", \"type\", \"costmatrix\", \"symmetry\", \"include_polymorphisms\", \"polymorphism_costs\", \"polymorphism_geometry\", \"polymorphism_distance\", \"includes_uncertainties\", \"pruned\", \"dollo_penalty\", \"base_age\", and \"weight\" in that order.")
@@ -50,7 +50,7 @@ check_costMatrix <- function(costmatrix) {
   if (!is.numeric(x = costmatrix$n_states) || length(x = costmatrix$size) != 1) return("costmatrix$n_states should be a single numeric value indicating the number of singles states (i.e., excluding polymorphic or ucertain values).")
 
   # Check single_states are formatted correctly and match other elements and add error message to output if false:
-  if (!is.character(x = costmatrix$single_states) || !is.vector(x = costmatrix$single_states) || length(x = costmatrix$single_states) != costmatrix$n_states || any(x = is.na(x = match(x = costmatrix$single_states, table = rownames(x = costmatrix$costmatrix)))) || length(x = grep(pattern = "/|&", x = costmatrix$single_states)) > 0) return("costmatrix$single_states must be a single character vector value equal in length to costmatrix$n_states, contain no polymorphic or uncertain values and match the states used in costmatrix$costmatrix.")
+  if (is.character(x = costmatrix$single_states) || !is.vector(x = costmatrix$single_states) || length(x = costmatrix$single_states) != costmatrix$n_states || any(x = is.na(x = match(x = costmatrix$single_states, table = rownames(x = costmatrix$costmatrix)))) || length(x = grep(pattern = "/|&", x = costmatrix$single_states)) > 0) return("costmatrix$single_states must be a single character vector value equal in length to costmatrix$n_states, contain no polymorphic or uncertain values and match the states used in costmatrix$costmatrix.")
   
   # Check type is formatted correctly and add error message to output if false:
   if (!is.character(x = costmatrix$type) || length(x = costmatrix$type) != 1) return("costmatrix$type should be a single character value indicating the type of costmatrix.")
@@ -82,8 +82,8 @@ check_costMatrix <- function(costmatrix) {
     args = lapply(
       X = as.list(costmatrix$single_states),
       FUN = function(x) {
-        row_x <- costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states][x, ]
-        column_x <- costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states][, x]
+        row_x <- costmatrix$costmatrix[as.character(x = costmatrix$single_states), as.character(x = costmatrix$single_states)][as.character(x = x), ]
+        column_x <- costmatrix$costmatrix[as.character(x = costmatrix$single_states), as.character(x = costmatrix$single_states)][, as.character(x = x)]
         row_x <- row_x[row_x > 0]
         column_x <- column_x[column_x > 0]
         is_infinity <- c(row_x == Inf, column_x == Inf)
@@ -175,5 +175,5 @@ check_costMatrix <- function(costmatrix) {
   }
 
   # Return empty vector:
-  vector(mode = "character")
+  return(vector(mode = "character"))
 }
