@@ -173,53 +173,35 @@
 #' @examples
 #'
 #' # Generate an example three-state unordered character costmatrix:
-#' unordered_costmatrix <- list(
-#'   size = 3,
-#'   n_states = 3,
-#'   single_states = c("0", "1", "2"),
-#'   type = "unordered",
-#'   costmatrix = matrix(
-#'     data = c(0, 1, 1, 1, 0, 1, 1, 1, 0),
-#'     nrow = 3,
-#'     dimnames = list(as.character(x = 0:2), as.character(x = 0:2))
-#'   ),
-#'   symmetry = "Symmetric",
-#'   includes_polymorphisms = FALSE,
-#'   includes_uncertainties = FALSE,
-#'   pruned = FALSE,
-#'   dollo_penalty = 999,
-#'   weight = 1
+#' unordered_costmatrix <- make_costmatrix(
+#'   min_state = 0,
+#'   max_state = 2,
+#'   character_type = "unordered"
 #' )
-#' class(unordered_costmatrix) <- "costMatrix"
 #'
 #' # Generate an example three-state ordered character costmatrix:
-#' ordered_costmatrix <- list(
-#'   size = 3,
-#'   n_states = 3,
-#'   single_states = c("0", "1", "2"),
-#'   type = "ordered",
-#'   costmatrix = matrix(
-#'     data = c(0, 1, 2, 1, 0, 1, 2, 1, 0),
-#'     nrow = 3,
-#'     dimnames = list(as.character(x = 0:2), as.character(x = 0:2))
-#'   ),
-#'   symmetry = "Symmetric",
-#'   includes_polymorphisms = FALSE,
-#'   includes_uncertainties = FALSE,
-#'   pruned = FALSE,
-#'   dollo_penalty = 999,
-#'   weight = 1
+#' ordered_costmatrix <- make_costmatrix(
+#'   min_state = 0,
+#'   max_state = 2,
+#'   character_type = "ordered"
 #' )
-#' class(ordered_costmatrix) <- "costMatrix"
 #'
-#' # Generate an example three-state ordered character costmatrix with uncertainties included:
+#' # Generate an example three-state ordered character costmatrix with uncertainties already included:
 #' ordered_uncertainty_costmatrix <- list(
 #'   size = 7,
 #'   n_states = 3,
 #'   single_states = c("0", "1", "2"),
 #'   type = "ordered",
 #'   costmatrix = matrix(
-#'     data = c(0, 1, 2, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 2, 1, 0, 1, 0, 0, 0, Inf, Inf, Inf, 0, Inf, Inf, Inf, Inf, Inf, Inf, Inf, 0, Inf, Inf, Inf, Inf, Inf, Inf, Inf, 0, Inf, Inf, Inf, Inf, Inf, Inf, Inf, 0),
+#'     data = c(
+#'       0, 1, 2, 0, 0, 1, 0,
+#'       1, 0, 1, 0, 1, 0, 0,
+#'       2, 1, 0, 1, 0, 0, 0,
+#'       Inf, Inf, Inf, 0, Inf, Inf, Inf,
+#'       Inf, Inf, Inf, Inf, 0, Inf, Inf,
+#'       Inf, Inf, Inf, Inf, Inf, 0, Inf,
+#'       Inf, Inf, Inf, Inf, Inf, Inf, 0
+#'     ),
 #'     nrow = 7,
 #'     byrow = TRUE,
 #'     dimnames = list(c(as.character(x = 0:2), "0/1", "0/2", "1/2", "0/1/2"), c(as.character(x = 0:2), "0/1", "0/2", "1/2", "0/1/2"))
@@ -227,6 +209,9 @@
 #'   symmetry = "Asymmetric",
 #'   includes_polymorphisms = FALSE,
 #'   includes_uncertainties = TRUE,
+#'   polymorphism_costs = "additive",
+#'   polymorphism_geometry = "simplex",
+#'   polymorphism_distance = "euclidean",
 #'   pruned = FALSE,
 #'   dollo_penalty = 999,
 #'   weight = 1
@@ -234,31 +219,12 @@
 #' class(ordered_uncertainty_costmatrix) <- "costMatrix"
 #'
 #' # Generate an example five-state stratigraphic character costmatrix:
-#' stratigraphic_costmatrix <- list(
-#'   size = 5,
-#'   n_states = 5,
-#'   single_states = c("0", "1", "2", "3", "4"),
-#'   type = "stratigraphic",
-#'   costmatrix = matrix(
-#'     data = c(
-#'       0, 1.3, 5.3, 8.0, 11.1,
-#'       Inf, 0, 4.0, 6.7, 9.8,
-#'       Inf, Inf, 0, 2.7, 5.8,
-#'       Inf, Inf, Inf, 0, 3.1,
-#'       Inf, Inf, Inf, Inf, 0
-#'     ),
-#'     nrow = 5,
-#'     byrow = TRUE,
-#'     dimnames = list(as.character(x = 0:4), as.character(x = 0:4))
-#'   ),
-#'   symmetry = "Asymmetric",
-#'   includes_polymorphisms = FALSE,
-#'   includes_uncertainties = FALSE,
-#'   pruned = FALSE,
-#'   dollo_penalty = 999,
-#'   weight = 1
+#' stratigraphic_costmatrix <- make_costmatrix(
+#'   min_state = 0,
+#'   max_state = 4,
+#'   character_type = "stratigraphy",
+#'   state_ages = c(0, 1.3, 5.3, 8.0, 11.1)
 #' )
-#' class(stratigraphic_costmatrix) <- "costMatrix"
 #'
 #' # Add polymorphisms to unordered costmatrix using additive method:
 #' unordered_costmatrix_additive_polymorphisms <- add_polymorphisms_to_costmatrix(
