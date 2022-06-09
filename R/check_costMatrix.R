@@ -50,7 +50,7 @@ check_costMatrix <- function(costmatrix) {
   if (!is.numeric(x = costmatrix$n_states) || length(x = costmatrix$size) != 1) return("costmatrix$n_states should be a single numeric value indicating the number of singles states (i.e., excluding polymorphic or ucertain values).")
 
   # Check single_states are formatted correctly and match other elements and add error message to output if false:
-  if (is.character(x = costmatrix$single_states) || !is.vector(x = costmatrix$single_states) || length(x = costmatrix$single_states) != costmatrix$n_states || any(x = is.na(x = match(x = costmatrix$single_states, table = rownames(x = costmatrix$costmatrix)))) || length(x = grep(pattern = "/|&", x = costmatrix$single_states)) > 0) return("costmatrix$single_states must be a single character vector value equal in length to costmatrix$n_states, contain no polymorphic or uncertain values and match the states used in costmatrix$costmatrix.")
+  if (!is.character(x = costmatrix$single_states) || !is.vector(x = costmatrix$single_states) || length(x = costmatrix$single_states) != costmatrix$n_states || any(x = is.na(x = match(x = costmatrix$single_states, table = rownames(x = costmatrix$costmatrix)))) || length(x = grep(pattern = "/|&", x = costmatrix$single_states)) > 0) return("costmatrix$single_states must be a single character vector value equal in length to costmatrix$n_states, contain no polymorphic or uncertain values and match the states used in costmatrix$costmatrix.")
   
   # Check type is formatted correctly and add error message to output if false:
   if (!is.character(x = costmatrix$type) || length(x = costmatrix$type) != 1) return("costmatrix$type should be a single character value indicating the type of costmatrix.")
@@ -82,8 +82,8 @@ check_costMatrix <- function(costmatrix) {
     args = lapply(
       X = as.list(costmatrix$single_states),
       FUN = function(x) {
-        row_x <- costmatrix$costmatrix[as.character(x = costmatrix$single_states), as.character(x = costmatrix$single_states)][as.character(x = x), ]
-        column_x <- costmatrix$costmatrix[as.character(x = costmatrix$single_states), as.character(x = costmatrix$single_states)][, as.character(x = x)]
+        row_x <- costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states][x, ]
+        column_x <- costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states][, x]
         row_x <- row_x[row_x > 0]
         column_x <- column_x[column_x > 0]
         is_infinity <- c(row_x == Inf, column_x == Inf)
