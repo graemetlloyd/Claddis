@@ -206,14 +206,15 @@
 #'     byrow = TRUE,
 #'     dimnames = list(c(as.character(x = 0:2), "0/1", "0/2", "1/2", "0/1/2"), c(as.character(x = 0:2), "0/1", "0/2", "1/2", "0/1/2"))
 #'   ),
-#'   symmetry = "Asymmetric",
+#'   symmetry = "Symmetric",
 #'   includes_polymorphisms = FALSE,
-#'   includes_uncertainties = TRUE,
 #'   polymorphism_costs = "additive",
 #'   polymorphism_geometry = "simplex",
 #'   polymorphism_distance = "euclidean",
+#'   includes_uncertainties = TRUE,
 #'   pruned = FALSE,
 #'   dollo_penalty = 999,
+#'   base_age = 1,
 #'   weight = 1
 #' )
 #' class(ordered_uncertainty_costmatrix) <- "costMatrix"

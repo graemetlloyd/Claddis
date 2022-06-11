@@ -33,44 +33,19 @@ Finally, it should be noted that uncertainties are the only allowable breaking o
 \examples{
 
 # Generate an example three-state unordered character costmatrix:
-unordered_costmatrix <- list(
-  size = 3,
-  n_states = 3,
-  single_states = c("0", "1", "2"),
-  type = "unordered",
-  costmatrix = matrix(
-    data = c(0, 1, 1, 1, 0, 1, 1, 1, 0),
-    nrow = 3,
-    dimnames = list(as.character(x = 0:2), as.character(x = 0:2))
-  ),
-  symmetry = "Symmetric",
-  includes_polymorphisms = FALSE,
-  includes_uncertainties = FALSE,
-  pruned = FALSE,
-  dollo_penalty = 999,
-  weight = 1
+# Generate an example three-state unordered character costmatrix:
+unordered_costmatrix <- make_costmatrix(
+  min_state = 0,
+  max_state = 2,
+  character_type = "unordered"
 )
-class(unordered_costmatrix) <- "costMatrix"
 
 # Generate an example three-state ordered character costmatrix:
-ordered_costmatrix <- list(
-  size = 3,
-  n_states = 3,
-  single_states = c("0", "1", "2"),
-  type = "ordered",
-  costmatrix = matrix(
-    data = c(0, 1, 2, 1, 0, 1, 2, 1, 0),
-    nrow = 3,
-    dimnames = list(as.character(x = 0:2), as.character(x = 0:2))
-  ),
-  symmetry = "Symmetric",
-  includes_polymorphisms = FALSE,
-  includes_uncertainties = FALSE,
-  pruned = FALSE,
-  dollo_penalty = 999,
-  weight = 1
+ordered_costmatrix <- make_costmatrix(
+  min_state = 0,
+  max_state = 2,
+  character_type = "ordered"
 )
-class(ordered_costmatrix) <- "costMatrix"
 
 # Generate an example three-state ordered character costmatrix with polymorphism included:
 unordered_polymorphism_costmatrix <- list(
@@ -95,11 +70,15 @@ unordered_polymorphism_costmatrix <- list(
       c(as.character(x = 0:2), "0&1", "0&2", "1&2", "0&1&2")
     )
   ),
-  symmetry = "Asymmetric",
+  symmetry = "Symmetric",
   includes_polymorphisms = TRUE,
+  polymorphism_costs = "geometric",
+  polymorphism_geometry = "hypercube",
+  polymorphism_distance = "manhattan",
   includes_uncertainties = FALSE,
   pruned = FALSE,
   dollo_penalty = 999,
+  base_age = 1,
   weight = 0.5
 )
 class(unordered_polymorphism_costmatrix) <- "costMatrix"
