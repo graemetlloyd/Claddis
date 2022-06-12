@@ -10,4 +10,24 @@ citEntry(entry = "Article",
 	doi = "10.1111/bij.12746",
 	textVersion = "Lloyd, Graeme T. (2016). Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. Biological Journal of the Linnean Society, 118, 131-151.")
 
+citEntry(entry = "Article",
+	title = "Journeys through discrete-character morphospace: synthesizing phylogeny, tempo, and disparity",
+	author = personList(as.person("Graeme T. Lloyd")),
+	journal = "Palaeontology",
+  	year = "2018",
+	volume = "61",
+	pages = "637-645",
+	doi = "10.1111/pala.12380",
+	textVersion = "Lloyd, G. T., 2018. Journeys through discrete-character morphospace: synthesizing phylogeny, tempo, and disparity. Palaeontology, 61, 637-645.")
+
+citEntry(entry = "Article",
+	title = "Biases with the Generalized Euclidean Distance measure in disparity analyses with high levels of missing data",
+	author = personList(as.person("Oscar E. R. Lehmann"), as.person("Martin D. Ezcurra"), as.person("Richard J. Butler"), as.person("Graeme T. Lloyd")),
+	journal = "Palaeontology",
+  	year = "2019",
+	volume = "62",
+	pages = "837-849",
+	doi = "10.1111/pala.12430",
+	textVersion = "Lehmann, Oscar E. R., Ezcurra, Martin D., Butler, Richard J. and Lloyd, Graeme T. (2019). Biases with the Generalized Euclidean Distance measure in disparity analyses with high levels of missing data. Palaeontology, 62, 837-849.")
+
 citFooter("As Claddis is evolving rapidly, you may want to also cite its version number (found with 'library(help = Claddis)').")
