@@ -1,12 +1,13 @@
 citHeader("To cite package 'Claddis' in a publication use:")
 
 citEntry(entry = "Article",
-	title = "Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. Biological Journal of the Linnean Society",
-	author = "G. T. Lloyd",
+	title = "Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions",
+	author = personList(as.person("Graeme T. Lloyd")),
 	journal = "Biological Journal of the Linnean Society",
   	year = "2016",
 	volume = "118",
-	pages = "131-151.",
+	pages = "131-151",
+	doi = "10.1111/bij.12746",
 	textVersion = "Lloyd, Graeme T. (2016). Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. Biological Journal of the Linnean Society, 118, 131-151.")
 
 citFooter("As Claddis is evolving rapidly, you may want to also cite its version number (found with 'library(help = Claddis)').")
