@@ -78,9 +78,7 @@
 #' unordered_costmatrix <- make_costmatrix(
 #'   min_state = 0,
 #'   max_state= 5,
-#'   character_type = "unordered",
-#'   polymorphism_shape = "simplex",
-#'   polymorphism_distance = "euclidean"
+#'   character_type = "unordered"
 #' )
 #'
 #' # Find the minimal directed graph representation:
@@ -90,9 +88,7 @@
 #' ordered_costmatrix <- make_costmatrix(
 #'   min_state = 0,
 #'   max_state= 5,
-#'   character_type = "ordered",
-#'   polymorphism_shape = "simplex",
-#'   polymorphism_distance = "euclidean"
+#'   character_type = "ordered"
 #' )
 #'
 #' # Find the minimal directed graph representation:
@@ -103,8 +99,6 @@
 #'   min_state = 0,
 #'   max_state= 5,
 #'   character_type = "stratigraphy",
-#'   polymorphism_shape = "simplex",
-#'   polymorphism_distance = "euclidean",
 #'   state_ages = c(103, 91.4, 78.2, 73.4, 66.0, 59.7)
 #' )
 #'
