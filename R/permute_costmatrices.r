@@ -260,9 +260,7 @@ permute_costmatrices <- function(
         make_costmatrix(
           min_state = states,
           max_state = states,
-          character_type = "ordered",
-          polymorphism_shape = "simplex",
-          polymorphism_distance = "euclidean"
+          character_type = "ordered"
         )
       )
     )

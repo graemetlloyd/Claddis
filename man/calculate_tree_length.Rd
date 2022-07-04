@@ -114,11 +114,7 @@ calculate_tree_length(
   cladistic_matrix = cladistic_matrix,
   inapplicables_as_missing = TRUE,
   polymorphism_behaviour = "uncertainty",
-  uncertainty_behaviour = "uncertainty",
-  polymorphism_shape = "hypersphere",
-  polymorphism_distance = "great_circle",
-  state_ages = c(),
-  dollo_penalty = 999
+  uncertainty_behaviour = "uncertainty"
 )$tree_lengths
 
 }

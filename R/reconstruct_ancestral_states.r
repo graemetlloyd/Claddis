@@ -11,7 +11,7 @@
 #' @param inapplicables_as_missing Argument passed to \link{calculate_tree_length}.
 #' @param polymorphism_behaviour Argument passed to \link{calculate_tree_length}.
 #' @param uncertainty_behaviour Argument passed to \link{calculate_tree_length}.
-#' @param polymorphism_shape Argument passed to \link{make_costmatrix}.
+#' @param polymorphism_geometry Argument passed to \link{make_costmatrix}.
 #' @param polymorphism_distance Argument passed to \link{make_costmatrix}.
 #' @param state_ages Argument passed to \link{make_costmatrix}.
 #' @param dollo_penalty Argument passed to \link{make_costmatrix}.
@@ -78,11 +78,7 @@
 #'   estimate_tip_values = FALSE,
 #'   inapplicables_as_missing = FALSE,
 #'   polymorphism_behaviour = "uncertainty",
-#'   uncertainty_behaviour = "uncertainty",
-#'   polymorphism_shape = "hypersphere",
-#'   polymorphism_distance = "great_circle",
-#'   state_ages = c(),
-#'   dollo_penalty = 100
+#'   uncertainty_behaviour = "uncertainty"
 #' )$node_estimates
 #'
 #' @export reconstruct_ancestral_states
@@ -94,7 +90,7 @@ reconstruct_ancestral_states <- function(
   inapplicables_as_missing = FALSE,
   polymorphism_behaviour = "uncertainty",
   uncertainty_behaviour = "uncertainty",
-  polymorphism_shape,
+  polymorphism_geometry,
   polymorphism_distance,
   state_ages,
   dollo_penalty
@@ -126,7 +122,7 @@ reconstruct_ancestral_states <- function(
     inapplicables_as_missing = inapplicables_as_missing,
     polymorphism_behaviour = polymorphism_behaviour,
     uncertainty_behaviour = uncertainty_behaviour,
-    polymorphism_shape = polymorphism_shape,
+    polymorphism_geometry = polymorphism_geometry,
     polymorphism_distance = polymorphism_distance,
     state_ages = state_ages,
     dollo_penalty = dollo_penalty

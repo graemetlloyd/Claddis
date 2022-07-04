@@ -38,10 +38,7 @@ Note: if multiple equally optimal solutions are possible, the function will only
 costmatrix <- make_costmatrix(
   min_state = 0,
   max_state = 3,
-  character_type = "dollo",
-  include_polymorphisms = FALSE,
-  polymorphism_shape = "hypersphere",
-  polymorphism_distance = "great_circle",
+  character_type = "dollo"
   dollo_penalty = 100
 )
 

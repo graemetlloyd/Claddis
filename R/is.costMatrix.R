@@ -22,10 +22,7 @@
 #' costmatrix <- make_costmatrix(
 #'   min_state = 0,
 #'   max_state = 2,
-#'   character_type = "unordered",
-#'   include_polymorphisms = FALSE,
-#'   polymorphism_shape = "hypersphere",
-#'   polymorphism_distance = "great_circle"
+#'   character_type = "unordered"
 #' )
 #'
 #' # Check that this is a valid costMatrix object:

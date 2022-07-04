@@ -12,7 +12,7 @@ reconstruct_ancestral_states(
   inapplicables_as_missing = FALSE,
   polymorphism_behaviour = "uncertainty",
   uncertainty_behaviour = "uncertainty",
-  polymorphism_shape,
+  polymorphism_geometry,
   polymorphism_distance,
   state_ages,
   dollo_penalty
@@ -33,7 +33,7 @@ reconstruct_ancestral_states(
 
 \item{uncertainty_behaviour}{Argument passed to \link{calculate_tree_length}.}
 
-\item{polymorphism_shape}{Argument passed to \link{make_costmatrix}.}
+\item{polymorphism_geometry}{Argument passed to \link{make_costmatrix}.}
 
 \item{polymorphism_distance}{Argument passed to \link{make_costmatrix}.}
 
@@ -87,11 +87,7 @@ reconstruct_ancestral_states(
   estimate_tip_values = FALSE,
   inapplicables_as_missing = FALSE,
   polymorphism_behaviour = "uncertainty",
-  uncertainty_behaviour = "uncertainty",
-  polymorphism_shape = "hypersphere",
-  polymorphism_distance = "great_circle",
-  state_ages = c(),
-  dollo_penalty = 100
+  uncertainty_behaviour = "uncertainty"
 )$node_estimates
 
 }

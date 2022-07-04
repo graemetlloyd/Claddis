@@ -41,9 +41,7 @@
 #' costmatrix <- make_costmatrix(
 #'   min_state = 0,
 #'   max_state = 2,
-#'   character_type = "irreversible",
-#'   polymorphism_shape = "simplex",
-#'   polymorphism_distance = "euclidean"
+#'   character_type = "irreversible"
 #' )
 #' costmatrix$costmatrix[1:9] <- c(0, 2, 4, 1, 0, 3, 5, 3, 0)
 #' costmatrix$symmetry <- "Asymmetric"

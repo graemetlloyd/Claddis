@@ -26,10 +26,7 @@ Displays some basic summary information on a costmatrix object.
 example_costmatrix <- make_costmatrix(
   min_state = 0,
   max_state = 2,
-  character_type = "unordered",
-  include_polymorphisms = FALSE,
-  polymorphism_shape = "hypersphere",
-  polymorphism_distance = "great_circle"
+  character_type = "unordered"
 )
 
 # Show print.costMatrix version:

@@ -66,10 +66,7 @@
 #' costmatrix <- make_costmatrix(
 #'   min_state = "0",
 #'   max_state = "5",
-#'   character_type = "ordered",
-#'   include_polymorphisms = FALSE,
-#'   polymorphism_shape = "hypersphere",
-#'   polymorphism_distance = "great_circle"
+#'   character_type = "ordered"
 #' )
 #'
 #' # Find length of shortest spanning tree of costmatrix:
