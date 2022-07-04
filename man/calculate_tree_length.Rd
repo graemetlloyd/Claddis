@@ -10,7 +10,7 @@ calculate_tree_length(
   inapplicables_as_missing = FALSE,
   polymorphism_behaviour,
   uncertainty_behaviour,
-  polymorphism_shape,
+  polymorphism_geometry,
   polymorphism_distance,
   state_ages,
   dollo_penalty
@@ -27,7 +27,7 @@ calculate_tree_length(
 
 \item{uncertainty_behaviour}{One of either "missing", "uncertainty", "polymorphism", or "random". See details.}
 
-\item{polymorphism_shape}{Argument passed to \link{make_costmatrix}.}
+\item{polymorphism_geometry}{Argument passed to \link{make_costmatrix}.}
 
 \item{polymorphism_distance}{Argument passed to \link{make_costmatrix}.}
 

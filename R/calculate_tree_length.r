@@ -9,7 +9,7 @@
 #' @param inapplicables_as_missing Logical that decides whether or not to treat inapplicables as missing (TRUE) or not (FALSE, the default and recommended option).
 #' @param polymorphism_behaviour One of either "missing", "uncertainty", "polymorphism", or "random". See details.
 #' @param uncertainty_behaviour One of either "missing", "uncertainty", "polymorphism", or "random". See details.
-#' @param polymorphism_shape Argument passed to \link{make_costmatrix}.
+#' @param polymorphism_geometry Argument passed to \link{make_costmatrix}.
 #' @param polymorphism_distance Argument passed to \link{make_costmatrix}.
 #' @param state_ages Argument passed to \link{make_costmatrix}.
 #' @param dollo_penalty Argument passed to \link{make_costmatrix}.
@@ -124,7 +124,17 @@
 #' )$tree_lengths
 #'
 #' @export calculate_tree_length
-calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_missing = FALSE, polymorphism_behaviour, uncertainty_behaviour, polymorphism_shape, polymorphism_distance, state_ages, dollo_penalty) {
+calculate_tree_length <- function(
+  trees,
+  cladistic_matrix,
+  inapplicables_as_missing = FALSE,
+  polymorphism_behaviour,
+  uncertainty_behaviour,
+  polymorphism_geometry,
+  polymorphism_distance,
+  state_ages,
+  dollo_penalty
+) {
   
   # ADD CHECKS!
   # - is.tree/is.cladisticmatrix
@@ -215,7 +225,7 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
           max_state = single_input_matrix$maxima[x],
           character_type = single_input_matrix$ordering[x],
           include_polymorphisms = include_polymorphisms,
-          polymorphism_shape = polymorphism_shape,
+          polymorphism_geometry = polymorphism_geometry,
           polymorphism_distance = polymorphism_distance,
           state_ages = state_ages,
           dollo_penalty = dollo_penalty
@@ -354,7 +364,7 @@ calculate_tree_length <- function(trees, cladistic_matrix, inapplicables_as_miss
       inapplicables_as_missing = inapplicables_as_missing,
       polymorphism_behaviour = polymorphism_behaviour,
       uncertainty_behaviour = uncertainty_behaviour,
-      polymorphism_shape = polymorphism_shape,
+      polymorphism_geometry = polymorphism_geometry,
       polymorphism_distance = polymorphism_distance,
       state_ages = state_ages,
       dollo_penalty = dollo_penalty
