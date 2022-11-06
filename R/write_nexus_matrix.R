@@ -177,10 +177,56 @@ write_nexus_matrix <- function(cladistic_matrix, file_name) {
   if (!is.list(cladistic_matrix$topper$costmatrices)) cladistic_matrix$topper$costmatrices <- list(NULL)
 
   # Create costmatrix block:
-  costmatrix_block <- paste(ifelse(!unlist(x = lapply(X = cladistic_matrix$topper$costmatrices, is.null)), paste(paste("\tUSERTYPE '", names(cladistic_matrix$topper$costmatrices), "' (STEPMATRIX) = ", unlist(x = lapply(X = cladistic_matrix$topper$costmatrices, function(x) ncol(x = x$costmatrix))), "\n", sep = ""), paste("\t", unlist(x = lapply(X = lapply(X = cladistic_matrix$topper$costmatrices, function(x) colnames(x = x$costmatrix)), paste, collapse = " ")), "\n\t", sep = ""), unlist(x = lapply(X = lapply(X = lapply(X = cladistic_matrix$topper$costmatrices, function(x) {
-    diag(x = x$costmatrix) <- "."
-    return(x$costmatrix)
-  }), apply, 1, paste, collapse = " "), paste, collapse = "\n\t")), "\n\t;\n", sep = ""), ""), collapse = "")
+  costmatrix_block <- paste(
+    ifelse(
+      test = !unlist(
+        x = lapply(
+          X = cladistic_matrix$topper$costmatrices,
+          FUN = is.null
+        )
+      ),
+      yes = paste(
+        paste(
+          "\tUSERTYPE ",
+          names(cladistic_matrix$topper$costmatrices),
+          " STEPMATRIX = ",
+          unlist(
+            x = lapply(
+              X = cladistic_matrix$topper$costmatrices,
+              FUN = function(x) ncol(x = x$costmatrix)
+            )
+          ),
+          " ",
+          unlist(
+            x = lapply(
+              X = lapply(
+                X = as.list(x = names(x = cladistic_matrix$topper$costmatrices)),
+                FUN = function(x) {
+                  block_costmatrix_appears_in <- which(x = unlist(x = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(y) any(x = y$ordering == x))))[1]
+                  cladistic_matrix[[(1 + block_costmatrix_appears_in)]]$characters$symbols[
+                    1:cladistic_matrix$topper$costmatrices[[x]]$size
+                  ]
+                }
+              ),
+              FUN = paste,
+              collapse = ""
+            )
+          ),
+          "\n",
+          sep = ""
+        ),
+        "\t",
+        unlist(x = lapply(X = lapply(X = lapply(X = cladistic_matrix$topper$costmatrices, function(x) {
+            diag(x = x$costmatrix) <- "."
+            return(x$costmatrix)
+            }), apply, 1, paste, collapse = " "), paste, collapse = "\n\t")),
+        "\n\t;\n",
+        sep = ""
+      ),
+      no = ""
+    ),
+    collapse = ""
+  )
 
   # Get ordering of all characters in sequence:
   ordering <- unlist(x = lapply(X = data_blocks, "[[", "ordering"))
