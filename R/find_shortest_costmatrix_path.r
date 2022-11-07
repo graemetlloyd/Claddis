@@ -90,17 +90,36 @@ find_shortest_costmatrix_path <- function(costmatrix, start, end) {
     unvisited_nodes = setdiff(x = states, y = start),
     visited_nodes = start,
     length = 0,
-    reached_destination = FALSE
+    reached_destination = FALSE,
+    exceeded_direct_cost = FALSE
   )
   
   # Set up a list of possible path(s):
   paths <- list(path)
   
   # Start a while loop that will run until either destination node is always reached and/or costs are always higher than direct cost:
-  while(!all(unlist(x = lapply(X = paths, FUN = function(x) x$reached_destination))) || any(unlist(x = lapply(X = paths, FUN = function(x) ifelse(test = x$reached_destination, yes = Inf, no = x$length))) < direct_cost)) {
+  while(
+    any(
+      unlist(
+        x = lapply(
+          X = paths,
+          FUN = function(path) all(x = c(!path$reached_destination, !path$exceeded_direct_cost))
+        )
+      )
+    )
+  ) {
   
     # Find which paths need to continue (have not reached destination or exceeded direct cost):
-    continuing_paths <- which(x = !unlist(x = lapply(X = paths, FUN = function(x) x$reached_destination)))
+    continuing_paths <- which(
+      x = !unlist(
+        x = lapply(
+          X = paths,
+          FUN = function(x) {
+            x$length >= direct_cost
+          }
+        )
+      )
+    )
     
     # For each continuing path (in reverse order so i doesn't get confused):
     for(i in rev(x = continuing_paths)) {
@@ -125,6 +144,7 @@ find_shortest_costmatrix_path <- function(costmatrix, start, end) {
           x$length <- x$length + costmatrix$costmatrix[previous_node, x$current_node]
           x$visited_nodes <- c(x$visited_nodes, x$current_node)
           if (x$current_node == x$destination_node) x$reached_destination <- TRUE
+          if (x$length >= direct_cost) x$exceeded_direct_cost <- TRUE
           x
         }
       )
