@@ -6,6 +6,7 @@
 \alias{Claddis}
 \title{Measuring Morphological Diversity and Evolutionary Tempo}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 Measures morphological diversity from discrete character data and estimates evolutionary tempo on phylogenetic trees.
 }
 \examples{
