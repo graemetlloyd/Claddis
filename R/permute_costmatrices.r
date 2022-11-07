@@ -210,7 +210,7 @@ permute_costmatrices <- function(
     #
     symmetric_costmatrices <- lapply(
       X = undirected_graphs,
-      FUN = convert_graph_to_costmatrix
+      FUN = convert_stategraph_to_costmatrix
     )
   }
   
