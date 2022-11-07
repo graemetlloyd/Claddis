@@ -1279,22 +1279,6 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
     
   }
   
-  # If costmatrices exist they will need to be formatted correctly for Claddis:
-  if (is.list(x = costmatrices)) {
-    
-    # Reformat any costmatrices in Claddis format (character type defaults to custom as cannot know for sure what other types might fit):
-    costmatrices <- lapply(X = costmatrices, function(x) {
-      matrix_size <- ncol(x = x)
-      matrix_labels <- colnames(x = x)
-      costmatrix <- matrix(data = as.numeric(x = x), nrow = matrix_size, dimnames = list(matrix_labels, matrix_labels))
-      symmetry <- ifelse(test = isSymmetric(object = costmatrix), yes = "Symmetric", no = "Asymmetric")
-      includes_polymorphisms <- ifelse(test = length(x = grep(pattern = "&", x = matrix_labels)) > 0, yes = TRUE, no = FALSE)
-      costmatrix <- list(size = matrix_size, type = "custom", costmatrix = costmatrix, symmetry = symmetry, includes_polymorphisms = includes_polymorphisms)
-      class(costmatrix) <- "costMatrix"
-      costmatrix
-    })
-  }
-  
   # Create top list:
   top_list <- list(header = text_lines, costmatrices = costmatrices)
   
