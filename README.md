@@ -1,4 +1,4 @@
-# Claddis
+# Claddis <img src="man/figures/logo.png" align="right" width="120" />
 
 Claddis is an R package designed to import cladistic-type data sets (#NEXUS format) into R and perform disparity analysis and rate tests.
 
