@@ -63,14 +63,16 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   
   # WHEN MAKING COSTMATRICES FROM DATA READ INTO CLADDIS NEED TO UPDATE WEIGHT TERM? POSSIBLY NOT?
 
-  # ADD ABILITY TO READ CHARSET LINES (NEED SORAGE FOR THESE TOO)
+  # ADD ABILITY TO READ CHARACTER STATE TREE LINES
+  # ALLOW READING IN OF ACTUAL COSTMATRIX LABELS (AND DISALLOW NAMES THAT WILL CREATE CLASHES LIKE ORD, UNORD, IRREV, DOLLO)
+  # ADD ABILITY TO READ CHARSET LINES (NEED STORAGE FOR THESE TOO)
   # COULD BE MULTIPLE TYPESET OR WTSET LINES, NEED TO CHECK FOR THIS!
   # ADD ABILITY TO READ AND STORE CHARACTER STATES LABELS ETC.
   # ADD ABILITY TO DEAL WITH RANGES FOR CONTINUOUS DATA
   # ALLOW READING OF TREES IF FOUND AND STORING IN TOPPER BUT MAYBE MAKE THIS OPTIONAL WITH DEFAULT TO NOT
   # READ IN INFINITIES IN COST MATRICES
   # READ IN CHARACTER STATE TREES
-  # MAYBE DROP THE MULTIPLE BLOCKS AS STRUCTURE IN CLADDIS (JUST RETAIN INFO FOR RITING OUT)?
+  # MAYBE DROP THE MULTIPLE BLOCKS AS STRUCTURE IN CLADDIS (JUST RETAIN INFO FOR WRITING OUT)?
   
   # Line formatting function to be used in lapply below to deal with polymorphic characters:
   format_lines <- function(x, direction = "in") {
@@ -856,45 +858,111 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   # Special case if there are user-defined characters, i.e. costmatrices:
   if (length(x = grep("USERTYPE", raw_nexus, ignore.case = TRUE)) > 0) {
     
-    # Set available letters for naming costmatrices (limits number of costmatrices allowed):
-    available_letters <- c(LETTERS, unlist(lapply(as.list(LETTERS), function(x) paste(x, LETTERS, sep = ""))))
+    # Create list of labels for costmatrices:
+    costmatrix_labels <- make_labels(N = length(x = grep("USERTYPE", raw_nexus, ignore.case = TRUE)))
     
     # Get rows corresponding to start of costmatrices:
     costmatrix_rows <- grep("USERTYPE", raw_nexus, ignore.case = TRUE)
     
-    # Create empty list to store costmatrices:
-    costmatrices <- list()
+    # Read in format and store costmatrices:
+    costmatrices <- lapply(
+      X = as.list(x = costmatrix_rows),
+      FUN = function(x) {
+        
+        # Grab text block corresponding to costmatrix:
+        costmatrix_block <- trim_marginal_whitespace(x = raw_nexus[x:(x + which(x = trim_marginal_whitespace(x = raw_nexus[x:length(x = raw_nexus)]) == ";")[1] - 2)])
+        
+        # Ascertain size of costmatrix:
+        costmatrix_size <- as.numeric(
+          x = strsplit(
+            x = strsplit(
+              x = costmatrix_block[1],
+              split = "STEPMATRIX="
+            )[[1]][2],
+            split = " "
+          )[[1]][1]
+        )
+        
+        # Make square costmatrix matrix:
+        costmatrix_matrix <- matrix(
+          data = as.numeric(
+            x = unlist(
+              x = strsplit(
+                x = gsub(
+                  pattern = "i",
+                  replacement = Inf,
+                  x = gsub(
+                    pattern = ".",
+                    replacement = "0",
+                    x = costmatrix_block[-1],
+                    fixed = TRUE
+                  )
+                ),
+                split = " "
+              )
+            )
+          ),
+          nrow = costmatrix_size,
+          byrow = TRUE,
+          dimnames = list(
+            0:(costmatrix_size - 1),
+            0:(costmatrix_size - 1)
+          )
+        )
+        
+        # Subfunction to convert square matrix to costmatrix:
+        convert_matrix_to_costmatrix <- function(square_matrix) {
+          
+          # Start by making simple ordered cstmatrix of same size:
+          costmatrix <- make_costmatrix(
+            min_state = 0,
+            max_state = nrow(x = square_matrix) - 1,
+            character_type = "ordered"
+          )
+          
+          # Insert squre matrix as costmatrix:
+          costmatrix$costmatrix <- square_matrix
+          
+          # Check symmetry and update if necessary:
+          costmatrix$symmetry <- ifelse(
+            test = isSymmetric(object = square_matrix),
+            yes = "Symmetric",
+            no = "Asymmetric"
+          )
+          
+          # Set type as custom:
+          costmatrix$type <- "custom"
+          
+          # Return costmatrix:
+          costmatrix
+        }
+        
+        # Convert square matrix to costmatrix:
+        convert_matrix_to_costmatrix(square_matrix = costmatrix_matrix)
+      }
+    )
     
-    # Little check in case of abnormally large number of costmatrices:
-    if (length(x = costmatrix_rows) > length(x = available_letters)) stop("Not enough available letters to store the number of different costmatrices. Ask Graeme to up the available number!")
+    # Find names of costmatrices:
+    costmatrix_names <- unlist(
+      x = lapply(
+        X = as.list(x = costmatrix_rows),
+        FUN = function(x) {
+          strsplit(x = trim_marginal_whitespace(x = raw_nexus[x]), split = "USERTYPE| ")[[1]][3]
+        }
+      )
+    )
     
-    # For each costmatrix:
-    for(i in costmatrix_rows) {
-      
-      # Grab text block corresponding to costmatrix:
-      costmatrix_block <- trim_marginal_whitespace(x = raw_nexus[i:(i + as.numeric(strsplit(raw_nexus[i], "\\(STEPMATRIX\\)=")[[1]][2]) + 1)])
-      
-      # Remove [] labels for rows:
-      costmatrix_block <- gsub(pattern = "\\[[:A-Z:]\\] |\\[[:0-9:]\\] ", replacement = "", x = costmatrix_block)
-      
-      # Get the costmatrix as a matrix (might still need to think about how to define e.g. infinity):
-      costmatrix <- gsub(pattern = "\\.", replacement = "0", x = matrix(unlist(x = strsplit(costmatrix_block[3:length(x = costmatrix_block)], " ")), ncol = as.numeric(strsplit(raw_nexus[i], "\\(STEPMATRIX\\)=")[[1]][2]), byrow = TRUE))
-      
-      # Add row and column names (assumes they start at zero and climb from there - i.e., should match symbols in order from 0 to N - 1):
-      rownames(x = costmatrix) <- colnames(x = costmatrix) <- as.character(0:(ncol(costmatrix) - 1))
-      
-      # Add costmatrix to list:
-      costmatrices[[length(x = costmatrices) + 1]] <- costmatrix
-      
-      # Find costmatrix name:
-      costmatrix_name <- strsplit(strsplit(raw_nexus[i], "USERTYPE ")[[1]][2], " ")[[1]][1]
-      
-      # Replace costmatrix name with step_N:
-      raw_nexus <- gsub(pattern = costmatrix_name, replacement = paste("step_", available_letters[length(x = costmatrices)], sep = ""), x = raw_nexus)
-      
-      # Use costmatrix name (step_N) in list for later calling:
-      names(costmatrices)[length(x = costmatrices)] <- paste("step_", available_letters[length(x = costmatrices)], sep = "")
+    # Replace costmatrix name with step_N:
+    for(i in 1:length(x = costmatrix_names)) {
+      raw_nexus <- gsub(
+        pattern = costmatrix_names[i],
+        replacement = paste("step_", costmatrix_labels[i], sep = ""),
+        x = raw_nexus
+      )
     }
+    
+    # Set costmatrices names as costmatrix labels:
+    names(x = costmatrices) <- paste("step_", costmatrix_labels, sep = "")
   }
   
   # Set default weights as 1:
