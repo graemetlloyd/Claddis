@@ -1,7 +1,7 @@
 # devtools::build_win(version = "R-devel")
 
 #' Measuring Morphological Diversity and Evolutionary Tempo
-#'
+#' \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 #' Measures morphological diversity from discrete character data and estimates evolutionary tempo on phylogenetic trees.
 #'
 #' @name Claddis-package

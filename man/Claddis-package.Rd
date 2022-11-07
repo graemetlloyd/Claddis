@@ -4,11 +4,9 @@
 \name{Claddis-package}
 \alias{Claddis-package}
 \alias{Claddis}
-\title{Measuring Morphological Diversity and Evolutionary Tempo}
-\description{
+\title{Measuring Morphological Diversity and Evolutionary Tempo
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
-Measures morphological diversity from discrete character data and estimates evolutionary tempo on phylogenetic trees.
-}
+Measures morphological diversity from discrete character data and estimates evolutionary tempo on phylogenetic trees.}
 \examples{
 
 # Get morphological distances for Michaux (1989) data set:
