@@ -20,7 +20,7 @@
 - Added permute_graph_splits to permute all possible ways to remove edges from a connected graph.
 - Added convert_costmatrix_to_stategraph to find the minimal directed graph representation of a costmatrix.
 - Added convert_stategraph_to_costmatrix function as reverse of convert_costmatrix_to_stategraph.
-- Added option to add size landscape to plot_morphospace.
+- Added option to add body size landscape to plot_morphospace.
 - Added count_cherries function to count number of cherries on a given phylogenetic tree or set of trees.
 - Added fix_costmatrix function to ensure all state-to-state transtion costs are self-consistent.
 - Added permute_treeshapes function to permute all unique treeshapes (i.e., all rooted unlabelled multifurcating trees).
@@ -32,6 +32,9 @@
 - Added permute_connected_graphs function to generate all connected graphs for a particular vertex count.
 - Added add_polymorphisms_to_costmatrix function to add polymorphisms to costmatrices and offering multiple approaches to do so.
 - Added add_uncertainties_to_costmatrix function to add uncertainties to costmatrices using the minimum cost rule.
+- Fixed bug with write_nexus_matrix where costmatrices were not writing character symbols correctly.
+- Added Claddis logo to manual and README.
+- Fixed way read_nexus_matrix imports costmatrices from NEXUS format.
 
 Version - 0.6.6 - 2021-02-21
 
