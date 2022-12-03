@@ -18,15 +18,13 @@ A costMatrix object with self-consistent transition costs.
 Given a costmatrix where transition costs are not self-consistent finds and returns a costmatrix that does.
 }
 \details{
-A user may wish to consider a complicated set of transition costs between states when modelling discrete character evolution. This can be achieved with a custom costmatrix in Claddis (and elsewhere). However, some caution is urged when using such matrices to ensure that these costs are \emph{self-consistent}. More specifically, no direct state-to-state transition cost should be greater than is possible with an indirect path via one or more intermediate states.
-
-This problem was first recognised (to the best of my knowledge) by Maddison and Maddison (2003), although they offered no direct solution.
+A user may wish to consider a complicated set of transition costs between states when modelling discrete character evolution. This can be achieved with a custom costmatrix in Claddis (and elsewhere). However, some caution is urged when using such matrices to ensure that these costs are \emph{self-consistent} (Maddison and Maddison 2003). More specifically, no direct state-to-state transition cost should be greater than is possible with an indirect path via one or more intermediate states.
 
 This function offers a solution through an algorithm that will iteratively alter a costmatrix until all direct transition costs are self-consistent. It does so by finding the shortest state-to-state path for all possible transitions using the \link{find_shortest_costmatrix_path} function. Because the first solution may itself be inconsistent (as it relied on costs that have since updated) the algorithm is repeated until an equilibrium is reached. (This scenario is unlikely in most real world cases, but may be possible with very large matrices representing many states so was implemented here for safety.)
 
-Note: infinite costs are allowed in costmatrices but unless they fill entire rows or columns (excluding the diagonal they will not be self-consistent as there will always be a cheaper indirect cost).
+Note: infinite costs are allowed in costmatrices but unless they fill entire rows or columns (excluding the diagonal) they will not be self-consistent as there will always be a cheaper indirect cost.
 
-Note: that TNT (Goloboff et al. 2008; Goloboff and Catalano, 2016) offers a correction based on the triangle inequality which appears to be an attempt to solve the same problem.
+Note: that both PAUP* (Swofford 2003) TNT (Goloboff et al. 2008; Goloboff and Catalano, 2016) offerthe same correction using the triangle inequality.
 
 Note: other issues with a costmatrix may arise that are better revealed by using the \link{check_costMatrix} function, which returns informative error messages (with fix suggestions) where issues are found.
 }
@@ -56,6 +54,8 @@ Goloboff, P. A. and Catalano, S. A., 2016. TNT version 1.5, including a full imp
 Goloboff, P., Farris, J. and Nixon, K., 2008. TNT, a free program for phylogenetic analysis. \emph{Cladistics}, \bold{24}, 774-786.
 
 Maddison, D. R. and Maddison, W. P., 2003. \emph{MacClade 4: Analysis of phylogeny and character evolution}. Version 4.06. Sinauer Associates, Sunderland, Massachusetts.
+
+Swofford, D. L., 2003. \emph{PAUP*. Phylogenetic Analysis Using Parsimony (*and Other Methods). Version 4}. Sinauer Associates, Sunderland, Massachusetts.
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
