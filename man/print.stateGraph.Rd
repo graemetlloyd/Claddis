@@ -22,12 +22,55 @@ Displays some basic summary information on a stateGraph object.
 }
 \examples{
 
-# Make an unordered costmatrix:
-example_stategraph <- make_costmatrix(
-  min_state = 0,
-  max_state = 2,
-  character_type = "unordered"
+# Make an example stategraph:
+example_stategraph <- list(
+  n_vertices = 6,
+  n_arcs = 12,
+  n_states = 6,
+  single_states = 6,
+  type = "custom",
+  arcs = data.frame(
+    from = as.character(x = c(0, 1, 0, 2, 2, 5, 1, 4, 5, 4, 3, 4)),
+    to = as.character(x = c(1, 0, 2, 0, 5, 2, 4, 1, 4, 5, 4, 3)),
+    weight = c(1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1)
+  ),
+  vertices = data.frame(
+    label = as.character(x = 0:5),
+    in_degree = c(2, 2, 2, 1, 3, 2),
+    out_degree = c(2, 2, 2, 1, 3, 2),
+    eccentricity = c(3, 2, 3, 3, 2, 2),
+    periphery = c(1, 0, 1, 1, 0, 0),
+    centre = c(0, 1, 0, 0, 1, 1)
+  ),
+  radius = 2,
+  diameter = 3,
+  adjacency_matrix = matrix(
+    data = c(
+      0, 1, 1, 0, 0, 0,
+      1, 0, 0, 0, 1, 0,
+      1, 0, 0, 0, 0, 1,
+      0, 0, 0, 0, 1, 0,
+      0, 1, 0, 1, 0, 1,
+      0, 0, 1, 0, 1, 0
+    ),
+    nrow = 6,
+    byrow = TRUE,
+    dimnames = list(0:5, 0:5)
+  ),
+  directed = FALSE,
+  includes_polymorphisms = FALSE,
+  polymorphism_costs = "additive",
+  polymorphism_geometry = "simplex",
+  polymorphism_distance = "euclidean",
+  includes_uncertainties = FALSE,
+  pruned = FALSE,
+  dollo_penalty = 999,
+  base_age = 100,
+  weight = 1
 )
+
+# Set class as stateGraph:
+class(x = example_stategraph) <- "stateGraph"
 
 # Show print.stateGraph version:
 print.stateGraph(x = example_stategraph)
