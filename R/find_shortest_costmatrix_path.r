@@ -111,12 +111,10 @@ find_shortest_costmatrix_path <- function(costmatrix, start, end) {
   
     # Find which paths need to continue (have not reached destination or exceeded direct cost):
     continuing_paths <- which(
-      x = !unlist(
+      x = unlist(
         x = lapply(
           X = paths,
-          FUN = function(x) {
-            x$length >= direct_cost
-          }
+          FUN = function(path) all(x = !c(path$reached_destination, path$exceeded_direct_cost))
         )
       )
     )
