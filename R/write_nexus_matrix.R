@@ -202,7 +202,11 @@ write_nexus_matrix <- function(cladistic_matrix, file_name) {
               X = lapply(
                 X = as.list(x = names(x = cladistic_matrix$topper$costmatrices)),
                 FUN = function(x) {
-                  block_costmatrix_appears_in <- which(x = unlist(x = lapply(X = cladistic_matrix[2:length(x = cladistic_matrix)], FUN = function(y) any(x = y$ordering == x))))[1]
+                  block_costmatrix_appears_in <- which(
+                    x = unlist(
+                      x = lapply(
+                        X = cladistic_matrix[2:length(x = cladistic_matrix)],
+                        FUN = function(y) any(x = y$ordering == x))))[1]
                   cladistic_matrix[[(1 + block_costmatrix_appears_in)]]$characters$symbols[
                     1:cladistic_matrix$topper$costmatrices[[x]]$size
                   ]
@@ -218,6 +222,7 @@ write_nexus_matrix <- function(cladistic_matrix, file_name) {
         "\t",
         unlist(x = lapply(X = lapply(X = lapply(X = cladistic_matrix$topper$costmatrices, function(x) {
             diag(x = x$costmatrix) <- "."
+            if(any(x$costmatrix == Inf)) x$costmatrix[rownames(x = x$costmatrix), colnames(x = x$costmatrix)] <- gsub(pattern = Inf, replacement = "i", x = x$costmatrix)
             return(x$costmatrix)
             }), apply, 1, paste, collapse = " "), paste, collapse = "\n\t")),
         "\n\t;\n",
