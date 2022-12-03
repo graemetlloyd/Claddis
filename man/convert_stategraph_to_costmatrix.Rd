@@ -4,18 +4,16 @@
 \alias{convert_stategraph_to_costmatrix}
 \title{Convert a minimal state graph to a costmatrix}
 \usage{
-convert_stategraph_to_costmatrix(state_graph, fix_ratio = FALSE)
+convert_stategraph_to_costmatrix(stategraph)
 }
 \arguments{
-\item{state_graph}{A matrix describing a state graph with columns indicating from states, to states and weights (costs).}
-
-\item{fix_ratio}{A logical indicating whether (\cost{TRUE}) or not (\code{FALSE}, the default) to fix costs such that the minimum cost is one.}
+\item{stategraph}{An object of class \code{stateGraph}.}
 }
 \value{
 An object of class \code{costMatrix}.
 }
 \description{
-Given a smallest possible state graph (fewest edges), returns the corresponding costmatrix.
+Given a state graph returns the corresponding costmatrix.
 }
 \details{
 A state graph describes the relationship between character states in terms of a graph of vertices (character states) and edges (weights). Edges can be "symmetric" (the graph is undirected) or "asymmetric" (the graph is directed, a digraph).
@@ -27,15 +25,15 @@ A---B}
 
 Here the two states are A and B and the weight (cost of transitioning from A to B or B to A) is one.
 
-In Claddis this graph can be represented using a data.frame of edges:
+In Claddis this graph can be represented using a \code{stateGraph} object including the arcs that describe the (di)graph:
 
 \preformatted{from to weight
    0  1      1
    1  0      1}
 
-Each row represents an edge, from one vertex to another, and the corresponding weight (transition cost). Note that for symmetric graphs the edge is stated twice, once for each direction of the transition.
+Each row represents an arc from one vertex to another, and the corresponding weight (transition cost). Note that for symmetric graphs the edge is stated using two arcs (from \emph{i} to \emph{j} and from \emph{j} to \emph{i}).
 
-This function converts these state transitions to costmatrices, including interpolating any missing transitions. Here the costmatrix would look quite simple:
+This function converts these state transitions to costmatrices, including interpolating any missing transitions by using the shortest indirect cost. In the example used here the costmatrix would look quite simple:
 
 \preformatted{    ---------
     | 0 | 1 |
@@ -44,24 +42,67 @@ This function converts these state transitions to costmatrices, including interp
 -------------
 | 1 | 1 | 0 |
 -------------}
-
-The function also offers the option to "fix" the ratio of costs such that the minimum edge weight (minimum direct state-to-state transition) is one. Note: this is unlikely to be something most users will need and so defaults to false.
 }
 \examples{
 
-# Make state graph for a four-state linear ordered character:
-state_graph <- data.frame(
-  from = c("0", "1", "2", "3", "2", "1"),
-  to = c("1", "2", "3", "2", "1", "0"),
-  weight = c(1, 1, 1, 1, 1, 1),
-  stringsAsFactors = FALSE
+# Make state graph for a six-state linear ordered character:
+stategraph <- list(
+  n_vertices = 6,
+  n_arcs = 10,
+  n_states = 6,
+  single_states = c("0", "1", "2", "3", "4", "5"),
+  type = "ordered",
+  arcs = data.frame(
+    from = c("1", "0", "2", "1", "3", "2", "4", "3", "5", "4"),
+    to = c("0", "1", "1", "2", "2", "3", "3", "4", "4", "5"),
+    weight = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+  ),
+  vertices = data.frame(
+    label = c("0", "1", "2", "3", "4", "5"),
+    in_degree = c(1, 2, 2, 2, 2, 1),
+    out_degree = c(1, 2, 2, 2, 2, 1),
+    eccentricity = c(5, 4, 3, 3, 4, 5),
+    periphery = c(1, 0, 0, 0, 0, 1),
+    centre = c(0, 0, 1, 1, 0, 0)
+  ),
+  radius = 3,
+  diameter = 5,
+  adjacency_matrix = matrix(
+    data = c(
+      0, 1, 0, 0, 0, 0,
+      1, 0, 1, 0, 0, 0,
+      0, 1, 0, 1, 0, 0,
+      0, 0, 1, 0, 1, 0,
+      0, 0, 0, 1, 0, 1,
+      0, 0, 0, 0, 1, 0
+    ),
+    ncol = 6,
+    byrow = TRUE,
+    dimnames = list(
+      c("0", "1", "2", "3", "4", "5"),
+      c("0", "1", "2", "3", "4", "5")
+    )
+  ),
+  directed = FALSE,
+  includes_polymorphisms = FALSE,
+  polymorphism_costs = "additive",
+  polymorphism_geometry = "simplex",
+  polymorphism_distance = "euclidean",
+  includes_uncertainties = FALSE,
+  pruned = FALSE,
+  dollo_penalty = 999,
+  base_age = 1,
+  weight = 1
 )
 
+# Set calss as stateGraph:
+class(x = stategraph) <- "stateGraph"
+
 # View state graph:
-state_graph
+stategraph
 
 # Convert state graph to a costmatrix:
-costmatrix <- convert_stategraph_to_costmatrix(state_graph = state_graph)
+costmatrix <- convert_stategraph_to_costmatrix(stategraph = stategraph)
 
 # Show costmatrix reflects linear ordered costs:
 costmatrix$costmatrix
