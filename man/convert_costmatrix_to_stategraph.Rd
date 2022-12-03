@@ -10,13 +10,13 @@ convert_costmatrix_to_stategraph(costmatrix)
 \item{costmatrix}{An object of class \code{costMatrix}.}
 }
 \value{
-A data frame representing the minimum directed graph as edges (from, to, and edge weight). For an undirected graph both to and from edges are included.
+An object of class \code{stateGraph}.
 }
 \description{
-Given a costmatrix, returns the smallest possible state graph (fewest edges).
+Given a costmatrix, returns the smallest possible state graph (fewest arcs).
 }
 \details{
-A costmatrix summarises all possible state-to-state transition costs and hence each entry can also be considered as an edge of a directed state graph. However, many of these edges could be removed and a complete description of the graph still be provided. For example, the diagonal (any transition from a state to itself) can be removed, as can any edge with infinite cost (as this edge would never be traversed in practice). Finally, some edges are redundant as indirect paths already represent the same cost.
+A costmatrix summarises all possible state-to-state transition costs and hence each entry can also be considered as an arc of a directed state graph. However, many of these arcs could be removed and a complete description of the graph still be provided. For example, the diagonal (any transition from a state to itself - a loop) can be removed, as can any arc with infinite cost (as this arc would never be traversed in practice). Finally, some arcs are redundant as indirect paths already represent the same cost.
 
 As an example, we can consider the linear ordered costmatrix:
 
@@ -68,7 +68,7 @@ But the following description is still complete, and minimal:
 |   2  | 1  |   1    |
 ----------------------}
 
-This function effectively generates the latter (the minimal directed graph representation as a matrix of edges).
+This function effectively generates the latter (the minimal directed graph representation as a matrix of arcs).
 }
 \examples{
 

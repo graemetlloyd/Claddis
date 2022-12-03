@@ -2,13 +2,13 @@
 #'
 #' @description
 #'
-#' Given a costmatrix, returns the smallest possible state graph (fewest edges).
+#' Given a costmatrix, returns the smallest possible state graph (fewest arcs).
 #'
 #' @param costmatrix An object of class \code{costMatrix}.
 #'
 #' @details
 #'
-#' A costmatrix summarises all possible state-to-state transition costs and hence each entry can also be considered as an edge of a directed state graph. However, many of these edges could be removed and a complete description of the graph still be provided. For example, the diagonal (any transition from a state to itself) can be removed, as can any edge with infinite cost (as this edge would never be traversed in practice). Finally, some edges are redundant as indirect paths already represent the same cost.
+#' A costmatrix summarises all possible state-to-state transition costs and hence each entry can also be considered as an arc of a directed state graph. However, many of these arcs could be removed and a complete description of the graph still be provided. For example, the diagonal (any transition from a state to itself - a loop) can be removed, as can any arc with infinite cost (as this arc would never be traversed in practice). Finally, some arcs are redundant as indirect paths already represent the same cost.
 #'
 #' As an example, we can consider the linear ordered costmatrix:
 #'
@@ -60,13 +60,13 @@
 #' |   2  | 1  |   1    |
 #' ----------------------}
 #'
-#' This function effectively generates the latter (the minimal directed graph representation as a matrix of edges).
+#' This function effectively generates the latter (the minimal directed graph representation as a matrix of arcs).
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
 #' @return
 #'
-#' A data frame representing the minimum directed graph as edges (from, to, and edge weight). For an undirected graph both to and from edges are included.
+#' An object of class \code{stateGraph}.
 #'
 #' @seealso
 #'
@@ -108,17 +108,16 @@
 #' @export convert_costmatrix_to_stategraph
 convert_costmatrix_to_stategraph <- function(costmatrix) {
   
-  # Store original states for using as output:
-  original_states <- colnames(x = costmatrix$costmatrix)
+  ### ADD SOME INPUT CHECKS!
   
-  # Set sampled states and costmatrix rows and columns to simple numbers to work with optrees:
-  sampled_states <- rownames(x = costmatrix$costmatrix) <- colnames(x = costmatrix$costmatrix) <- 1:costmatrix$size
+  # Set sampled states:
+  sampled_states <- rownames(x = costmatrix$costmatrix)
   
   # Create table of all possible edges:
   all_edges <- expand.grid(from = sampled_states, to = sampled_states)
   
   # Add weight to edges:
-  all_edges <- cbind(
+  all_edges <- data.frame(
     from = all_edges[, "from"],
     to = all_edges[, "to"],
     weight = apply(
@@ -128,10 +127,10 @@ convert_costmatrix_to_stategraph <- function(costmatrix) {
     )
   )
   
-  # Prune all zero weight edges (i.e., diagonal):
-  all_edges <- all_edges[-which(x = all_edges[, "weight"] == 0), , drop = FALSE]
+  # Prune loops (i.e., diagonal):
+  all_edges <- all_edges[-which(x = all_edges[, "from"] == all_edges[, "to"]), , drop = FALSE]
   
-  # Prune any Infinite weight edges:
+  # Prune any infinite weight edges:
   if (any(all_edges[, "weight"] == Inf)) all_edges <- all_edges[-which(x = all_edges[, "weight"] == Inf), , drop = FALSE]
   
   # Make vector of redundant edges to remove (may be empty):
@@ -200,10 +199,111 @@ convert_costmatrix_to_stategraph <- function(costmatrix) {
   # If there are redundant edges to remove then remove them:
   if (length(x = to_remove) > 0) all_edges <- all_edges[-to_remove, ]
   
-  # Return graph as edges:
-  data.frame(
-    from = original_states[all_edges[, "from"]],
-    to = original_states[all_edges[, "to"]],
-    weight = as.numeric(x = all_edges[, "weight"])
+  # Create empty adjacency matrix:
+  adjacency_matrix <- matrix(
+    data = 0,
+    nrow = nrow(x = costmatrix$costmatrix),
+    ncol = ncol(x = costmatrix$costmatrix),
+    dimnames = list(
+      rownames(x = costmatrix$costmatrix),
+      colnames(x = costmatrix$costmatrix)
+    )
   )
+  
+  # Populate adjacency matrix:
+  for (i in 1:nrow(x = all_edges)) {
+    adjacency_matrix[all_edges[i, "from"], all_edges[i, "to"]] <- 1
+    adjacency_matrix[all_edges[i, "to"], all_edges[i, "from"]] <- 1
+  }
+  
+  # Create vertices data frame:
+  vertices <- data.frame(
+    label = sampled_states,
+    in_degree = unlist(
+      x = lapply(
+        X = as.list(x = sampled_states),
+        FUN = function(i) sum(x = all_edges[, "to"] == i)
+      )
+    ),
+    out_degree = unlist(
+      x = lapply(
+        X = as.list(x = sampled_states),
+        FUN = function(i) sum(x = all_edges[, "from"] == i)
+      )
+    ),
+    eccentricity = unlist(
+      x = lapply(
+        X = as.list(x = sampled_states),
+        FUN = function(i) {
+          visited_states <- vector(mode = "character")
+          current_states <- i
+          path_length <- 0
+          while(
+            length(x =
+              intersect(
+                x = all_edges[, "from"],
+                y = setdiff(
+                  x = current_states,
+                  y = visited_states
+                )
+              )
+            ) > 0
+          ) {
+            visited_states <- c(visited_states, current_states)
+            current_states <- setdiff(
+              x = unique(
+                x = unlist(
+                  x = lapply(
+                    X = as.list(x = current_states),
+                    FUN = function(j) all_edges[all_edges[, "from"] == j, "to"]
+                  )
+                )
+              ),
+              y = visited_states
+            )
+            if (length(x = current_states) > 0) path_length <- path_length + 1
+          }
+          path_length
+        }
+      )
+    ),
+    periphery = 0,
+    centre = 0
+  )
+  vertices[, "periphery"] <- as.numeric(x = vertices[, "eccentricity"] == max(x = vertices[, "eccentricity"]))
+  vertices[, "centre"] <- as.numeric(x = vertices[, "eccentricity"] == min(x = vertices[, "eccentricity"]))
+  
+  # Compile output as stategraph object:
+  stategraph <- list(
+    n_vertices = costmatrix$size,
+    n_arcs = nrow(x = all_edges),
+    n_states = costmatrix$n_states,
+    single_states = costmatrix$single_states,
+    type = costmatrix$type,
+    arcs = all_edges,
+    vertices = vertices,
+    radius = min(x = vertices[, "eccentricity"]),
+    diameter = max(x = vertices[, "eccentricity"]),
+    adjacency_matrix = adjacency_matrix,
+    directed = ifelse(
+      test = costmatrix$symmetry == "Symmetric",
+      yes = FALSE,
+      no = TRUE
+    ),
+    includes_polymorphisms = costmatrix$includes_polymorphisms,
+    polymorphism_costs = costmatrix$polymorphism_costs,
+    polymorphism_geometry = costmatrix$polymorphism_geometry,
+    polymorphism_distance = costmatrix$polymorphism_distance,
+    includes_uncertainties = costmatrix$includes_uncertainties,
+    pruned = costmatrix$pruned,
+    dollo_penalty = costmatrix$dollo_penalty,
+    base_age = costmatrix$base_age,
+    weight = costmatrix$weight
+  )
+  
+  # Set object class as stateGraph:
+  class(x = stategraph) <- "stateGraph"
+  
+  # Return stategraph object:
+  stategraph
 }
