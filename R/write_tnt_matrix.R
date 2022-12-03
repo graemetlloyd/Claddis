@@ -188,7 +188,21 @@ write_tnt_matrix <- function(cladistic_matrix, file_name, add_analysis_block = F
         for (k in colnames(x = cladistic_matrix$topper$costmatrices[[i]]$costmatrix)) {
 
           # Add cost of j to k transition to costs vector:
-          costs <- c(costs, paste(j, ">", k, " ", cladistic_matrix$topper$costmatrices[[i]]$costmatrix[j, k], sep = ""))
+          costs <- c(
+            costs,
+            paste(
+              j,
+              ">",
+              k,
+              " ",
+              gsub(
+                pattern = Inf,
+                replacement = "i",
+                x = cladistic_matrix$topper$costmatrices[[i]]$costmatrix[j, k]
+              ),
+              sep = ""
+            )
+          )
         }
       }
 
