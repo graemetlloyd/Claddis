@@ -34,7 +34,10 @@
 - Added add_uncertainties_to_costmatrix function to add uncertainties to costmatrices using the minimum cost rule.
 - Fixed bug with write_nexus_matrix where costmatrices were not writing character symbols correctly.
 - Added Claddis logo to manual and README.
-- Fixed way read_nexus_matrix imports costmatrices from NEXUS format.
+- Fixed bug in how read_nexus_matrix imports costmatrices from NEXUS format.
+- Added new stateGraph class and supporting functions print.stateGraph and XXXXX.
+- Added prune_costmatrix function to prune costmatrices of unsampled states.
+- Added equalize_weights function to offer new options to equalize weights of a cladistic matrix.
 
 Version - 0.6.6 - 2021-02-21
 
