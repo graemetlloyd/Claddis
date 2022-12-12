@@ -38,6 +38,8 @@
 - Added new stateGraph class and supporting functions print.stateGraph and XXXXX.
 - Added prune_costmatrix function to prune costmatrices of unsampled states.
 - Added equalize_weights function to offer new options to equalize weights of a cladistic matrix.
+- Added classify_costmatrix function to classify costmatrix character into one of twelve distinct types.
+- Added find_steiner_tree_of_stategraph to find a Steiner tree (shortest tree connected a subset of character states) given a state graph.
 
 Version - 0.6.6 - 2021-02-21
 
