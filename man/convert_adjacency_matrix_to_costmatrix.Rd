@@ -54,7 +54,12 @@ This function simply takes the adjacency matrix and returns the corresponding co
 
 # Build the example adjacency matrix for the graph above:
 adjacency_matrix <- matrix(
-  data = c(0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0),
+  data = c(
+    0, 1, 0, 1,
+    1, 0, 1, 0,
+    0, 1, 0, 0,
+    1, 0, 0, 0
+  ),
   nrow = 4,
   ncol = 4,
   dimnames = list(0:3, 0:3)

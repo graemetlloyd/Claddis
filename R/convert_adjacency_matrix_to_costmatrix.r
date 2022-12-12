@@ -56,7 +56,12 @@
 #'
 #' # Build the example adjacency matrix for the graph above:
 #' adjacency_matrix <- matrix(
-#'   data = c(0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0),
+#'   data = c(
+#'     0, 1, 0, 1,
+#'     1, 0, 1, 0,
+#'     0, 1, 0, 0,
+#'     1, 0, 0, 0
+#'   ),
 #'   nrow = 4,
 #'   ncol = 4,
 #'   dimnames = list(0:3, 0:3)
@@ -70,12 +75,18 @@
 #' @export convert_adjacency_matrix_to_costmatrix
 convert_adjacency_matrix_to_costmatrix <- function(adjacency_matrix) {
   
-  # TO DO:
-  #
-  # - Check that matrix is connected somehow (cannot solve all distances if not)
-  
   # Check adjacency_matrix is symmetric and stop and warn user if not:
   if (!isSymmetric(object = adjacency_matrix)) stop("adjacency_matrix must be symmetric. Fix and try again.")
+  
+  # Check adjacency_matrix is for a connected graph:
+  if (!is_graph_connected(adjacency_matrix = adjacency_matrix)) stop("adjacency_matrix must represent a connected graph. Fix and try again")
+  
+  # Check for polymorphisms and uncertainties and remove if found:
+  if (length(x = grep(pattern = "&", x = colnames(x = adjacency_matrix)))) stop("Polymorphisms (&) are not permitted by this function.")
+  if (length(x = grep(pattern = "/", x = colnames(x = adjacency_matrix)))) stop("Uncertainties (/) are not permitted by this function.")
+
+  # Calculate size of adjacency matrix:
+  matrix_size <- nrow(x = adjacency_matrix)
   
   # Set initial costmatrix as adjacency matrix:
   costmatrix <- adjacency_matrix
@@ -114,24 +125,36 @@ convert_adjacency_matrix_to_costmatrix <- function(adjacency_matrix) {
     
     # Update costmatrix with path length (minimum length to connect path_start to path_end):
     costmatrix[current_path[1], current_path[2]] <- costmatrix[current_path[2], current_path[1]] <- length(path_list)
-    
   }
   
-  # Store default character type as custom:
+  # Initialise character type as custom:
   character_type <- "custom"
   
   # If adjacency matrix matches an unordered character (everything is adjacent) then store character type as such:
   if (all(x = as.dist(m = adjacency_matrix) == 1)) character_type <- "unordered"
   
-  # Calculate size of adjacency matrix:
-  matrix_size <- nrow(x = adjacency_matrix)
+  # If adjacency matrix matches an ordered character (maximum vertex degree is 2) then store character type as such:
+  if (all(adjacency_matrix[c(2, cumsum(x = rep(x = matrix_size + 1, length.out = matrix_size - 2)) + 2)] == 1) && sum(adjacency_matrix) == ((2 * matrix_size) - 2)) character_type <- "ordered"
   
-  # If adjacency matrix matches an ordered character (everything is adjacent) then store character type as such:
-  if (all(adjacency_matrix[c(2, cumsum(x = rep(x = matrix_size + 1, length.out = matrix_size - 2)) + 2)] == 1) && sum(adjacency_matrix) == ((2 * matrix_size) - 2)) character_type <- "unordered"
+  # Format as a costmatrix object:
+  costmatrix <- list(
+    size = ncol(x = costmatrix),
+    n_states = ncol(x = costmatrix),
+    single_states = colnames(x = costmatrix),
+    type = character_type,
+    costmatrix = costmatrix,
+    symmetry = "Symmetric",
+    includes_polymorphisms = FALSE,
+    polymorphism_costs = "additive",
+    polymorphism_geometry = "simplex",
+    polymorphism_distance = "euclidean",
+    includes_uncertainties = FALSE,
+    pruned = FALSE,
+    dollo_penalty = 99,
+    base_age = 100,
+    weight = 1
+  )
   
-  # Create full costmatrix object:
-  costmatrix <- list(size = ncol(x = costmatrix), type = character_type, costmatrix = costmatrix, symmetry = "Symmetric", includes_polymorphisms = ifelse(test = length(x = grep(pattern = "&", x = colnames(x = costmatrix))) > 0, yes = TRUE, no = FALSE))
-
   # Set class of output as costMatrix:
   class(costmatrix) <- "costMatrix"
   
