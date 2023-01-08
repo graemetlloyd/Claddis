@@ -115,6 +115,9 @@ calculate_homoplasy_indices <- function(
   dollo_penalty
 ) {
   
+  ### ADD IMPLIED WEIGHTS TO OUTPUT k=0.5; plot(x =0:100, y = (k + 1) / (1:101 + k + 1 - 1), type = "l", xlab = "Homoplasy (extra steps)", ylab = "Weight", ylim = c(0, 1))
+  ### IF CALLING find_stategraph_minimum_span REMEMBER TO NOT JUST TAKE THE ARC WEIGHTS BUT TO CONSIDEr CHARACTER WEIGHT TOO!
+  
   # HOMOPLASY FUNCTION:
   # - Option to define outgroup (root state?) as will affect min cost value
   # - Otherwise need to do path both ways, e.g., 0->1->2 and 2->1->0 in case of asymmetric characters
