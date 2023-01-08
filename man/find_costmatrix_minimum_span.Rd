@@ -2,7 +2,7 @@
 % Please edit documentation in R/find_costmatrix_minimum_span.r
 \name{find_costmatrix_minimum_span}
 \alias{find_costmatrix_minimum_span}
-\title{Finds the minimum spanning tree length for a costmatrix}
+\title{Finds a minimum spanning tree of a costmatrix}
 \usage{
 find_costmatrix_minimum_span(costmatrix)
 }
@@ -10,63 +10,63 @@ find_costmatrix_minimum_span(costmatrix)
 \item{costmatrix}{An object of class \code{costMatrix}.}
 }
 \value{
-A scalar indicating the cost (length) of the minimum spanning tree or arboresence.
+A \code{data.frame} object describing a minimum spanning tree or minimum weight arboresence as a series of edges or arcs.
 }
 \description{
-Given a costmatrix, returns the length of the shortest tree that connects every state.
+Given a costmatrix, returns a shortest tree connecting every state.
 }
 \details{
-The minimum parsimony length a phylogenetic hypothesis can have depends on the costmatrix of transition costs and the states actually sampled. If the costmatrix rows and columns already represent sampled states (the assumption here) then this minimum length is reduced to a graph theory problem - the minimum spanning tree. This function returns the length of that tree and hence the minimum cost (as used in stratocladistics to help define "parsimony debt" Fisher 1994, or in homoplasy indices, see Hoyal Cuthill 2015).
+The minimum parsimony length a phylogenetic hypothesis can have depends on both the costmatrix of transition costs and the states actually sampled. If the costmatrix rows and columns already represent sampled states (the assumption here) then this minimum length is reduced to a graph theory problem - the minimum spanning tree or, if a directed graph, the minimum weight spanning arboresence. (NB: if there are unsampled states then the \link{find_steiner_tree_of_stategraph} function should be used instead.) This function returns one such shortest tree (although others may exist). The sum of the weights of the edges or arcs returned is the minimum cost.
 
-\bold{Special case solutions}
+As the algorithms used are graph theory based the function operates by simply calling \link{convert_costmatrix_to_stategraph} and \link{find_stategraph_minimum_span}. In practice, if the costmatrix represents a graph (transition costs are all symmetric) then Kruskal's algorithm is applied (Kruskal 1956). If costs are asymmetric, however, then the graph representation is a directed graph (or digraph) and so a version of Edmonds' algorithm is applied (Edmonds 1967).
 
-In order for the function to run as fast as possible the following special case solutions are used.
-
-\emph{Invariant character solution}
-
-If the character is invariant then the costmatrix will have size one (one-by-one), and more simply the minimum spanning tree is length zero as there are no transitions to make.
-
-\emph{Unordered character solution}
-
-If the character is unordered all off-diagonal values of the costmatrix are one and the minimum cost is the size of the costmatrix minus one (as there is no cost to visit the root state).
-
-\emph{Ordered/irreversible/stratigraphic character solution}
-
-For an ordered, irreversible, or stratigraphic character the solution is also simple, and identical. This is the cost to go between the furthest two states which is simply the value in the upper right of the costmatrix.
-
-\emph{Dollo character solution}
-
-Despite other complexities Dollo characters also have a simple solution that mirrors that for ordered, irreversible, or stratigraphic characters. I.e., the derived states must all be acquired once which is simply the value in the lower left of the costmatrix.
-
-\bold{General case solution}
-
-For characters that do not constitute any of the above special case solutions a slower running general case solution is required. This is effectively limited to so-called "custom" characters - \code{costmatrix$type = "custom"} that can \emph{only} be represented by either a state tree or costmatrix.
-
-Strictly speaking the solution used depends on whether the costmatrix is symmetric (representing an undirected graph, or simply a graph) or asymmetric (representing a directed graph, or digraph). In both cases the edge weights of the graph/digraph are the transition costs from the costmatrix. For a graph the problem is the "regular" minimum spanning tree, and if for a digraph then it is the arboresence. For regular minimum spanning trees Kruskal's (1956) algorithm is used and for aboresence's Edmonds' (1967) algorithm is used. (The function automatically makes this choice using the value of \code{costmatrix$symmetry}.) In practice the implementations used come from the optrees package (Fontenla 2014), and specifically the functions \code{getMinimumSpanningTree} and \code{msArborEdmonds}.
-
-Note that regardless of method the function only returns the \emph{length} of the minimum spanning tree or arboresence (i.e., the total minimum cost), not the actual path (pattern of states traversed). Additionally, multiple paths (trees or arboresences) may exist that have the same minimum length - i.e., there can be more than one optimal solution.
+Note that Dollo characters represent a special case solution as although a penalty weight is applied to the edges intended to only ever be traversed once this weight should not be used when calculating tree lengths. The function catches this and returns the edges with the weight that would actually be counted for a minimum weight spanning tree.
 }
 \examples{
 
-# Make a six-state ordered character cotmatrix:
-costmatrix <- make_costmatrix(
+# Make a four-state ordered character costmatrix:
+ordered_costmatrix <- make_costmatrix(
   min_state = "0",
-  max_state = "5",
+  max_state = "3",
   character_type = "ordered"
 )
 
 # Find length of shortest spanning tree of costmatrix:
-find_costmatrix_minimum_span(costmatrix = costmatrix)
+find_costmatrix_minimum_span(costmatrix = ordered_costmatrix)
+
+# Make a four-state unordered character costmatrix:
+unordered_costmatrix <- make_costmatrix(
+  min_state = "0",
+  max_state = "3",
+  character_type = "unordered"
+)
+
+# Find length of shortest spanning tree of costmatrix:
+find_costmatrix_minimum_span(costmatrix = unordered_costmatrix)
+
+# Make a four-state irreversible character costmatrix:
+irreversible_costmatrix <- make_costmatrix(
+  min_state = "0",
+  max_state = "3",
+  character_type = "irreversible"
+)
+
+# Find length of shortest spanning tree of costmatrix:
+find_costmatrix_minimum_span(costmatrix = irreversible_costmatrix)
+
+# Make a four-state Dollo character costmatrix:
+dollo_costmatrix <- make_costmatrix(
+  min_state = "0",
+  max_state = "3",
+  character_type = "dollo"
+)
+
+# Find length of shortest spanning tree of costmatrix:
+find_costmatrix_minimum_span(costmatrix = dollo_costmatrix)
 
 }
 \references{
 Edmonds, J., 1967. Optimum branchings. \emph{Journal of Research of the National Bureau of Standards Section B}, \bold{71B}, 233-240.
-
-Fisher, D. C., 1994. Stratocladistics: morphological and temporal patterns and their relation to phylogenetic process. In L. Grande and O. Rieppel (eds.), \emph{Interpreting the Hierarchy of Nature}. Academic Press, San Diego. pp133–171.
-
-Fontenla, M., 2014. optrees: Optimal Trees in Weighted Graphs. R package version 1.0. https://CRAN.R-project.org/package=optrees
-
-Hoyal Cuthill, J., 2015. The size of the character state space affects the occurrence and detection of homoplasy: modelling the probability of incompatibility for unordered phylogenetic characters. \emph{Journal ofTheoretical Biology}, \bold{366}, 24-32.
 
 Kruskal, J. B., 1956. On the shortest spanning subtree of a graph and the traveling salesman problem. \emph{Proceedings of the American Mathematical Society}, \bold{7}, 48-50.
 }
