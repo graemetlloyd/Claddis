@@ -148,9 +148,6 @@ x <- list(
 )
 class(x = x) <- "stateGraph"
 
-  
-  
-  
   # Check x has class stateGraph and stop and warn user if not:
   if (!inherits(x = x, what = "stateGraph")) stop("x must be an object of class \"stateGraph\".")
   
