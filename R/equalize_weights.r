@@ -22,7 +22,8 @@
 #' @export equalize_weights
 equalize_weights <- function(cladistic_matrix, method) {
 
-  # method being for disparity of phylogenetics
+  # method being for disparity or phylogenetics
+  # Need to calculate what weights would work TNT and not tht not all of them need to be integers if they would not cause FPEs, e.g., 0.5 is fine
   
   if (method == "disparity") {
     
