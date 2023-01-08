@@ -20,7 +20,7 @@
 #'
 #' Note: negative costs are not allowed in costmatrices as they will confound the halting criteria of the algorithm. (They also do not make logical sense in a costmatrix anyway!)
 #'
-#' Note: if multiple equally optimal solutions are possible, the function will only return one of them. I.e., just because a solution is not presented it cannot be assumed it is suboptimal. For example, for any ordered character (of three or more states) there will always be multiple equally optimal solutions.
+#' Note: if multiple equally optimal solutions are possible, the function will only return one of them. I.e., just because a solution is not presented it cannot be assumed it is suboptimal.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
