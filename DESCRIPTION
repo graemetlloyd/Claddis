@@ -23,7 +23,6 @@ Imports:
     grDevices,
     methods,
     multicool,
-    optrees,
     partitions,
     stats,
     utils
