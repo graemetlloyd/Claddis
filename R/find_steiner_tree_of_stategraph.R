@@ -22,23 +22,28 @@
 find_steiner_tree_of_stategraph <- function(stategraph, sampled_vertices) {
 
   ### EXAMPLE DATASET
-  unordered_costmatrix <- make_costmatrix(
+  costmatrix <- make_costmatrix(
     min_state = 0,
     max_state= 5,
-    character_type = "irreversible"
+    character_type = "dollo"
   )
-  stategraph <- convert_costmatrix_to_stategraph(costmatrix = unordered_costmatrix)
+  stategraph <- convert_costmatrix_to_stategraph(costmatrix = costmatrix)
   sampled_vertices <- c("1", "3", "4")
   
   ### CHECK SAMPLED VERTICES ARE UNIQUE AND PRESENT!
   ### CHECK STATEGRAPH IS A STATEGRAPH!
+  ### ADD MST OPTION IF ALL STATES SAMPLED8
   ### ADD OPTION FOR SIMPLE SOLUTIONS FOR TWO VERTEX GRAPH (SHORTEST PATH) OR COMPLETE GRAPH/DIGRAPH (MST/MWSA) - WILL MAKE MUCH FASTER!!!!
   ### MAYBE ADD OTHER FAST OPTIONS FOR SIMPLE CASES (E.G. ORDERED BUT NO POLYMORPHISMS OR UNCERTAINTIES)
   ### WHAT TO RETURN? (COULD BE MULTILE SHORTEST STEINER TREES FOR EXAMPLE)
-  ### ASYMMETRIC CHARACTERS CAN GET STUCK IF ROT IS NOT VALID (RUN OUT OF ARCS TO ADD BUT NOT BE ONGER THAN SHORTEST TREE
+  ### ASYMMETRIC CHARACTERS CAN GET STUCK IF ROOT IS NOT VALID (RUN OUT OF ARCS TO ADD BUT NOT BE LONGER THAN SHORTEST TREE
+  ### OUTPUT PRUNED STATEGRAPH
+  ### IF NOT DIRECTED CHECK FOR DUPLICATES (SAME BASIC ARCS JUST VARIED ORDER(S)) AND REMOVE (ROOT NO LONGER MATTERS?)?
+
   
   # Case if only one sampled vertex then return tree as single vertex:
   if (length(x = sampled_vertices) == 1) return(sampled_vertices)
+  ### MAKE OUTPUT A PRUNED STATGRAPH!
   
   # Case if at least two vertices:
   if (length(x = sampled_vertices) > 1) {
@@ -87,46 +92,60 @@ find_steiner_tree_of_stategraph <- function(stategraph, sampled_vertices) {
               )
             )
             
-            ### COULD BE NO NEW ARCS SO NEED CONDITIONALS TO DEAL WITH THIS (SET TO INACTIVE AND SET LENGTH TO INF?)
+            # If there are new arcs to explore:
+            if (length(x = new_arcs) > 0) {
             
-            # Duplicate tree to make new trees:
-            new_trees <- rep(x = trees[active_tree], length(x = new_arcs))
+              # Duplicate tree to make new trees:
+              new_trees <- rep(x = trees[active_tree], length(x = new_arcs))
             
-            # Update each new tree by adding new arc and updating contents:
-            new_trees <- mapply(
-              FUN = function(new_tree, new_arc) {
+              # Update each new tree by adding new arc and updating contents:
+              new_trees <- mapply(
+                FUN = function(new_tree, new_arc) {
                 
-                # Add new arc to used arcs:
-                new_tree$used_arcs <- rbind(new_tree$used_arcs, new_tree$available_arcs[new_arc, ])
+                  # Add new arc to used arcs:
+                  new_tree$used_arcs <- rbind(new_tree$used_arcs, new_tree$available_arcs[new_arc, ])
+                  
+                  # Update vertices connected:
+                  new_tree$vertices_connected <- unique(x = as.character(x = c(new_tree$used_arcs$from, new_tree$used_arcs$to)))
+                  
+                  # Update length of Steiner tree by adding weight of new arc:
+                  new_tree$tree_length <- new_tree$tree_length + new_tree$available_arcs[new_arc, "weight"]
+                  
+                  # Update available arcs by removing just added one:
+                  new_tree$available_arcs <- new_tree$available_arcs[-new_arc, , drop = FALSE]
+                  
+                  # Check if sampled vertices are now connected:
+                  if (length(x = setdiff(x = sampled_vertices, y = new_tree$vertices_connected)) == 0) {
+                    new_tree$sampled_vertices_connected <- TRUE
+                    new_tree$active <- FALSE
+                  }
                 
-                # Update vertices connected:
-                new_tree$vertices_connected <- unique(x = as.character(x = c(new_tree$used_arcs$from, new_tree$used_arcs$to)))
+                  # If tree is too long to ever be the Steiner graph then make inactive:
+                  if (new_tree$tree_length >= length_threshold) new_tree$active <- FALSE
                 
-                # Update length of Steiner tree by adding weight of new arc:
-                new_tree$tree_length <- new_tree$tree_length + new_tree$available_arcs[new_arc, "weight"]
-                
-                # Update available arcs by removing just added one:
-                new_tree$available_arcs <- new_tree$available_arcs[-new_arc, , drop = FALSE]
-                
-                # Check if sampled vertices are now connected:
-                if (length(x = setdiff(x = sampled_vertices, y = new_tree$vertices_connected)) == 0) {
-                  new_tree$sampled_vertices_connected <- TRUE
-                  new_tree$active <- FALSE
-                }
-                
-                # If tree is too long to ever be the Steiner graph then make inactive:
-                if (new_tree$tree_length >= length_threshold) new_tree$active <- FALSE
-                
-                # Return updated new tree:
-                new_tree
-              },
-              new_tree = new_trees,
-              new_arc = as.list(x = new_arcs),
-              SIMPLIFY = FALSE
-            )
+                  # Return updated new tree:
+                  new_tree
+                },
+                new_tree = new_trees,
+                new_arc = as.list(x = new_arcs),
+                SIMPLIFY = FALSE
+              )
             
-            # Add new trees to trees:
-            trees <- c(trees, new_trees)
+              # Add new trees to trees:
+              trees <- c(trees, new_trees)
+              
+            # If no new arcs:
+            } else {
+              
+              # Set current tree length to Infinite:
+              tree$tree_length <- Inf
+            
+              # Set current tree active status to FALSE:
+              tree$active <- FALSE
+            
+              # Add current tree to trees:
+              trees <- c(trees, list(tree))
+            }
           }
           
           # Remove the now superseded active trees:
@@ -176,7 +195,6 @@ find_steiner_tree_of_stategraph <- function(stategraph, sampled_vertices) {
     
     # Collapse all_steiner_trees to just the shortest one(s):
     all_steiner_trees <- all_steiner_trees[steiner_tree_lengths == min(x = steiner_tree_lengths)]
-    
-    ### IF NOT DIRECTED CHECK FOR DUPLICATES (SAME BASIC ARCS JUST VARIED ORDER(S)) AND REMOVE (ROOT NO LONGER MATTERS?)
   }
 }
+
