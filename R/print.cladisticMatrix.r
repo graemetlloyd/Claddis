@@ -74,7 +74,7 @@ print.cladisticMatrix <- function(x, ...) {
       paste0("  ", character_spacings[1], n_unordered_characters, " are unordered,\n"),
       paste0("  ", character_spacings[2], n_ordered_characters, " are ordered,\n"),
       paste0("  ", character_spacings[3], n_continuous_characters, " are continuous, and\n"),
-      paste0("  ", character_spacings[4], n_costmatrix_characters, " are cost-matrix characters\n"),
+      paste0("  ", character_spacings[4], n_costmatrix_characters, " are costmatrix characters\n"),
       weight_line)
   )
 }
