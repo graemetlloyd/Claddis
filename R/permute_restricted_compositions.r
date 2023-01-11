@@ -47,6 +47,12 @@ permute_restricted_compositions <- function(
   # Set m as length of m labels:
   m <- length(x = m_labels)
   
+  # Special case of only one label (simple single restricted composition):
+  if (m == 1) return(value = matrix(data = n, dimnames = list(c(), m_labels)))
+  
+  # Special case of not allowing zeroes and m and n being equal (single restricted compositon of one per label):
+  if (!allow_zero && m == n) return(value = matrix(data = 1, ncol = m, dimnames = list(c(), m_labels)))
+  
   # If allow_zero is FALSE but m is larger than n:
   if (!allow_zero && m > n) {
     
@@ -54,7 +60,7 @@ permute_restricted_compositions <- function(
     allow_zero <- TRUE
     
     # Inform user this has happened:
-    cat("It is not possible to set allow_zero as FALSE as m is greater than n.\n")
+    cat("It is not possible to set allow_zero as FALSE as m is greater than n; allow_zero has been reset as TRUE.\n")
   }
   
   # If zeroes are not allowed reduce n by m (will add one later):
