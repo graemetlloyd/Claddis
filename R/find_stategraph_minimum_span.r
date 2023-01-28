@@ -90,7 +90,7 @@ find_stategraph_minimum_span <- function(stategraph) {
     # Make Dollo arcs from those that should be traversed just once:
     dollo_arcs <- stategraph$arcs[stategraph$arcs$weight == stategraph$dollo_penalty, ]
       
-    # Set the weights o these arcs to one as this is what should actually be counted for a Dollo character:
+    # Set the weights of these arcs to one as this is what should actually be counted for a Dollo character:
     dollo_arcs$weight <- 1
       
     # Return Dollo arcs:
