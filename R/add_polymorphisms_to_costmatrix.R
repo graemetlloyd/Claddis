@@ -366,7 +366,7 @@ add_polymorphisms_to_costmatrix <- function(
   character_is_ordered <- FALSE
   
   # If character is demonstrably ordered - all state graph edge weights are symmetric and equal - set character_is_ordered to TRUE:
-  if (length(x = unique(x = convert_costmatrix_to_stategraph(costmatrix = costmatrix)[, "weight"])) == 1 && isSymmetric(object = costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states])) character_is_ordered <- TRUE
+  if (length(x = unique(x = convert_costmatrix_to_stategraph(costmatrix = costmatrix)$arcs[, "weight"])) == 1 && isSymmetric(object = costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states])) character_is_ordered <- TRUE
   
   # If polymorphism_costs is maddison but character type is not linear or non-linear ordered:
   if (polymorphism_costs == "maddison" && !character_is_ordered) {
