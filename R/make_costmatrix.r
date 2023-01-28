@@ -415,7 +415,7 @@ make_costmatrix <- function(
   if (include_uncertainties) {
     
     # Add uncertainties to costmatrix using options supplied
-    add_uncertainties_to_costmatrix(
+    costmatrix <- add_uncertainties_to_costmatrix(
       costmatrix = costmatrix,
       message = message
     )
