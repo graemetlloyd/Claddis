@@ -362,11 +362,8 @@ add_polymorphisms_to_costmatrix <- function(
     if (message) print("polymorphism_costs cannot be \"geometric\" if character type is not \"unordered\". polymorphism_costs changed to \"additive\" instead.")
   }
   
-  # Create variable for whether character is ordered (linear or state tree) and initialise as FALSE:
-  character_is_ordered <- FALSE
-  
-  # If character is demonstrably ordered - all state graph edge weights are symmetric and equal - set character_is_ordered to TRUE:
-  if (length(x = unique(x = convert_costmatrix_to_stategraph(costmatrix = costmatrix)$arcs[, "weight"])) == 1 && isSymmetric(object = costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states])) character_is_ordered <- TRUE
+  # Create variable for whether character is possible ordered (Type I, Type II, Type IV or Type V):
+  character_is_ordered <- ifelse(test = length(x = intersect(x = c("Type I", "Type II", "Type IV", "Type V"), y = classify_costmatrix(costmatrix = costmatrix))) == 1, yes = TRUE, no = FALSE)
   
   # If polymorphism_costs is maddison but character type is not linear or non-linear ordered:
   if (polymorphism_costs == "maddison" && !character_is_ordered) {
