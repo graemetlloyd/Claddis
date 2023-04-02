@@ -58,7 +58,7 @@ file.remove("morphmatrix.nex")
 Maddison, D. R., Swofford, D. L. and Maddison, W. P., 1997. NEXUS: an extensible file format for systematic information. \emph{Systematic Biology}, \bold{46}, 590-621.
 }
 \seealso{
-\link{build_cladistic_matrix}, \link{compactify_matrix}, \link{prune_cladistic_matrix}, \link{safe_taxonomic_reduction}, \link{write_nexus_matrix}, \link{write_tnt_matrix}
+\link{build_cladistic_matrix}, \link{compactify_cladistic_matrix}, \link{prune_cladistic_matrix}, \link{safe_taxonomic_reduction}, \link{write_nexus_matrix}, \link{write_tnt_matrix}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

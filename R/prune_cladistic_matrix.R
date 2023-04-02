@@ -18,7 +18,7 @@
 #'
 #' @seealso
 #'
-#' \link{build_cladistic_matrix}, \link{compactify_matrix}, \link{read_nexus_matrix}, \link{safe_taxonomic_reduction}, \link{write_nexus_matrix}, \link{write_tnt_matrix}
+#' \link{build_cladistic_matrix}, \link{compactify_cladistic_matrix}, \link{read_nexus_matrix}, \link{safe_taxonomic_reduction}, \link{write_nexus_matrix}, \link{write_tnt_matrix}
 #'
 #' @examples
 #'

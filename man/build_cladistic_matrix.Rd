@@ -60,7 +60,7 @@ nrow = 10, dimnames =
 build_cladistic_matrix(character_taxon_matrix)
 }
 \seealso{
-\link{compactify_matrix}, \link{prune_cladistic_matrix}, \link{read_nexus_matrix}, \link{safe_taxonomic_reduction}, \link{write_nexus_matrix}, \link{write_tnt_matrix}
+\link{compactify_cladistic_matrix}, \link{prune_cladistic_matrix}, \link{read_nexus_matrix}, \link{safe_taxonomic_reduction}, \link{write_nexus_matrix}, \link{write_tnt_matrix}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

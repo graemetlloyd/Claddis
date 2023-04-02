@@ -26,7 +26,7 @@
 #'
 #' @seealso
 #'
-#' \link{build_cladistic_matrix}, \link{compactify_matrix}, \link{prune_cladistic_matrix}, \link{safe_taxonomic_reinsertion}, \link{read_nexus_matrix}, \link{write_nexus_matrix}, \link{write_tnt_matrix}
+#' \link{build_cladistic_matrix}, \link{compactify_cladistic_matrix}, \link{prune_cladistic_matrix}, \link{safe_taxonomic_reinsertion}, \link{read_nexus_matrix}, \link{write_nexus_matrix}, \link{write_tnt_matrix}
 #'
 #' @examples
 #'

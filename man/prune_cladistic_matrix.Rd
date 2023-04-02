@@ -42,7 +42,7 @@ prunedmatrix <- prune_cladistic_matrix(
 prunedmatrix$matrix_1$matrix
 }
 \seealso{
-\link{build_cladistic_matrix}, \link{compactify_matrix}, \link{read_nexus_matrix}, \link{safe_taxonomic_reduction}, \link{write_nexus_matrix}, \link{write_tnt_matrix}
+\link{build_cladistic_matrix}, \link{compactify_cladistic_matrix}, \link{read_nexus_matrix}, \link{safe_taxonomic_reduction}, \link{write_nexus_matrix}, \link{write_tnt_matrix}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

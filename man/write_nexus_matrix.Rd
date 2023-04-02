@@ -31,7 +31,7 @@ Maddison, D. R., Swofford, D. L. and Maddison, W. P., 1997. NEXUS: an extensible
 \seealso{
 \link{write_tnt_matrix}
 
-\link{build_cladistic_matrix}, \link{compactify_matrix}, \link{prune_cladistic_matrix}, \link{read_nexus_matrix}, \link{safe_taxonomic_reduction}, \link{write_tnt_matrix}
+\link{build_cladistic_matrix}, \link{compactify_cladistic_matrix}, \link{prune_cladistic_matrix}, \link{read_nexus_matrix}, \link{safe_taxonomic_reduction}, \link{write_tnt_matrix}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

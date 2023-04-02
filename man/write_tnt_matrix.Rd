@@ -37,7 +37,7 @@ Goloboff, P., Farris, J. and Nixon, K., 2008. TNT, a free program for phylogenet
 \seealso{
 \link{write_nexus_matrix}
 
-\link{build_cladistic_matrix}, \link{compactify_matrix}, \link{prune_cladistic_matrix}, \link{read_nexus_matrix}, \link{safe_taxonomic_reduction}, \link{write_nexus_matrix}
+\link{build_cladistic_matrix}, \link{compactify_cladistic_matrix}, \link{prune_cladistic_matrix}, \link{read_nexus_matrix}, \link{safe_taxonomic_reduction}, \link{write_nexus_matrix}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}
