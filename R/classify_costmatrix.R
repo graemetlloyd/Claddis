@@ -2,145 +2,550 @@
 #'
 #' @description
 #'
-#' Given a costmatrix, classifies it as one of twelve distinct character types.
+#' Given a costmatrix, classifies it into one of twelve distinct types.
 #'
 #' @param costmatrix An object of class \code{costMatrix}.
 #'
 #' @details
 #'
-#' Type I - constant (any type but must be one state)
-#' Type II - symmetric binary (any type but must be two states)
-#' Type III - multistate unordered (three plus states and unordered type)
-#' Type IV - linear ordered symmetric (three plus states and ordered)
-#' Type V - Non-linear ordered symmetric (four plus states and custom direct costs all equal)
-#' Type VI - Binary irreversible (two states and irreversible type)
-#' Type VII - Multistate irreversible (three states and irreversible type)
-#' Type VIII - Binary Dollo (two states and Dollo type)
-#' Type IX - Multistate Dollo (three plus states and Dollo type)
-#' Type X - Multistate custom symmetric (three plus states, symmetric but variable direct transition costs)
-#' Type XI - Binary custom asymmetric (two states, custom type costs unequal and non-infinite)
-#' Type XII - Multistate custom asymmetric (three plus states, custom type, asymmetric costs and not Type VII)
+#' Hoyal Cuthill and Lloyd (in review) classified discrete characters into twelve different types. This function applies their classification to a costmatrix object. The twelve different types are defined below alongside an empirical example for each, following Hoyal Cuthill and Lloyd (in review).
 #'
-#' # For whole cladistic data set:
-#' Stratigraphic is something else(?)
-#' Type XIII - Gap weighted (or is this just a linear ordered? I guess issue is when N states > N tips?)
-#' Type XIV - Continuous
+#' \bold{Type I - Constant}
 #'
-#' classify_character # For costMatrix
-#' classify_characters # For cladisticMatrix
+#' The simplest character type - only one state
 #'
-#' @return A vector of named edges (X->Y) with their distances. The sum of this vector is the length of the minimum spanning tree.
+#' Example: Character 18 of Sterli et al. (2013)
+#'
+#' Costmatrix:
+#'
+#' \preformatted{    -----
+#'     | 0 |
+#' ---------
+#' | 0 | 0 |
+#' ---------}
+#'
+#' State graph:
+#'
+#' \preformatted{0}
+#'
+#' \bold{Type II - Binary symmetric}
+#'
+#' Exactly two states with equal and finite transition costs between them.
+#'
+#' Example: Character 1 of Sterli et al. (2013)
+#'
+#' Costmatrix:
+#'
+#' \preformatted{    ---------
+#'     | 0 | 1 |
+#' -------------
+#' | 0 | 0 | 1 |
+#' -------------
+#' | 1 | 1 | 0 |
+#' -------------}
+#'
+#' State graph:
+#'
+#' \preformatted{  1
+#' 0---1}
+#'
+#' \bold{Type III - Multistate unordered}
+#'
+#' Three or more states where every state-to-state transition has equal and finite cost.
+#'
+#' Example: Character 53 of Sterli et al. (2013)
+#'
+#' Costmatrix:
+#'
+#' \preformatted{    -------------
+#'     | 0 | 1 | 2 |
+#' -----------------
+#' | 0 | 0 | 1 | 1 |
+#' -----------------
+#' | 1 | 1 | 0 | 1 |
+#' -----------------
+#' | 2 | 1 | 1 | 0 |
+#' -----------------}
+#'
+#' State graph:
+#'
+#' \preformatted{    1
+#'    / \
+#'  1/   \1
+#'  /     \
+#' 0-------2
+#'     1}
+#'
+#' \bold{Type IV - linear ordered symmetric}
+#'
+#' Three or more states arranged as a single path with all connected states having equal and finite transition cost.
+#'
+#' Example: Character 7 of Sterli et al. (2013)
+#'
+#' Costmatrix:
+#'
+#' \preformatted{    -------------
+#'     | 0 | 1 | 2 |
+#' -----------------
+#' | 0 | 0 | 1 | 2 |
+#' -----------------
+#' | 1 | 1 | 0 | 1 |
+#' -----------------
+#' | 2 | 2 | 1 | 0 |
+#' -----------------}
+#'
+#' State graph:
+#'
+#' \preformatted{  1   1
+#' 0---1---2}
+#'
+#' \bold{Type V - Non-linear ordered symmetric}
+#'
+#' Four or more states arranged into a state graph with at least one branching point (vertex of degree three or greater) with all connected states having equal and finite transition costs.
+#'
+#' Example: Character 71 of Hooker (2014)
+#'
+#' Costmatrix:
+#'
+#' \preformatted{    -------------
+#'     | 0 | 1 | 2 | 3 |
+#' ---------------------
+#' | 0 | 0 | 1 | 2 | 2 |
+#' ---------------------
+#' | 1 | 1 | 0 | 1 | 1 |
+#' ---------------------
+#' | 1 | 2 | 1 | 0 | 2 |
+#' ---------------------
+#' | 1 | 2 | 1 | 2 | 0 |
+#' ---------------------}
+#'
+#' State graph:
+#'
+#' \preformatted{          2
+#'          /
+#'        1/
+#'    1   /
+#' 0-----1
+#'        \
+#'        1\
+#'          \
+#'           3}
+#'
+#' \bold{Type VI - Binary irreversible}
+#'
+#' Two states where transitions in one direction have infinite cost and the other finite cost.
+#'
+#' Example: Character 119 of Gunnell et al. (2018)
+#'
+#' Costmatrix:
+#'
+#' \preformatted{    ---------
+#'     | 0 | 1 |
+#' -------------
+#' | 0 | 0 | 1 |
+#' -------------
+#' | 1 | i | 0 |
+#' -------------}
+#'
+#' (i = infinity)
+#'
+#' State graph:
+#'
+#' \preformatted{  1
+#' 0-->1}
+#'
+#' \bold{Type VII - Multistate irreversible}
+#'
+#' Three or more states where transitions in one direction have infinite cost and the other finite cost.
+#'
+#' Example: Character 21 of Gunnell et al. (2018)
+#'
+#' Costmatrix:
+#'
+#' \preformatted{    -------------
+#'     | 0 | 1 | 2 |
+#' -----------------
+#' | 0 | 0 | 1 | 2 |
+#' -----------------
+#' | 1 | i | 0 | 1 |
+#' -----------------
+#' | 2 | i | i | 0 |
+#' -----------------}
+#'
+#' (i = infinity)
+#'
+#' State graph:
+#'
+#' \preformatted{  1   1
+#' 0-->1-->2}
+#'
+#' \bold{Type VIII - Binary Dollo}
+#'
+#' Two states where transitions in one direction can be made at most once, with no restriction in the other direction.
+#'
+#' Example: Character 10 of Paterson et al. (2014)
+#'
+#' Costmatrix:
+#'
+#' \preformatted{    ----------
+#'     | 0 | 1 |
+#' -------------
+#' | 0 | 0 | D |
+#' -------------
+#' | 1 | 1 | 0 |
+#' -------------}
+#'
+#' (D = a Dollo penalty applied to avoid multiple transitions, see Swofford and Olsen 1990)
+#'
+#' State graph:
+#'
+#' \preformatted{      1
+#'  --- <-- ---
+#' | 0 |   | 1 |
+#'  --- --> ---
+#'       D}
+#'
+#' \bold{Type IX - Multistate Dollo}
+#'
+#' Three or more states where transitions in one direction can be made at most once, with no restriction in the other direction.
+#'
+#' Example: Character 15 of Paterson et al. (2014)
+#'
+#' Costmatrix:
+#'
+#' \preformatted{    --------------
+#'     | 0 | 1 |  2 |
+#' ------------------
+#' | 0 | 0 | D | 2D |
+#' ------------------
+#' | 1 | 1 | 0 |  D |
+#' ------------------
+#' | 2 | 2 | 1 |  0 |
+#' ------------------}
+#'
+#' (D = a Dollo penalty applied to avoid multiple transitions, see Swofford and Olsen 1990)
+#'
+#' State graph:
+#'
+#' \preformatted{      1       1
+#'  --- <-- --- <-- ---
+#' | 0 |   | 1 |   | 2 |
+#'  --- --> --- --> ---
+#'       D       D}
+#'
+#' \bold{Type X - Multistate symmetric}
+#'
+#' Three or more states where connected states have symmetric finite costs, but where these are not all equal.
+#'
+#' Example: Character 8 of Sumrall abd Brett (2002)
+#'
+#' Costmatrix:
+#'
+#' \preformatted{
+#'     -------------------------
+#'     | 0 | 1 | 2 | 3 | 4 | 5 |
+#' -----------------------------
+#' | 0 | 0 | 1 | 2 | 3 | 2 | 3 |
+#' -----------------------------
+#' | 1 | 1 | 0 | 3 | 2 | 1 | 2 |
+#' -----------------------------
+#' | 2 | 2 | 3 | 0 | 3 | 2 | 1 |
+#' -----------------------------
+#' | 3 | 3 | 2 | 3 | 0 | 1 | 2 |
+#' -----------------------------
+#' | 4 | 2 | 1 | 2 | 1 | 0 | 1 |
+#' -----------------------------
+#' | 5 | 3 | 2 | 1 | 2 | 1 | 0 |
+#' -----------------------------}
+#'
+#' State graph:
+#'
+#' \preformatted{   1
+#'  2---5   3
+#'  |    \  |
+#' 2|    1\ |1
+#'  |      \|
+#'  0---1---4
+#'    1   1}
+#'
+#' \bold{Type XI - Binary asymmetric}
+#'
+#' Two states where transition costs are finite but non-equal.
+#'
+#' Example: Character 3 of Gheerbrant et al. (2014)
+#'
+#' Costmatrix:
+#'
+#' \preformatted{    ----------
+#'     |  0 | 1 |
+#' --------------
+#' | 0 |  0 | 1 |
+#' --------------
+#' | 1 | 10 | 0 |
+#' --------------}
+#'
+#' State graph:
+#'
+#' \preformatted{      10
+#'  --- <--- ---
+#' | 0 |    | 1 |
+#'  --- ---> ---
+#'       1}
+#'
+#' \bold{Type XII - Multistate asymmetric}
+#'
+#' Three or more states where at least one transition is asymmetric, but the character does not meet the definition of other multistate asymmetric characters (i.e., Type VII and IX).
+#'
+#' Example: Character 7 of Gheerbrant et al. (2014)
+#'
+#' Costmatrix:
+#'
+#' \preformatted{    ---------------
+#'     |  0 |  1 | 2 |
+#' -------------------
+#' | 0 |  0 |  1 | 1 |
+#' -------------------
+#' | 1 |  1 |  0 | 1 |
+#' -------------------
+#' | 1 | 10 | 10 | 0 |
+#' -------------------}
+#'
+#' State graph:
+#'
+#' \preformatted{          10
+#'     ______________
+#'    /              \
+#'   L   1       10   \
+#'  --- <-- --- <--- ---
+#' | 0 |   | 1 |    | 2 |
+#'  --- --> --- ---> ---
+#'   \   1        1   ^
+#'    \______________/
+#'            1}
+#'
+#' \bold{Other character types}
+#'
+#' The classification of Hoyal Cuthill and Lloyd (in review) was derived as a means to delineate a mathematical problem. As such it may be of use to consider where some special kinds of character would fall in this classification.
+#'
+#' \emph{Stratigraphic characters}
+#'
+#' These would be classified as either Type VI, Type VII, Type XI, or Type XII characters (depending on state count and spacing of stratigraphic units).
+#'
+#' \emph{Gap-weighted characters}
+#'
+#' A gap-weighted (Thiele 1993) character would be classified as either Type II or Type IV (depending on state count), but differ in the implicit assumption of whether all states are expected to be sampled. For a gap-weighted character there is no presumption that every state be sampled as the spacing between states is the primary information being considered.
+#'
+#' \emph{Continuous characters}
+#'
+#' Continuous characters are necessarily not classifiable here as they are by definition non-discrete (except where translated into a gap-weighted character, above).
+#'
+#' @return A text string indicating the classification result (e.g., \code{"Type VIII"}).
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
+#' @references
+#'
+# 'Gheerbrant, E., Amaghzaz, M., Bouya, B., Goussard, F. and Letenneur, C., 2014. \emph{Ocepeia} (Middle Paleocene of Morocco): the oldest skull of an Afrotherian mammal. \emph{PLoS ONE}, \bold{9}, e89739.
+#'
+#' Gunnell, G. F., Boyer, D. M., Friscia, A. R., Heritage, S., Manthi, F. K., Miller, E. R., Sallam, H. M., Simmons, N. B., Stevens, N. J. and Seiffert, E. R., 2018. Fossil lemurs from Egypt and Kenya suggest an African origin for Madagascar's aye-aye. \emph{Nature Communications}, \bold{9}, 3193.
+#'
+#' Hooker, J. J., 2014. New postcranial bones of the extinct mammalian family Nyctitheriidae (Paleogene, UK): primitive euarchontans with scansorial locomotion. \emph{Palaeontologia Electronica}, \bold{17.3.47A}, 1-82.
+#'
+#' Hoyal Cuthill, J. F. and Lloyd, G. T., in review.
+#'
+#' Paterson, A. M., Wallis, G. P., Kennedy, M. and Gray, R. D., 2014. Behavioural evolution in penguins does not reflect phylogeny. \emph{Cladistics}, \bold{30}, 243-259.
+#'
+#' Sterli, J., Pol, D. and Laurin, M., 2013. Incorporating phylogenetic uncertainty on phylogeny-based palaeontological dating and the timing of turtle diversification. \emph{Cladistics}, \bold{29}, 233-246.
+#'
+#' Sumrall, C. D. and Brett, C. E., 2002. A revision of \emph{Novacystis hawkesi} Paul and Bolton 1991 (Middle Silurian: Glyptocystitida, Echinodermata) and the phylogeny of early callocystitids. \emph{Journal of Paleontology}, \bold{76}, 733-740.
+#'
+#' Swofford, D. L. and Olsen, G. J., 1990. Phylogeny reconstruction. In D. M. Hillis and C. Moritz (eds.), \emph{Molecular Systematics}. Sinauer Associates, Sunderland. pp411-501.
+#'
+#' Thiele, K.. 1993. The Holy Grail of the perfect character: the cladistic treatment of morphometric data. \emph{Cladistics}, \bold{9}, 275-304.
+#'
 #' @examples
 #'
-#' # Example of a Type I character:
-#' classify_costmatrix(
-#'   costmatrix = make_costmatrix(
-#'     min_state = 0,
-#'     max_state= 0,
-#'     character_type = "unordered"
+#' # Create a Type I character costmatrix:
+#' constant_costmatrix <- make_costmatrix(
+#'   min_state = 0,
+#'   max_state = 0,
+#'   character_type = "unordered"
+#' )
+#'
+#' # Classify costmatrix:
+#' classify_costmatrix(costmatrix = constant_costmatrix)
+#'
+#' # Create a Type II character costmatrix:
+#' binary_symmetric_costmatrix <- make_costmatrix(
+#'   min_state = 0,
+#'   max_state = 1,
+#'   character_type = "unordered"
+#' )
+#'
+#' # Classify costmatrix:
+#' classify_costmatrix(costmatrix = binary_symmetric_costmatrix)
+#'
+#' # Create a Type III character costmatrix:
+#' unordered_costmatrix <- make_costmatrix(
+#'   min_state = 0,
+#'   max_state= 2,
+#'   character_type = "unordered"
+#' )
+#'
+#' # Classify costmatrix:
+#' classify_costmatrix(costmatrix = unordered_costmatrix)
+#'
+#' # Create a Type IV character costmatrix:
+#' linear_ordered_costmatrix <- make_costmatrix(
+#'   min_state = 0,
+#'   max_state= 2,
+#'   character_type = "ordered"
+#' )
+#'
+#' # Classify costmatrix:
+#' classify_costmatrix(costmatrix = linear_ordered_costmatrix)
+#'
+#' # Create a Type V character costmatrix:
+#' nonlinear_ordered_costmatrix <- convert_adjacency_matrix_to_costmatrix(
+#'   adjacency_matrix = matrix(
+#'     data = c(
+#'       0, 1, 0, 0,
+#'       1, 0, 1, 1,
+#'       0, 1, 0, 0,
+#'       0, 1, 0, 0
+#'     ),
+#'     nrow = 4,
+#'     dimnames = list(0:3, 0:3)
 #'   )
 #' )
 #'
-#' # Example of a Type II character:
-#' classify_costmatrix(
-#'   costmatrix = make_costmatrix(
-#'     min_state = 0,
-#'     max_state= 1,
-#'     character_type = "unordered"
+#' # Classify costmatrix:
+#' classify_costmatrix(costmatrix = nonlinear_ordered_costmatrix)
+#'
+#' # Create a Type VI character costmatrix:
+#' binary_irreversible_costmatrix <- make_costmatrix(
+#'   min_state = 0,
+#'   max_state= 1,
+#'   character_type = "irreversible"
+#' )
+#'
+#' # Classify costmatrix:
+#' classify_costmatrix(costmatrix = binary_irreversible_costmatrix)
+#'
+#' # Create a Type VII character costmatrix:
+#' multistate_irreversible_costmatrix <- make_costmatrix(
+#'   min_state = 0,
+#'   max_state= 2,
+#'   character_type = "irreversible"
+#' )
+#'
+#' # Classify costmatrix:
+#' classify_costmatrix(costmatrix = multistate_irreversible_costmatrix)
+#'
+#' # Create a Type VIII character costmatrix:
+#' binary_dollo_costmatrix <- make_costmatrix(
+#'   min_state = 0,
+#'   max_state= 1,
+#'   character_type = "dollo"
+#' )
+#'
+#' # Classify costmatrix:
+#' classify_costmatrix(costmatrix = binary_dollo_costmatrix)
+#'
+#' # Create a Type IX character costmatrix:
+#' multistate_dollo_costmatrix <- make_costmatrix(
+#'   min_state = 0,
+#'   max_state= 2,
+#'   character_type = "dollo"
+#' )
+#'
+#' # Classify costmatrix:
+#' classify_costmatrix(costmatrix = multistate_dollo_costmatrix)
+#'
+#' # Create a Type X character costmatrix:
+#' multistate_symmetric_costmatrix <- make_costmatrix(
+#'   min_state = 0,
+#'   max_state= 5,
+#'   character_type = "ordered"
+#' )
+#' multistate_symmetric_costmatrix$type <- "custom"
+#' multistate_symmetric_costmatrix$costmatrix <- matrix(
+#'   data = c(
+#'     0, 1, 2, 3, 2, 3,
+#'     1, 0, 3, 2, 1, 2,
+#'     2, 3, 0, 3, 2, 1,
+#'     3, 2, 3, 0, 1, 2,
+#'     2, 1, 2, 1, 0, 1,
+#'     3, 2, 1, 2, 1, 0
+#'   ),
+#'   nrow = multistate_symmetric_costmatrix$size,
+#'   ncol = multistate_symmetric_costmatrix$size,
+#'   byrow = TRUE,
+#'   dimnames = list(
+#'     multistate_symmetric_costmatrix$single_states,
+#'     multistate_symmetric_costmatrix$single_states
 #'   )
 #' )
 #'
-#' # Example of a Type III character:
-#' classify_costmatrix(
-#'   costmatrix = make_costmatrix(
-#'     min_state = 0,
-#'     max_state= 3,
-#'     character_type = "unordered"
+#' # Classify costmatrix:
+#' classify_costmatrix(costmatrix = multistate_symmetric_costmatrix)
+#'
+#' # Create a Type XI character costmatrix:
+#' binary_asymmetric_costmatrix <- make_costmatrix(
+#'   min_state = 0,
+#'   max_state= 1,
+#'   character_type = "ordered"
+#' )
+#' binary_asymmetric_costmatrix$type <- "custom"
+#' binary_asymmetric_costmatrix$costmatrix <- matrix(
+#'   data = c(
+#'     0, 1,
+#'     10, 0
+#'   ),
+#'   nrow = binary_asymmetric_costmatrix$size,
+#'   ncol = binary_asymmetric_costmatrix$size,
+#'   byrow = TRUE,
+#'   dimnames = list(
+#'     binary_asymmetric_costmatrix$single_states,
+#'     binary_asymmetric_costmatrix$single_states
 #'   )
 #' )
+#' binary_asymmetric_costmatrix$symmetry <- "Asymmetric"
 #'
-#' # Example of a Type IV character:
-#' classify_costmatrix(
-#'   costmatrix = make_costmatrix(
-#'     min_state = 0,
-#'     max_state= 3,
-#'     character_type = "ordered"
+#' # Classify costmatrix:
+#' classify_costmatrix(costmatrix = binary_asymmetric_costmatrix)
+#'
+#' # Create a Type XII character costmatrix:
+#' multistate_asymmetric_costmatrix <- make_costmatrix(
+#'   min_state = 0,
+#'   max_state= 2,
+#'   character_type = "ordered"
+#' )
+#' multistate_asymmetric_costmatrix$type <- "custom"
+#' multistate_asymmetric_costmatrix$costmatrix <- matrix(
+#'   data = c(
+#'     0, 1, 1,
+#'     1, 0, 1,
+#'     10, 10, 0
+#'   ),
+#'   nrow = multistate_asymmetric_costmatrix$size,
+#'   ncol = multistate_asymmetric_costmatrix$size,
+#'   byrow = TRUE,
+#'   dimnames = list(
+#'     multistate_asymmetric_costmatrix$single_states,
+#'     multistate_asymmetric_costmatrix$single_states
 #'   )
 #' )
+#' multistate_asymmetric_costmatrix$symmetry <- "Asymmetric"
 #'
-#' # Example of a Type V character:
-#' classify_costmatrix(
-#'   costmatrix = convert_adjacency_matrix_to_costmatrix(
-#'     adjacency_matrix = matrix(
-#'       data = c(
-#'         0, 1, 0, 0,
-#'         1, 0, 1, 1,
-#'         0, 1, 0, 0,
-#'         0, 1, 0, 0
-#'       ),
-#'       nrow = 4,
-#'       dimnames = list(0:3, 0:3)
-#'     )
-#'   )
-#' )
-#'
-#' # Example of a Type VI character:
-#' classify_costmatrix(
-#'   costmatrix = make_costmatrix(
-#'     min_state = 0,
-#'     max_state= 1,
-#'     character_type = "stratigraphy",
-#'     state_ages = c(103.7, 99.6)
-#'   )
-#' )
-#'
-#' # Example of a Type VII character:
-#' classify_costmatrix(
-#'   costmatrix = make_costmatrix(
-#'     min_state = 0,
-#'     max_state= 3,
-#'     character_type = "irreversible"
-#'   )
-#' )
-#'
-#' # Example of a Type VIII character:
-#' classify_costmatrix(
-#'   costmatrix = make_costmatrix(
-#'     min_state = 0,
-#'     max_state= 1,
-#'     character_type = "dollo"
-#'   )
-#' )
-#'
-#' # Example of a Type IX character:
-#' classify_costmatrix(
-#'   costmatrix = make_costmatrix(
-#'     min_state = 0,
-#'     max_state= 3,
-#'     character_type = "dollo"
-#'   )
-#' )
-#'
-#' # Example of a Type X character:
-#'
-#' # Example of a Type XI character:
-#'
-#' # Example of a Type XII character:
-#' classify_costmatrix(
-#'   costmatrix = make_costmatrix(
-#'     min_state = 0,
-#'     max_state= 3,
-#'     character_type = "stratigraphy",
-#'     state_ages = c(103.7, 99.6, 91.0, 77.2)
-#'   )
-#' )
+#' # Classify costmatrix:
+#' classify_costmatrix(costmatrix = multistate_asymmetric_costmatrix)
 #'
 #' @export classify_costmatrix
 classify_costmatrix <- function(costmatrix) {
   
+  # Add a function to classify all characters for a cladistic matrix?
+
   # If a constant character return Type I:
   if (costmatrix$n_states == 1) return("Type I")
   
