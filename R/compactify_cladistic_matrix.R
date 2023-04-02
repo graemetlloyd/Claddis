@@ -30,15 +30,16 @@
 #' michaux_1989$matrix_1$character_weights
 #'
 #' # Compactify the matrix:
-#' michaux_1989compact <- compactify_matrix(michaux_1989)
+#' michaux_1989compact <- compactify_cladistic_matrix(michaux_1989)
 #'
 #' # Examine the matrix post-compactification:
 #' michaux_1989compact$matrix_1$matrix
 #'
 #' # Examine the weights post-compactification:
 #' michaux_1989compact$matrix_1$character_weights
-#' @export compactify_matrix
-compactify_matrix <- function(cladistic_matrix, message = TRUE) {
+#'
+#' @export compactify__cladistic_matrix
+compactify_cladistic_matrix <- function(cladistic_matrix, message = TRUE) {
 
   # FUTURE COULD CHECK FOR UNORDERED AND ORDERED WHEN BINARY AND HENCE MEANINGLESS
 
