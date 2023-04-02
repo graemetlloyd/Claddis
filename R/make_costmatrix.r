@@ -69,14 +69,14 @@
 #' \preformatted{    -------------------
 #'     |  0  |  1  |  2  |
 #' -----------------------
-#' | 0 |  0  |  1M |  2M |
+#' | 0 |  0  |  1D |  2D |
 #' -----------------------
-#' | 1 |  1  |  0  |  1M |
+#' | 1 |  1  |  0  |  1D |
 #' -----------------------
 #' | 2 |  2  |  1  |  0  |
 #' -----------------------}
 #'
-#' Where \code{M} is some arbitrary large number, set here using the \code{dollo_penalty} option. Note that \code{M} should still be finite as the purpose is to weight acquisitions such that they are sufficiently expensive that any most parsimonious reconstruction will favour only one transition, but not make them so expensive that they are not favoured at all. Furthermore, in this example there are two derived states (1 and 2) and hence logically the weighting should be similar to an ordered character. Specifically, that there should be a single acquisition of state 1 (from state 0) and that this should precede a single acquistion of state 2 (from state 1). Most of the time, though, a Dollo character will be binary (e.g., see \link{map_dollo_changes}).
+#' Where \code{D} is some arbitrary large number, set here using the \code{dollo_penalty} option. Note that \code{D} should still be finite as the purpose is to weight acquisitions such that they are sufficiently expensive that any most parsimonious reconstruction will favour only one transition, but not make them so expensive that they are not favoured at all. Furthermore, in this example there are two derived states (1 and 2) and hence logically the weighting should be similar to an ordered character. Specifically, that there should be a single acquisition of state 1 (from state 0) and that this should precede a single acquistion of state 2 (from state 1). Most of the time, though, a Dollo character will be binary (e.g., see \link{map_dollo_changes}).
 #'
 #' Importantly, and as stated above, a Dollo costmatrix, unlike the ordered and unordered costmatrices, cannot be used without further analytical restrictions. Specifically, because it assumes an asymmetric acquisition of \emph{derived} states the root or "primitive" value must be 0. (It would not be logical to apply such a costmatrix where the root state is 1 or 2.) Thus use of a Dollo character requires the additional assumption that the primitive (root) state is known \emph{a priori}. As always, it is up to the user to know that this is a valid assumption for their data, and to set a value for the \code{dollo_penalty} accordingly.
 #'
