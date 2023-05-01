@@ -7,6 +7,7 @@ Authors@R: c(
     person(given = "Graeme T.", family = "Lloyd",
     email = "graemetlloyd@gmail.com", role = c("aut", "cre", "cph")),
     person(given = "Thomas", family = "Guillerme", role = c("aut", "cph")),
+    person(given = "Jen", family = "Hoyal Cuthill, role = c("aut", "cph")),
     person(given = "Emma", family = "Sherratt", role = c("aut", "cph")),
     person(given = "Steve C.", family = "Wang", role = c("aut", "cph"))
     )
@@ -62,4 +63,4 @@ Encoding: UTF-8
 License: GPL (>=2)
 LazyData: yes
 ByteCompile: yes
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
