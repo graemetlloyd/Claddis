@@ -954,9 +954,18 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
     
     # Replace costmatrix name with step_N:
     for(i in 1:length(x = costmatrix_names)) {
+      
+      # Replce USERTYPE names:
       raw_nexus <- gsub(
-        pattern = costmatrix_names[i],
-        replacement = paste("step_", costmatrix_labels[i], sep = ""),
+        pattern = paste(costmatrix_names[i], " ", sep = ""),
+        replacement = paste("step_", costmatrix_labels[i], " ", sep = ""),
+        x = raw_nexus
+      )
+      
+      # Replace TYPESET names:
+      raw_nexus <- gsub(
+        pattern = paste(costmatrix_names[i], ":", sep = ""),
+        replacement = paste("step_", costmatrix_labels[i], ":", sep = ""),
         x = raw_nexus
       )
     }
