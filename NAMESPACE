@@ -86,7 +86,6 @@ export(trim_marginal_whitespace)
 export(trim_matrix)
 export(write_nexus_matrix)
 export(write_tnt_matrix)
-exportPattern("^[[:alpha:]]+")
 
 # Imports:
 import(ape)
