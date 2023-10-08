@@ -29,9 +29,9 @@
 #' @param n_y_tiles The number of vertical "tiles" to plot a size landscape with.
 #' @param landscape_colour The colour of the size landscape. Must be one of \code{"blue"}, \code{"green"} or \code{"red"}.
 #' @param landscape_transparency The transparency value to use for the size landscape. Must be on a zero to one scale. Default is \code{0.5}.
-#' @param landscape_weight The "weight" to use for interpolating the colour of each size landscape tile. This is used to vary how much proximity to the tile is taken into account and can be any positive number (default is \{code{0.1}).
-#' @param x_tile_apron How far to extend the size landscape horizontally beyond the data points. Should be a number greater than 1 (default is \code{1.2}). By 50% would be 1.5.
-#' @param y_tile_apron How far to extend the size landscape vertically beyond the data points. Should be a number greater than 1 (default is \code{1.2}). By 50% would be 1.5.
+#' @param landscape_weight The "weight" to use for interpolating the colour of each size landscape tile. This is used to vary how much proximity to the tile is taken into account and can be any positive number (default is \code{0.1}).
+#' @param x_tile_apron How far to extend the size landscape horizontally beyond the data points. Should be a number greater than 1 (default is \code{1.2}). By 50\% would be 1.5.
+#' @param y_tile_apron How far to extend the size landscape vertically beyond the data points. Should be a number greater than 1 (default is \code{1.2}). By 50\% would be 1.5.
 #'
 #' @details
 #'
