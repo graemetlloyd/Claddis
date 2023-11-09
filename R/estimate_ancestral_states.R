@@ -272,14 +272,18 @@ estimate_ancestral_states <- function(cladistic_matrix, time_tree, estimate_all_
           }
         }
 
-        # If a continuous character:
+      # If a continuous character:
       } else {
 
         # Simply make tip states the numeric values (should never be a polymorphism) as a vector:
-        x$tip_states <- as.numeric(x$tip_states)
+        x$tip_states <- as.numeric(x = x$tip_states[x$tree$tip.label])
+        
+        # Re-add tip labels:
+        names(x = x$tip_states) <- x$tree$tip.label
+        
       }
 
-      # If tip state has no length (all values are missing):
+    # If tip state has no length (all values are missing):
     } else {
 
       # Create row-less tip states matrix:
