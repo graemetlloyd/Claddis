@@ -94,7 +94,7 @@ safe_taxonomic_reduction <- function(cladistic_matrix) {
     matrix_block_to_check <- cladistic_matrix[[2]]$matrix[rownumber:nrow(cladistic_matrix[[2]]$matrix), non_missing_characters, drop = FALSE]
 
     # Find any taxa that have missing characters inside the block (can not be true parents):
-    taxa_with_missing_characters <- names(which(x = apply(apply(matrix_block_to_check, 1, is.na), 2, any)))
+    taxa_with_missing_characters <- names(x = which(x = apply(X = matrix_block_to_check, MARGIN = 1, FUN = function(i) any(is.na(i)))))
 
     # If any taxa have missing characters inside the block (can not be true parents) remove them from the block:
     if (length(x = taxa_with_missing_characters) > 0) matrix_block_to_check <- matrix_block_to_check[-match(taxa_with_missing_characters, rownames(x = matrix_block_to_check)), , drop = FALSE]
