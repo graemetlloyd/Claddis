@@ -30,7 +30,7 @@
 #' @examples
 #'
 #' # Label some six-tip treeshapes with the letters A-F:
-#' label_treeshapes(
+#' permute_all_treeshape_labellings(
 #'   treeshapes = c(
 #'     "(6);",
 #'     "((3),(3));",
@@ -39,8 +39,8 @@
 #'   labels = LETTERS[1:6]
 #' )
 #'
-#' @export label_treeshapes
-label_treeshapes <- function(treeshapes, labels) {
+#' @export permute_all_treeshape_labellings
+permute_all_treeshape_labellings <- function(treeshapes, labels) {
   
   # TO DO:
   # - LIKE PERMUTE TIPSTATES AND PERMUTE TREESHAPES HAS REDUNDANCIES DUE TO REPEATING TREE MOTIFS (COULD BE SPED UP IF A WAY TO DEAL WITH THESE IS IDENTIFIED
