@@ -109,7 +109,7 @@ plot_morphospace_stack <- function(pcoa_input, taxon_ages, taxon_groups, time_bi
   #
   # - Needs plenty of checks on input data.
   # - Add more option plots to example.
-  # - PC2 axis label could be in a more sensible position, preferably aligned with rightnand side of bottom platform (dunno how to make this work on a rescalable plot) - Looks like a separate vertical axis currently (actually time!)
+  # - PC2 axis label could be in a more sensible position, preferably aligned with righthand side of bottom platform (dunno how to make this work on a rescalable plot) - Looks like a separate vertical axis currently (actually time!)
   # - How to allow a phylomorphospace options?
   # - Allow Wills style z-ais maybe?
   # - Other options for treatment of age data than just ranges?
