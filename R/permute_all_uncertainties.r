@@ -10,7 +10,7 @@
 #'
 #' This function solves a simple phylogenetic combinatorics problem - what are all the possible outcomes for a character to be in given uncertainties are allowed?
 #'
-#' For example, for three states (0, 1, 2) there are four possible polymorphisms: 0/1, 0/2, 1/2 and 0/1/2.
+#' For example, for three states (0, 1, 2) there are four possible uncertainties: 0/1, 0/2, 1/2 and 0/1/2.
 #'
 #' If the user is instead only interested in the size of this state space, this is simply given by 2^N - N - 1, where N is the number of single states. Thus, the first several outcomes are:
 #'
