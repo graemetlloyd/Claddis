@@ -285,6 +285,7 @@ calculate_g <- function(
   # CONSIDER SOME OTHER EDGE CASES LIKE NO TIPS (EXCEPT MISSING/INAPPLICABLE OR ONLY A SINGLE CODED STATE).
   # WHAT ABOUT POLYMORPHISMS WITH DOLLO?
   # ADD SOME POLYMORPHIC/UNCERTAINTY EXAMPLES TO THE EXAMPLES!
+  # ADD POSSIBILITY TO FORCE ROOT STATE
   
   # Initialise character_is_dollo as FALSE:
   character_is_dollo <- FALSE
@@ -390,5 +391,3 @@ calculate_g <- function(
   # Return calculated value of g:
   unname(obj = min(x = total_cost_for_each_ancestral_state))
 }
-
-
