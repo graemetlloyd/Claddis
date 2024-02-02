@@ -33,7 +33,7 @@
 #' | 16 | 1 | 1 | 1 | 1 |
 #' ----------------------}
 #'
-#' We can know there are sixteen permutations before we even check as logially for any N states we simply multiply T times (for T tips). I.e., the answer is given by N^T. As here is N is 2 and T is 4 this is 2^4 = 2 x 2 x 2 x 2 = 16.
+#' We can know there are sixteen permutations before we even check as logically for any N states we simply multiply T times (for T tips). I.e., the answer is given by N^T. As here N is 2 and T is 4 this is 2^4 = 2 x 2 x 2 x 2 = 16.
 #'
 #' Technically this achieves our goal - we have generated all possible tip states, but there are at least two reasons this approach is suboptimal. Firstly, permutations 1 and 16 are invariant (all tip states are the same) and so are unlikely to be of interest. Or, to generalise this, we might not want to consider permutations where not all possible states are sampled - i.e., we may wish to stipulate that every state appear at least once. Secondly, this approach does not consider the structure of the phylogenetic tree of interest. It might not be immediately obvious why this matters, so let's consider another example, Sticking with our binary character and four tips let's consider the tree:
 #'
