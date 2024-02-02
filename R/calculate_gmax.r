@@ -6,11 +6,11 @@
 #'
 #' @param costmatrix An object of class \code{costMatrix}.
 #' @param n_taxa The number of taxa (ree tips) to consider.
-#' @param allow_zeroes Logical indicating whether some states are allowed to be assigned zero tips. Defaults to \code{TRUE}. Note that if the number of states exceeds the number of tips then \code{allow_zeroes = TRUE} is forced. Additionally, this rstriction only applies to integer gmax.
+#' @param allow_zeroes Logical indicating whether some states are allowed to be assigned zero tips. Defaults to \code{FALSE} (recommended). Note that if the number of states exceeds the number of tips then \code{allow_zeroes = TRUE} is forced.
 #'
 #' @details
 #'
-#' The concept of \emph{gmax} was introduced by Hoyal Cuthill et al. (2010) and in the strictest sense represents the integer state frequency that maximises \emph{g} given every state is sampled at least once. This function is intended to relax that slightly using the \code{allow_zeroes} option and indeed this is not possible in rare cases such as either high levels of missing data or gap-weighted (Thiele 1993) characters where it is possible for the number of states to exceed the (effective) number of tips. In practice the function also estimates an algebraic version of \emph{gmax} which allows for fractional or negative state frequencies (Hoyal Cuthill and Lloyd in revision).
+#' The concept of \emph{gmax} was introduced by Hoyal Cuthill et al. (2010) and in the strictest sense represents the integer state frequency that maximises \emph{g} given every state is sampled at least once. This function is intended to relax that slightly using the \code{allow_zeroes} option and indeed this is not possible in rare cases such as either high levels of missing data or gap-weighted (Thiele 1993) characters where it is possible for the number of states to exceed the (effective) number of tips. For a more detailed description of the problem and implemented solution(s) see Hoyal Cuthill and Lloyd (in revision).
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Jen Hoyal Cuthill \email{j.hoyal-cuthill@@essex.ac.uk}
 #'
@@ -22,10 +22,7 @@
 #'
 #' @return
 #'
-#' A list containings two items:
-#'
-#' \item{algebraic_gmax}{The absolute limit gmax can reach if not restricted to positive or integer state frequencies.}
-#' \item{integer_gmax}{The value gmax can reach when restfricted to integer values and whatever was chosen for the \code{allow_zeroes} option.}
+#' A numeric indicating the maximum possible cost, \emph{gmax}.
 #'
 #' @seealso
 #'
@@ -247,528 +244,224 @@
 #' )
 #'
 #' @export calculate_gmax
-calculate_gmax <- function(costmatrix, n_taxa, allow_zeroes = TRUE) {
+calculate_gmax <- function(costmatrix, n_taxa, allow_zeroes = FALSE) {
   
   ### IGNORES POLYMORPHISMS AND UNCERTAINTIES FOR TIPS, BUT COULD PERHAPS ALLOW FORMER FOR ANCESTRAL STATE?
-  ### CHECK N TAXA IS A SENSIBLE NUMBER!
-  ### CHECK FOR COSTMATRIX OF TYPE I (OUTPUT IMMEDIATELY IS ZERO!)
-  ### CURRENTLY CUSTOM INTEGER GMAX DOES NOT DEAL WITH ALLOW ZEROES = FALSE CASE
+  ### CHECK N TAXA IS A SENSIBLE NUMBER! (Below assumes at least 1 but zero, negatives or decimals are bad)
   
-  # Set logical value for Dollo status (used later):
-  costmatrix_is_dollo <- ifelse(
-    test = costmatrix$type == "dollo",
-    yes = TRUE,
-    no = FALSE
-  )
-  
-  # Special case of an ordered character:
-  if (costmatrix$type == "ordered") {
-      
-    # If can safely assign at least one taxon to each state:
-    if (!allow_zeroes && n_taxa >= costmatrix$n_states) {
-        
-      # Assign one taxon to each state to initialise state frequencies:
-      state_frequencies <- rep(x = 1, times = costmatrix$n_states)
-        
-    # If cannot assign a taxon to each state:
-    } else {
-        
-      # Initialise state frequencies as all zeros:
-      state_frequencies <- rep(x = 0, times = costmatrix$n_states)
-    }
-      
-    # Find number of tips left to assign to a state:
-    tips_to_assign <- n_taxa - sum(x = state_frequencies)
-      
-    # As long as there are still tips to assign:
-    if (tips_to_assign > 0) {
-        
-      # Assign half (rounding up) of taxa to first state:
-      state_frequencies[1] <- state_frequencies[1] + ceiling(x = tips_to_assign / 2)
-        
-      # Assign half (rounding down) of taxa to last state:
-      state_frequencies[costmatrix$n_states] <- state_frequencies[costmatrix$n_states]  + floor(x = tips_to_assign / 2)
-    }
+  # Check if allow_zeroes is consistent with tip and state counts:
+  if (allow_zeroes && costmatrix$n_states > n_taxa) {
     
-    # Special case of ordered algebraic gmax:
-    algebraic_gmax <- (max(x = costmatrix$costmatrix[1, costmatrix$single_states]) / 2) * n_taxa
-  }
+    # Reset allow_zeroes:
+    allow_zeroes <- TRUE
     
-  # Special case of an unordered character:
-  if (costmatrix$type == "unordered") {
-      
-    # Initialise state frequencies with largest integer that can be assigned to each state:
-    state_frequencies <- rep(x = floor(x = n_taxa / costmatrix$n_states), times = costmatrix$n_states)
-      
-    # If there are still some taxa left without a state assignment:
-    if (sum(x = state_frequencies) < n_taxa) {
-        
-      # Add 1 to each of the first N state frequencies where N is the number of taxa without a state assignment:
-      state_frequencies[1:(n_taxa - sum(x = state_frequencies))] <- state_frequencies[1:(n_taxa - sum(x = state_frequencies))] + 1
-    }
-    
-    # Special case of algenraic gmax for unordered characters:
-    algebraic_gmax <- sum(x = costmatrix$costmatrix[1, costmatrix$single_states] * rep(x = n_taxa / costmatrix$n_states, times = costmatrix$n_states))
-  }
-    
-  # Special case of a Dollo character:
-  if (costmatrix_is_dollo) {
-    
-    # Convert costmatrix into a linear ordered character to maintain correct costs below:
-    new_costmatrix <- make_costmatrix(
-      min_state = 0,
-      max_state = costmatrix$n_states - 1,
-      character_type = "ordered",
-      include_polymorphisms = costmatrix$includes_polymorphisms,
-      include_uncertainties = costmatrix$includes_uncertainties,
-      polymorphism_costs = costmatrix$polymorphism_costs,
-      polymorphism_geometry = costmatrix$polymorphism_geometry,
-      polymorphism_distance = costmatrix$polymorphism_distance,
-      dollo_penalty = costmatrix$dollo_penalty
-    )
-    
-    # Update weight term:
-    new_costmatrix$weight <- costmatrix$weight
-    
-    # Overwrite Dollo costmatrix with new costmatrix:
-    costmatrix <- new_costmatrix
-
-    # If can safely assign at least one taxon to each state:
-    if (!allow_zeroes && n_taxa >= costmatrix$n_states) {
-        
-      # Assign one taxon to each state to initialise state frequencies:
-      state_frequencies <- rep(x = 1, times = costmatrix$n_states)
-        
-    # If cannot assign a taxon to each state:
-    } else {
-        
-      # Initialise state frequencies by assigning one taxon to the two terminal states:
-      state_frequencies <- c(1, rep(x = 0, times = costmatrix$n_states - 2), 1)
-    }
-      
-    # Find number of tips left to assign to a state:
-    tips_to_assign <- n_taxa - sum(x = state_frequencies)
-    
-    # If allowing zeroes and still tips to assign:
-    if (allow_zeroes && tips_to_assign > 0) {
-      
-      # Make most derived ttate 2 to force as root (maximising length on star tre):
-      state_frequencies[costmatrix$n_states] <- 2
-      
-      # Lower tips to assign by one:
-      tips_to_assign <- tips_to_assign - 1
-    }
-    
-    # As long as there are still tips to assign assign them to the lowest state (maximising losses):
-    if (tips_to_assign > 0) state_frequencies[1] <- state_frequencies[1] + tips_to_assign
-    
-    # Set Dollo star root as second most derived individual tip state (forces no multiple acquisitions):
-    dollo_star_root <- unlist(
-      x = lapply(
-        X = as.list(x = 1:costmatrix$n_states),
-        FUN = function(state) rep(x = costmatrix$single_states[state], times = state_frequencies[state]))
-    )[(n_taxa - 1)]
-    
-    # Special case of algebraic gmax for Dollo (at limit there are 1 plus 1/Inf of derived state and hence n - 1 losses to least derived state - with any intermediate states not sampled):
-    algebraic_gmax <- (n_taxa - 1) * costmatrix$costmatrix["0", costmatrix$n_states]
-  }
-    
-  # Special case of an irreversible or stratigraphic character:
-  if (costmatrix$type == "irreversible" || costmatrix$type == "stratigraphy") {
-      
-    # If can safely assign at least one taxon to each state:
-    if (!allow_zeroes && n_taxa >= costmatrix$n_states) {
-        
-      # Assign one taxon to each state to initialise state frequencies:
-      state_frequencies <- rep(x = 1, times = costmatrix$n_states)
-        
-    # If cannot assign a taxon to each state:
-    } else {
-        
-      # Initialise state frequencies by assigning one taxon to the two terminal states:
-      state_frequencies <- c(1, rep(x = 0, times = costmatrix$n_states - 2), 1)
-    }
-
-    # Find number of tips left to assign to a state:
-    tips_to_assign <- n_taxa - sum(x = state_frequencies)
-      
-    # As long as there are still tips to assign assign them to the smallest state (most reversals):
-    if (tips_to_assign > 0) state_frequencies[costmatrix$n_states] <- state_frequencies[1] + tips_to_assign
-    
-    # Special case of irreversible or stratigraphic algebraic gmax (frequency of most derived state tends to n_taxa but least derived state still considered "present"):
-    algebraic_gmax <- costmatrix$costmatrix[1, costmatrix$n_states] * n_taxa
+    # Warn user:
+    print("Zeroes must be allowed as costmatrix$n_states exceeds n_taxa, allow_zeroes is reset to TRUE.")
   }
   
-  # If the general case:
-  if (costmatrix$type == "custom") {
+  # Special case of a Type I constant character (return zero):
+  if (costmatrix$n_states == 1 || n_taxa <= 1) return(0)
+  
+  # Special case of a binary character (will never want to allow zeroes for these as would then be a constant character and gmax > 0 as long as there are at least two states and two tips):
+  if (costmatrix$n_states == 2) {
     
-    # Subfunction to traverse simplex of all possible state frequencies to find integer gmax:
-    traverse_simplex_gmax <- function(costmatrix, n_taxa) {
+    # Special case of a Type II standard binary character (return gmax according to formula from Hoyal Cuthill and Lloyd):
+    if (length(x = setdiff(x = costmatrix$type, y = c("ordered", "unordered"))) == 0) return(costmatrix$costmatrix[1, 2] * (n_taxa - ceiling(z = n_taxa / 2)))
+    
+    # Special case of a Type VI standard binary irreversible character (return gmax according to formula from Hoyal Cuthill and Lloyd):
+    if (length(x = setdiff(x = costmatrix$type, y = c("irreversible", "stratigraphy"))) == 0) return(costmatrix$costmatrix[1, 2] * (n_taxa - 1))
+    
+    # Special case of a Type XI custom binary character (or non-standard Type II or Type VI character) (return gmax according to formula from Hoyal Cuthill and Lloyd):
+    if (length(x = setdiff(x = costmatrix$type, y = c("custom"))) == 0) return(max(x = min(x = (n_taxa - floor(x = (n_taxa * (costmatrix$costmatrix[1, 2] / (costmatrix$costmatrix[1, 2] + costmatrix$costmatrix[2, 1]))))) * costmatrix$costmatrix[1, 2], floor(x = (n_taxa * (costmatrix$costmatrix[1, 2] / (costmatrix$costmatrix[1, 2] + costmatrix$costmatrix[2, 1])))) * costmatrix$costmatrix[2, 1]), min(x = (n_taxa - ceiling((n_taxa * (costmatrix$costmatrix[1, 2] / (costmatrix$costmatrix[1, 2] + costmatrix$costmatrix[2, 1]))))) * costmatrix$costmatrix[1, 2], ceiling(x = (n_taxa * (costmatrix$costmatrix[1, 2] / (costmatrix$costmatrix[1, 2] + costmatrix$costmatrix[2, 1])))) * costmatrix$costmatrix[2, 1])))
+    
+    # Special case of a Type VIII binary Dollo character (return gmax according to formula from Hoyal Cuthill and Lloyd):
+    if (length(x = setdiff(x = costmatrix$type, y = c("dollo"))) == 0) return(costmatrix$costmatrix[2, 1] * (n_taxa - 1))
+  }
+  
+  # Special case of a multistate character:
+  if (costmatrix$n_states > 2) {
+    
+    # Special case of a Type III multistate unordered character (return gmax according to formula from Hoyal Cuthill and Lloyd):
+    if (length(x = setdiff(x = costmatrix$type, y = c("unordered"))) == 0) return(costmatrix$n_states[1, 2] * (n_taxa - ceiling(x = n_taxa / costmatrix$n_states)))
+    
+    # If zeroes are not permitted:
+    if (!allow_zeroes) {
+    
+      # Special case of a Type IV multistate linear ordered character (return gmax according to formula from Hoyal Cuthill and Lloyd):
+      if (length(x = setdiff(x = costmatrix$type, y = c("ordered"))) == 0) return(costmatrix$costmatrix[1, 2] * floor(x = (costmatrix$n_states - 3) + (n_taxa - (costmatrix$n_states - 2)) * ((costmatrix$n_states - 1) / 2)))
+    
+      # Special case of a Type VII multistate irreversible character (return gmax according to formula from Hoyal Cuthill and Lloyd):
+      if (length(x = setdiff(x = costmatrix$type, y = c("irreversible"))) == 0) return(costmatrix$costmatrix[1, 2] * ((n_taxa - costmatrix$n_states + 1) * costmatrix$costmatrix[1, costmatrix$n_states] + sum(costmatrix$costmatrix[1, (1:costmatrix$n_states - 1)])))
+    
+      # Special case of a Type IX multistate Dollo character:
+      if (length(x = setdiff(x = costmatrix$type, y = c("dollo"))) == 0) {
       
-      ### HOW TO MAKE THIS WORK FOR THE ALL STATES MUST BE PRESENT AT LEAST ONCE CASE? CAN WE JUST EXCLUDE THE "PERIMETER" LAYER SOMEHOW?
+        # If n tips and n states are same return gmax according to formula from Hoyal Cuthill and Lloyd:
+        if (n_taxa < costmatrix$n_states + 1) return(costmatrix$costmatrix[2, 1] * ((costmatrix$n_states - 2) * (n_taxa - costmatrix$n_states + 1) + (1 / 2) * (costmatrix$n_states - 2) * (costmatrix$n_states - 3) + 1))
       
-      # Little fix for infinite characters (just replace with a very large value as this will never be part of g anyway):
-      if (any(costmatrix$costmatrix == Inf)) costmatrix$costmatrix[costmatrix$costmatrix == Inf] <- max(x = costmatrix$costmatrix[costmatrix$costmatrix != Inf]) * 9999999
-      
-      # Starting state frequency:
-      state_frequency <- c(n_taxa, rep(x = 0, times = costmatrix$n_states - 1))
-      names(x = state_frequency) <- costmatrix$single_states
-      
-      # Build state frequency matrix:
-      state_frequency_matrix <- matrix(
-        data = rep(x = state_frequency, times = costmatrix$n_states),
-        nrow = costmatrix$n_states,
-        ncol = costmatrix$n_states,
-        byrow = TRUE,
-        dimnames = list(costmatrix$single_states, costmatrix$single_states)
-      )
-      
-      # Get costs of each possible root:
-      root_costs <- apply(
-        X = state_frequency_matrix * costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states],
-        MARGIN = 1,
-        FUN = sum
-      )
-
-      # Get minimum star tree cost (g):
-      g = min(x = root_costs)
-      
-      # Populate start point (all tips assigned to first state):
-      start_point <- list(
-        step = 0,
-        state_frequency = state_frequency,
-        g = g,
-        root_state = names(x = which(x = root_costs == g))
-      )
-      
-      # Create empty list to store path taken in gmax search:
-      path <- list()
-      
-      # Add start point as first item in path:
-      path[[1]] <- start_point
-      
-      # Create empty vector to store previous roots:
-      previous_roots <- vector(mode = "character")
-      
-      # Set current root as first state:
-      current_root <- start_point$root_state
-      
-      # Set starting next root as second state:
-      next_root <- costmatrix$single_states[2]
-      
-      # Until all roots have been discovered:
-      while(!is.na(x = next_root)) {
-        
-        # Generate candidate state frequencies:
-        candidate_state_frequencies <- do.call(
-          what = rbind,
-          args = lapply(
-            X = as.list(x = c(previous_roots, current_root)),
-            FUN = function(old_state) {
-              new_state_frequency <- state_frequency
-              if (state_frequency[old_state] > 0) {
-                new_state_frequency[old_state] <- new_state_frequency[old_state] - 1
-                new_state_frequency[next_root] <- new_state_frequency[next_root] + 1
-                return(value = new_state_frequency)
-              } else {
-                return(value = matrix(ncol = costmatrix$n_states, nrow = 0, dimnames = list(c(), costmatrix$single_states)))
-              }
-            }
-          )
-        )
-
-        # If there is more than one candidate state freqeuncy (first look for maximum roots):
-        if (nrow(x = candidate_state_frequencies) > 1) {
-          
-          # Get some stats on each candidate state frequency:
-          candidate_stats <- apply(
-            X = candidate_state_frequencies,
-            MARGIN = 1,
-            FUN = function(candidate_state_frequency) {
-              
-              # Build state frequency matrix:
-              state_frequency_matrix <- matrix(
-                data = rep(x = candidate_state_frequency, times = costmatrix$n_states),
-                nrow = costmatrix$n_states,
-                ncol = costmatrix$n_states,
-                byrow = TRUE,
-                dimnames = list(costmatrix$single_states, costmatrix$single_states)
-              )
-              
-              # Get costs of each possible root:
-              root_costs <- apply(
-                X = state_frequency_matrix * costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states],
-                MARGIN = 1,
-                FUN = sum
-              )
-              
-              # Get g:
-              g <- min(x = root_costs)
-              
-              # Get root state(s):
-              root_state <- names(x = which(x = root_costs == g))
-              
-              # Return g, root states:
-              list(
-                state_frequency = candidate_state_frequency,
-                g = g,
-                root_state = root_state,
-                n_roots = length(root_state)
-              )
-            }
-          )
-          
-          # Get total number of roots for each candidate state frequency:
-          n_roots <- unlist(x = lapply(X = candidate_stats, FUN = function(x) x$n_roots))
-          
-          # Get maximum number of roots:
-          max_n_roots <- max(x = n_roots)
-          
-          # Prune out lower root counts:
-          candidate_state_frequencies <- candidate_state_frequencies[n_roots == max_n_roots, , drop = FALSE]
-          candidate_stats <- candidate_stats[n_roots == max_n_roots]
-        }
-
-        # If there is still more than one candidate state freqeuncy (choose most different root(s)):
-        if (nrow(x = candidate_state_frequencies) > 1) {
-
-          # Check last root in path:
-          last_root <- path[[length(x = path)]]$root_state
-            
-          # Identify number of diffreent roots to last root:
-          different_roots <- unlist(x = lapply(X = candidate_stats, FUN = function(x) length(x = setdiff(x = x$root_state, y = last_root))))
-          
-          # Get maximum different roots value:
-          max_different_roots <- max(x = different_roots)
-          
-          # Prune out lower different root counts:
-          candidate_state_frequencies <- candidate_state_frequencies[different_roots == max_different_roots, , drop = FALSE]
-          candidate_stats <- candidate_stats[different_roots == max_different_roots]
-        }
-
-        # If there is still more than one candidate state frequency (choose largest g value):
-        if (nrow(x = candidate_state_frequencies) > 1) {
-          
-          # Get all g values:
-          g_values <- unlist(x = lapply(X = candidate_stats, FUN = function(x) x$g))
-
-          # Get maximum g value:
-          max_g_value <- max(x = g_values)
-          
-          # Prune out lower g values:
-          candidate_state_frequencies <- candidate_state_frequencies[g_values == max_g_value, , drop = FALSE]
-          candidate_stats <- candidate_stats[g_values == max_g_value]
-        }
-        
-        # Should now either be a single caniddtae state frequency (or no further reason to choose one over another) so take first:
-        state_frequency <- candidate_state_frequencies[1, ]
-
-        # Build state frequency matrix:
-        state_frequency_matrix <- matrix(
-          data = rep(x = state_frequency, times = costmatrix$n_states),
-          nrow = costmatrix$n_states,
-          ncol = costmatrix$n_states,
-          byrow = TRUE,
-          dimnames = list(costmatrix$single_states, costmatrix$single_states)
-        )
-        
-        # Get costs of each possible root:
-        root_costs <- apply(
-          X = state_frequency_matrix * costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states],
-          MARGIN = 1,
-          FUN = sum
-        )
-
-        # Get minimum star tree cost (g):
-        g = min(x = root_costs)
-        
-        # Add new state frequency to path:
-        path[[(length(x = path) + 1)]] <- list(
-          step = length(x = path),
-          state_frequency = state_frequency,
-          g = g,
-          root_state = names(x = which(x = root_costs == g))
-        )
-        
-        # Check for next_root and update if found:
-        if (any(path[[length(x = path)]]$root_state == next_root)) {
-          previous_roots <- c(previous_roots, current_root)
-          current_root <- next_root
-          next_root <- costmatrix$single_states[which(x = costmatrix$single_states == current_root) + 1]
-        }
+        # If more tips than states return gmax according to formula from Hoyal Cuthill and Lloyd:
+        if (n_taxa >= costmatrix$n_states + 1) return(costmatrix$costmatrix[2, 1] * ((costmatrix$n_states - 1) * (n_taxa - costmatrix$n_states) + (1 / 2) * (costmatrix$n_states - 1) * (costmatrix$n_states - 2)))
       }
       
-      # Get final state frequency (last step in path):
-      final_state_frequency <- path[[length(x = path)]]$state_frequency
+      # If still going must be one of remaining types:
+      #
+      # Type V - Multistate non-linear ordered
+      # Type X - Multisatte custom symmetric
+      # Type XII - Multistate custom asymmetric
+
+      # Before adopting exhaustive solution check it is computationally feasible:
+      exhaustive_problem_size <- choose(n = n_taxa, k = costmatrix$n_states)
+      if (exhaustive_problem_size > 40000000) stop("Cost matrix is of a type without a direct solution and combination of state and tip counts is too large for an exhaustive solution.")
       
-      # Make final state frequencies to check:
-      final_state_frequencies <- do.call(
-        what = rbind,
-        args = lapply(
-          X = as.list(x = names(x = which(x = final_state_frequency > 0))),
-          FUN = function(state) {
-            do.call(
-              what = rbind,
-              args = lapply(
-                X = as.list(x = setdiff(x = costmatrix$single_states, y = state)),
-                FUN = function(other_state) {
-                  final_state_frequency[state] <- final_state_frequency[state] - 1
-                  final_state_frequency[other_state] <- final_state_frequency[other_state] + 1
-                  final_state_frequency
-                }
-              )
+      # Permute all possible state frequencies:
+      permuted_state_frequencies <- permute_restricted_compositions(n = n_taxa, m_labels = costmatrix$single_states, allow_zero = FALSE)
+      
+      # Calculate gmax via an exhaustive search of possible state frequencies:
+      exhaustive_gmax <- max(
+        x = apply(
+          X = permuted_state_frequencies,
+          MARGIN = 1,
+          FUN = function(i) {
+            cost_for_each_ancestral_state <- apply(
+              X = matrix(data = rep(x = i, each = costmatrix$n_states), nrow = costmatrix$n_states) * costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states],
+              MARGIN = 1,
+              FUN = sum
             )
+            # Maximum parsimony cost:
+            min(x = cost_for_each_ancestral_state)
           }
         )
       )
       
-      # Make final path additions by checking area around final step of path:
-      final_path_additions <- apply(
-        X = final_state_frequencies,
-        MARGIN = 1,
-        FUN = function(state_frequency) {
-          
-          # Build state frequency matrix:
-          state_frequency_matrix <- matrix(
-            data = rep(x = state_frequency, times = costmatrix$n_states),
-            nrow = costmatrix$n_states,
-            ncol = costmatrix$n_states,
-            byrow = TRUE,
-            dimnames = list(costmatrix$single_states, costmatrix$single_states)
-          )
-
-          # Get costs of each possible root:
-          root_costs <- apply(
-            X = state_frequency_matrix * costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states],
-            MARGIN = 1,
-            FUN = sum
-          )
-          
-          # Get g:
-          g <- min(x = root_costs)
-          
-          # Output data in path format:
-          list(
-            step = NA,
-            state_frequency = state_frequency,
-            g = g,
-            root_state = costmatrix$single_states[root_costs == g]
-          )
-        },
-        simplify = FALSE
-      )
-      
-      # Add to path object:
-      path <- c(path, final_path_additions)
-      
-      # Isolate g values:
-      g_values <- unlist(x = lapply(X = path, FUN = function(x) x$g))
-      
-      # Calculate gmax:
-      gmax <- max(x = g_values)
-      
-      # return first state frequecny with g maximized:
-      path[[which(x = g_values == gmax)[1]]]$state_frequency
+      # Return exhaustive gmax:
+      return(exhaustive_gmax)
     }
     
-    # Define a subfunction to get state frequencies for algebraic gmax:
-    algebraic_gmax_state_frequencies <- function(costmatrix, n_taxa) {
+    # If zeroes are permitted:
+    if (allow_zeroes) {
       
-      # Little fix for infinite characters (just replace with a very large value as this will never be part of g anyway):
-      if (any(costmatrix$costmatrix == Inf)) costmatrix$costmatrix[costmatrix$costmatrix == Inf] <- max(x = costmatrix$costmatrix[costmatrix$costmatrix != Inf]) * 9999999
+      # Special case of a Type IV multistate linear ordered character:
+      if (length(x = setdiff(x = costmatrix$type, y = c("ordered"))) == 0) return(costmatrix$costmatrix[1, 2] * floor(x = (n_taxa / 2) * (costmatrix$n_states - 1)))
       
-      # Prepare zero value matrices to fill:
-      coefficient_matrix <- matrix(
-        data = 0,
-        nrow = costmatrix$n_states,
-        ncol = costmatrix$n_states
-      )
-      constant_matrix <- matrix(
-        data = 0,
-        nrow = costmatrix$n_states,
-        ncol = 1
-      )
+      # Special case of a Type VII multistate irreversible character:
+      if (length(x = setdiff(x = costmatrix$type, y = c("irreversible"))) == 0) return(costmatrix$costmatrix[1, 2] * ((n_taxa - 1) * (costmatrix$n_states - 1)))
       
-      # Enter frequency coefficients of 1 given that state frequencies sum to the number of taxa:
-      coefficient_matrix[1, ] <- 1
+      # Special case of a Type IX multistate Dollo character:
+      if (length(x = setdiff(x = costmatrix$type, y = c("dollo"))) == 0) {
+        
+        # If n tips and n states are same:
+        if (n_taxa == 2) return(costmatrix$costmatrix[2, 1] * (costmatrix$n_states - 1))
+        
+        # If more tips than states:
+        if (n_taxa >= 2) return(costmatrix$costmatrix[2, 1] * ((costmatrix$n_states - 1) * (n_taxa - 2)))
+      }
+      
+      # If still going must be one of remaining types:
+      #
+      # Type V - Multistate non-linear ordered
+      # Type X - Multisatte custom symmetric
+      # Type XII - Multistate custom asymmetric
+      
+      # Before adopting exhaustive solution check it is computationally feasible:
+      exhaustive_problem_size <- choose(n = n_taxa + costmatrix$n_states - 1, k = costmatrix$n_states - 1)
+      if (exhaustive_problem_size > 40000000) stop("Cost matrix is of a type without a direct solution and combination of state and tip counts is too large for an exhaustive solution.")
+      
+      # Permute all possible state frequencies:
+      permuted_state_frequencies <- permute_restricted_compositions(n = n_taxa, m_labels = costmatrix$single_states, allow_zero = TRUE)
 
-      # Enter constant t given that state frequencies sum to the number of taxa:
-      constant_matrix[1] <- n_taxa
-
-      # Enter remaining n - 1 rows of frequency coefficients based on subtraction of rows in the cost matrix:
-      coefficient_matrix[2:costmatrix$n_states, ] <- do.call(
-        what = rbind,
-        args = apply(
-          X = costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states][2:costmatrix$n_states, , drop = FALSE],
+      # Calculate gmax via an exhaustive search of possible state frequencies:
+      exhaustive_gmax <- max(
+        x = apply(
+          X = permuted_state_frequencies,
           MARGIN = 1,
-          FUN = function(row) costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states][1, ] - row,
-          simplify = FALSE
+          FUN = function(i) {
+            cost_for_each_ancestral_state <- apply(
+              X = matrix(data = rep(x = i, each = costmatrix$n_states), nrow = costmatrix$n_states) * costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states],
+              MARGIN = 1,
+              FUN = sum
+            )
+            # Maximum parsimony cost:
+            min(x = cost_for_each_ancestral_state)
+          }
         )
       )
-        
-      # Get frequency of states:
-      state_frequency_solution <- base::solve(a = coefficient_matrix, b = constant_matrix, tol = 1.85037e-18)
-      rownames(x = state_frequency_solution) <- costmatrix$single_states
       
-      # Return algebraic gmax state frequencies:
-      state_frequency_solution[, 1]
+      # Return exhaustive gmax:
+      return(exhaustive_gmax)
     }
-    
-    # Set state frequencies for integer gmax:
-    state_frequencies <- traverse_simplex_gmax(costmatrix = costmatrix, n_taxa = n_taxa)
-    
-    # Set satte frequencies for algebraic gmax:
-    algebraic_state_frequencies <- algebraic_gmax_state_frequencies(costmatrix = costmatrix, n_taxa = n_taxa)
-
-    # Calculate algebraic gmax:
-    algebraic_gmax <- min(
-      x = apply(
-        X = matrix(
-          data = rep(x = algebraic_state_frequencies, times = costmatrix$n_states),
-          nrow = costmatrix$n_states,
-          byrow = TRUE
-        ) * costmatrix$costmatrix,
-        MARGIN = 1,
-        FUN = sum
-      )
-    )
   }
   
-  # Add state names to state frequencies:
-  names(x = state_frequencies) <- costmatrix$single_states
-    
-  # Build state frequencies into a matrix ready to calculate g_max:
-  frequency_matrix <- matrix(
-    data = rep(x = state_frequencies, times = costmatrix$n_states),
-    nrow = costmatrix$n_states,
-    ncol = costmatrix$n_states,
-    byrow = TRUE,
-    dimnames = list(names(x = state_frequencies), names(x = state_frequencies))
-  )
-    
-  # Get costs for each possible ancestral state:
-  costs_for_ancestral_state <- apply(
-    X = frequency_matrix * costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states],
-    MARGIN = 1,
-    FUN = function(x) sum(x = as.numeric(x = gsub(pattern = NaN, replacement = 0, x = x)))
-  )
-  
-  # Special case of a Dollo character:
-  if (costmatrix_is_dollo) {
-
-    # Calculate integer gmax for Dollo character (uses forced root and state frequencies):
-    integer_gmax <- sum(x = costmatrix$costmatrix[dollo_star_root, ] * state_frequencies)
-    
-  # If any other type of character:
-  } else {
-    
-    # Calculate integer g_max for non-Dollo character:
-    integer_gmax <- min(x = costs_for_ancestral_state)
-  }
-  
-  # Return gmax values:
-  list(
-    algebraic_gmax = algebraic_gmax,
-    integer_gmax = integer_gmax
-  )
+  # Error check if not already returned out of function:
+  stop("Something has gone horribly wrong if you see this error as every possibility should have already returned a value from calculate_gmax!")
 }
+
+#THIS IS NOT A PROPER TYPE V CHARACTER. MUST HAVE A VERTEX OF DEGREE 3!
+#graph_size <- 6
+#tip_count <- 10
+#adjacency_matrix <- matrix(
+#  data = 0,
+#  nrow = graph_size,
+#  ncol = graph_size,
+#  dimnames = list(0:(graph_size - 1), 0:(graph_size - 1))
+#)
+# Add minimum links (creating a subgraph that is a path graph:
+#for(i in 1:(graph_size - 1)) adjacency_matrix[i, (i + 1)] <- adjacency_matrix[(i + 1), i] <- 1
+#min_links <- graph_size - 1
+#max_links <- (((graph_size ^ 2) - graph_size) / 2) - 1
+#adjacency_matrices <- list(adjacency_matrix)
+#if (max_links > min_links) {
+#  for(i in 1:(max_links - min_links)) {
+#    sampled_coordinates <- sample(x = 1:graph_size, size = 2, replace = TRUE)
+#    while(length(x = unique(x = sampled_coordinates)) == 1 || adjacency_matrices[[length(adjacency_matrices)]][sampled_coordinates[1], sampled_coordinates[2]] == 1) sampled_coordinates <- sample(x = 1:graph_size, size = 2, replace = TRUE)
+#    adjacency_matrix <- adjacency_matrices[[length(adjacency_matrices)]]
+#    adjacency_matrix[sampled_coordinates[1], sampled_coordinates[2]] <- adjacency_matrix[sampled_coordinates[2], sampled_coordinates[1]] <- 1
+#    adjacency_matrices[[(length(x = adjacency_matrices) + 1)]] <- adjacency_matrix
+#  }
+#}
+#type_v_costmatrices <- lapply(X = adjacency_matrices, FUN = Claddis::convert_adjacency_matrix_to_costmatrix)
+#permuted_tipstates <- permute_tipstates(
+#  tree = ape::read.tree(text = paste("(", paste(make_labels(tip_count), collapse = ","), ");", sep = "")),
+#  states = as.character(x = 0:(graph_size - 1)),
+#  all_states_present = TRUE
+#)
+#exhaustive_gmax <- apply(
+#  X = apply(
+#    X = permuted_tipstates,
+#    MARGIN = 1,
+#    FUN = function(i) {
+#      unlist(
+#        x = lapply(
+#          X = type_v_costmatrices,
+#          FUN = function(j) {
+#            calculate_g(
+#              costmatrix = j,
+#              tip_states = i
+#            )
+#          }
+#        )
+#      )
+#    }
+#  ),
+#  MARGIN = 1,
+#  FUN = max
+#)
+# Assumes starting path from 0 to n is longest and assigns states equally to ends (DOES NOT WORK):
+#integer_gmax_1 <- unlist(
+#  x = lapply(
+#    X = type_v_costmatrices,
+#    FUN = function(i) calculate_g(costmatrix = i, tip_states = c(rep("0", length.out = floor(x = (tip_count - graph_size) / 2)), as.character(x = 0:(graph_size - 1)), rep(as.character(x = (graph_size - 1)), length.out = ceiling(x = (tip_count - graph_size) / 2))))
+#  )
+#)
+# Assumes can dsitribute spare states to peripheral vertices (DOES NOT WORK):
+#integer_gmax_2 <- unlist(
+#  x = lapply(
+#    X = type_v_costmatrices,
+#    FUN = function(i) {
+#      vertices <- convert_costmatrix_to_stategraph(i)$vertices
+#      peripheral_vertices <- vertices[vertices[, "periphery"] == 1, "label"]
+#      calculate_g(costmatrix = i, tip_states = tip_states <- sort(x = c(as.character(x = 0:(graph_size - 1)), peripheral_vertices[((0:(tip_count - graph_size - 1)) %% length(x = peripheral_vertices)) + 1])))
+#    }
+#  )
+#)
+# TRY ACTUALLY FINDING A LONGEST PATH AND THEN ASSIGNING SPARE STATES EQUALLY TO ENDS
+#cbind(exhaustive_gmax, integer_gmax_1, integer_gmax_2)

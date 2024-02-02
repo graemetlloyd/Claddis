@@ -4,26 +4,23 @@
 \alias{calculate_gmax}
 \title{Calculate the maximum possible tree length, gmax, under parsimony}
 \usage{
-calculate_gmax(costmatrix, n_taxa, allow_zeroes = TRUE)
+calculate_gmax(costmatrix, n_taxa, allow_zeroes = FALSE)
 }
 \arguments{
 \item{costmatrix}{An object of class \code{costMatrix}.}
 
 \item{n_taxa}{The number of taxa (ree tips) to consider.}
 
-\item{allow_zeroes}{Logical indicating whether some states are allowed to be assigned zero tips. Defaults to \code{TRUE}. Note that if the number of states exceeds the number of tips then \code{allow_zeroes = TRUE} is forced. Additionally, this rstriction only applies to integer gmax.}
+\item{allow_zeroes}{Logical indicating whether some states are allowed to be assigned zero tips. Defaults to \code{FALSE} (recommended). Note that if the number of states exceeds the number of tips then \code{allow_zeroes = TRUE} is forced.}
 }
 \value{
-A list containings two items:
-
-\item{algebraic_gmax}{The absolute limit gmax can reach if not restricted to positive or integer state frequencies.}
-\item{integer_gmax}{The value gmax can reach when restfricted to integer values and whatever was chosen for the \code{allow_zeroes} option.}
+A numeric indicating the maximum possible cost, \emph{gmax}.
 }
 \description{
 Given a costmatrix and number of tips, calculates the longest possible tree length under maximum parsimony.
 }
 \details{
-The concept of \emph{gmax} was introduced by Hoyal Cuthill et al. (2010) and in the strictest sense represents the integer state frequency that maximises \emph{g} given every state is sampled at least once. This function is intended to relax that slightly using the \code{allow_zeroes} option and indeed this is not possible in rare cases such as either high levels of missing data or gap-weighted (Thiele 1993) characters where it is possible for the number of states to exceed the (effective) number of tips. In practice the function also estimates an algebraic version of \emph{gmax} which allows for fractional or negative state frequencies (Hoyal Cuthill and Lloyd in revision).
+The concept of \emph{gmax} was introduced by Hoyal Cuthill et al. (2010) and in the strictest sense represents the integer state frequency that maximises \emph{g} given every state is sampled at least once. This function is intended to relax that slightly using the \code{allow_zeroes} option and indeed this is not possible in rare cases such as either high levels of missing data or gap-weighted (Thiele 1993) characters where it is possible for the number of states to exceed the (effective) number of tips. For a more detailed description of the problem and implemented solution(s) see Hoyal Cuthill and Lloyd (in revision).
 }
 \examples{
 
