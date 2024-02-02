@@ -282,7 +282,7 @@ calculate_gmax <- function(costmatrix, n_taxa, allow_zeroes = FALSE) {
   if (costmatrix$n_states > 2) {
     
     # Special case of a Type III multistate unordered character (return gmax according to formula from Hoyal Cuthill and Lloyd):
-    if (length(x = setdiff(x = costmatrix$type, y = c("unordered"))) == 0) return(costmatrix$n_states[1, 2] * (n_taxa - ceiling(x = n_taxa / costmatrix$n_states)))
+    if (length(x = setdiff(x = costmatrix$type, y = c("unordered"))) == 0) return(costmatrix$costmatrix[1, 2] * (n_taxa - ceiling(x = n_taxa / costmatrix$n_states)))
     
     # If zeroes are not permitted:
     if (!allow_zeroes) {
