@@ -2,9 +2,9 @@
 % Please edit documentation in R/permute_restricted_compositions.r
 \name{permute_restricted_compositions}
 \alias{permute_restricted_compositions}
-\title{Permute all way to permute n into m bins}
+\title{Permute all ways to place n items into m bins}
 \usage{
-permute_restricted_compositions(n, m_labels, allow_zero = TRUE)
+permute_restricted_compositions(n, m_labels, allow_zero = FALSE)
 }
 \arguments{
 \item{n}{A positive integer.}
@@ -23,6 +23,13 @@ Given a positive integer, n, and a number of bins (m), permutes all possible com
 Every way that an integer (\code{n}) can be divided up into \code{m} bins can be permuted using a restricted version of the mathematical concept of compositions. In practice this function is designed to distribute the states for \code{n} tips across \code{m} states (e.g., with \link{permute_tipstates}), but many other uses are conceivable and hence this is included here as a general function.
 
 This algorithm reuses code from the \code{multicool} (Curran et al. 2021) and \code{partitions} (Hankin 2006) packages.
+
+The number of restricted compositions is given by the k-dimensional extension of triangular numbers (Baumann 2019):
+
+\itemize{
+  \item{If \code{allow_zero = TRUE}, the binomial coefficient, n choose k, where n = \code{n + m} - 1 and k = \code{m}.}
+  \item{If \code{allow_zero = FALSE}, the binomial coefficient, n choose k, where n = \code{n} - 1 and k = \code{m}.}
+}
 }
 \examples{
 
@@ -36,6 +43,8 @@ permute_restricted_compositions(
 
 }
 \references{
+Baumann, M. H., 2019. Die k-dimensionale Champagnerpyramide. Mathematische Semesterberichte, 66, 89-100.
+
 Curran, J., Williams, A., Kelleher, J. and Barber, D., 2021. multicool: Permutations of Multisets in Cool-Lex Order. R package version 0.1-12. https://CRAN.R-project.org/package=multicool.
 
 Hankin, R. K. S., 2006. Additive integer partitions in R. \emph{Journal of Statistical Software, Code Snippets}, \bold{16}, 1.

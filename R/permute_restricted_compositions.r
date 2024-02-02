@@ -1,4 +1,4 @@
-#' Permute all way to permute n into m bins
+#' Permute all ways to place n items into m bins
 #'
 #' @description
 #'
@@ -14,11 +14,20 @@
 #'
 #' This algorithm reuses code from the \code{multicool} (Curran et al. 2021) and \code{partitions} (Hankin 2006) packages.
 #'
+#' The number of restricted compositions is given by the k-dimensional extension of triangular numbers (Baumann 2019):
+#'
+#' \itemize{
+#'   \item{If \code{allow_zero = TRUE}, the binomial coefficient, n choose k, where n = \code{n + m} - 1 and k = \code{m}.}
+#'   \item{If \code{allow_zero = FALSE}, the binomial coefficient, n choose k, where n = \code{n} - 1 and k = \code{m}.}
+#' }
+#'
 #' @return A matrix where each row is a unique restricted composition of n and each column is a labelled bin.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
 #' @references
+#'
+#' Baumann, M. H., 2019. Die k-dimensionale Champagnerpyramide. Mathematische Semesterberichte, 66, 89-100.
 #'
 #' Curran, J., Williams, A., Kelleher, J. and Barber, D., 2021. multicool: Permutations of Multisets in Cool-Lex Order. R package version 0.1-12. https://CRAN.R-project.org/package=multicool.
 #'
@@ -38,11 +47,8 @@
 permute_restricted_compositions <- function(
   n,
   m_labels,
-  allow_zero = TRUE
+  allow_zero = FALSE
 ) {
-  
-  # TO DO:
-  # - Construct an equation that will determine size of output!
   
   # Set m as length of m labels:
   m <- length(x = m_labels)
