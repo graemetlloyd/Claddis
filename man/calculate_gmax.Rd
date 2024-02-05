@@ -20,7 +20,7 @@ A numeric indicating the maximum possible cost, \emph{gmax}.
 Given a costmatrix and number of tips, calculates the longest possible tree length under maximum parsimony.
 }
 \details{
-The concept of \emph{gmax} was introduced by Hoyal Cuthill et al. (2010) and in the strictest sense represents the integer state frequency that maximises \emph{g} given every state is sampled at least once. This function is intended to relax that slightly using the \code{allow_zeroes} option and indeed this is not possible in rare cases such as either high levels of missing data or gap-weighted (Thiele 1993) characters where it is possible for the number of states to exceed the (effective) number of tips. For a more detailed description of the problem and implemented solution(s) see Hoyal Cuthill and Lloyd (in revision).
+The concept of \emph{gmax} was introduced by Hoyal Cuthill et al. (2010) and in the strictest sense represents the integer state frequency that maximize \emph{g} given every state is sampled at least once. This function is intended to relax that slightly using the \code{allow_zeroes} option and indeed this is not possible in rare cases such as either high levels of missing data or gap-weighted (Thiele 1993) characters where it is possible for the number of states to exceed the (effective) number of tips. For a more detailed description of the problem and implemented solution(s) see Hoyal Cuthill and Lloyd (in revision).
 }
 \examples{
 
@@ -53,7 +53,7 @@ calculate_gmax(
 # Create a Type III character costmatrix:
 unordered_costmatrix <- make_costmatrix(
   min_state = 0,
-  max_state= 2,
+  max_state = 2,
   character_type = "unordered"
 )
 
@@ -66,7 +66,7 @@ calculate_gmax(
 # Create a Type IV character costmatrix:
 linear_ordered_costmatrix <- make_costmatrix(
   min_state = 0,
-  max_state= 2,
+  max_state = 2,
   character_type = "ordered"
 )
 
@@ -100,7 +100,7 @@ calculate_gmax(
 # Create a Type VI character costmatrix:
 binary_irreversible_costmatrix <- make_costmatrix(
   min_state = 0,
-  max_state= 1,
+  max_state = 1,
   character_type = "irreversible"
 )
 
@@ -113,7 +113,7 @@ calculate_gmax(
 # Create a Type VII character costmatrix:
 multistate_irreversible_costmatrix <- make_costmatrix(
   min_state = 0,
-  max_state= 2,
+  max_state = 2,
   character_type = "irreversible"
 )
 
@@ -123,9 +123,10 @@ calculate_gmax(
   n_taxa = 10
 )
 
+#' # Create a Type VIII character costmatrix:
 binary_dollo_costmatrix <- make_costmatrix(
   min_state = 0,
-  max_state= 1,
+  max_state = 1,
   character_type = "dollo"
 )
 
@@ -138,7 +139,7 @@ calculate_gmax(
 # Create a Type IX character costmatrix:
 multistate_dollo_costmatrix <- make_costmatrix(
   min_state = 0,
-  max_state= 2,
+  max_state = 2,
   character_type = "dollo"
 )
 
@@ -151,7 +152,7 @@ calculate_gmax(
 # Create a Type X character costmatrix:
 multistate_symmetric_costmatrix <- make_costmatrix(
   min_state = 0,
-  max_state= 5,
+  max_state = 5,
   character_type = "ordered"
 )
 multistate_symmetric_costmatrix$type <- "custom"
@@ -182,7 +183,7 @@ calculate_gmax(
 # Create a Type XI character costmatrix:
 binary_asymmetric_costmatrix <- make_costmatrix(
   min_state = 0,
-  max_state= 1,
+  max_state = 1,
   character_type = "ordered"
 )
 binary_asymmetric_costmatrix$type <- "custom"
@@ -210,7 +211,7 @@ calculate_gmax(
 # Create a Type XII character costmatrix:
 multistate_asymmetric_costmatrix <- make_costmatrix(
   min_state = 0,
-  max_state= 2,
+  max_state = 2,
   character_type = "ordered"
 )
 multistate_asymmetric_costmatrix$type <- "custom"

@@ -10,7 +10,7 @@
 #'
 #' @details
 #'
-#' The concept of \emph{gmax} was introduced by Hoyal Cuthill et al. (2010) and in the strictest sense represents the integer state frequency that maximises \emph{g} given every state is sampled at least once. This function is intended to relax that slightly using the \code{allow_zeroes} option and indeed this is not possible in rare cases such as either high levels of missing data or gap-weighted (Thiele 1993) characters where it is possible for the number of states to exceed the (effective) number of tips. For a more detailed description of the problem and implemented solution(s) see Hoyal Cuthill and Lloyd (in revision).
+#' The concept of \emph{gmax} was introduced by Hoyal Cuthill et al. (2010) and in the strictest sense represents the integer state frequency that maximize \emph{g} given every state is sampled at least once. This function is intended to relax that slightly using the \code{allow_zeroes} option and indeed this is not possible in rare cases such as either high levels of missing data or gap-weighted (Thiele 1993) characters where it is possible for the number of states to exceed the (effective) number of tips. For a more detailed description of the problem and implemented solution(s) see Hoyal Cuthill and Lloyd (in revision).
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com} and Jen Hoyal Cuthill \email{j.hoyal-cuthill@@essex.ac.uk}
 #'
@@ -59,7 +59,7 @@
 #' # Create a Type III character costmatrix:
 #' unordered_costmatrix <- make_costmatrix(
 #'   min_state = 0,
-#'   max_state= 2,
+#'   max_state = 2,
 #'   character_type = "unordered"
 #' )
 #'
@@ -72,7 +72,7 @@
 #' # Create a Type IV character costmatrix:
 #' linear_ordered_costmatrix <- make_costmatrix(
 #'   min_state = 0,
-#'   max_state= 2,
+#'   max_state = 2,
 #'   character_type = "ordered"
 #' )
 #'
@@ -106,7 +106,7 @@
 #' # Create a Type VI character costmatrix:
 #' binary_irreversible_costmatrix <- make_costmatrix(
 #'   min_state = 0,
-#'   max_state= 1,
+#'   max_state = 1,
 #'   character_type = "irreversible"
 #' )
 #'
@@ -119,7 +119,7 @@
 #' # Create a Type VII character costmatrix:
 #' multistate_irreversible_costmatrix <- make_costmatrix(
 #'   min_state = 0,
-#'   max_state= 2,
+#'   max_state = 2,
 #'   character_type = "irreversible"
 #' )
 #'
@@ -129,10 +129,10 @@
 #'   n_taxa = 10
 #' )
 #'
-# Create a Type VIII character costmatrix:
+#' #' # Create a Type VIII character costmatrix:
 #' binary_dollo_costmatrix <- make_costmatrix(
 #'   min_state = 0,
-#'   max_state= 1,
+#'   max_state = 1,
 #'   character_type = "dollo"
 #' )
 #'
@@ -145,7 +145,7 @@
 #' # Create a Type IX character costmatrix:
 #' multistate_dollo_costmatrix <- make_costmatrix(
 #'   min_state = 0,
-#'   max_state= 2,
+#'   max_state = 2,
 #'   character_type = "dollo"
 #' )
 #'
@@ -158,7 +158,7 @@
 #' # Create a Type X character costmatrix:
 #' multistate_symmetric_costmatrix <- make_costmatrix(
 #'   min_state = 0,
-#'   max_state= 5,
+#'   max_state = 5,
 #'   character_type = "ordered"
 #' )
 #' multistate_symmetric_costmatrix$type <- "custom"
@@ -189,7 +189,7 @@
 #' # Create a Type XI character costmatrix:
 #' binary_asymmetric_costmatrix <- make_costmatrix(
 #'   min_state = 0,
-#'   max_state= 1,
+#'   max_state = 1,
 #'   character_type = "ordered"
 #' )
 #' binary_asymmetric_costmatrix$type <- "custom"
@@ -217,7 +217,7 @@
 #' # Create a Type XII character costmatrix:
 #' multistate_asymmetric_costmatrix <- make_costmatrix(
 #'   min_state = 0,
-#'   max_state= 2,
+#'   max_state = 2,
 #'   character_type = "ordered"
 #' )
 #' multistate_asymmetric_costmatrix$type <- "custom"
@@ -275,7 +275,14 @@ calculate_gmax <- function(costmatrix, n_taxa, allow_zeroes = FALSE) {
     if (length(x = setdiff(x = costmatrix$type, y = c("custom"))) == 0) return(max(x = min(x = (n_taxa - floor(x = (n_taxa * (costmatrix$costmatrix[1, 2] / (costmatrix$costmatrix[1, 2] + costmatrix$costmatrix[2, 1]))))) * costmatrix$costmatrix[1, 2], floor(x = (n_taxa * (costmatrix$costmatrix[1, 2] / (costmatrix$costmatrix[1, 2] + costmatrix$costmatrix[2, 1])))) * costmatrix$costmatrix[2, 1]), min(x = (n_taxa - ceiling((n_taxa * (costmatrix$costmatrix[1, 2] / (costmatrix$costmatrix[1, 2] + costmatrix$costmatrix[2, 1]))))) * costmatrix$costmatrix[1, 2], ceiling(x = (n_taxa * (costmatrix$costmatrix[1, 2] / (costmatrix$costmatrix[1, 2] + costmatrix$costmatrix[2, 1])))) * costmatrix$costmatrix[2, 1])))
     
     # Special case of a Type VIII binary Dollo character (return gmax according to formula from Hoyal Cuthill and Lloyd):
-    if (length(x = setdiff(x = costmatrix$type, y = c("dollo"))) == 0) return(costmatrix$costmatrix[2, 1] * (n_taxa - 1))
+    if (length(x = setdiff(x = costmatrix$type, y = c("dollo"))) == 0) {
+      
+      # If n tips and n states are same (i.e., two) return gmax according to formula from Hoyal Cuthill and Lloyd:
+      if (n_taxa == 2) return(costmatrix$costmatrix[2, 1] * (n_taxa - 1))
+    
+      # If more tips than states return gmax according to formula from Hoyal Cuthill and Lloyd:
+      if (n_taxa >= 2) return(costmatrix$costmatrix[2, 1] * (n_taxa - 2))
+    }
   }
   
   # Special case of a multistate character:
