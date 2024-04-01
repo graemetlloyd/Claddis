@@ -35,7 +35,7 @@
 is.stateGraph <- function(x) {
   
   # Get any error messages for stategraph:
-  messages <- check_stateGraph(costmatrix = x)
+  messages <- check_stateGraph(stategraph = x)
   
   # Return logical indicating whether object is a valid stategraph object or not:
   ifelse(test = length(x = messages) > 0, yes = FALSE, no = TRUE)
