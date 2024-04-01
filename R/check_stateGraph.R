@@ -58,7 +58,7 @@ check_stateGraph <- function(stategraph) {
   if (!is.numeric(x = stategraph$n_states) || length(x = stategraph$n_vertices) != 1) return("stategraph$n_states should be a single numeric value indicating the number of singles states (i.e., excluding polymorphic or uncertain values).")
 
   # Check single_states are formatted correctly and match other elements and add error message to output if false:
-  if (!is.character(x = stategraph$single_states) || !is.vector(x = stategraph$single_states) || length(x = stategraph$single_states) != stategraph$n_states || any(x = is.na(x = match(x = stategraph$single_states, table = rownames(x = stategraph$vertices[, "label"])))) || length(x = grep(pattern = "/|&", x = stategraph$single_states)) > 0) return("stategraph$single_states must be a single character vector value equal in length to stategraph$n_states, contain no polymorphic or uncertain values and match the states used in stategraph$vertices.")
+  if (!is.character(x = stategraph$single_states) || !is.vector(x = stategraph$single_states) || length(x = stategraph$single_states) != stategraph$n_states || any(x = is.na(x = match(x = stategraph$single_states, table = stategraph$vertices[, "label"]))) || length(x = grep(pattern = "/|&", x = stategraph$single_states)) > 0) return("stategraph$single_states must be a single character vector value equal in length to stategraph$n_states, contain no polymorphic or uncertain values and match the states used in stategraph$vertices.")
   
   # Check type is formatted correctly and add error message to output if false:
   if (!is.character(x = stategraph$type) || length(x = stategraph$type) != 1) return("stategraph$type should be a single character value indicating the type of stategraph.")
@@ -93,69 +93,6 @@ check_stateGraph <- function(stategraph) {
   # Check adjacency_matrix is a matrix:
   if (!is.matrix(x = stategraph$adjacency_matrix)) return("stategraph$adjacency_matrix should be a matrix.")
 
-  # Check stategraph$costmatrix is an actual matrix and add error message to output if false:
-  if (!is.matrix(x = stategraph$costmatrix)) return("stategraph$costmatrix must be a matrix.")
-  
-  # Check costmatrix$costmatrix size matches costMatrix$size and add error message to output if false
-  if (length(x = costmatrix$costmatrix) != costmatrix$size ^ 2) return("The size of costmatrix$costmatrix must match costmatrix$size.")
-  
-  # RULE ONE: Check costmatrix$costmatrix is only numeric values and add error message to output if false:
-  if (!is.numeric(costmatrix$costmatrix)) return("All elements of costmatrix$costmatrix must be numeric.")
-  
-  # Check costmatrix$costmatrix is only positive or zero values and add error message to output if false:
-  if (!all(x = costmatrix$costmatrix >= 0)) return("All elements of costmatrix$costmatrix must be either zero or positive.")
-  
-  # RULE TWO: Check costmatrix$costmatrix diagonal is only zero values and add error message to output if false:
-  if (!all(x = diag(x = costmatrix$costmatrix) == 0)) return("All diagonal elements of costmatrix$costmatrix must be zero.")
-  
-  # RULE THREE: Check costmatrix$costmatrix off-diagonal is only positive values and add error message to output if false:
-  if (!all(x = c(costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states][lower.tri(x = costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states])], costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states][upper.tri(x = costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states])]) > 0)) return("All non-diagonal elements of costmatrix$costmatrix must be positive (except for uncertainties, if included).")
-  
-  # RULE FOUR: Check no state has infinite costs for every row and column (i.e., no state is disconnected from all others) and add error message if so:
-  infinity_states <- do.call(
-    what = rbind,
-    args = lapply(
-      X = as.list(costmatrix$single_states),
-      FUN = function(x) {
-        row_x <- costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states][x, ]
-        column_x <- costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states][, x]
-        row_x <- row_x[row_x > 0]
-        column_x <- column_x[column_x > 0]
-        is_infinity <- c(row_x == Inf, column_x == Inf)
-      }
-    )
-  )
-  rownames(x = infinity_states) <- costmatrix$single_states
-  infinite_states <- names(x = costmatrix$single_states[apply(X = infinity_states, MARGIN = 1, FUN = all)])
-  if (length(x = infinite_states) > 0) return("Costmatrix contains disconnected states (row ad column all infinite costs).")
-  
-  # RULE FIVE: Check no more than one state has all infinite "to" transition costs and add error message if not:
-  infinite_columns <- costmatrix$single_states[apply(
-    X = costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states],
-    MARGIN = 2,
-    FUN = function(x) {
-      x <- x[x > 0] # Remove diagonal zero
-      all(x == Inf)
-    }
-  )]
-  if (length(infinite_columns) > 1) return("Multiple columns of costmatrix are all infinite cost meaning a tree must have multiple roots (impossible).")
-
-  # RULE SIX: Check at least one state has all non-infinite "from" transition costs and add error message if not:
-  infinite_rows <- costmatrix$single_states[apply(
-    X = costmatrix$costmatrix[costmatrix$single_states, costmatrix$single_states],
-    MARGIN = 1,
-    FUN = function(x) {
-      x <- x[x > 0] # Remove diagonal zero
-      all(x != Inf)
-    }
-  )]
-  if (length(infinite_rows) < 1) return("No row of costmatrix is free of infinite costs meaning no state can be a root state (impossible).")
-
-  
-  
-  
-  
-  
   # Check directed is formatted correctly and add error message to output if false:
   if (!is.logical(x = stategraph$directed) || length(x = stategraph$directed) != 1) return("stategraph$directed should be a single logical value indicating whether graph is directed or not.")
 
