@@ -75,7 +75,6 @@
 #' @export print.stateGraph
 print.stateGraph <- function(x, ...) {
   
-
 #  "n_vertices" The total number of vertices
 #  "n_arcs" The total number of arcs (2 arcs for an edge)
 #  "n_states" The number of unique single states
@@ -96,57 +95,6 @@ print.stateGraph <- function(x, ...) {
 #  "dollo_penalty" A numeric value indicating the penalty used for a Dollo character
 #  "base_age" A numeric value indicating the base (oldest) age used for a stratigraphic character
 #  "weight" A numeric value indicating the character weight
-  
-  
-  
-  
-  
-x <- list(
-  n_vertices = 6,
-  n_arcs = 12,
-  n_states = 6,
-  single_states = 6,
-  type = "custom",
-  arcs = data.frame(
-    from = as.character(x = c(0, 1, 0, 2, 2, 5, 1, 4, 5, 4, 3, 4)),
-    to = as.character(x = c(1, 0, 2, 0, 5, 2, 4, 1, 4, 5, 4, 3)),
-    weight = c(1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1)
-  ),
-  vertices = data.frame(
-    label = as.character(x = 0:5),
-    in_degree = c(2, 2, 2, 1, 3, 2),
-    out_degree = c(2, 2, 2, 1, 3, 2),
-    eccentricity = c(3, 2, 3, 3, 2, 2),
-    periphery = c(1, 0, 1, 1, 0, 0),
-    centre = c(0, 1, 0, 0, 1, 1)
-  ),
-  radius = 2,
-  diameter = 3,
-  adjacency_matrix = matrix(
-    data = c(
-      0, 1, 1, 0, 0, 0,
-      1, 0, 0, 0, 1, 0,
-      1, 0, 0, 0, 0, 1,
-      0, 0, 0, 0, 1, 0,
-      0, 1, 0, 1, 0, 1,
-      0, 0, 1, 0, 1, 0
-    ),
-    nrow = 6,
-    byrow = TRUE,
-    dimnames = list(0:5, 0:5)
-  ),
-  directed = FALSE,
-  includes_polymorphisms = FALSE,
-  polymorphism_costs = "additive",
-  polymorphism_geometry = "simplex",
-  polymorphism_distance = "euclidean",
-  includes_uncertainties = FALSE,
-  pruned = FALSE,
-  dollo_penalty = 999,
-  base_age = 100,
-  weight = 1
-)
-class(x = x) <- "stateGraph"
 
   # Check x has class stateGraph and stop and warn user if not:
   if (!inherits(x = x, what = "stateGraph")) stop("x must be an object of class \"stateGraph\".")
@@ -166,7 +114,7 @@ class(x = x) <- "stateGraph"
       " composed of ",
       x$n_arcs,
       " arcs connecting ",
-      x$single_states,
+      x$n_states,
       " unique states",
       ifelse(
         test = all(c(x$includes_polymorphisms, x$includes_uncertainties)),
