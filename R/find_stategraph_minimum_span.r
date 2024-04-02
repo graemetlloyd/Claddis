@@ -96,7 +96,7 @@ find_stategraph_minimum_span <- function(stategraph) {
     # Return Dollo arcs:
     return(value = dollo_arcs)
   }
-    
+  
   # If undirected case (apply Kruskal's algorithm):
   if (!stategraph$directed) {
       
@@ -158,7 +158,7 @@ find_stategraph_minimum_span <- function(stategraph) {
     
   # If directed case (Edmonds algorithm):
   if (stategraph$directed) {
-      
+    
     # First establish root options (must be able to reach all other vertices):
     root_options <- names(
       x = which(
@@ -169,10 +169,10 @@ find_stategraph_minimum_span <- function(stategraph) {
         )
       )
     )
-      
+  
     # Little error check that should in theory never be hit if a valid stategraph was supplied:
     if (length(x = root_options) == 0) stop("No minimum-weight spanning arboresence is possible as no vertex exists that can reach all other vertices.")
-      
+    
     # Next reweight arcs (minimum arriving cost at vertex is zero):
     reweighted_arcs <- do.call(
       what = rbind,
@@ -186,7 +186,7 @@ find_stategraph_minimum_span <- function(stategraph) {
         }
       )
     )
-      
+    
     # Generate a single shortest arboresence for each root option:
     shortest_arboresences <- lapply(
       X = as.list(x = root_options),
@@ -243,7 +243,7 @@ find_stategraph_minimum_span <- function(stategraph) {
             )
           )
         )]
-          
+        
         # Add in original weights:
         original_weight_arboresences <- lapply(
           X = actual_arboresences,
@@ -262,19 +262,32 @@ find_stategraph_minimum_span <- function(stategraph) {
             x
           }
         )
+        
+        # As long as there are arboresences:
+        if (length(x = original_weight_arboresences) > 0) {
           
-        # Get total weight of each arboresence:
-        arboresence_lengths <- unlist(x = lapply(X = original_weight_arboresences, FUN = function(x) sum(x = x$weight)))
+          # Get total weight of each arboresence:
+          arboresence_lengths <- unlist(x = lapply(X = original_weight_arboresences, FUN = function(x) sum(x = x$weight)))
           
-        # Return first lowst weight arboresence:
-        original_weight_arboresences[[which(x = arboresence_lengths == min(x = arboresence_lengths))[1]]]
+          # Return first lowest weight arboresence:
+          return(value = original_weight_arboresences[[which(x = arboresence_lengths == min(x = arboresence_lengths))[1]]])
+        
+        # If there re no arboresences:
+        } else {
+          
+          # Create dummy infinite length arboresence:
+          return(value = data.frame(from = root, to = non_root_vertices, weight = Inf))
+        }
       }
     )
-      
+    
+    # Little error check (shouldn't ever happen in practice!):
+    if (all(unlist(x = lapply(X = shortest_arboresences, FUN = function(x) sum(x = x$weight))) == Inf)) stop("No valid shortest arboresences.")
+    
     # Get total lengths of each root option:
     shortest_arboresence_lengths <- unlist(x = lapply(X = shortest_arboresences, FUN = function(x) sum(x = x$weight)))
-      
+    
     # Return first shortest arboresence:
-    return(value = shortest_arboresences[[which(x = shortest_arboresence_lengths  == min(x = shortest_arboresence_lengths))[1]]])
+    return(value = shortest_arboresences[[which(x = shortest_arboresence_lengths == min(x = shortest_arboresence_lengths))[1]]])
   }
 }
