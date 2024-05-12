@@ -6,6 +6,7 @@
 #'
 #' @param states A vector of character states, e.g., "0", "1", "2".
 #' @param costs A vector of numeric costs, e.g., 1, 2, Inf.
+#' @param symmetry Must be one of \code{"Symmetric"}, \code{"Asymmetric"} or \code{"both"}.
 #'
 #' @details
 #'
