@@ -74,7 +74,7 @@
 #' dollo_stategraph <- convert_costmatrix_to_stategraph(costmatrix = dollo_costmatrix)
 #'
 #' # Find length of shortest spanning tree of stategraph:
-#' find_stategraph_minimum_span(stategraph = dollo_costmatrix)
+#' find_stategraph_minimum_span(stategraph = dollo_stategraph)
 #'
 #' @export find_costmatrix_minimum_span
 find_stategraph_minimum_span <- function(stategraph) {
@@ -102,7 +102,12 @@ find_stategraph_minimum_span <- function(stategraph) {
       
     # Treat paired arcs as single weighted edges:
     weighted_edges <- stategraph$arcs[as.numeric(x = stategraph$arcs$from) < as.numeric(x = stategraph$arcs$to), ]
+    # Make Dollo arcs from those that should be traversed just once:
+    dollo_arcs <- stategraph$arcs[stategraph$arcs$weight == stategraph$dollo_penalty, ]
       
+    # Set the weights of these arcs to one as this is what should actually be counted for a Dollo character:
+    dollo_arcs$weight <- 1
+
     # Sort from lowest to highest weight:
     weighted_edges <- weighted_edges[order(x = weighted_edges$weight), ]
       

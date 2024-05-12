@@ -66,7 +66,7 @@ dollo_costmatrix <- make_costmatrix(
 dollo_stategraph <- convert_costmatrix_to_stategraph(costmatrix = dollo_costmatrix)
 
 # Find length of shortest spanning tree of stategraph:
-find_stategraph_minimum_span(stategraph = dollo_costmatrix)
+find_stategraph_minimum_span(stategraph = dollo_stategraph)
 
 }
 \references{
