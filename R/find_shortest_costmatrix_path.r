@@ -68,7 +68,7 @@
 find_shortest_costmatrix_path <- function(costmatrix, start, end) {
 
   # Check costmatrix is correct class and stop and warn user if not:
-  if (class(costmatrix) != "costMatrix") stop("costmatrix must be an object o class \"costMatrix\".")
+  if (!inherits(x = costmatrix, what = "costMatrix")) stop("costmatrix must be an object of class \"costMatrix\".")
   
   # Check start and end are in character format so that the correct costmatrix rows and columns are called:
   if (any(c(!is.character(x = start), !is.character(x = end)))) stop("start and end must be characters (i.e., \"0\" not 0).")

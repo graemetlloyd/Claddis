@@ -58,7 +58,7 @@
 fix_costmatrix <- function(costmatrix, message = TRUE) {
   
   # Check object is at least a costmatrix and stop and warn user if not:
-  if (class(costmatrix) != "costMatrix") stop("costmatrix must be an object of class \"costMatrix\".")
+  if (!inherits(x = costmatrix, what = "costMatrix")) stop("costmatrix must be an object of class \"costMatrix\".")
   
   # Sanity check (stop and warn user if all values are zero):
   if (all(costmatrix$costmatrix == 0)) stop("Costmatrix is all zero values! (A fix is impossible.)")

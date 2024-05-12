@@ -165,7 +165,7 @@ permute_treeshapes <- function(n_tips, sort_by_resolution = TRUE) {
         trees <- ape::read.tree(text = multihit_treeshapes)
         
         # If only one tree convert to a list so below wll work:
-        if (class(trees) == "phylo") trees <- list(trees)
+        if (inherits(x = trees, waht = "phylo")) trees <- list(trees)
         
         # Permute all new multihit treeshapes:
         new_multihit_treeshapes <- lapply(

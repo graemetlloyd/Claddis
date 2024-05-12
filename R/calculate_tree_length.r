@@ -172,7 +172,7 @@ calculate_tree_length <- function(
   if (any(x = is.na(x = match(x = trees[[1]]$tip.label, table = rownames(x = cladistic_matrix$matrix_1$matrix))))) stop("Names in trees and names in cladistic_matrix do not match.")
 
   # If trees is a single topology then reformat as a list of length one:
-  if (class(x = trees) == "phylo") trees <- list(trees)
+  if (inherits(x = trees, what = "phylo")) trees <- list(trees)
   
   # Set include_polymorphisms for make_costmatrix by polymorphism_behaviour or uncertainty_behaviour choice:
   include_polymorphisms <- ifelse(test = polymorphism_behaviour == "polymorphism" || uncertainty_behaviour == "polymorphism", yes = TRUE, no = FALSE)

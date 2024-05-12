@@ -36,8 +36,8 @@
 count_cherries <- function(tree) {
   
   # If a single tree return scalar of pre-terminal nodes with two descendants (i.e., cherries):
-  if (class(tree) == "phylo") return(value = sum(x = rle(x = sort(x = tree$edge[match(x = 1:ape::Ntip(tree), table = tree$edge[, 2]), 1]))$lengths == 2))
+  if (inherits(x = tree, what = "phylo")) return(value = sum(x = rle(x = sort(x = tree$edge[match(x = 1:ape::Ntip(tree), table = tree$edge[, 2]), 1]))$lengths == 2))
   
   # If multiple trees return vector of pre-terminal nodes with two descendants (i.e., cherries):
-  if (class(tree) == "multiPhylo") return(unlist(lapply(X = tree, FUN = function(x) value = sum(x = rle(x = sort(x = x$edge[match(x = 1:ape::Ntip(x), table = x$edge[, 2]), 1]))$lengths == 2))))
+  if (inherits(x = tree, what = "multiPhylo")) return(unlist(lapply(X = tree, FUN = function(x) value = sum(x = rle(x = sort(x = x$edge[match(x = 1:ape::Ntip(x), table = x$edge[, 2]), 1]))$lengths == 2))))
 }
