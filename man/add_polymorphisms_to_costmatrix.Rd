@@ -198,7 +198,10 @@ ordered_uncertainty_costmatrix <- list(
     ),
     nrow = 7,
     byrow = TRUE,
-    dimnames = list(c(as.character(x = 0:2), "0/1", "0/2", "1/2", "0/1/2"), c(as.character(x = 0:2), "0/1", "0/2", "1/2", "0/1/2"))
+    dimnames = list(
+      c(as.character(x = 0:2), "0/1", "0/2", "1/2", "0/1/2"),
+      c(as.character(x = 0:2), "0/1", "0/2", "1/2", "0/1/2")
+    )
   ),
   symmetry = "Symmetric",
   includes_polymorphisms = FALSE,
