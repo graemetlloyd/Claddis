@@ -331,7 +331,7 @@ make_costmatrix <- function(
     # Set upper triangle as an ordered character times the dollo_penalty
     costmatrix[upper.tri(x = costmatrix)] <- unlist(x = lapply(X = as.list(x = 1:(costmatrix_size - 1)), FUN = function(cost) cost:1)) * dollo_penalty
       
-    # Store regular ordered values in lower triangles::
+    # Store regular ordered values in lower triangles:
     costmatrix[lower.tri(x = costmatrix)] <- unlist(x = lapply(X = as.list(x = (costmatrix_size - 1):1), FUN = function(cost) 1:cost))
   }
   

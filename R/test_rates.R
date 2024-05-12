@@ -953,7 +953,7 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
     # If using the Close time bin completeness approach get completeness value for each time bin:
     if (time_binning_approach == "close") time_bin_completeness <- apply(do.call(what = rbind, args = lapply(X = edge_list, function(x) x$proportional_binned_edge_durations * (sum(character_weights[x$comparable_characters]) / sum(character_weights)))), 2, sum) / apply(do.call(what = rbind, args = lapply(X = edge_list, function(x) x$proportional_binned_edge_durations)), 2, sum)
 
-    # If using the Lloyd time bin completeness approach get completeness value for each time bin::
+    # If using the Lloyd time bin completeness approach get completeness value for each time bin:
     if (time_binning_approach == "lloyd") time_bin_completeness <- apply(do.call(what = rbind, args = lapply(X = edge_list, function(x) apply(matrix(character_weights[x$comparable_characters], ncol = 1) %*% x$binned_branch_durations, 2, sum))), 2, sum) / apply(do.call(what = rbind, args = lapply(X = edge_list, function(x) apply(matrix(character_weights, ncol = 1) %*% x$binned_branch_durations, 2, sum))), 2, sum)
 
     # Get durations of edges in each time bin:

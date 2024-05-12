@@ -647,25 +647,25 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
         
       }
       
-      # If CONTINUOUS use default symbols::
+      # If CONTINUOUS use default symbols:
       if (datatype == "CONTINUOUS") symbols <- NULL
       
-      # If DNA use default symbols::
+      # If DNA use default symbols:
       if (datatype == "DNA") symbols <- c("A", "C", "G", "T", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N")
       
-      # If NUCLEOTIDE use default symbols::
+      # If NUCLEOTIDE use default symbols:
       if (datatype == "NUCLEOTIDE") symbols <- c("A", "C", "G", "T", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N")
       
-      # If PROTEIN use default symbols::
+      # If PROTEIN use default symbols:
       if (datatype == "PROTEIN") symbols <- c("A", "R", "N", "D", "C", "Q", "E", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V")
       
-      # If RESTRICTION use default symbols::
+      # If RESTRICTION use default symbols:
       if (datatype == "RESTRICTION") symbols <- c("0", "1")
       
-      # If STANDARD use default symbols::
+      # If STANDARD use default symbols:
       if (datatype == "RNA") symbols <- c("A", "C", "G", "U", "R", "Y", "M", "K", "S", "W", "H", "B", "V", "D", "N")
       
-      # If STANDARD use default symbols::
+      # If STANDARD use default symbols:
       if (datatype == "STANDARD") symbols <- c(c(0:9), LETTERS[1:22])
       
     }
