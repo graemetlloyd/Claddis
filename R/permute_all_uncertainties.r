@@ -42,7 +42,7 @@
 #'
 #' @seealso
 #'
-#' \link{make_costmatrix} and \link{permute_all_polymrphisms}
+#' \link{make_costmatrix} and \link{permute_all_polymorphisms}
 #'
 #' @examples
 #'
