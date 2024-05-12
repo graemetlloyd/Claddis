@@ -204,7 +204,8 @@ multistate_symmetric_costmatrix$costmatrix <- matrix(
   )
 )
 
-# Calculate g for the case of two state 0s, three state 1s, two state 2s, one state 3, three state 4s and two state 5s:
+# Calculate g for the case of two state 0s, three state 1s, two state 2s,
+# one state 3, three state 4s and two state 5s:
 calculate_g(
   costmatrix = multistate_symmetric_costmatrix,
   tip_states = c("0", "0", "1", "1", "1", "2", "2", "3", "4", "4", "4", "5", "5")
