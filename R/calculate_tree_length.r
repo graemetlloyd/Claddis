@@ -108,10 +108,13 @@
 #'
 #' # Use one of the MPTs from a TNT analysis as the tree:
 #' tree <- ape::read.tree(
-#'   text = "(Outgroup,(Ornithischia,(Sauropodomorpha,(Ceratosauria,Procompsognathus,
-#'   Liliensternus,(Carnosauria,(Ornithmimidae,Saurornitholestes,Hulsanpes,(Coelurus,
-#'   Elmisauridae,(Compsognathus,(Ornitholestes,Microvenator,Caenagnathidae,
-#'   (Deinonychosauria,Avialae))))))))));"
+#'   text = paste(
+#'     "(Outgroup,(Ornithischia,(Sauropodomorpha,(Ceratosauria,Procompsognathus,",
+#'     "Liliensternus,(Carnosauria,(Ornithmimidae,Saurornitholestes,Hulsanpes,(Coelurus,",
+#'     "Elmisauridae,(Compsognathus,(Ornitholestes,Microvenator,Caenagnathidae,",
+#'     "(Deinonychosauria,Avialae))))))))));",
+#'     sep = ""
+#'   )
 #' )
 #'
 #' # Calculate tree length (and only use tree lengths from output):
@@ -120,7 +123,11 @@
 #'   cladistic_matrix = cladistic_matrix,
 #'   inapplicables_as_missing = TRUE,
 #'   polymorphism_behaviour = "uncertainty",
-#'   uncertainty_behaviour = "uncertainty"
+#'   uncertainty_behaviour = "uncertainty",
+#'   polymorphism_geometry = "simplex",
+#'   polymorphism_distance = "euclidean",
+#'   state_ages = c(200, 100),
+#'   dollo_penalty = 999
 #' )$tree_lengths
 #'
 #' @export calculate_tree_length
@@ -168,12 +175,12 @@ calculate_tree_length <- function(
   ### MAYBE MAKE THIS A CLASS AND/OR "APPEND" IT TO A "phylo" CLASS OBJECT
   node_constraints = NULL
   
-  # EXPAND THIS IN BOTH DIRECTIONS AND ADD INROMATIVE RESOLUTION!
-  if (any(x = is.na(x = match(x = trees[[1]]$tip.label, table = rownames(x = cladistic_matrix$matrix_1$matrix))))) stop("Names in trees and names in cladistic_matrix do not match.")
-
   # If trees is a single topology then reformat as a list of length one:
   if (inherits(x = trees, what = "phylo")) trees <- list(trees)
   
+  # EXPAND THIS IN BOTH DIRECTIONS AND ADD INROMATIVE RESOLUTION!
+  if (any(x = is.na(x = match(x = trees[[1]]$tip.label, table = rownames(x = cladistic_matrix$matrix_1$matrix))))) stop("Names in trees and names in cladistic_matrix do not match.")
+
   # Set include_polymorphisms for make_costmatrix by polymorphism_behaviour or uncertainty_behaviour choice:
   include_polymorphisms <- ifelse(test = polymorphism_behaviour == "polymorphism" || uncertainty_behaviour == "polymorphism", yes = TRUE, no = FALSE)
   

@@ -102,10 +102,13 @@ cladistic_matrix <- Claddis::gauthier_1986
 
 # Use one of the MPTs from a TNT analysis as the tree:
 tree <- ape::read.tree(
-  text = "(Outgroup,(Ornithischia,(Sauropodomorpha,(Ceratosauria,Procompsognathus,
-  Liliensternus,(Carnosauria,(Ornithmimidae,Saurornitholestes,Hulsanpes,(Coelurus,
-  Elmisauridae,(Compsognathus,(Ornitholestes,Microvenator,Caenagnathidae,
-  (Deinonychosauria,Avialae))))))))));"
+  text = paste(
+    "(Outgroup,(Ornithischia,(Sauropodomorpha,(Ceratosauria,Procompsognathus,",
+    "Liliensternus,(Carnosauria,(Ornithmimidae,Saurornitholestes,Hulsanpes,(Coelurus,",
+    "Elmisauridae,(Compsognathus,(Ornitholestes,Microvenator,Caenagnathidae,",
+    "(Deinonychosauria,Avialae))))))))));",
+    sep = ""
+  )
 )
 
 # Calculate tree length (and only use tree lengths from output):
@@ -114,7 +117,11 @@ calculate_tree_length(
   cladistic_matrix = cladistic_matrix,
   inapplicables_as_missing = TRUE,
   polymorphism_behaviour = "uncertainty",
-  uncertainty_behaviour = "uncertainty"
+  uncertainty_behaviour = "uncertainty",
+  polymorphism_geometry = "simplex",
+  polymorphism_distance = "euclidean",
+  state_ages = c(200, 100),
+  dollo_penalty = 999
 )$tree_lengths
 
 }
