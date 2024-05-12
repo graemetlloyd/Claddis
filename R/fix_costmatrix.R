@@ -46,7 +46,6 @@
 #' costmatrix$costmatrix[1:9] <- c(0, 2, 4, 1, 0, 3, 5, 3, 0)
 #' costmatrix$symmetry <- "Asymmetric"
 #' costmatrix$type <- "custom"
-#' costmatrix
 #'
 #' # Fix costmatrix:
 #' fixed_costmatrix <- fix_costmatrix(costmatrix = costmatrix)
