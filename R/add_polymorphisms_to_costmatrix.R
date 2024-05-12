@@ -294,7 +294,8 @@
 #'   polymorphism_costs = "maddison"
 #' )
 #'
-#' # Show costmatrix, with polymorphism-to-uncertainty transitions interpolated using minimum cost rule:
+#' # Show costmatrix, with polymorphism-to-uncertainty transitions
+#' # interpolated using minimum cost rule:
 #' ordered_uncertainty_costmatrix_maddison_polymorphisms$costmatrix
 #'
 #' # Add polymorphisms to stratigraphic costmatrix using stratigraphic method:
