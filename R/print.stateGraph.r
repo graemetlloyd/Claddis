@@ -24,7 +24,7 @@
 #'   n_vertices = 6,
 #'   n_arcs = 12,
 #'   n_states = 6,
-#'   single_states = 6,
+#'   single_states = as.character(x = 0:5),
 #'   type = "custom",
 #'   arcs = data.frame(
 #'     from = as.character(x = c(0, 1, 0, 2, 2, 5, 1, 4, 5, 4, 3, 4)),
