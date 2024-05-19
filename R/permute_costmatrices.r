@@ -6,7 +6,7 @@
 #'
 #' @param states A vector of character states, e.g., "0", "1", "2".
 #' @param costs A vector of numeric costs, e.g., 1, 2, Inf.
-#' @param symmetry Must be one of \code{"Symmetric"}, \code{"Asymmetric"} or \code{"both"}.
+#' @param symmetry Must be one of \code{"symmetric"}, \code{"asymmetric"} or \code{"both"}.
 #'
 #' @details
 #'
@@ -38,10 +38,6 @@
 #'
 #' @examples
 #'
-#' # Permute all the ways of assigning the costs 1, 2, 3 and infinity for
-#' # a binary character:
-#' permute_costmatrices(states = c("0", "1"), costs = c(1:3, Inf))
-#'
 #' # Permute all the ways to assign the costs 1 and 2 for a three state
 #' # character:
 #' permute_costmatrices(
@@ -59,19 +55,55 @@ permute_costmatrices <- function(
   
   ### ADD CHECKS FOR SYMMETRY VARIABLE!!!!
   
-  ### DUMMY DATA FOR EXAMPLE
-  #states = c("0", "1", "2", "3"); costs = c(1:2); symmetry = "both"
+  # Check states has positive length and stop and warn user if not:
+  if (length(x = states) < 1) stop("states must have at least one value.")
   
-  # DIRECTED, UNDIRECTED OR BOTH?
+  # Check states are in the form of characters and stop and warn user if not:
+  if (!is.character(states)) stop("states must be a character vector. If they are 0, 1 etc. then place in quotes or use as.character().")
   
-  n_vertices <- length(x = states)
-  n_costs <- length(x = costs)
+  # Check there are no duplicate states and stop and warn user if not:
+  if (any(duplicated(x = states))) stop("states cannot include duplicate values.")
+  
+  # Check costs has positive length and stop and warn user if not:
+  if (length(x = costs) < 1) stop("costs must have at least one value.")
+  
+  # Check costs are in the form of numbers and stop and warn user if not:
+  if (!is.numeric(x = costs)) stop("costs must be a numeric vector.")
+  
+  # Check costs are all positive values and stop and war user if not:
+  if (any(costs <= 0)) stop("costs must all be positive values.")
+  
+  # Check there are no duplicate costs and stop and warn user if not:
+  if (any(duplicated(x = costs))) stop("costs cannot include duplicate values.")
+  
+  # Check costs is not just infinity and stop and warn user if not:
+  if (all(costs == Inf)) stop("costs must include at least one non-infinite value.")
+  
+  # If only one state just return a single zero costmatrix:
+  if (length(x = states) == 1) {
+    return(
+      list(
+        make_costmatrix(
+          min_state = states,
+          max_state = states,
+          character_type = "ordered"
+        )
+      )
+    )
+  }
 
-  
+  # Get number of vertices:
+  n_vertices <- length(x = states)
   
   # If symmetric costmatries (undirected graphs) are requested:
   if (symmetry == "both" || symmetry == "symmetric") {
-  
+    
+    # Cannot have infinite costs for symmetric graph as would not be connected:
+    undirected_costs <- setdiff(x = costs, y = Inf)
+    
+    # Set directed costs length:
+    n_undirected_costs <- length(x = undirected_costs)
+    
     # First generate all possible connected graphs of n vertices:
     state_graphs <- permute_connected_graphs(n_vertices = n_vertices)
   
@@ -85,8 +117,8 @@ permute_costmatrices <- function(
       
         # Create a matrix of costs (will be converted to a list for permutation below):
         costs_matrix <- matrix(
-          data = rep(x = costs, times = nrow(x = state_graph)),
-          ncol = n_costs,
+          data = rep(x = undirected_costs, times = nrow(x = state_graph)),
+          ncol = n_undirected_costs,
           byrow = TRUE
         )
       
@@ -150,7 +182,7 @@ permute_costmatrices <- function(
       }
     )
     
-    # Remove any idetnical ratio graphs:
+    # Remove any identical ratio graphs:
     undirected_graphs <- lapply(
       X = undirected_graphs,
       FUN = function(graph) {
@@ -208,176 +240,222 @@ permute_costmatrices <- function(
       }
     )
     
-    #
+    # Convert simple stategraphs into proper stategraph class:
+    undirected_graphs <- lapply(
+      X = undirected_graphs,
+      FUN = function(stategraph) {
+        
+        # Make vertices:
+        vertices <- data.frame(
+          label = states,
+          in_degree = 0,
+          out_degree = 0,
+          eccentricity = 0,
+          periphery = 0,
+          centre = 0
+        )
+        for(i in states) {
+          vertices[vertices[, "label"] == i, "in_degree"] <- sum(x = stategraph[, "to"] == i)
+          vertices[vertices[, "label"] == i, "out_degree"] <- sum(x = stategraph[, "from"] == i)
+        }
+        
+        # Make adjacency matrix for graph:
+        adjacency_matrix <- matrix(
+          data = 0,
+          nrow = n_vertices,
+          ncol = n_vertices,
+          dimnames = list(states, states)
+        )
+        for(i in 1:nrow(x = stategraph)) adjacency_matrix[stategraph[i, "from"], stategraph[i, "to"]] <- 1
+        
+        # Compile stategraph:
+        stategraph <- list(
+          n_vertices = n_vertices,
+          n_arcs = nrow(x = stategraph),
+          n_states = n_vertices,
+          single_states = states,
+          type = "custom",
+          arcs = stategraph,
+          vertices = vertices,
+          radius = min(x = vertices[, "eccentricity"]),
+          diameter = max(x = vertices[, "eccentricity"]),
+          adjacency_matrix = adjacency_matrix,
+          directed = FALSE,
+          includes_polymorphisms = FALSE,
+          polymorphism_costs = "additive",
+          polymorphism_geometry = "simplex",
+          polymorphism_distance = "euclidean",
+          includes_uncertainties = FALSE,
+          pruned = FALSE,
+          dollo_penalty = 999,
+          base_age = 1,
+          weight = 1
+        )
+        
+        # Make class stategraph:
+        class(x = stategraph) <- "stateGraph"
+
+        # Return now formatted stategraph:
+        stategraph
+      }
+    )
+    
+    # Convert stategraph(s) to costmatri(ces):
     symmetric_costmatrices <- lapply(
       X = undirected_graphs,
       FUN = convert_stategraph_to_costmatrix
     )
+    
+    # If only want symmetric than can just return those now:
+    if (symmetry == "symmetric") return(value = symmetric_costmatrices)
   }
   
-  
-  
-
-  
-  
-  
-  # PERMUTE STATE GRAPHS THEN EDGE WEIGHTS AS AN ALTERNATE APPROACH?
-  # WOULD REQUIRE A FUNCTION TO CONVERT A GRAPH TO A COSTMATRIX
-  # AND MAYBE ADDING A stateGraph CLASS.
-  
-  ### ADD INFINITY VIOLATION CHECKS TO CHECK_COSTMATRIX!!!!!
-  # Need to check infinity rules!!!!!!!!
-  # NO - NEED TO FIX FIX_COSTMATRIX INSTEAD!
-  ### NEW BOXES TO ADD TO MANUSCRIPT: 1. CLADDIS FUNCTIONS, 2. NOTATIONS FOR N_tips etc., 3. COSTMATRIX RULES.
-  
-  # Check states has positive length and stop and warn user if not:
-  if (length(x = states) < 1) stop("states must have at least one value.")
-  
-  # Check states are in the form of characters and stop and warn user if not:
-  if (!is.character(states)) stop("states must be a character vector. If they are 0, 1 etc. then place in quotes or use as.character().")
-  
-  # Check there are no duplicate states and stop and warn user if not:
-  if (any(duplicated(x = states))) stop("states cannot include duplicate values.")
-  
-  # Check costs has positive length and stop and warn user if not:
-  if (length(x = costs) < 1) stop("costs must have at least one value.")
-  
-  # Check costs are in the form of numbers and stop and warn user if not:
-  if (!is.numeric(x = costs)) stop("costs must be a numeric vector.")
-  
-  # Check costs are all positive values and stop and war user if not:
-  if (any(costs <= 0)) stop("costs must all be positive values.")
-  
-  # Check there are no duplicate costs and stop and warn user if not:
-  if (any(duplicated(x = costs))) stop("costs cannot include duplicate values.")
-  
-  # Check costs is not just infinity and stop and warn user if not:
-  if (all(costs == Inf)) stop("costs must include at least one non-infinite value.")
-  
-  # If only one state just return a single zero costmatrix:
-  if (length(x = states) == 1) {
-    return(
-      list(
-        make_costmatrix(
-          min_state = states,
-          max_state = states,
-          character_type = "ordered"
+  # If asymmetric costmatries (directed graphs) are requested:
+  if (symmetry == "both" || symmetry == "asymmetric") {
+    
+    # Check for infinite costs which cannot currently be dealt with (they create a complex combinatoric problem that remians unsolved):
+    if (any(costs == Inf)) stop("Function cannot currently handle infinite costs (which are treated as \"missing\" arcs).")
+    
+    # Set directed costs length:
+    n_directed_costs <- length(x = costs)
+    
+    # First generate all possible connected graphs of n vertices:
+    state_graphs <- permute_connected_graphs(n_vertices = n_vertices)
+    
+    # Permute asymmetric costmatrices from state graphs and costs:
+    asymmetric_costmatrices <- lapply(
+      X = state_graphs,
+      FUN = function(state_graph) {
+        
+        # Set size of permutation (number of arcs):
+        permutation_size <- nrow(x = state_graph)
+        
+        # Permute initial set of costs:
+        permutations <- as.matrix(x = expand.grid(rep(x = list(costs), times = permutation_size)))
+        
+        # Set as ratios by dividing through by minimum cost:
+        permutation_ratios <- apply(X = permutations, MARGIN = 1, FUN = function(i) i / min(x = i))
+        
+        # Find any duplicated cost ratios (can be eliminated):
+        duplicate_ratios <- which(x = duplicated(x = apply(X = permutation_ratios, MARGIN = 2, FUN = paste, collapse = "%")))
+        
+        # If there are duplicatec cost ratios then remove these:
+        if (length(x = duplicate_ratios) > 0) permutations <- permutations[-duplicate_ratios, , drop = FALSE]
+        
+        # Create permuted state graphs using permuted costs:
+        permuted_state_graphs <- lapply(
+          X = as.list(x = 1:nrow(x = permutations)),
+          FUN = function(i) {
+            state_graph[, "weight"] <- permutations[i, ]
+            state_graph
+          }
         )
-      )
-    )
-  }
+        
+        # Convert into proper state graphs:
+        permuted_state_graphs <- lapply(
+          X = permuted_state_graphs,
+          FUN = function(permuted_state_graph) {
+            
+            # Make labels table:
+            labels <- matrix(
+              data = c(unique(x = c(permuted_state_graph[, "from"], permuted_state_graph[, "to"])), states),
+              nrow = n_vertices
+            )
+            
+            # Re-label graph with states:
+            permuted_state_graph[, "from"] <- labels[match(x = permuted_state_graph[, "from"], table = labels[, 1]), 2]
+            permuted_state_graph[, "to"] <- labels[match(x = permuted_state_graph[, "to"], table = labels[, 1]), 2]
 
-  # Create empty costmatrix list:
-  costmatrix <- list()
-  
-  # Set costmatrix size:
-  costmatrix$size <- length(x = states)
+            # Make vertices:
+            vertices <- data.frame(
+              label = states,
+              in_degree = 0,
+              out_degree = 0,
+              eccentricity = 0,
+              periphery = 0,
+              centre = 0
+            )
+            for(i in states) {
+              vertices[vertices[, "label"] == i, "in_degree"] <- sum(x = permuted_state_graph[, "to"] == i)
+              vertices[vertices[, "label"] == i, "out_degree"] <- sum(x = permuted_state_graph[, "from"] == i)
+            }
+            
+            # Make adjacency matrix for graph:
+            adjacency_matrix <- matrix(
+              data = 0,
+              nrow = n_vertices,
+              ncol = n_vertices,
+              dimnames = list(states, states)
+            )
+            for(i in 1:nrow(x = permuted_state_graph)) adjacency_matrix[permuted_state_graph[i, "from"], permuted_state_graph[i, "to"]] <- 1
+            
+            # Compile stategraph:
+            permuted_state_graph <- list(
+              n_vertices = n_vertices,
+              n_arcs = nrow(x = permuted_state_graph),
+              n_states = n_vertices,
+              single_states = states,
+              type = "custom",
+              arcs = permuted_state_graph,
+              vertices = vertices,
+              radius = min(x = vertices[, "eccentricity"]),
+              diameter = max(x = vertices[, "eccentricity"]),
+              adjacency_matrix = adjacency_matrix,
+              directed = TRUE,
+              includes_polymorphisms = FALSE,
+              polymorphism_costs = "additive",
+              polymorphism_geometry = "simplex",
+              polymorphism_distance = "euclidean",
+              includes_uncertainties = FALSE,
+              pruned = FALSE,
+              dollo_penalty = 999,
+              base_age = 1,
+              weight = 1
+            )
+            
+            # Make class stategraph:
+            class(x = permuted_state_graph) <- "stateGraph"
 
-  # Set cstmatrix type:
-  costmatrix$type <- "custom"
-
-  # Build empty costmatrix:
-  costmatrix$costmatrix <- matrix(
-    data = NA,
-    nrow = costmatrix$size,
-    ncol = costmatrix$size,
-    dimnames = list(states, states)
-  )
-  
-  # Build costmatrix symmetry:
-  costmatrix$symmetry <- "Asymmetric"
-  
-  # Build costmatrix includes_polymorphisms:
-  costmatrix$includes_polymorphisms <- FALSE
-  
-  # Set costmatrix diagonal as all zeroes:
-  diag(x = costmatrix$costmatrix) <- 0
-  
-  # Set costmatrix class as "costMatrix":
-  class(costmatrix) <- "costMatrix"
-  
-  # If only one cost just return a single costmatrix:
-  if (length(x = costs) == 1) {
-    costmatrix$costmatrix[is.na(x = costmatrix$costmatrix)] <- costs[1]
-    costmatrix$symmetry <- "Symmetric"
-    return(list(costmatrix))
-  }
-  
-  # Set size of permutation (number of empty costmatrix cells):
-  permutation_size <- sum(x = is.na(x = costmatrix$costmatrix))
-  
-  # Use expand grid to set (starting) permutation number:
-  permutations <- as.matrix(x = expand.grid(rep(x = list(costs), times = permutation_size)))
-  
-  # Remove any permutations where cost ratios duplicate another permutation:
-  permutations <- permutations[!duplicated(
-    x = apply(
-      X = permutations,
-      MARGIN = 1,
-      FUN = function(i) paste(i / min(x = i), collapse = "%")
-    )),
-  ]
-  
-  # Get (starting) permutation size:
-  permutations_size <- nrow(x = permutations)
-  
-  # Convert permutations into costmatrices (may generate duplicates):
-  costmatrices <- lapply(
-    X = as.list(x = 1:permutations_size),
-    FUN = function(i) {
-      
-      # Start with base costmatrix:
-      i_costmatrix <- costmatrix
-      
-      # Insert permuted scores (to complete costmatrix):
-      i_costmatrix$costmatrix[is.na(x = i_costmatrix$costmatrix)] <- unname(obj = permutations[i, ])
-      
-      # Set state infinities (i.e., infinite costs for each state row and column):
-      state_infinities <- lapply(
-        X = as.list(x = states),
-        FUN = function(j) rbind(
-          row = i_costmatrix$costmatrix[j, ] == Inf,
-          column = i_costmatrix$costmatrix[, j] == Inf
+            # Return now formatted stategraph:
+            permuted_state_graph
+          }
         )
-      )
-      
-      # Only proceed if there is at least one infinite cost:
-      if (any(unlist(x = state_infinities))) {
         
-        # Set infinity violation to FALSE as default (may be updated below):
-        infinity_violation <- FALSE
+        # Convert permuted state graphs to costmatrices:
+        asymmetric_costmatrices <- lapply(X = permuted_state_graphs, FUN = convert_stategraph_to_costmatrix)
         
-        # If any state is isolated the set infinity_violation to TRUE:
-        if (any(unlist(x = lapply(X = state_infinities, FUN = function(j) sum(x = j) == ((i_costmatrix$size - 1) * 2))))) infinity_violation <- TRUE
+        # Look for an symmetric costmatrices (need pruning):
+        is_costmatrix_symmetric <- unlist(
+          x = lapply(
+            X = asymmetric_costmatrices,
+            FUN = function(i) isSymmetric(object = i$costmatrix)
+          )
+        )
+
+        # Prune any symmetric costmatrices:
+        if (any(is_costmatrix_symmetric)) asymmetric_costmatrices <- asymmetric_costmatrices[-which(x = is_costmatrix_symmetric)]
         
-        # If more than one state is a forced root state set infinity_violation to TRUE:
-        if (sum(unlist(x = lapply(X = state_infinities, FUN = function(j) sum(x = j["column", ]) == (i_costmatrix$size - 1)))) > 1) infinity_violation <- TRUE
-        
-        # If more than N - 1 states are "to" only set infinity_violation to TRUE:
-        row_infinities <- unlist(x = lapply(X = state_infinities, FUN = function(j) sum(x = j["row", ])))
-        if (sum(x = row_infinities == (i_costmatrix$size - 1)) >= (i_costmatrix$size - 1) && all(row_infinities) > 0) infinity_violation <- TRUE
-        
-        # If any infinity violation is found replace infinities with a non-infinite cost (these will ultimately get removed as duplicates):
-        if (infinity_violation) i_costmatrix$costmatrix[i_costmatrix$costmatrix == Inf] <- costs[costs != Inf][1]
+        # Return asymmetric costmatrices:
+        asymmetric_costmatrices
       }
-      
-      # Check for symmetry and update if required:
-      if (isSymmetric(object = i_costmatrix$costmatrix)) i_costmatrix$symmetry <- "Symmetric"
-      
-      # Fix costmatrix (ensures path lengths are self-consistent):
-      i_costmatrix <- fix_costmatrix(costmatrix = i_costmatrix, message = FALSE)
-      
-      # Return costmatrix
-      i_costmatrix
-    }
-  )
+    )
+    
+    # restructure as single list of costmatrices:
+    asymmetric_costmatrices <- do.call( what = c, args = asymmetric_costmatrices)
+    
+    # Fix costmatrices:
+    asymmetric_costmatrices <- lapply(X = asymmetric_costmatrices, FUN = fix_costmatrix)
+    
+    # Find any duplicate costmatrices:
+    duplicated_costmatrices <- duplicated(x = unlist(x = lapply(X = asymmetric_costmatrices, FUN = function(i) paste(i$costmatrix, collapse = "%"))))
+    
+    # Remove any duplicated costmatrices:
+    if (any(duplicated_costmatrices)) asymmetric_costmatrices <- asymmetric_costmatrices[-which(x = duplicated_costmatrices)]
+    
+    # If only want asymmetric than can just return those now:
+    if (symmetry == "asymmetric") return(value = asymmetric_costmatrices)
+  }
   
-  # Remove any duplicate costmatrices:
-  costmatrices <- costmatrices[!duplicated(x = unlist(x = lapply(X = costmatrices, FUN = function(costmatrix) paste(unlist(x = lapply(X = costmatrix, FUN = function(j) paste(as.vector(x = j), collapse = "%"))), collapse = "&"))))]
-  
-  # Final removal of any further ratio duplicates (only relevant if corrections for infinite costs were made):
-  if (any(costs == Inf)) costmatrices <- costmatrices[!duplicated(x = unlist(x = lapply(X = costmatrices, function(i) paste(as.vector(x = i$costmatrix / min(x = i$costmatrix[(upper.tri(x = i$costmatrix) + lower.tri(x = i$costmatrix)) == 1])), collapse = "%"))))]
-  
-  # Return list of costmatrices:
-  return(costmatrices)
+  # If still here must want both so return these:
+  return(value = c(symmetric_costmatrices, asymmetric_costmatrices))
 }

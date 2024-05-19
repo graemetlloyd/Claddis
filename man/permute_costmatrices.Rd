@@ -11,7 +11,7 @@ permute_costmatrices(states = c("0", "1"), costs = c(1:3), symmetry = "both")
 
 \item{costs}{A vector of numeric costs, e.g., 1, 2, Inf.}
 
-\item{symmetry}{Must be one of \code{"Symmetric"}, \code{"Asymmetric"} or \code{"both"}.}
+\item{symmetry}{Must be one of \code{"symmetric"}, \code{"asymmetric"} or \code{"both"}.}
 }
 \value{
 A list of unique costmatrices containing every possible combination of costs.
@@ -35,10 +35,6 @@ B 4 0}
 For the function to work costs must be unique positive values. This includes infinity (\code{Inf} in R). Infinite costs can be used to denote a particular transition is impossible and allows defining (e.g.) irreversible characters, or those that force a particular root value.
 }
 \examples{
-
-# Permute all the ways of assigning the costs 1, 2, 3 and infinity for
-# a binary character:
-permute_costmatrices(states = c("0", "1"), costs = c(1:3, Inf))
 
 # Permute all the ways to assign the costs 1 and 2 for a three state
 # character:
