@@ -78,7 +78,11 @@
 #'   estimate_tip_values = FALSE,
 #'   inapplicables_as_missing = FALSE,
 #'   polymorphism_behaviour = "uncertainty",
-#'   uncertainty_behaviour = "uncertainty"
+#'   uncertainty_behaviour = "uncertainty",
+#'   polymorphism_geometry = "simplex",
+#'   polymorphism_distance = "euclidean",
+#'   dollo_penalty = 999,
+#'   state_ages = c(2, 1)
 #' )$node_estimates
 #'
 #' @export reconstruct_ancestral_states
