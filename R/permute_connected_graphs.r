@@ -73,7 +73,7 @@ permute_connected_graphs <- function(n_vertices) {
   if (n_vertices < 2) stop("n_vertices must be at least 2.")
   
   # Special case of two vertices (single possible graph) - return single fully conected graph):
-  if (n_vertices == 2) return(value = data.frame(from = c("A", "B"), to = c("B", "A"), weight = c(1, 1)))
+  if (n_vertices == 2) return(value = list(data.frame(from = c("A", "B"), to = c("B", "A"), weight = c(1, 1))))
   
   # Generate vertex labels:
   vertices <- make_labels(N = n_vertices)
