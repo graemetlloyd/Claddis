@@ -198,7 +198,31 @@
 #'   time_binning_approach = "lloyd"
 #' )
 #' @export test_rates
-test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions = NULL, character_partitions = NULL, clade_partitions = NULL, time_partitions = NULL, change_times = "random", test_type = "aic", alpha = 0.01, multiple_comparison_correction = "benjaminihochberg", polymorphism_state = "missing", uncertainty_state = "missing", inapplicable_state = "missing", time_binning_approach = "lloyd", all_weights_integers = FALSE, estimate_all_nodes = FALSE, estimate_tip_values = FALSE, inapplicables_as_missing = FALSE, polymorphism_behaviour = "equalp", uncertainty_behaviour = "equalp", threshold = 0.01, all_missing_allowed = FALSE) {
+test_rates <- function(
+  time_tree,
+  cladistic_matrix,
+  time_bins,
+  branch_partitions = NULL,
+  character_partitions = NULL,
+  clade_partitions = NULL,
+  time_partitions = NULL,
+  change_times = "random",
+  test_type = "aic",
+  alpha = 0.01,
+  multiple_comparison_correction = "benjaminihochberg",
+  polymorphism_state = "missing",
+  uncertainty_state = "missing",
+  inapplicable_state = "missing",
+  time_binning_approach = "lloyd",
+  all_weights_integers = FALSE,
+  estimate_all_nodes = FALSE,
+  estimate_tip_values = FALSE,
+  inapplicables_as_missing = FALSE,
+  polymorphism_behaviour = "equalp",
+  uncertainty_behaviour = "equalp",
+  threshold = 0.01,
+  all_missing_allowed = FALSE
+) {
   
   # MAKE RATES OUTPUT MAKE SENSE BY PROPERLY SEPARATING COMPLETENESS AND DURATION
 
@@ -622,8 +646,8 @@ test_rates <- function(time_tree, cladistic_matrix, time_bins, branch_partitions
       if (change_times == "midpoint") character_changes <- cbind(character_changes, rep(x$node_age_from_to[1] - (x$branch_duration / 2), length.out = nrow(character_changes)))
 
       # If using spaced then set character change times as equally spaced along branch:
-      if (change_times == "spaced") character_changes <- cbind(character_changes, x$node_age_from_to[1] - (seq(from = 0, to = x$branch_duration, length.out = nrow(character_changes) + 1)[1:nrow(character_changes)] + (diff(seq(from = 0, to = x$branch_duration, length.out = nrow(character_changes) + 1))[1] / 2)))
-
+      if (change_times == "spaced") character_changes <- cbind(character_changes, x$node_age_from_to[1] - (cumsum(x = rep(x = x$branch_duration / nrow(x = character_changes), times = nrow(x = character_changes))) - (x$branch_duration / nrow(x = character_changes) / 2)))
+      
       # If using random then set character change times as random draws from a uniform distribution:
       if (change_times == "random") character_changes <- cbind(character_changes, x$node_age_from_to[1] - stats::runif(n = nrow(character_changes), min = 0, max = x$branch_duration))
 
