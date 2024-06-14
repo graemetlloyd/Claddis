@@ -55,5 +55,12 @@ calculate_WMPD <- function(distances, taxon_groups) {
   if (!is.taxonGroups(x = taxon_groups)) stop(check_taxonGroups(taxon_groups = taxon_groups)[1])
 
   # Calculate and return weighted mean pairwise distance for each taxon group:
-  unlist(x = lapply(X = taxon_groups, FUN = function(x) sum(x = as.dist(m = distances$distance_matrix[x, x]) * as.dist(m = distances$comparable_weights_matrix[x, x])) / sum(x = as.dist(m = distances$comparable_weights_matrix[x, x]))))
+  unlist(
+    x = lapply(
+      X = taxon_groups,
+      FUN = function(x) {
+        sum(x = distances$distance_matrix[x, x][lower.tri(x = distances$distance_matrix[x, x])] * distances$comparable_weights_matrix[x, x][lower.tri(x = distances$comparable_weights_matrix[x, x])], na.rm = TRUE) / sum(x = distances$comparable_weights_matrix[x, x][lower.tri(x = distances$comparable_weights_matrix[x, x])], na.rm = TRUE)
+      }
+    )
+  )
 }
