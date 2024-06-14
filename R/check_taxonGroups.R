@@ -43,7 +43,7 @@ check_taxonGroups <- function(taxon_groups) {
   if (all(x = !unlist(x = lapply(X = taxon_groups, FUN = function(x) length(x = x))) > 0)) return("taxon_groups must have at least one element containing taxa.")
   
   # Check group names are set:
-  if (is.null(x = names(x = taxon_groups))) return("taxon_groups must have names set fo each group.")
+  if (is.null(x = names(x = taxon_groups))) return("taxon_groups must have names set for each group.")
   
   # Check group names are all unique:
   if (any(x = duplicated(x = names(x = taxon_groups)))) return("taxon_groups must have unique group names.")
