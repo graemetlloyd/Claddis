@@ -70,7 +70,7 @@
 #' )
 #'
 #' # Plot results:
-#/ ape::plot.phylo(
+#' ape::plot.phylo(
 #'   x = ape::read.tree(text = "((A,B),(C,D));"),
 #'   main = paste("Sum of squares =", scp$sum_of_squares)
 #' )
@@ -84,7 +84,7 @@
 #' )
 #'
 #' # Plot results:
-#/ ape::plot.phylo(
+#' ape::plot.phylo(
 #'   x = ape::read.tree(text = "((A,B),(C,D));"),
 #'   main = paste("Sum of squares =", scp$sum_of_squares)
 #' )
@@ -98,7 +98,7 @@
 #' )
 #'
 #' # Plot results:
-#/ ape::plot.phylo(
+#' ape::plot.phylo(
 #'   x = ape::read.tree(text = "((A:1,B:2):2,(C:2,D:3):4);"),
 #'   main = paste("Sum of squares =", scp$sum_of_squares)
 #' )
@@ -112,7 +112,7 @@
 #' )
 #'
 #' # Plot results:
-#/ ape::plot.phylo(
+#' ape::plot.phylo(
 #'   x = ape::read.tree(text = "(A,(B,C,D));"),
 #'   main = paste("Sum of squares =", scp$sum_of_squares)
 #' )
