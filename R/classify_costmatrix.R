@@ -8,7 +8,7 @@
 #'
 #' @details
 #'
-#' Hoyal Cuthill and Lloyd (in review) classified discrete characters into twelve different types. This function applies their classification to a costmatrix object. The twelve different types are defined below alongside an empirical example for each, following Hoyal Cuthill and Lloyd (in review).
+#' Hoyal Cuthill and Lloyd (in press) classified discrete characters into twelve different types. This function applies their classification to a costmatrix object. The twelve different types are defined below alongside an empirical example for each, following Hoyal Cuthill and Lloyd (in review).
 #'
 #' \bold{Type I - Constant}
 #'
@@ -351,7 +351,7 @@
 #'
 #' Hooker, J. J., 2014. New postcranial bones of the extinct mammalian family Nyctitheriidae (Paleogene, UK): primitive euarchontans with scansorial locomotion. \emph{Palaeontologia Electronica}, \bold{17.3.47A}, 1-82.
 #'
-#' Hoyal Cuthill, J. F. and Lloyd, G. T., in review.
+#' Hoyal Cuthill, J. F. and Lloyd, G. T., in press. Measuring homoplasy I: comprehensive measures of maximum and minimum cost under parsimony across discrete cost matrix character types. \emph{Cladistics}, bold{}, .
 #'
 #' Paterson, A. M., Wallis, G. P., Kennedy, M. and Gray, R. D., 2014. Behavioural evolution in penguins does not reflect phylogeny. \emph{Cladistics}, \bold{30}, 243-259.
 #'
