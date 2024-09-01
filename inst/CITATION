@@ -18,7 +18,7 @@ citEntry(entry = "Article",
 	volume = "61",
 	pages = "637-645",
 	doi = "10.1111/pala.12380",
-	textVersion = "Lloyd, G. T., 2018. Journeys through discrete-character morphospace: synthesizing phylogeny, tempo, and disparity. Palaeontology, 61, 637-645.")
+	textVersion = "Lloyd, Graeme T. (2018). Journeys through discrete-character morphospace: synthesizing phylogeny, tempo, and disparity. Palaeontology, 61, 637-645.")
 
 citEntry(entry = "Article",
 	title = "Biases with the Generalized Euclidean Distance measure in disparity analyses with high levels of missing data",
