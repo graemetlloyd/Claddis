@@ -1,3 +1,5 @@
+Version - 0.7.0 - 2024-09-01
+
 - Changed all stepmatrix terms to costmatrix as this is the true general term.
 - Added calculate_tree_length function to get parsimony tree lengths and also generate data for use in ancestral state reconstructions.
 - Added permute_all_polymorphisms to generate all possible polymorphisms for a set of states.
@@ -9,7 +11,6 @@
 - Added check_costMatrix, is.costMatrix, and print.costMatrix functions to support new class.
 - Added find_shortest_costmatrix_path function to find shortest state-to-state path from a costmatrix.
 - Added reconstruct_ancestral_states to generate parsimony-based ancestral state estimates.
-- Added calculate_homoplasy_indices to calculate common homoplasy indices for a given set of tree(s) and matching cladistic matrix.
 - Added find_costmatrix_minimum_span function to find minimum cost a character could have on a tree.
 - Added find_unique_trees function as a faster alternative to ape::unique.multiPhylo for isolating just unique topologies from a larger set.
 - Added calculate_kardashian_index to calculate the Kardashian Index.
@@ -27,7 +28,7 @@
 - Added make_labels function to generate N unique text labels.
 - Added permute_tipstates to permute all possible tip states given a specific tree.
 - Added permute_restricted_compositions (initallly a subfunction of permute_tipstates) to permute all restricted compositions (e.g., for permuting tip states on the star tree).
-- Added label_treeshapes function to generate (permute) all labelled trees from a treeshape and label set.
+- Added permute_all_treeshape_labellings function to generate (permute) all labelled trees from a treeshape and label set.
 - Added permute_costmatrices function to generate all valid costmatrices from a restricted set of states and cost values.
 - Added permute_connected_graphs function to generate all connected graphs for a particular vertex count.
 - Added add_polymorphisms_to_costmatrix function to add polymorphisms to costmatrices and offering multiple approaches to do so.
@@ -36,11 +37,18 @@
 - Added Claddis logo to manual and README.
 - Fixed bug in how read_nexus_matrix imports costmatrices from NEXUS format.
 - Added new stateGraph class and supporting functions print.stateGraph and XXXXX.
-- Added prune_costmatrix function to prune costmatrices of unsampled states.
-- Added equalize_weights function to offer new options to equalize weights of a cladistic matrix.
 - Added classify_costmatrix function to classify costmatrix character into one of twelve distinct types.
-- Added find_steiner_tree_of_stategraph to find a Steiner tree (shortest tree connected a subset of character states) given a state graph.
 - Added find_stategraph_minimum_span function to find a minimum spanning tree of a stategraph.
+- Renamed compactify_matrix as compactify_cladistic_matrix to distiguish between other matrix types (e.g., costmatrices).
+- Added calculate_g function to calculate the maximum possible steps for a cladistic character.
+- Fixed bug with read_nexus_matrix which previously errored where more than 26 costmatrices were specified.
+- Added Jen Hoyal Cuthill to package authors.
+- Added calculate_gmax function to calculate the maximum possible steps for a cladistic character under any state frequency.
+- Fixed bug in how estimate_ancestral_states was estimating ancestral states for continuous characters.
+- Fixed bug in safe_taxonomic_reduction where only one character scored for a taxon.
+- Added check_stateGraph and is.stateGraph to support stateGraph class.
+- Fixed bug with calculate_MPD and calculate_WMPD where NAs were confounding calculation.
+- Added estimate_squared_change_ancestors function to implement squared change parsimony.
 
 Version - 0.6.6 - 2021-02-21
 
