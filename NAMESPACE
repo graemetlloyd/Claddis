@@ -124,11 +124,6 @@ importFrom(utils,combn)
 importFrom(utils,stack)
 
 # S3:
-S3method(is, cladisticMatrix)
-S3method(is, costMatrix)
-S3method(is, stateGraph)
-S3method(is, taxonGroups)
-S3method(is, timeBins)
 S3method(print, cladisticMatrix)
 S3method(print, costMatrix)
 S3method(print, stateGraph)
