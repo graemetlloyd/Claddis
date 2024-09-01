@@ -19,7 +19,7 @@ read_nexus_matrix(file_name, equalize_weights = FALSE)
 Reads in a morphological data file in #NEXUS format.
 }
 \details{
-Reads in a #NEXUS (Maddison et al. 1997) data file representing the distribution of characters (continuous, discrete, DNA etc.) in a set of taxa. Unlike \link{read.nexus.data} this function can handle polymorphisms (e.g., \code{(012)}).
+Reads in a #NEXUS (Maddison et al. 1997) data file representing the distribution of characters (continuous, discrete, DNA etc.) in a set of taxa. Unlike \link[ape]{read.nexus.data} this function can handle polymorphisms (e.g., \code{(012)}).
 
 Note that the function is generally intolerant to excursions from a standard format and it is recommended your data be formatted like the \code{morphmatrix.nex} example below. However, the function also produces informative error messages if (expected) excursions are discovered.
 

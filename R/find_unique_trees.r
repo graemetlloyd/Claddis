@@ -8,7 +8,7 @@
 #'
 #' @details
 #'
-#' Where labelled topologies are generated randomly or modified by (e.g.) removing a tip, it may be useful to isolate just those that are truly unique. The \code{ape} package already has a function for this (\link{unique.multiPhylo}), but it can be slow when the number of trees is large. This function is thus intended as a faster version.
+#' Where labelled topologies are generated randomly or modified by (e.g.) removing a tip, it may be useful to isolate just those that are truly unique. The \code{ape} package already has a function for this (\link[ape]{unique.multiPhylo}), but it can be slow when the number of trees is large. This function is thus intended as a faster version.
 #'
 #' The function works by breaking down a tree into its' component bipartitions and treating the combination of these as the definition of the tree. It thus escapes problems due to the principle of free rotation. Specifically, these two trees are actually identical:
 #'
@@ -42,7 +42,7 @@
 #'
 #' @seealso
 #'
-#' \link{unique.multiPhylo}
+#' \link[ape]{unique.multiPhylo}
 #'
 #' @examples
 #'

@@ -7,7 +7,7 @@
 permute_all_treeshape_labellings(treeshapes, labels)
 }
 \arguments{
-\item{treeshapes}{A vector of treeshape(s) in the same format as link{permute_treeshapes}.}
+\item{treeshapes}{A vector of treeshape(s) in the same format as \link{permute_treeshapes}.}
 
 \item{labels}{A character vector of tip labels to use for labelling.}
 }
@@ -22,7 +22,7 @@ A treeshape is an unlabelled phylogenetic tree and as such can be labelled to pr
 
 Note that the star tree always allows only a single labelling, whereas any more resolved treeshape will have multiple labellings.
 
-Here treeshapes are encoded in the same pseudo-Newick format as the link{permute_treeshapes} function, e.g.:
+Here treeshapes are encoded in the same pseudo-Newick format as the \link{permute_treeshapes} function, e.g.:
 
 (((3),1),(1,(2)));
 

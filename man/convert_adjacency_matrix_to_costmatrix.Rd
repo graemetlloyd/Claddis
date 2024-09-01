@@ -72,7 +72,7 @@ convert_adjacency_matrix_to_costmatrix(
 
 }
 \seealso{
-\link{convert_state_tree_to_adjacency_matrix}, link{locate_bracket_positions}
+\link{convert_state_tree_to_adjacency_matrix}, \link{locate_bracket_positions}
 }
 \author{
 Graeme T. Lloyd \email{graemetlloyd@gmail.com}

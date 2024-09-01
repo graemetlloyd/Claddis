@@ -4,7 +4,7 @@
 #'
 #' Given a treeshape and set of labels, permutes all possible labelled phylogenetic trees.
 #'
-#' @param treeshapes A vector of treeshape(s) in the same format as link{permute_treeshapes}.
+#' @param treeshapes A vector of treeshape(s) in the same format as \link{permute_treeshapes}.
 #' @param labels A character vector of tip labels to use for labelling.
 #'
 #' @details
@@ -13,7 +13,7 @@
 #'
 #' Note that the star tree always allows only a single labelling, whereas any more resolved treeshape will have multiple labellings.
 #'
-#' Here treeshapes are encoded in the same pseudo-Newick format as the link{permute_treeshapes} function, e.g.:
+#' Here treeshapes are encoded in the same pseudo-Newick format as the \link{permute_treeshapes} function, e.g.:
 #'
 #' (((3),1),(1,(2)));
 #'

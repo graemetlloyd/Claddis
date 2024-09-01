@@ -220,7 +220,7 @@ estimate_squared_change_ancestors <- function(tree, tip_values) {
   }
   
   # Optimise fit to minimum sum of squares:
-  fit <- optim(
+  fit <- stats::optim(
     par = init,
     fn = sum_of_squares,
     method = "L-BFGS-B",

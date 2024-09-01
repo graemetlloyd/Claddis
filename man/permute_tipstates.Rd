@@ -7,7 +7,7 @@
 permute_tipstates(tree, states, all_states_present = TRUE)
 }
 \arguments{
-\item{tree}{A phylogenetic tree in \link{ape} format.}
+\item{tree}{A phylogenetic tree in \link[ape]{ape} format.}
 
 \item{states}{A vector of character states.}
 

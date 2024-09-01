@@ -4,7 +4,7 @@
 #'
 #' Given a phylogenetic tree and a set of states, permutes all possible tip state combinations.
 #'
-#' @param tree A phylogenetic tree in \link{ape} format.
+#' @param tree A phylogenetic tree in \link[ape]{ape} format.
 #' @param states A vector of character states.
 #' @param all_states_present A logical indicating whether or not all states should appear at least once. (Defaults to \code{TRUE}.)
 #'

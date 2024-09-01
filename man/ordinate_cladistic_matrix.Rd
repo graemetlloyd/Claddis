@@ -44,7 +44,7 @@ ordinate_cladistic_matrix(
 
 \item{alpha}{See \link{calculate_morphological_distances}.}
 
-\item{correction}{The negative eigenvalue correction to use (one of "lingoes", "none", or "cailliez" - the default). See \link{pcoa} for more details.}
+\item{correction}{The negative eigenvalue correction to use (one of "lingoes", "none", or "cailliez" - the default). See \link[ape]{pcoa} for more details.}
 
 \item{time_tree}{If a phylmorphospace is desired then a tree with root age and branch-lengths must be included.}
 
@@ -66,10 +66,10 @@ ordinate_cladistic_matrix(
 \item{time_tree}{The tree (if supplied). Note this may be pruned from the input tree by \link{trim_matrix}.}
 \item{distance_matrix}{The distance matrix. Note this may be pruned by \link{trim_matrix} and thus not include all taxa.}
 \item{removed_taxa}{A vector of taxa and/or nodes removed by \link{trim_matrix}. Returns NULL if none were removed.}
-\item{note}{See \link{pcoa}.}
-\item{values}{See \link{pcoa}.}
-\item{vectors}{See \link{pcoa}. Note: this will be the same as \code{vectors.cor} from the \link{pcoa} output if a correction was applied.}
-\item{trace}{See \link{pcoa}. Note: this will be the same as \code{trace.cor} from the \link{pcoa} output if a correction was applied.}
+\item{note}{See \link[ape]{pcoa}.}
+\item{values}{See \link[ape]{pcoa}.}
+\item{vectors}{See \link[ape]{pcoa}. Note: this will be the same as \code{vectors.cor} from the \link[ape]{pcoa} output if a correction was applied.}
+\item{trace}{See \link[ape]{pcoa}. Note: this will be the same as \code{trace.cor} from the \link[ape]{pcoa} output if a correction was applied.}
 }
 \description{
 Performs Principal Coordinates Analysis (PCoA) on a cladistic matrix.
@@ -79,9 +79,9 @@ Takes a cladistic matrix in the format imported by \link{read_nexus_matrix} and 
 
 This function is effectively a wrapper for the pipeline:
 
-\link{estimate_ancestral_states} -> \link{calculate_morphological_distances} -> \link{pcoa}
+\link{estimate_ancestral_states} -> \link{calculate_morphological_distances} -> \link[ape]{pcoa}
 
-With the first part being optional (if wanting a phylomorphospace) and the latter coming from the \link{ape} package (the user is referred there for some of the options, e.g., using the Caillez 1983 approach to avoiding negative eigenvalues). (See Lloyd 2016 for more on disparity pipelines.)
+With the first part being optional (if wanting a phylomorphospace) and the latter coming from the \link[ape]{ape} package (the user is referred there for some of the options, e.g., using the Caillez 1983 approach to avoiding negative eigenvalues). (See Lloyd 2016 for more on disparity pipelines.)
 
 If providing a tree and inferring ancestral states then options to also infer missing or uncertain tips and whether to infer values for all characters at all internal nodes are provided by the \link{estimate_ancestral_states} part.
 

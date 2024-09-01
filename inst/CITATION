@@ -1,8 +1,8 @@
 citHeader("To cite package 'Claddis' in a publication use:")
 
-citEntry(entry = "Article",
+bibentry(entry = "Article",
 	title = "Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions",
-	author = personList(as.person("Graeme T. Lloyd")),
+	author = c(as.person("Graeme T. Lloyd")),
 	journal = "Biological Journal of the Linnean Society",
   	year = "2016",
 	volume = "118",
@@ -10,9 +10,9 @@ citEntry(entry = "Article",
 	doi = "10.1111/bij.12746",
 	textVersion = "Lloyd, Graeme T. (2016). Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. Biological Journal of the Linnean Society, 118, 131-151.")
 
-citEntry(entry = "Article",
+bibentry(entry = "Article",
 	title = "Journeys through discrete-character morphospace: synthesizing phylogeny, tempo, and disparity",
-	author = personList(as.person("Graeme T. Lloyd")),
+	author = c(as.person("Graeme T. Lloyd")),
 	journal = "Palaeontology",
   	year = "2018",
 	volume = "61",
@@ -20,9 +20,9 @@ citEntry(entry = "Article",
 	doi = "10.1111/pala.12380",
 	textVersion = "Lloyd, Graeme T. (2018). Journeys through discrete-character morphospace: synthesizing phylogeny, tempo, and disparity. Palaeontology, 61, 637-645.")
 
-citEntry(entry = "Article",
+bibentry(entry = "Article",
 	title = "Biases with the Generalized Euclidean Distance measure in disparity analyses with high levels of missing data",
-	author = personList(as.person("Oscar E. R. Lehmann"), as.person("Martin D. Ezcurra"), as.person("Richard J. Butler"), as.person("Graeme T. Lloyd")),
+	author = c(as.person("Oscar E. R. Lehmann"), as.person("Martin D. Ezcurra"), as.person("Richard J. Butler"), as.person("Graeme T. Lloyd")),
 	journal = "Palaeontology",
   	year = "2019",
 	volume = "62",

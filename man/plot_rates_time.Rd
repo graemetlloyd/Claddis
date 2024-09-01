@@ -11,7 +11,7 @@ plot_rates_time(test_rates_output, model_number, ...)
 
 \item{model_number}{The number of the model you wish to visualise from the rate output.}
 
-\item{...}{Other options to be passed to \link{geoscalePlot}.}
+\item{...}{Other options to be passed to \link[geoscale]{geoscalePlot}.}
 }
 \value{
 Nothing is returned, but a plot is produced.
@@ -24,7 +24,7 @@ The raw output from \link{test_rates} can be difficult to interpret without visu
 
 The function will only work for a single model, but in practice the user may wish to produce multiple plots in which case they simply need to rn the function multiple times or setup a multipanel window first with \link{layout}, or similar.
 
-Plots use the \link{geoscale} package to add geologic time to the x-axis and interested users should consult the documentation tere for a full ist of options (passed via ...) in the function (see example below).
+Plots use the \link[geoscale]{geoscale} package to add geologic time to the x-axis and interested users should consult the documentation tere for a full ist of options (passed via ...) in the function (see example below).
 
 Calculated rates (changes per lineage million years) are plotted as filled circles and models are plotted as horizontal lines labelled by rate parameters (lambda_i).
 }

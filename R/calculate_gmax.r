@@ -268,7 +268,7 @@ calculate_gmax <- function(costmatrix, n_taxa, allow_zeroes = FALSE) {
   if (costmatrix$n_states == 2) {
     
     # Special case of a Type II standard binary character (return gmax according to formula from Hoyal Cuthill and Lloyd):
-    if (length(x = setdiff(x = costmatrix$type, y = c("ordered", "unordered"))) == 0) return(costmatrix$costmatrix[1, 2] * (n_taxa - ceiling(z = n_taxa / 2)))
+    if (length(x = setdiff(x = costmatrix$type, y = c("ordered", "unordered"))) == 0) return(costmatrix$costmatrix[1, 2] * (n_taxa - ceiling(x = n_taxa / 2)))
     
     # Special case of a Type VI standard binary irreversible character (return gmax according to formula from Hoyal Cuthill and Lloyd):
     if (length(x = setdiff(x = costmatrix$type, y = c("irreversible", "stratigraphy"))) == 0) return(costmatrix$costmatrix[1, 2] * (n_taxa - 1))

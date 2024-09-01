@@ -36,17 +36,17 @@ estimate_ancestral_states(
 \item{all_missing_allowed}{Logical to allow all missing character values (generally not recommended, hence default is FALSE).}
 }
 \value{
-The function will return the same \code{cladistic_matrix}, but with two key additions: 1. Internal nodes (numbered by \link{ape} formatting) will appear after taxa in each matrix block with estimated states coded for them, and 2. The time-scaled tree used will be added to \code{cladistic_matrix} as \code{cladistic_matrix$topper$tree}. Note that if using the \code{estimate_tip_values = TRUE} option then tip values may also be changed from those provided as input.
+The function will return the same \code{cladistic_matrix}, but with two key additions: 1. Internal nodes (numbered by \link[ape]{ape} formatting) will appear after taxa in each matrix block with estimated states coded for them, and 2. The time-scaled tree used will be added to \code{cladistic_matrix} as \code{cladistic_matrix$topper$tree}. Note that if using the \code{estimate_tip_values = TRUE} option then tip values may also be changed from those provided as input.
 }
 \description{
 Given a tree and a cladistic matrix uses likelihood to estimate the ancestral states for every character.
 }
 \details{
-At its' core the function uses either the \link{rerootingMethod} (Yang et al. 1995) as implemented in the \link{phytools} package (for discrete characters) or the \link{ace} function in the \link{ape} package (for continuous characters) to make ancestral state estimates. For discrete characters these are collapsed to the most likely state (or states, given equal likelihoods or likelihood within a defined \code{threshold} value). In the latter case the resulting states are represented as an uncertainty (i.e., states separated by a slash, e.g., 0/1). This is the method developed for Brusatte et al. (2014).
+At its' core the function uses either the \link[phytools]{rerootingMethod} (Yang et al. 1995) as implemented in the \link[phytools]{phytools} package (for discrete characters) or the \link[ape]{ace} function in the \link[ape]{ape} package (for continuous characters) to make ancestral state estimates. For discrete characters these are collapsed to the most likely state (or states, given equal likelihoods or likelihood within a defined \code{threshold} value). In the latter case the resulting states are represented as an uncertainty (i.e., states separated by a slash, e.g., 0/1). This is the method developed for Brusatte et al. (2014).
 
 The function can deal with ordered or unordered characters and does so by allowing only indirect transitions (from 0 to 2 must pass through 1) or direct transitions (from 0 straight to 2), respectively. However, more complex costmatrix transitions are not currently supported.
 
-Ancestral state estimation is complicated where polymorphic or uncertain tip values exist. These are not currently well handled here, although see the \code{fitpolyMk} function in \link{phytools} for a way these could be dealt with in future. The only available options right now are to either treat multiple states as being equally probable of the "true" tip state (i.e., a uniform prior) or to avoid dealing with them completely by treating them as missing (NA) values.
+Ancestral state estimation is complicated where polymorphic or uncertain tip values exist. These are not currently well handled here, although see the \code{fitpolyMk} function in \link[phytools]{phytools} for a way these could be dealt with in future. The only available options right now are to either treat multiple states as being equally probable of the "true" tip state (i.e., a uniform prior) or to avoid dealing with them completely by treating them as missing (NA) values.
 
 It is also possible to try to use phylogenetic information to infer missing states, both for internal nodes (e.g., those leading to missing tip states) and for tips. This is captured by the \code{estimate_all_nodes} and \code{estimate_tip_values} options. These have been partially explored by Lloyd (2018), who cuationed against their use.
 }

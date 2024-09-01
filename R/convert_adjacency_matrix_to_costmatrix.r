@@ -50,7 +50,7 @@
 #'
 #' @seealso
 #'
-#' \link{convert_state_tree_to_adjacency_matrix}, link{locate_bracket_positions}
+#' \link{convert_state_tree_to_adjacency_matrix}, \link{locate_bracket_positions}
 #'
 #' @examples
 #'

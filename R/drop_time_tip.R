@@ -12,7 +12,7 @@
 #'
 #' (NB: This function is designed to only cope with trees containing at least three tips.)
 #'
-#' Usually ape formatted trees are pruned with the \link{drop.tip} function in \link{ape}. However, trees time-scaled using either the \code{paleotree} or \code{strap} packages have an additional important component, the root age (\code{$root.time}) that may need updating when tips are removed. (See \link{fix_root_time}.) Thus this function is a modified version of \link{drop.tip} that also performs the \link{fix_root_time} step.
+#' Usually ape formatted trees are pruned with the \link[ape]{drop.tip} function in \link[ape]{ape}. However, trees time-scaled using either the \code{paleotree} or \code{strap} packages have an additional important component, the root age (\code{$root.time}) that may need updating when tips are removed. (See \link{fix_root_time}.) Thus this function is a modified version of \link[ape]{drop.tip} that also performs the \link{fix_root_time} step.
 #'
 #' Note that \code{dropPaleoTip} in the \code{paleotree} package performs the exact same function, but is not called here to reduce the number of dependencies for \code{Claddis}.
 #'
