@@ -1,6 +1,6 @@
 citHeader("To cite package 'Claddis' in a publication use:")
 
-bibentry(entry = "Article",
+bibentry(bibtype = "Article",
 	title = "Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions",
 	author = c(as.person("Graeme T. Lloyd")),
 	journal = "Biological Journal of the Linnean Society",
@@ -10,7 +10,7 @@ bibentry(entry = "Article",
 	doi = "10.1111/bij.12746",
 	textVersion = "Lloyd, Graeme T. (2016). Estimating morphological diversity and tempo with discrete character-taxon matrices: implementation, challenges, progress, and future directions. Biological Journal of the Linnean Society, 118, 131-151.")
 
-bibentry(entry = "Article",
+bibentry(bibtype = "Article",
 	title = "Journeys through discrete-character morphospace: synthesizing phylogeny, tempo, and disparity",
 	author = c(as.person("Graeme T. Lloyd")),
 	journal = "Palaeontology",
@@ -20,7 +20,7 @@ bibentry(entry = "Article",
 	doi = "10.1111/pala.12380",
 	textVersion = "Lloyd, Graeme T. (2018). Journeys through discrete-character morphospace: synthesizing phylogeny, tempo, and disparity. Palaeontology, 61, 637-645.")
 
-bibentry(entry = "Article",
+bibentry(bibtype = "Article",
 	title = "Biases with the Generalized Euclidean Distance measure in disparity analyses with high levels of missing data",
 	author = c(as.person("Oscar E. R. Lehmann"), as.person("Martin D. Ezcurra"), as.person("Richard J. Butler"), as.person("Graeme T. Lloyd")),
 	journal = "Palaeontology",
