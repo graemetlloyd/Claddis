@@ -112,7 +112,7 @@ Broyden, C. G., 1970. The convergence of a class of double-rank minimization alg
 
 Fletcher, R., 1970. A new approach to variable metric algorithms. \emph{Computer Journal}, \bold{13}, 317-322.
 
-Goloboff, P. A., 2022. \emph{Phylogenetic Analysis of Morphological Data, Volume 2: Refining Phylogenetic Analyses}. CRC Press, Boca Raton. 291 pp.
+Goloboff, P. A., 2022. \emph{Phylogenetic Analysis of Morphological Data, Volume 2: Refining Phylogenetic Analyses}. CRC Press, Boca Raton. 291 pp.
 
 Goldfarb, D., 1970. A family of variable metric updates derived by variational means. \emph{Mathematics of Computation}, \bold{24}, 23-26.
 
