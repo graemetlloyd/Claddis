@@ -202,7 +202,7 @@ map_dollo_changes <- function(time_tree, tip_states) {
         descendant_edges <- find_descendant_edges(new_root, time_tree)
 
         # Update state of descending edges to derived (1):
-        for (i in descendant_edges) names(SCM[[i]]) <- "1"
+        for (i in descendant_edges) names(stochastic_character_map[[i]]) <- "1"
 
         # Case if at least three members in clade:
       } else {
