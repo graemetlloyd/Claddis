@@ -22,7 +22,7 @@ A treeshape is essentially an unlabelled phylogenetic tree. Like other phylogene
 
 Note that unique means it excludes alternative rotations of individual branch points. For example, the trees ((2),1); and (1,(2)); are identical in information content and this function would only permute one of them.
 
-The algorithm used here is loosely based on the partitions approach suggested in Felsenstein (2004), although to the best of my knowledge nobody else has formally created an algorithm to do this. (Felsenstein also lays out the expected number of such treeshapes for each value of N.)
+The algorithm used here is based on the partitions approach from Felsenstein (2004), although to the best of my knowledge nobody else has formally created an algorithm to do this. (Felsenstein also lays out the expected number of such treeshapes for each value of N in his Table 3.4.)
 
 Here treeshapes are encoded and output in a pseudo-Newick style format where labels are replaced with the number of tips, e.g.:
 
@@ -32,7 +32,7 @@ Thus each pair of parentheses represents an internal node, each number the numbe
 }
 \examples{
 
-# Permute all treeshapes of six tips:
+# Permute all treeshapes of six tips sorted by resolution:
 permute_treeshapes(n_tips = 6)
 
 }
