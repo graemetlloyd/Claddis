@@ -4,13 +4,15 @@
 \alias{make_labels}
 \title{Make unique text labels}
 \usage{
-make_labels(N)
+make_labels(n, case = "upper")
 }
 \arguments{
-\item{N}{The number of labels required,}
+\item{n}{The number of labels required,}
+
+\item{case}{The case the labels should be in. Should be "upper" for uppercase (the default), or "lower" for lower case.}
 }
 \value{
-A character vector of N unique labels.
+A character vector of \code{n} unique labels in upper- or lowercase.
 }
 \description{
 Given a requisite number, generates that many unique text labels.
@@ -18,16 +20,16 @@ Given a requisite number, generates that many unique text labels.
 \details{
 Where a list of unique text labels are required (i.e., where simple numbering will not suffice) it can be useful to have a simple function that generates the required amount.
 
-In practice, this is simple in R when N is 26 or less as the \code{LETTERS} object can be used for this purpose. For example, to get ten unique labels:
+In practice, this is simple in R when N is 26 or less as the \code{letters} or \code{LETTERS} object can be used for this purpose. For example, to get ten unique uppercase labels we can simply use:
 
 \code{LETTERS[1:10]}
 
-This function works in a similar way but will add a second, third etc. letter where the value of N requires it.
+This function works in a similar way but will add a second, third etc. letter where the value of \code{n} requires it.
 }
 \examples{
 
-# Make 40 unique text labels:
-make_labels(N = 40)
+# Make 40 unique lowercase text labels:
+make_labels(n = 40, case = "lower")
 
 }
 \author{

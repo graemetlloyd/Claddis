@@ -1,3 +1,8 @@
+Version - 0.7.1 - 2026-01-XX
+
+- Fixed bug where ordered characters were not appearing as such in TNT output.
+- Refactored make_labels to be recursive, use all shortest length labels before adding longer labels and allowing case option.
+
 Version - 0.7.0 - 2024-09-01
 
 - Changed all stepmatrix terms to costmatrix as this is the true general term.

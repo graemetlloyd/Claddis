@@ -4,47 +4,47 @@
 #'
 #' Given a requisite number, generates that many unique text labels.
 #'
-#' @param N The number of labels required,
+#' @param n The number of labels required,
+#' @param case The case the labels should be in. Should be "upper" for uppercase (the default), or "lower" for lower case.
 #'
 #' @details
 #'
 #' Where a list of unique text labels are required (i.e., where simple numbering will not suffice) it can be useful to have a simple function that generates the required amount.
 #'
-#' In practice, this is simple in R when N is 26 or less as the \code{LETTERS} object can be used for this purpose. For example, to get ten unique labels:
+#' In practice, this is simple in R when N is 26 or less as the \code{letters} or \code{LETTERS} object can be used for this purpose. For example, to get ten unique uppercase labels we can simply use:
 #'
 #' \code{LETTERS[1:10]}
 #'
-#' This function works in a similar way but will add a second, third etc. letter where the value of N requires it.
+#' This function works in a similar way but will add a second, third etc. letter where the value of \code{n} requires it.
 #'
-#' @return A character vector of N unique labels.
+#' @return A character vector of \code{n} unique labels in upper- or lowercase.
 #'
 #' @author Graeme T. Lloyd \email{graemetlloyd@@gmail.com}
 #'
 #' @examples
 #'
-#' # Make 40 unique text labels:
-#' make_labels(N = 40)
+#' # Make 40 unique lowercase text labels:
+#' make_labels(n = 40, case = "lower")
 #'
 #' @export make_labels
-make_labels <- function(N) {
-
-  # Make starting exponent:
-  exponent <- 1
+make_labels <- function(n, case = "upper") {
   
-  # If necessary increase exponent to meet the demands of N:
-  while (N > (26 ^ exponent)) exponent <- exponent + 1
+  # Check case is valid option:
+  if (length(x = setdiff(x = case, y = c("upper", "lower"))) > 0) {
+    stop("case must be one of \"upper\" or \"lower\".")
+  }
   
-  # Generate a list of letters using the exponent value:
-  letters_list <- lapply(
-    X = as.list(x = 1:exponent),
-    FUN = function(i) LETTERS
-  )
+  # Subfunction to recursively generated a single label for the kth value:
+  make_label <- function(k) {
+    if (case == "lower") letters_vector <- letters
+    if (case == "upper") letters_vector <- LETTERS
+    if (k <= 26) {
+      letters_vector[k]
+    } else {
+      make_label((k - 1) %/% 26) |> paste0(letters_vector[(k - 1) %% 26 + 1])
+    }
+  }
   
-  # Return a character vector of unique labels:
-  apply(
-    X = expand.grid(letters_list),
-    MARGIN = 1,
-    FUN = paste,
-    collapse = ""
-  )[1:N]
+  # Make full list of n variables:
+  sapply(X = 1:n, FUN = make_label)
 }
