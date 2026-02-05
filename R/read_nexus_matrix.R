@@ -859,7 +859,10 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
   if (length(x = grep("USERTYPE", raw_nexus, ignore.case = TRUE)) > 0) {
     
     # Create list of labels for costmatrices:
-    costmatrix_labels <- make_labels(N = length(x = grep("USERTYPE", raw_nexus, ignore.case = TRUE)))
+    costmatrix_labels <- make_labels(
+      n = length(x = grep("USERTYPE", raw_nexus, ignore.case = TRUE)),
+      case = "upper"
+    )
     
     # Get rows corresponding to start of costmatrices:
     costmatrix_rows <- grep("USERTYPE", raw_nexus, ignore.case = TRUE)
@@ -913,14 +916,14 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
         # Subfunction to convert square matrix to costmatrix:
         convert_matrix_to_costmatrix <- function(square_matrix) {
           
-          # Start by making simple ordered cstmatrix of same size:
+          # Start by making simple ordered costmatrix of same size:
           costmatrix <- make_costmatrix(
             min_state = 0,
             max_state = nrow(x = square_matrix) - 1,
             character_type = "ordered"
           )
           
-          # Insert squre matrix as costmatrix:
+          # Insert square matrix as costmatrix:
           costmatrix$costmatrix <- square_matrix
           
           # Check symmetry and update if necessary:
@@ -955,7 +958,7 @@ read_nexus_matrix <- function(file_name, equalize_weights = FALSE) {
     # Replace costmatrix name with step_N:
     for(i in 1:length(x = costmatrix_names)) {
       
-      # Replce USERTYPE names:
+      # Replace USERTYPE names:
       raw_nexus <- gsub(
         pattern = paste(costmatrix_names[i], " ", sep = ""),
         replacement = paste("step_", costmatrix_labels[i], " ", sep = ""),
